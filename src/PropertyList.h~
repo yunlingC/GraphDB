@@ -1,0 +1,37 @@
+#ifndef _PROPERTY_LIST_H_
+#define _PROPERTY_LIST_H_
+
+#include <map>
+#include <string>
+
+#include <iostream>
+
+using namespace std;
+
+struct PropertyList {
+  
+  typedef KeyType string;
+  typedef ValueType string;
+
+  typedef map<KeyType, ValueType>::iterator mitType;
+
+  bool insert(const KeyType & k, const ValueType & v) {
+    pair<KeyType, ValueType> p(k,v);
+    _pl.insert(p);
+    return true;
+  }
+
+  void delete(const KeyType & k) {
+    _pl.erase(k);
+  }
+
+  void print() {
+    for (mitType mi = _pl.begin(), mitType me = _pl.end(); mi != me; mi++) {
+      cout << "[" << mi->first << ", " << mi->second << "]" << endl;
+    }
+  }
+private:
+  map<KeyType, ValueType> _pl;
+};
+
+#endif /* _PROPERTY_LIST_H_ */

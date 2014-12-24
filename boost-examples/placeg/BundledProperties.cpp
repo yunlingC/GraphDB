@@ -59,6 +59,13 @@ int main(int,char*[])
     memory[i] = 'x';
   }
 
+  cout << "Initialized memory\n";
+  cout << "\n===============================================" << endl;
+  for (int i = 0; i < (sizeof(char)*200); i++) {
+    cout << hex << setfill('0') << memory[i] << " " ;
+  }
+  cout << "\n===============================================" << endl;
+
   // Create a graph object
   Graph* g = new(place) Graph();
 
