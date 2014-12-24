@@ -2,8 +2,8 @@
 #define _PROPERTY_LIST_H_
 
 #include <map>
-//#include <string>
 
+// TODO: This should be replaced with debug function.
 #include <iostream>
 
 using namespace std;
@@ -23,6 +23,10 @@ struct PropertyList {
 
   void remove(const KeyType & k) {
     _pl.erase(k);
+  }
+
+  mitType  get(const KeyType & k) {
+    return _pl.find(k);
   }
 
   void print() {
