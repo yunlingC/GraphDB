@@ -14,7 +14,7 @@ struct PropertyList {
   //  typedef K KeyType;
   //  typedef V ValueType;
   typedef typename map<KeyType, ValueType>::iterator mitType;
-
+  
   bool insert(const KeyType & k, const ValueType & v) {
     pair<KeyType, ValueType> p(k,v);
     _pl.insert(p);
