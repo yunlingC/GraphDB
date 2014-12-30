@@ -27,9 +27,17 @@ int main(int argc, char * argv[]) {
 
   g.insertVertex();
   g.insertVertex();
+  g.insertVertex();
   g.print();
 
-  //  Vertex v;
+  cout << "+ Vertex range test" << endl;
+  Graph::VertexRange vr = g.getVertexRange();
+  
+  for(Graph::GraphType::vertex_iterator vertexIterator = vr.first; 
+      vertexIterator != vr.second; ++vertexIterator)      {
+    Graph::GraphType::vertex_descriptor v = *vertexIterator;
+    cout << v << endl;
+  }
 
   return 0;
 }
