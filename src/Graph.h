@@ -54,11 +54,6 @@ public:
     remove_edge(vs, vd, _g);
   }
 
-  VertexProp const & getVertexProperty(GraphType::vertex_descriptor v) {
-    VertexProp const & vp =_g[v];
-    return vp;
-  }
-
   const VertexRange getVertexRange() {
     return boost::vertices(_g);
   }
