@@ -13,12 +13,12 @@ using namespace boost;
 
 struct VertexProperties {
 public:
-  PropertyList<string, string > vpl;
+  PropertyList<string, string > list;
 };
 
 struct EdgeProperties {
 public:
-  PropertyList<string, string > epl;
+  PropertyList<string, string > list;
 };
 
 struct Graph {
@@ -34,7 +34,8 @@ public:
   
 public:
   void insertVertex() {
-    add_vertex(_g);
+    GraphType::vertex_descriptor vd = add_vertex(_g);
+    _g[vd].list.insert("a", "B");
   }
 
   void removeVertex(GraphType::vertex_descriptor v) {
@@ -60,6 +61,10 @@ public:
 
   const VertexRange getVertexRange() {
     return boost::vertices(_g);
+  }
+
+  Graph::VertexProp & operator[](std::size_t i) {
+    return _g[i];
   }
 
   void print() {

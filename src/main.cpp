@@ -36,7 +36,9 @@ int main(int argc, char * argv[]) {
   for(Graph::GraphType::vertex_iterator vertexIterator = vr.first; 
       vertexIterator != vr.second; ++vertexIterator)      {
     Graph::GraphType::vertex_descriptor v = *vertexIterator;
-    cout << v << endl;
+    
+    cout << v << ", " << endl;
+    g[v].list.print();
   }
 
   return 0;
