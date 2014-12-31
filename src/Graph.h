@@ -95,6 +95,17 @@ public:
       GraphType::vertex_descriptor v = *vertexIterator;
       cout << v << endl;
     }
+    // Output using edge properties.
+    
+    cout << "=========================== Graph print of edges ================================== \n";
+    std::pair<Graph::GraphType::edge_iterator, Graph::GraphType::edge_iterator> edgeIteratorRange = boost::edges(_g);
+    for(Graph::GraphType::edge_iterator edgeIterator = edgeIteratorRange.first; edgeIterator != edgeIteratorRange.second; ++edgeIterator)
+    {
+      //      cout << _g[*edgeIterator].EdgeIntProperty <<  " : " << (*g)[*edgeIterator].EdgeStringProperty <<  std::endl;
+      cout << "edge id: " << *edgeIterator << ", source: " << source(*edgeIterator, _g) << ", target: " << target(*edgeIterator, _g) << endl;
+    }
+
+
   }
 
   Graph() {

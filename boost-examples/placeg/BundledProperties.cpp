@@ -117,7 +117,8 @@ int main(int,char*[])
     {
   //     g[*edgeIterator].EdgeIntProperty = 5;
   //     g[*edgeIterator].EdgeStringProperty = "test";
-      std::cout << (*g)[*edgeIterator].EdgeIntProperty <<  " : " << (*g)[*edgeIterator].EdgeStringProperty <<  std::endl;
+      //      std::cout << (*g)[*edgeIterator].EdgeIntProperty <<  " : " << (*g)[*edgeIterator].EdgeStringProperty <<  std::endl;
+      cout << source(*edgeIterator, _g) << endl;
     }
 
   custom_bfs_visitor vis;
