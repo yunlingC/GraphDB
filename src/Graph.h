@@ -101,8 +101,15 @@ public:
     std::pair<Graph::GraphType::edge_iterator, Graph::GraphType::edge_iterator> edgeIteratorRange = boost::edges(_g);
     for(Graph::GraphType::edge_iterator edgeIterator = edgeIteratorRange.first; edgeIterator != edgeIteratorRange.second; ++edgeIterator)
     {
-      //      cout << _g[*edgeIterator].EdgeIntProperty <<  " : " << (*g)[*edgeIterator].EdgeStringProperty <<  std::endl;
-      cout << "edge id: " << *edgeIterator << ", source: " << source(*edgeIterator, _g) << ", target: " << target(*edgeIterator, _g) << endl;
+      cout << "= edge id: " << *edgeIterator << endl;// ", source: " << source(*edgeIterator, _g) << ", target: " << target(*edgeIterator, _g) << endl;
+      cout << "- Property list for edge" << endl;
+      _g[*edgeIterator].list.print();
+
+      cout << "- Property list for source vertex: " << source(*edgeIterator, _g) << endl;
+      _g[source(*edgeIterator, _g)].list.print();
+      cout << "- Property list for target vertex: " << target(*edgeIterator, _g) << endl;
+      _g[source(*edgeIterator, _g)].list.print();
+
     }
 
 
