@@ -7,30 +7,36 @@
 #include <boost/graph/adjacency_list.hpp>
 
 #include "PropertyList.h"
+#include "VertexProperty.h"
+#include "EdgeProperty.h"
 
 using namespace std;
 using namespace boost;
 
-struct VertexProperties {
-public:
-  PropertyList<string, string > list;
-};
-
-struct EdgeProperties {
-public:
-  PropertyList<string, string > list;
-};
-
 struct Graph {
 
 public:
-  typedef int VertexType;
-  typedef int EdgeType;
-  typedef VertexProperties VertexProp;
-  typedef EdgeProperties EdgeProp;
-  typedef adjacency_list<vecS, vecS, undirectedS, 
+  
+  // Vertex property types.
+  typedef string VertexPropertyKeyType;
+  typedef string VertexPropertyValueType;
+
+  // Edge property types.
+  typedef string EdgePropertyKeyType;
+  typedef string EdgePropertyValueType;
+
+  // Define the VertexProperty using the KeyType and ValueType.
+  typedef VertexProperty<VertexPropertyKeyType, VertexPropertyValueType> VertexProp;
+  // Define the VertexProperty using the KeyType and ValueType.
+  typedef EdgeProperty<EdgePropertyKeyType, EdgePropertyValueType> EdgeProp;
+
+  // GraphType declaration
+  typedef adjacency_list<vecS, vecS, directedS, 
 			 VertexProp, EdgeProp> GraphType;
-  typedef std::pair<Graph::GraphType::vertex_iterator, Graph::GraphType::vertex_iterator> VertexRange;
+
+  // Iterator for GraphType.
+  typedef std::pair<Graph::GraphType::vertex_iterator, 
+		    Graph::GraphType::vertex_iterator> VertexRange;
   
 public:
   void insertVertex() {
@@ -79,7 +85,6 @@ public:
 
 private:
   Graph::GraphType _g;
-  
 
 };
 #endif /* _GRAPH_H_ */

@@ -1,16 +1,14 @@
 #ifndef _VERTEX_PROPERTY_H_
 #define _VERTEX_PROPERTY_H_
 
-#include <string>
-#include <iostream>
-
 #include "PropertyList.h"
 
 using namespace std;
 
+template <typename KeyType, typename ValueType>
 struct VertexProperty {
 public:
-  PropertyList<string, string > list;
+  PropertyList<KeyType, ValueType > list;
 };
 
 #endif /* _VERTEX_PROPERTY_H_ */
