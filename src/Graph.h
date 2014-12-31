@@ -30,6 +30,10 @@ public:
   // Define the VertexProperty using the KeyType and ValueType.
   typedef EdgeProperty<EdgePropertyKeyType, EdgePropertyValueType> EdgeProp;
 
+  // Type for vertex and edge property list.
+  typedef PropertyList<VertexPropertyKeyType, VertexPropertyValueType> VertexPropertyList;
+  typedef PropertyList<EdgePropertyKeyType, EdgePropertyValueType> EdgePropertyList;
+
   // GraphType declaration
   typedef adjacency_list<vecS, vecS, directedS, 
 			 VertexProp, EdgeProp> GraphType;
@@ -42,6 +46,11 @@ public:
   void insertVertex() {
     GraphType::vertex_descriptor vd = add_vertex(_g);
     _g[vd].list.insert("a", "B");
+  }
+
+  void insertVertex(VertexPropertyList vlist) {
+    GraphType::vertex_descriptor vd = add_vertex(_g);
+    _g[vd].list = vlist;
   }
 
   void removeVertex(GraphType::vertex_descriptor v) {

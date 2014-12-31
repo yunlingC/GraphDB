@@ -25,7 +25,7 @@ int main(int argc, char * argv[]) {
   cout << "+ Start testing graph" << endl;
   Graph g;
 
-  g.insertVertex();
+  g.insertVertex(p);
   g.insertVertex();
   g.insertVertex();
   g.print();

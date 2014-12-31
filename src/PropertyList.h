@@ -11,8 +11,6 @@ using namespace std;
 template <typename KeyType, typename ValueType>
 struct PropertyList {
   
-  //  typedef K KeyType;
-  //  typedef V ValueType;
   typedef typename map<KeyType, ValueType>::iterator mitType;
   
   bool insert(const KeyType & k, const ValueType & v) {
@@ -28,6 +26,15 @@ struct PropertyList {
   mitType  get(const KeyType & k) {
     return _pl.find(k);
   }
+
+  // There is no need for the following.
+  // - Copy constructor, assignment operator
+  // This is only true if the key, value is assumed to be a simple type.
+
+  // Copy constructor.
+  // PropertyList(const PropertyList & from) {
+    
+  // }
 
   void print() {
     mitType mbeg, mend;
