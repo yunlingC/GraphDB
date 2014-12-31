@@ -25,9 +25,11 @@ int main(int argc, char * argv[]) {
   cout << "+ Start testing graph" << endl;
   Graph g;
 
-  g.insertVertex(p);
-  g.insertVertex();
-  g.insertVertex();
+  Graph::GraphType::vertex_descriptor v1 = g.insertVertex(p);
+  Graph::GraphType::vertex_descriptor v2 = g.insertVertex();
+  Graph::GraphType::vertex_descriptor v3 = g.insertVertex();
+  g.insertEdge(v1, v2);
+  g.insertEdge(v1, v3);
   g.print();
 
   cout << "+ Vertex range test" << endl;

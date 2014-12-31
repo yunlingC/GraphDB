@@ -43,14 +43,16 @@ public:
 		    Graph::GraphType::vertex_iterator> VertexRange;
   
 public:
-  void insertVertex() {
+  GraphType::vertex_descriptor insertVertex() {
     GraphType::vertex_descriptor vd = add_vertex(_g);
-    _g[vd].list.insert("a", "B");
+    return vd;
+    //    _g[vd].list.insert("a", "B");
   }
 
-  void insertVertex(VertexPropertyList vlist) {
+  GraphType::vertex_descriptor  insertVertex(VertexPropertyList vlist) {
     GraphType::vertex_descriptor vd = add_vertex(_g);
     _g[vd].list = vlist;
+    return vd;
   }
 
   void removeVertex(GraphType::vertex_descriptor v) {
@@ -63,6 +65,12 @@ public:
 
   void insertEdge(GraphType::vertex_descriptor vs, GraphType::vertex_descriptor vd) {
     add_edge(vs, vd, _g);
+  }
+
+  void insertEdge(GraphType::vertex_descriptor vs, GraphType::vertex_descriptor vd, 
+		  EdgePropertyList elist) {
+    pair<GraphType::edge_descriptor,bool> ed = add_edge(vs, vd, _g);
+    _g[ed.first].list = elist;
   }
 
   void removeEdge(GraphType::vertex_descriptor vs, GraphType::vertex_descriptor vd) {
