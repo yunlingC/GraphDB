@@ -1,6 +1,5 @@
 #include "PropertyList.h"
 #include "Graph.h"
-#include "Vertex.h"
 
 #include <string>
 
