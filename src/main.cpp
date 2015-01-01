@@ -39,9 +39,13 @@ int main(int argc, char * argv[]) {
   g.print();
 
   // Check for interface methods from blueprint
-  Graph::OutEdgeIteratorPair oei = g.getOutEdges(v1);
+
+  cout << "\n= getEdges() test" << endl;
+  Graph::EdgeIteratorPair ei = g.getEdges();
+  print(ei.first, ei.second);
 
   cout << "\n= getOutEdges() test" << endl;
+  Graph::OutEdgeIteratorPair oei = g.getOutEdges(v1);
   print(oei.first, oei.second);
 
   cout << "\n= getInEdges() test" << endl;

@@ -61,7 +61,6 @@ public:
   typedef std::pair<Graph::GraphType::out_edge_iterator, 
 		    Graph::GraphType::out_edge_iterator> OutEdgeIteratorPair;
   
-  
 public:
   VertexDescriptor insertVertex() {
     VertexDescriptor vd = add_vertex(_g);
@@ -93,7 +92,6 @@ public:
     pair<EdgeDescriptor, bool> ed = add_edge(vs, vd, _g);
     _g[ed.first].list = elist;
     _g[ed.first].type = type;
-    
     return ed;
   }
 
@@ -109,7 +107,11 @@ public:
     return _g[i];
   }
 
-  // These are methods from standards.
+  // These are methods from Blueprints standards.
+  EdgeIteratorPair getEdges() {
+    return edges(_g);
+  }
+
   InEdgeIteratorPair getInEdges(VertexDescriptor v) {
     // There is no in_edges method.
     return in_edges(v, _g);
@@ -118,6 +120,8 @@ public:
   OutEdgeIteratorPair getOutEdges(VertexDescriptor v) {
     return out_edges(v, _g);
   }
+
+  // End of Blueprints standards methods.
 
   void print() {
 
