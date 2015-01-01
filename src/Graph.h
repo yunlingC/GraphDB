@@ -43,8 +43,12 @@ public:
 
   // Vertex descriptors.
   typedef GraphType::vertex_descriptor VertexDescriptor;
+  typedef GraphType::edge_descriptor EdgeDescriptor;
 
-  // Iterators for GraphType.
+  // Iterators used for GraphType for convenience.
+  typedef Graph::GraphType::vertex_iterator VertexIterator;
+  typedef Graph::GraphType::edge_iterator EdgeIterator;
+
   typedef std::pair<Graph::GraphType::vertex_iterator, 
 		    Graph::GraphType::vertex_iterator> VertexIteratorPair;
 
@@ -76,15 +80,15 @@ public:
     clear_vertex(v, _g);
   }
 
-  pair<GraphType::edge_descriptor,bool> insertEdge(VertexDescriptor vs, VertexDescriptor vd) {
-    pair<GraphType::edge_descriptor,bool> ed = add_edge(vs, vd, _g);
+  pair<EdgeDescriptor, bool> insertEdge(VertexDescriptor vs, VertexDescriptor vd) {
+    pair<EdgeDescriptor, bool> ed = add_edge(vs, vd, _g);
     _g[ed.first].type = "default";
     return ed;
   }
 
-  pair<GraphType::edge_descriptor,bool> insertEdge(VertexDescriptor vs, VertexDescriptor vd, 
+  pair<EdgeDescriptor, bool> insertEdge(VertexDescriptor vs, VertexDescriptor vd, 
 						   const string & type, EdgePropertyList elist) {
-    pair<GraphType::edge_descriptor,bool> ed = add_edge(vs, vd, _g);
+    pair<EdgeDescriptor, bool> ed = add_edge(vs, vd, _g);
     _g[ed.first].list = elist;
     _g[ed.first].type = type;
     
@@ -110,9 +114,9 @@ public:
   void print() {
 
     // Output the properties of each vertex
-    std::pair<Graph::GraphType::vertex_iterator, Graph::GraphType::vertex_iterator> vertexIteratorRange = boost::vertices(_g);
+    VertexIteratorPair vertexIteratorRange = vertices(_g);
 
-    for(Graph::GraphType::vertex_iterator vertexIterator = vertexIteratorRange.first; 
+    for(VertexIterator vertexIterator = vertexIteratorRange.first; 
 	vertexIterator != vertexIteratorRange.second; ++vertexIterator)      {
       VertexDescriptor v = *vertexIterator;
       cout << v << endl;
@@ -120,8 +124,8 @@ public:
     // Output using edge properties.
     
     cout << "=========================== Graph print of edges ================================== \n";
-    std::pair<Graph::GraphType::edge_iterator, Graph::GraphType::edge_iterator> edgeIteratorRange = boost::edges(_g);
-    for(Graph::GraphType::edge_iterator edgeIterator = edgeIteratorRange.first; edgeIterator != edgeIteratorRange.second; ++edgeIterator)
+    EdgeIteratorPair edgeIteratorRange = edges(_g);
+    for(EdgeIterator edgeIterator = edgeIteratorRange.first; edgeIterator != edgeIteratorRange.second; ++edgeIterator)
     {
       cout << "= edge id: " << *edgeIterator << ", type: " << _g[*edgeIterator].type << endl;// ", source: " << source(*edgeIterator, _g) << ", target: " << target(*edgeIterator, _g) << endl;
       cout << "- Property list for edge" << endl;
