@@ -38,7 +38,7 @@ public:
   typedef PropertyList<EdgePropertyKeyType, EdgePropertyValueType> EdgePropertyList;
 
   // GraphType declaration
-  typedef adjacency_list<vecS, vecS, directedS, 
+  typedef adjacency_list<vecS, vecS, bidirectionalS, 
 			 VertexProp, EdgeProp> GraphType;
 
   // Vertex descriptors.
@@ -55,6 +55,9 @@ public:
   typedef std::pair<Graph::GraphType::edge_iterator, 
 		    Graph::GraphType::edge_iterator> EdgeIteratorPair;
 
+  typedef std::pair<Graph::GraphType::in_edge_iterator, 
+		    Graph::GraphType::in_edge_iterator> InEdgeIteratorPair;
+
   typedef std::pair<Graph::GraphType::out_edge_iterator, 
 		    Graph::GraphType::out_edge_iterator> OutEdgeIteratorPair;
   
@@ -70,7 +73,6 @@ public:
     _g[vd].list = vlist;
     return vd;
   }
-
 
   void removeVertex(VertexDescriptor v) {
     remove_vertex(v, _g);
@@ -99,7 +101,7 @@ public:
     remove_edge(vs, vd, _g);
   }
 
-  const VertexIteratorPair getVertexRange() {
+  const VertexIteratorPair getVertices() {
     return boost::vertices(_g);
   }
 
@@ -107,8 +109,14 @@ public:
     return _g[i];
   }
 
-  OutEdgeIteratorPair outEdges(VertexDescriptor vd) {
-    return out_edges(vd, _g);
+  // These are methods from standards.
+  InEdgeIteratorPair getInEdges(VertexDescriptor v) {
+    // There is no in_edges method.
+    return in_edges(v, _g);
+  }
+
+  OutEdgeIteratorPair getOutEdges(VertexDescriptor v) {
+    return out_edges(v, _g);
   }
 
   void print() {
