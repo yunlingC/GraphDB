@@ -36,6 +36,9 @@ int main(int argc, char * argv[]) {
   g.insertEdge(v1, v3);
   g.print();
 
+  // Chck for interface methods from blueprint
+  Graph::OutEdgeIteratorPair oei = g.outEdges(v1);
+
   // cout << "+ Vertex range test" << endl;
   // Graph::VertexRange vr = g.getVertexRange();
   

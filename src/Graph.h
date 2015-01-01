@@ -41,40 +41,48 @@ public:
   typedef adjacency_list<vecS, vecS, directedS, 
 			 VertexProp, EdgeProp> GraphType;
 
-  // Iterator for GraphType.
+  // Vertex descriptors.
+  typedef GraphType::vertex_descriptor VertexDescriptor;
+
+  // Iterators for GraphType.
   typedef std::pair<Graph::GraphType::vertex_iterator, 
-		    Graph::GraphType::vertex_iterator> VertexRange;
+		    Graph::GraphType::vertex_iterator> VertexIteratorPair;
+
   typedef std::pair<Graph::GraphType::edge_iterator, 
-		    Graph::GraphType::edge_iterator> EdgeRange;
+		    Graph::GraphType::edge_iterator> EdgeIteratorPair;
+
+  typedef std::pair<Graph::GraphType::out_edge_iterator, 
+		    Graph::GraphType::out_edge_iterator> OutEdgeIteratorPair;
   
   
 public:
-  GraphType::vertex_descriptor insertVertex() {
-    GraphType::vertex_descriptor vd = add_vertex(_g);
+  VertexDescriptor insertVertex() {
+    VertexDescriptor vd = add_vertex(_g);
     return vd;
   }
 
-  GraphType::vertex_descriptor  insertVertex(VertexPropertyList vlist) {
-    GraphType::vertex_descriptor vd = add_vertex(_g);
+  VertexDescriptor insertVertex(VertexPropertyList vlist) {
+    VertexDescriptor vd = add_vertex(_g);
     _g[vd].list = vlist;
     return vd;
   }
 
-  void removeVertex(GraphType::vertex_descriptor v) {
+
+  void removeVertex(VertexDescriptor v) {
     remove_vertex(v, _g);
   }
 
-  void clearVertex(GraphType::vertex_descriptor v) {
+  void clearVertex(VertexDescriptor v) {
     clear_vertex(v, _g);
   }
 
-  pair<GraphType::edge_descriptor,bool> insertEdge(GraphType::vertex_descriptor vs, GraphType::vertex_descriptor vd) {
+  pair<GraphType::edge_descriptor,bool> insertEdge(VertexDescriptor vs, VertexDescriptor vd) {
     pair<GraphType::edge_descriptor,bool> ed = add_edge(vs, vd, _g);
     _g[ed.first].type = "default";
     return ed;
   }
 
-  pair<GraphType::edge_descriptor,bool> insertEdge(GraphType::vertex_descriptor vs, GraphType::vertex_descriptor vd, 
+  pair<GraphType::edge_descriptor,bool> insertEdge(VertexDescriptor vs, VertexDescriptor vd, 
 						   const string & type, EdgePropertyList elist) {
     pair<GraphType::edge_descriptor,bool> ed = add_edge(vs, vd, _g);
     _g[ed.first].list = elist;
@@ -83,21 +91,21 @@ public:
     return ed;
   }
 
-  void removeEdge(GraphType::vertex_descriptor vs, GraphType::vertex_descriptor vd) {
+  void removeEdge(VertexDescriptor vs, VertexDescriptor vd) {
     remove_edge(vs, vd, _g);
   }
 
-  const VertexRange getVertexRange() {
+  const VertexIteratorPair getVertexRange() {
     return boost::vertices(_g);
   }
 
-  Graph::VertexProp & operator[](std::size_t i) {
+  VertexProp & operator[](std::size_t i) {
     return _g[i];
   }
 
-  // const EdgeRange  inEdges(GraphType::vertex_descriptor vd) {
-  //   return boost::in_edges(vd, _g);
-  // }
+  OutEdgeIteratorPair outEdges(VertexDescriptor vd) {
+    return out_edges(vd, _g);
+  }
 
   void print() {
 
@@ -106,7 +114,7 @@ public:
 
     for(Graph::GraphType::vertex_iterator vertexIterator = vertexIteratorRange.first; 
 	vertexIterator != vertexIteratorRange.second; ++vertexIterator)      {
-      GraphType::vertex_descriptor v = *vertexIterator;
+      VertexDescriptor v = *vertexIterator;
       cout << v << endl;
     }
     // Output using edge properties.
