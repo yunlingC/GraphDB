@@ -13,6 +13,9 @@
 using namespace std;
 using namespace boost;
 
+// The interface we should follow is that defined by Blueprints (at least some standard)
+// https://github.com/tinkerpop/blueprints/wiki
+
 struct Graph {
 
 public:
@@ -41,6 +44,9 @@ public:
   // Iterator for GraphType.
   typedef std::pair<Graph::GraphType::vertex_iterator, 
 		    Graph::GraphType::vertex_iterator> VertexRange;
+  typedef std::pair<Graph::GraphType::edge_iterator, 
+		    Graph::GraphType::edge_iterator> EdgeRange;
+  
   
 public:
   GraphType::vertex_descriptor insertVertex() {
@@ -88,6 +94,10 @@ public:
   Graph::VertexProp & operator[](std::size_t i) {
     return _g[i];
   }
+
+  // const EdgeRange  inEdges(GraphType::vertex_descriptor vd) {
+  //   return boost::in_edges(vd, _g);
+  // }
 
   void print() {
 

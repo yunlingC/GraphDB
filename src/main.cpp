@@ -32,6 +32,7 @@ int main(int argc, char * argv[]) {
   Graph::GraphType::vertex_descriptor v2 = g.insertVertex();
   Graph::GraphType::vertex_descriptor v3 = g.insertVertex();
   g.insertEdge(v1, v2, "1-2", q);
+  g.insertEdge(v2, v1, "2-1", q);
   g.insertEdge(v1, v3);
   g.print();
 
