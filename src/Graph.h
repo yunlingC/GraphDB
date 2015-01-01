@@ -46,7 +46,6 @@ public:
   GraphType::vertex_descriptor insertVertex() {
     GraphType::vertex_descriptor vd = add_vertex(_g);
     return vd;
-    //    _g[vd].list.insert("a", "B");
   }
 
   GraphType::vertex_descriptor  insertVertex(VertexPropertyList vlist) {
@@ -63,14 +62,19 @@ public:
     clear_vertex(v, _g);
   }
 
-  void insertEdge(GraphType::vertex_descriptor vs, GraphType::vertex_descriptor vd) {
-    add_edge(vs, vd, _g);
+  pair<GraphType::edge_descriptor,bool> insertEdge(GraphType::vertex_descriptor vs, GraphType::vertex_descriptor vd) {
+    pair<GraphType::edge_descriptor,bool> ed = add_edge(vs, vd, _g);
+    _g[ed.first].type = "default";
+    return ed;
   }
 
-  void insertEdge(GraphType::vertex_descriptor vs, GraphType::vertex_descriptor vd, 
-		  EdgePropertyList elist) {
+  pair<GraphType::edge_descriptor,bool> insertEdge(GraphType::vertex_descriptor vs, GraphType::vertex_descriptor vd, 
+						   const string & type, EdgePropertyList elist) {
     pair<GraphType::edge_descriptor,bool> ed = add_edge(vs, vd, _g);
     _g[ed.first].list = elist;
+    _g[ed.first].type = type;
+    
+    return ed;
   }
 
   void removeEdge(GraphType::vertex_descriptor vs, GraphType::vertex_descriptor vd) {
@@ -101,7 +105,7 @@ public:
     std::pair<Graph::GraphType::edge_iterator, Graph::GraphType::edge_iterator> edgeIteratorRange = boost::edges(_g);
     for(Graph::GraphType::edge_iterator edgeIterator = edgeIteratorRange.first; edgeIterator != edgeIteratorRange.second; ++edgeIterator)
     {
-      cout << "= edge id: " << *edgeIterator << endl;// ", source: " << source(*edgeIterator, _g) << ", target: " << target(*edgeIterator, _g) << endl;
+      cout << "= edge id: " << *edgeIterator << ", type: " << _g[*edgeIterator].type << endl;// ", source: " << source(*edgeIterator, _g) << ", target: " << target(*edgeIterator, _g) << endl;
       cout << "- Property list for edge" << endl;
       _g[*edgeIterator].list.print();
 
@@ -111,8 +115,6 @@ public:
       _g[source(*edgeIterator, _g)].list.print();
 
     }
-
-
   }
 
   Graph() {
