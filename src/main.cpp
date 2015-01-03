@@ -23,19 +23,18 @@ int main(int argc, char * argv[]) {
   
   cout << "value for 'c': " << p.get("c") << endl;
 
-
   /* Start to test the graph class */
   
   cout << "+ Start testing graph" << endl;
   Graph g;
 
-  Graph::VertexDescriptor v1 = g.insertVertex(p);
-  Graph::VertexDescriptor v2 = g.insertVertex();
-  Graph::VertexDescriptor v3 = g.insertVertex();
-  Graph::EdgeDescriptor e1 = g.insertEdge(v1, v2, "1-2", q);
-  g.insertEdge(v2, v1, "2-1", q);
-  g.insertEdge(v1, v3); // 1-3
-  g.insertEdge(v3, v2, "3-2", p); // 3-2
+  Graph::VertexDescriptor v1 = g.addVertex(p);
+  Graph::VertexDescriptor v2 = g.addVertex();
+  Graph::VertexDescriptor v3 = g.addVertex();
+  Graph::EdgeDescriptor e1 = g.addEdge(v1, v2, "1-2", q);
+  g.addEdge(v2, v1, "2-1", q);
+  g.addEdge(v1, v3); // 1-3
+  g.addEdge(v3, v2, "3-2", p); // 3-2
 
   // Set individual properties.
   g[e1].setProperty("name", "edge1");

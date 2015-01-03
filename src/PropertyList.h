@@ -10,9 +10,11 @@ using namespace std;
 
 template <typename KeyType, typename ValueType>
 struct PropertyList {
-  
+
+public:  
   typedef typename map<KeyType, ValueType>::iterator mapIteratorType;
   
+public:
   bool set(const KeyType & k, const ValueType & v) {
     pair<KeyType, ValueType> p(k,v);
     _pl.insert(p);

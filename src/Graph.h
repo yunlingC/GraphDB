@@ -62,13 +62,13 @@ public:
 		    Graph::GraphType::out_edge_iterator> OutEdgeIteratorPair;
   
 public:
-  VertexDescriptor insertVertex() {
+  VertexDescriptor addVertex() {
     VertexDescriptor vd = add_vertex(_g);
     _g[vd].setId(vd);
     return vd;
   }
 
-  VertexDescriptor insertVertex(VertexPropertyList vlist) {
+  VertexDescriptor addVertex(VertexPropertyList vlist) {
     VertexDescriptor vd = add_vertex(_g);
     _g[vd].setPropertyList(vlist);
     return vd;
@@ -82,13 +82,13 @@ public:
     clear_vertex(v, _g);
   }
 
-  pair<EdgeDescriptor, bool> insertEdge(VertexDescriptor vs, VertexDescriptor vd) {
+  EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd) {
     pair<EdgeDescriptor, bool> ed = add_edge(vs, vd, _g);
     _g[ed.first].setType("default");
-    return ed;
+    return ed.first;
   }
 
-  EdgeDescriptor insertEdge(VertexDescriptor vs, VertexDescriptor vd, 
+  EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd, 
 						   const string & type, EdgePropertyList elist) {
     pair<EdgeDescriptor, bool> ed = add_edge(vs, vd, _g);
     _g[ed.first].setPropertyList(elist);
