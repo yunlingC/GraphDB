@@ -8,16 +8,30 @@ using namespace std;
 template <typename KeyType, typename ValueType>
 struct VertexProperty {
 public:
-  typedef PropertyList<KeyType, ValueType> PropertyListType;
+  typedef PropertyList< KeyType, ValueType > PropertyListType;
+
+public:
+  unsigned int getId() {
+    return _id;
+  }
+
+  ValueType getPropertyValue(KeyType k) {
+    return _list.get(k);
+  }
 
   void setId(unsigned int id) {
     _id = id;
+  }
+
+  void setProperty(KeyType k, ValueType v) {
+    _list.set(k,v);
   }
 
   void setPropertyList(PropertyListType l) {
     _list = l;
   }
 
+  // Remember you can change this when returned.
   PropertyListType &  getPropertyList() {
     return _list;
   }

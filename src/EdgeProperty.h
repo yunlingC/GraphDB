@@ -24,8 +24,16 @@ public:
     return _list;
   }
 
+  ValueType getPropertyValue(KeyType k) {
+    return _list.get(k);
+  }
+
   void setId(unsigned int id) {
     _id = id;
+  }
+
+  void setProperty(KeyType k, ValueType v) {
+    _list.set(k,v);
   }
 
   void setPropertyList(PropertyListType l) {

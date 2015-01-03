@@ -88,12 +88,12 @@ public:
     return ed;
   }
 
-  pair<EdgeDescriptor, bool> insertEdge(VertexDescriptor vs, VertexDescriptor vd, 
+  EdgeDescriptor insertEdge(VertexDescriptor vs, VertexDescriptor vd, 
 						   const string & type, EdgePropertyList elist) {
     pair<EdgeDescriptor, bool> ed = add_edge(vs, vd, _g);
     _g[ed.first].setPropertyList(elist);
     _g[ed.first].setType(type);
-    return ed;
+    return ed.first;
   }
 
   void removeEdge(VertexDescriptor vs, VertexDescriptor vd) {
@@ -104,7 +104,11 @@ public:
     return boost::vertices(_g);
   }
 
-  VertexProp & operator[](std::size_t i) {
+  VertexProp & operator[](VertexDescriptor i) {
+    return _g[i];
+  }
+
+  EdgeProp & operator[](EdgeDescriptor i) {
     return _g[i];
   }
 

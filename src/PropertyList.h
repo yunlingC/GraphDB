@@ -13,7 +13,7 @@ struct PropertyList {
   
   typedef typename map<KeyType, ValueType>::iterator mapIteratorType;
   
-  bool insert(const KeyType & k, const ValueType & v) {
+  bool set(const KeyType & k, const ValueType & v) {
     pair<KeyType, ValueType> p(k,v);
     _pl.insert(p);
     return true;
@@ -23,8 +23,12 @@ struct PropertyList {
     _pl.erase(k);
   }
 
-  mapIteratorType  get(const KeyType & k) {
-    return _pl.find(k);
+  ValueType  get(const KeyType & k) {
+    mapIteratorType mi = _pl.find(k);
+    if (mi == _pl.end()) {
+      return "null";
+    }
+    return mi->second;
   }
 
   // There is no need for the following.

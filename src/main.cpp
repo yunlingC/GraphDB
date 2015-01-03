@@ -11,9 +11,9 @@ int main(int argc, char * argv[]) {
   PropertyListType p;
   PropertyListType q;
 
-  p.insert("a", "1");
-  p.insert("b", "2");
-  p.insert("c", "3");
+  p.set("a", "1");
+  p.set("b", "2");
+  p.set("c", "3");
 
   q = p;
   p.remove("b");
@@ -21,8 +21,8 @@ int main(int argc, char * argv[]) {
   q.print();
   p.print();
   
-  PropertyListType::mapIteratorType mi = p.get("c");
-  cout << "first: " << mi->first << ", second: " << mi->second << endl;
+  cout << "value for 'c': " << p.get("c") << endl;
+
 
   /* Start to test the graph class */
   
@@ -32,10 +32,14 @@ int main(int argc, char * argv[]) {
   Graph::VertexDescriptor v1 = g.insertVertex(p);
   Graph::VertexDescriptor v2 = g.insertVertex();
   Graph::VertexDescriptor v3 = g.insertVertex();
-  g.insertEdge(v1, v2, "1-2", q);
+  Graph::EdgeDescriptor e1 = g.insertEdge(v1, v2, "1-2", q);
   g.insertEdge(v2, v1, "2-1", q);
   g.insertEdge(v1, v3); // 1-3
   g.insertEdge(v3, v2, "3-2", p); // 3-2
+
+  // Set individual properties.
+  g[e1].setProperty("name", "edge1");
+  g[v2].setProperty("z", "lkjadsf");
   g.print();
 
   // Check for interface methods from blueprint
