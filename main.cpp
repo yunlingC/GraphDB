@@ -68,6 +68,7 @@ int main(int argc, char * argv[]) {
 
   /* PLEASE ignore this code.  It's the basic to allow for JSON parsing */
   GraphReaderJSON json("t.json");
+  json.print();
   /* 
   cout << "\n= JSON parsing" << endl;
   try    {
