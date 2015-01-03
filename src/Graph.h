@@ -64,12 +64,13 @@ public:
 public:
   VertexDescriptor insertVertex() {
     VertexDescriptor vd = add_vertex(_g);
+    _g[vd].setId(vd);
     return vd;
   }
 
   VertexDescriptor insertVertex(VertexPropertyList vlist) {
     VertexDescriptor vd = add_vertex(_g);
-    _g[vd].list = vlist;
+    _g[vd].setPropertyList(vlist);
     return vd;
   }
 
@@ -83,15 +84,15 @@ public:
 
   pair<EdgeDescriptor, bool> insertEdge(VertexDescriptor vs, VertexDescriptor vd) {
     pair<EdgeDescriptor, bool> ed = add_edge(vs, vd, _g);
-    _g[ed.first].type = "default";
+    _g[ed.first].setType("default");
     return ed;
   }
 
   pair<EdgeDescriptor, bool> insertEdge(VertexDescriptor vs, VertexDescriptor vd, 
 						   const string & type, EdgePropertyList elist) {
     pair<EdgeDescriptor, bool> ed = add_edge(vs, vd, _g);
-    _g[ed.first].list = elist;
-    _g[ed.first].type = type;
+    _g[ed.first].setPropertyList(elist);
+    _g[ed.first].setType(type);
     return ed;
   }
 
@@ -139,14 +140,14 @@ public:
     EdgeIteratorPair edgeIteratorRange = edges(_g);
     for(EdgeIterator edgeIterator = edgeIteratorRange.first; edgeIterator != edgeIteratorRange.second; ++edgeIterator)
     {
-      cout << "= edge id: " << *edgeIterator << ", type: " << _g[*edgeIterator].type << endl;// ", source: " << source(*edgeIterator, _g) << ", target: " << target(*edgeIterator, _g) << endl;
+      cout << "= edge id: " << *edgeIterator << ", type: " << _g[*edgeIterator].getType() << endl;// ", source: " << source(*edgeIterator, _g) << ", target: " << target(*edgeIterator, _g) << endl;
       cout << "- Property list for edge" << endl;
-      _g[*edgeIterator].list.print();
+      _g[*edgeIterator].getPropertyList().print();
 
       cout << "- Property list for source vertex: " << source(*edgeIterator, _g) << endl;
-      _g[source(*edgeIterator, _g)].list.print();
+      _g[source(*edgeIterator, _g)].getPropertyList().print();
       cout << "- Property list for target vertex: " << target(*edgeIterator, _g) << endl;
-      _g[source(*edgeIterator, _g)].list.print();
+      _g[target(*edgeIterator, _g)].getPropertyList().print();
 
     }
   }

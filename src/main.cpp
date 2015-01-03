@@ -21,7 +21,7 @@ int main(int argc, char * argv[]) {
   q.print();
   p.print();
   
-  PropertyListType::mitType mi = p.get("c");
+  PropertyListType::mapIteratorType mi = p.get("c");
   cout << "first: " << mi->first << ", second: " << mi->second << endl;
 
   /* Start to test the graph class */

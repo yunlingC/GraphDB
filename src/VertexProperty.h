@@ -8,7 +8,25 @@ using namespace std;
 template <typename KeyType, typename ValueType>
 struct VertexProperty {
 public:
-  PropertyList<KeyType, ValueType > list;
+  typedef PropertyList<KeyType, ValueType> PropertyListType;
+
+  void setId(unsigned int id) {
+    _id = id;
+  }
+
+  void setPropertyList(PropertyListType l) {
+    _list = l;
+  }
+
+  PropertyListType &  getPropertyList() {
+    return _list;
+  }
+
+protected:
+  // Vertex id.
+  unsigned int _id;
+  // Property list.
+  PropertyListType _list;
 };
 
 #endif /* _VERTEX_PROPERTY_H_ */

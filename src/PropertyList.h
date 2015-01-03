@@ -11,7 +11,7 @@ using namespace std;
 template <typename KeyType, typename ValueType>
 struct PropertyList {
   
-  typedef typename map<KeyType, ValueType>::iterator mitType;
+  typedef typename map<KeyType, ValueType>::iterator mapIteratorType;
   
   bool insert(const KeyType & k, const ValueType & v) {
     pair<KeyType, ValueType> p(k,v);
@@ -23,7 +23,7 @@ struct PropertyList {
     _pl.erase(k);
   }
 
-  mitType  get(const KeyType & k) {
+  mapIteratorType  get(const KeyType & k) {
     return _pl.find(k);
   }
 
@@ -37,7 +37,7 @@ struct PropertyList {
   // }
 
   void print() {
-    mitType mbeg, mend;
+    mapIteratorType mbeg, mend;
     for (mbeg = _pl.begin(), mend = _pl.end(); mbeg != mend; mbeg++) {
       cout << "[" << mbeg->first << ", " << mbeg->second << "]" << endl;
     }
