@@ -1,3 +1,10 @@
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
+
+
+#include <sstream>
+
 #include "PropertyList.h"
 #include "Graph.h"
 
@@ -58,6 +65,36 @@ int main(int argc, char * argv[]) {
   cout << "\n= getVertices() test" << endl;
   Graph::VertexIteratorPair vr = g.getVertices();
   print(vr.first, vr.second);
+
+
+  /* PLEASE ignore this code.  It's the basic to allow for JSON parsing */
+  /* 
+  cout << "\n= JSON parsing" << endl;
+  try    {
+    std::stringstream ss;
+    ss << "{ \"root\": { \"values\": [1, 2, 3, 4, 5 ] } }"; 
+
+    boost::property_tree::ptree pt;
+    boost::property_tree::read_json("t.json", pt);
+
+    BOOST_FOREACH(boost::property_tree::ptree::value_type &v, 
+		  pt.get_child("graph.vertices") )      {
+      assert(v.first.empty()); // array elements have no names
+      
+      cout << v.second.size() << endl;
+      property_tree::ptree & pt2 = v.second;
+      
+      property_tree::ptree::const_iterator ci;
+      for (ci = pt2.begin(); ci != pt2.end(); ci++) {
+	cout << "k: " << ci->first.data() << ", v: " << ci->second.data() << endl;
+      }
+    }
+    return EXIT_SUCCESS;
+    }
+  catch (std::exception const& e)    {
+      std::cerr << e.what() << std::endl;
+    }
+  */
 
   return 0;
 }
