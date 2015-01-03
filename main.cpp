@@ -3,11 +3,10 @@
 #include <boost/foreach.hpp>
 
 
-#include <sstream>
-
 #include "PropertyList.h"
 #include "Graph.h"
 
+#include "readers/GraphReaderJSON.h"
 #include "Utility.h"
 
 #include <string>
@@ -68,6 +67,7 @@ int main(int argc, char * argv[]) {
 
 
   /* PLEASE ignore this code.  It's the basic to allow for JSON parsing */
+  GraphReaderJSON json("t.json");
   /* 
   cout << "\n= JSON parsing" << endl;
   try    {
