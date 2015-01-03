@@ -160,7 +160,7 @@ public:
   }
 
 private:
-  Graph::GraphType _g;
+  GraphType _g;
 
 };
 #endif /* _GRAPH_H_ */
