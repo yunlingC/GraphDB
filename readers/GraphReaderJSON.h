@@ -10,6 +10,9 @@ using namespace boost;
 #include <string>
 #include <iostream>
 
+#include "Graph.h"
+
+
 class GraphReaderJSON {
 public:
   typedef property_tree::ptree jsonTreeType;
@@ -20,7 +23,16 @@ public:
 public:
   GraphReaderJSON(const string & f) {
     read_json(f.c_str(), _jt);
+  }
+
+  GraphReaderJSON(const string & f, Graph & g) {
+    read_json(f.c_str(), _jt);
+    // Begin parsing and population of g
   }    
+
+  void parse() {
+    
+  }
 
   void print() {
     // This format will be only 3 levels deep as it is defined.
