@@ -38,8 +38,21 @@ public:
   void print() {
     // This format will be only 3 levels deep as it is defined.
     jsonTreeType & g = _jt.get_child("graph");
+    //    jsonTreeType & mode = _jt.get_child("graph.mode");
     jsonTreeType & vertices = _jt.get_child("graph.vertices");
     jsonTreeType & edges = _jt.get_child("graph.edges");
+
+    // Check the mode of the graph.
+    // Should be NORMAL or EXTENDED.
+    for (jsonTreeType::iterator m = g.begin(); m != g.end(); m++) {
+      if ( (!m->first.empty() ) && 
+	   ( (m->second.data() == "NORMAL")  || (m->second.data() == "EXTENDED")
+	     )
+	   )
+      cout << "mode: " << m->first.data() << ", " << m->second.data() << endl;
+    }
+
+
 
     // Vertices
     for (jsonTreeType::iterator i = vertices.begin();  i != vertices.end(); i++) {
