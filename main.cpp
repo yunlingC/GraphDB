@@ -27,7 +27,7 @@ int main(int argc, char * argv[]) {
   q.print();
   p.print();
   
-  cout << "value for 'c': " << p.get("c") << endl;
+  cout << "value for 'c': " << p.get("c").first << endl;
 
   /* Start to test the graph class */
   
@@ -43,8 +43,26 @@ int main(int argc, char * argv[]) {
   g.addEdge(v3, v2, "3-2", p); // 3-2
 
   // Set individual properties.
-  g[e1].setProperty("name", "edge1");
-  g[v2].setProperty("z", "lkjadsf");
+  g.setProperty(e1, "name", "edge1");
+  g.setProperty(v2, "z", "lkjadsf");
+  cout << "edge: prop: " << g.getProperty(e1, "name").first << endl;
+  cout << "vertex: prop: " << g.getProperty(v2, "z").first << endl;
+  // Failed error checking.
+  if (g.getProperty(v2, "66").second == true) {
+    cout << "property exists in vertex " << endl;
+   }
+  else {
+     cout << "property does not exist in vertex " << endl;
+  }
+
+  // Failed error checking.
+  if (g.getProperty(e1, "name2").second == true) {
+    cout << "property exists in edge " << endl;
+  }
+  else {
+    cout << "property does not exist in edge " << endl;
+  }
+
   g.print();
 
   // Check for interface methods from blueprint
@@ -67,35 +85,9 @@ int main(int argc, char * argv[]) {
 
 
   /* PLEASE ignore this code.  It's the basic to allow for JSON parsing */
+  // TODO: Still need to implement the parsing method.
   GraphReaderJSON json("t.json");
   json.print();
-  /* 
-  cout << "\n= JSON parsing" << endl;
-  try    {
-    std::stringstream ss;
-    ss << "{ \"root\": { \"values\": [1, 2, 3, 4, 5 ] } }"; 
-
-    boost::property_tree::ptree pt;
-    boost::property_tree::read_json("t.json", pt);
-
-    BOOST_FOREACH(boost::property_tree::ptree::value_type &v, 
-		  pt.get_child("graph.vertices") )      {
-      assert(v.first.empty()); // array elements have no names
-      
-      cout << v.second.size() << endl;
-      property_tree::ptree & pt2 = v.second;
-      
-      property_tree::ptree::const_iterator ci;
-      for (ci = pt2.begin(); ci != pt2.end(); ci++) {
-	cout << "k: " << ci->first.data() << ", v: " << ci->second.data() << endl;
-      }
-    }
-    return EXIT_SUCCESS;
-    }
-  catch (std::exception const& e)    {
-      std::cerr << e.what() << std::endl;
-    }
-  */
 
   return 0;
 }

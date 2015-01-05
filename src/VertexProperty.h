@@ -10,12 +10,13 @@ struct VertexProperty {
 public:
   typedef PropertyList< KeyType, ValueType > PropertyListType;
 
+  typedef pair<ValueType, bool> ReturnPropertyValueType;
 public:
   unsigned int getId() {
     return _id;
   }
 
-  ValueType getPropertyValue(KeyType k) {
+  ReturnPropertyValueType getPropertyValue(KeyType k) {
     return _list.get(k);
   }
 

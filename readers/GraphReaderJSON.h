@@ -18,7 +18,7 @@ public:
   typedef property_tree::ptree jsonTreeType;
   // Node type.
   typedef property_tree::ptree::value_type jsonTreeNodeType;
-
+  // Constant iterator.
   typedef jsonTreeType::const_iterator const_iterator;
   
 public:
@@ -46,8 +46,8 @@ public:
     // Should be NORMAL or EXTENDED.
     for (jsonTreeType::iterator m = g.begin(); m != g.end(); m++) {
       if ( (!m->first.empty() ) && 
-	   ( (m->second.data() == "NORMAL")  || (m->second.data() == "EXTENDED")
-	     )
+	   ( (m->second.data() == "NORMAL")  
+	     || (m->second.data() == "EXTENDED") )
 	   )
       cout << "mode: " << m->first.data() << ", " << m->second.data() << endl;
     }

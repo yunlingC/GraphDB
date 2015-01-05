@@ -61,6 +61,8 @@ public:
   typedef std::pair<Graph::GraphType::out_edge_iterator, 
 		    Graph::GraphType::out_edge_iterator> OutEdgeIteratorPair;
   
+  typedef pair<VertexPropertyValueType, bool> ReturnVertexPropertyValueType;
+  typedef pair<EdgePropertyValueType, bool> ReturnEdgePropertyValueType;
 public:
   VertexDescriptor addVertex() {
     VertexDescriptor vd = add_vertex(_g);
@@ -74,9 +76,32 @@ public:
     return vd;
   }
 
+  ReturnEdgePropertyValueType getProperty(EdgeDescriptor e, EdgePropertyKeyType ek) {
+    // TODO: Error checking.
+    //    pair<EdgePropertyValueType, bool> re = 
+    return _g[e].getPropertyValue(ek);
+  }
+
+  ReturnVertexPropertyValueType getProperty(VertexDescriptor v, VertexPropertyKeyType vk) {
+    // TxODO: Error checking.
+    //    ReturnVertexPropertyValueType, 
+    return _g[v].getPropertyValue(vk);
+  }
+
   void removeVertex(VertexDescriptor v) {
     remove_vertex(v, _g);
   }
+
+  void setProperty(VertexDescriptor v, VertexPropertyKeyType vk, VertexPropertyValueType vv) {
+    // TODO: Error checking.
+    _g[v].setProperty(vk, vv);
+  }
+
+  void setProperty(EdgeDescriptor e, EdgePropertyKeyType ek, EdgePropertyValueType ev) {
+    // TODO: Error checking.
+    _g[e].setProperty(ek, ev);
+  }
+  
 
   void clearVertex(VertexDescriptor v) {
     clear_vertex(v, _g);

@@ -12,6 +12,8 @@ struct EdgeProperty {
 public:
   typedef PropertyList<KeyType, ValueType > PropertyListType;
 
+  typedef pair<ValueType, bool> ReturnValueType;
+
   unsigned int getId() {
     return _id;
   }
@@ -24,7 +26,7 @@ public:
     return _list;
   }
 
-  ValueType getPropertyValue(KeyType k) {
+  ReturnValueType getPropertyValue(KeyType k) {
     return _list.get(k);
   }
 

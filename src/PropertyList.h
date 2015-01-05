@@ -13,7 +13,9 @@ struct PropertyList {
 
 public:  
   typedef typename map<KeyType, ValueType>::iterator mapIteratorType;
-  
+
+  typedef pair<ValueType, bool> ReturnValueType;
+
 public:
   bool set(const KeyType & k, const ValueType & v) {
     pair<KeyType, ValueType> p(k,v);
@@ -25,12 +27,22 @@ public:
     _pl.erase(k);
   }
 
-  ValueType  get(const KeyType & k) {
+  ReturnValueType get(const KeyType & k) {
+    // Only initialize if known type parameters.
+    // Assume <string, bool>
+    ReturnValueType rv("null", true);
+
     mapIteratorType mi = _pl.find(k);
+    // Check if it's not found.
     if (mi == _pl.end()) {
-      return "null";
+      // Set the bool flag if not found.
+      rv.second = false;
+      return rv;
     }
-    return mi->second;
+    //    cout << "copy value: " << mi->first << ", " << mi->second << endl;
+    // Copy the value.
+    rv.first = mi->second;
+    return rv;
   }
 
   // There is no need for the following.
