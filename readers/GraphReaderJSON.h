@@ -1,7 +1,6 @@
 #ifndef _GRAPHREADERJSON_H_
 #define _GRAPHREADERJSON_H_
 
-
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
@@ -15,7 +14,9 @@ using namespace boost;
 
 class GraphReaderJSON {
 public:
+  // Parse tree type.
   typedef property_tree::ptree jsonTreeType;
+  // Node type.
   typedef property_tree::ptree::value_type jsonTreeNodeType;
 
   typedef jsonTreeType::const_iterator const_iterator;
@@ -30,7 +31,7 @@ public:
     // Begin parsing and population of g
   }    
 
-  void parse() {
+  void parseJSON() {
     
   }
 
