@@ -60,9 +60,11 @@ public:
 
   typedef std::pair<Graph::GraphType::out_edge_iterator, 
 		    Graph::GraphType::out_edge_iterator> OutEdgeIteratorPair;
-  
+
+  // Return types to ensure that bools are also passed back for error checking.
   typedef pair<VertexPropertyValueType, bool> ReturnVertexPropertyValueType;
   typedef pair<EdgePropertyValueType, bool> ReturnEdgePropertyValueType;
+
 public:
   VertexDescriptor addVertex() {
     VertexDescriptor vd = add_vertex(_g);
@@ -77,14 +79,12 @@ public:
   }
 
   ReturnEdgePropertyValueType getProperty(EdgeDescriptor e, EdgePropertyKeyType ek) {
-    // TODO: Error checking.
-    //    pair<EdgePropertyValueType, bool> re = 
+    // Error checking must be done at the client.
     return _g[e].getPropertyValue(ek);
   }
 
   ReturnVertexPropertyValueType getProperty(VertexDescriptor v, VertexPropertyKeyType vk) {
-    // TxODO: Error checking.
-    //    ReturnVertexPropertyValueType, 
+    // Error checking must be done at the client.
     return _g[v].getPropertyValue(vk);
   }
 
@@ -93,7 +93,7 @@ public:
   }
 
   void setProperty(VertexDescriptor v, VertexPropertyKeyType vk, VertexPropertyValueType vv) {
-    // TODO: Error checking.
+    // Error checking must be done at the client.
     _g[v].setProperty(vk, vv);
   }
 
