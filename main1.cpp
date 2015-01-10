@@ -4,7 +4,7 @@
 #include "Utility.h"
 
 #include <string>
-#include "readers/FileReader.h"
+#include "readers/GDReader.h"
 
 int main(int argc, char * argv[]) {
 
