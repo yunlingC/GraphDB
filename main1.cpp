@@ -10,6 +10,8 @@ int main(int argc, char * argv[]) {
 
   Graph gf;
   GDReader reader(gf);
-  reader.readFile();
+  reader.readFile("sndata.gd");
+  gf.print();
+
   return 0;
 }
