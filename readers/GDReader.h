@@ -36,7 +36,6 @@ struct GDReader {
 
   private:
     Graph &_graph;
-    string line;
     unsigned int  _people;
     unsigned int  _webpages;
     unsigned int  _friends;
@@ -46,6 +45,7 @@ struct GDReader {
     ifstream _GDfile;
 
   public:
+    string line;
     GDReader(Graph &graph):_graph(graph){};
 
     void readFile(string filename) {

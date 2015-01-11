@@ -2,6 +2,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 
+#include <boost/graph/breadth_first_search.hpp>
 
 #include "PropertyList.h"
 #include "Graph.h"
@@ -11,6 +12,22 @@
 
 #include <string>
 
+class custom_bfs_visitor : public boost::default_bfs_visitor
+{
+public:
+     
+  template < typename Vertex, typename Gr >
+  void discover_vertex(Vertex u, Gr & g) 
+  {
+    std::cout << u << std::endl;
+    VertexProperty<string,string> v = g[u];
+    //VertexProperty<string,string>::ReturnPropertyValueType vt = v.getPropertyValue("a");
+    //cout << ", " << vt.first << endl;
+    VertexProperty<string,string>::PropertyListType & p = v.getPropertyList();
+    p.print();
+  }
+};
+ 
 int main(int argc, char * argv[]) {
 
   typedef PropertyList<string, string> PropertyListType;
@@ -35,12 +52,16 @@ int main(int argc, char * argv[]) {
   Graph g;
 
   Graph::VertexDescriptor v1 = g.addVertex(p);
-  Graph::VertexDescriptor v2 = g.addVertex();
-  Graph::VertexDescriptor v3 = g.addVertex();
+  Graph::VertexDescriptor v2 = g.addVertex(p);
+  Graph::VertexDescriptor v3 = g.addVertex(p);
+  Graph::VertexDescriptor v4 = g.addVertex();
+  Graph::VertexDescriptor v5 = g.addVertex();
   Graph::EdgeDescriptor e1 = g.addEdge(v1, v2, "1-2", q);
   g.addEdge(v2, v1, "2-1", q);
   g.addEdge(v1, v3); // 1-3
   g.addEdge(v3, v2, "3-2", p); // 3-2
+  g.addEdge(v2, v4, "2-4", p); // 3-2
+  g.addEdge(v1, v5, "1-5", p); // 3-2
 
   // Set individual properties.
   g.setProperty(e1, "name", "edge1");
@@ -86,9 +107,13 @@ int main(int argc, char * argv[]) {
 
   /* PLEASE ignore this code.  It's the basic to allow for JSON parsing */
   // TODO: Still need to implement the parsing method.
-  GraphReaderJSON json("t.json");
-  json.print();
+  //GraphReaderJSON json("t.json");
+  //json.print();
 
+  cout << "\n= ==========================================\n";
+  custom_bfs_visitor vis;
+  breadth_first_search(g._g, v1, visitor(vis));
+ 
 
   return 0;
 }
