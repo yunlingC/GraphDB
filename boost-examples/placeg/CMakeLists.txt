@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.6)
   Project(BundledProperties)
    
   set(Boost_USE_MULTITHREADED ON)
+  set(CMAKE_BUILD_TYPE Release)
+
   FIND_PACKAGE(Boost 1.48 COMPONENTS required)
    
   INCLUDE_DIRECTORIES(${INCLUDE_DIRECTORIES} ${Boost_INCLUDE_DIRS})
