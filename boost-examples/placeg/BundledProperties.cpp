@@ -14,7 +14,7 @@ public:
   template < typename Vertex, typename Graph >
   void discover_vertex(Vertex u, const Graph & g) const
   {
-    cout << u << endl;
+        cout << u << endl;
    
   }
 };
@@ -70,7 +70,8 @@ int main(int,char*[])
   Graph* g = new(place) Graph();
   Graph & gr = *g;
 
-  cout << "Address for graph: " << g << endl;
+  cout << "Address for graph ptr: " << g << endl;
+  cout << "Address for graph ref: " << &gr << endl;
   cout << "Address for memory: " << place << endl;
 
   // Add vertices
@@ -90,7 +91,7 @@ int main(int,char*[])
   std::pair<Graph::edge_descriptor, bool> e04 = boost::add_edge(v0, v4, gr);    
   
   // Set and output the properties of a single vertex
-  (gr)[v0].VertexIntProperty = 0;  (gr)[v0].VertexStringProperty = "zero";
+  gr[v0].VertexIntProperty = 0;  gr[v0].VertexStringProperty = "zero";
   (gr)[v1].VertexIntProperty = 1;  (gr)[v1].VertexStringProperty = "one";
   (gr)[v2].VertexIntProperty = 2;  (gr)[v2].VertexStringProperty = "two";
   (gr)[v3].VertexIntProperty = 3;  (gr)[v3].VertexStringProperty = "three";
