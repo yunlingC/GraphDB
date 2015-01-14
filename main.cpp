@@ -1,3 +1,5 @@
+#include <new>
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
@@ -11,6 +13,18 @@
 #include "Utility.h"
 
 #include <string>
+
+void printmem (char* p) {
+  char* q = p;
+  cout << "Trying to print the contents of memory" << endl;
+  cout << "\n===============================================" << endl;
+  for (int i = 0; i < sizeof(char)*200/(sizeof(int)); i++) {
+    int fourbyte = (*q);
+    cout << hex << setfill('0')<< fourbyte << " ";
+    q = q++;
+  }
+  cout << "\n===============================================" << endl;
+}
 
 class custom_bfs_visitor : public boost::default_bfs_visitor
 {
@@ -29,6 +43,19 @@ public:
 };
  
 int main(int argc, char * argv[]) {
+
+  char memory[sizeof(char)*400];
+  void* place = memory;
+  for (int i = 0; i < (sizeof(char)*400); i++) {
+    memory[i] = 'x';
+  }
+
+  cout << "Initialized memory\n";
+  cout << "\n===============================================" << endl;
+  for (int i = 0; i < (sizeof(char)*200); i++) {
+    cout << hex << setfill('0') << memory[i] << " " ;
+  }
+  cout << "\n===============================================" << endl;
 
   typedef PropertyList<string, string> PropertyListType;
   PropertyListType p;
@@ -49,7 +76,13 @@ int main(int argc, char * argv[]) {
   /* Start to test the graph class */
   
   cout << "+ Start testing graph" << endl;
-  Graph g;
+  //  Graph g;
+
+  // Create a graph object
+  Graph* gr = new(place) Graph();
+  Graph & g = *gr;
+
+
 
   Graph::VertexDescriptor v1 = g.addVertex(p);
   Graph::VertexDescriptor v2 = g.addVertex(p);
@@ -114,6 +147,9 @@ int main(int argc, char * argv[]) {
   custom_bfs_visitor vis;
   breadth_first_search(g._g, v1, visitor(vis));
  
+  // Call destructor
+  // Must do this manually as the place is used.
+  gr->~Graph();
 
   return 0;
 }

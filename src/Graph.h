@@ -184,7 +184,11 @@ public:
   Graph() {
   }
 
-private:
+  ~Graph() {
+
+  }
+  //protected:
+public:
   GraphType _g;
 
 };
