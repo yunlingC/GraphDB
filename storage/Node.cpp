@@ -56,6 +56,14 @@ void Node::dump() {
       std::cout << ep->getId() << ": (" << ep->getFirstId() << ", " << ep->getSecondId() << ") ";
     }
     
+    // For this node's next first edge
+    std::cout << "\nPrint edge traversals:" << _nextEdge << std::endl;
+    EdgePtr p = _nextEdge;
+    while ( p != NULL) {
+      std::cout << "=> " << p->getId() << " ";
+      p = p->getFirstNextEdge();
+    }
+
     std::cout << std::endl;
     std::cout << " ========================================= " << std::endl;
 

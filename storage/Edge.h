@@ -17,6 +17,9 @@ public:
   void setEdges();
   VertexDescriptor getFirstId();
   VertexDescriptor getSecondId();
+  EdgePtr getFirstNextEdge();
+  EdgePtr getFirstPreviousEdge();
+
   
   EdgeDescriptor getId();
 

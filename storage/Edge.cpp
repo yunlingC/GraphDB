@@ -5,6 +5,15 @@
 
 using namespace std;
 
+Edge::EdgePtr Edge::getFirstNextEdge() {
+  return _firstNextEdge;
+}
+
+Edge::EdgePtr Edge::getFirstPreviousEdge() {
+  return _firstPreviousEdge;
+}
+
+
 Edge::VertexDescriptor Edge::getFirstId() {
   return _firstNode->getId();
 }
@@ -26,15 +35,12 @@ void Edge::setEdges() {
   // Must set the _id before doing this.
 
   // Set first node's Next and previous pointer
-  cout << "edge id: " << _id << endl;
-  cout << "first node: " << _firstNode << endl;;
   _firstNextEdge = _firstNode->getNextEdge(_id);
-  cout << "prev" << endl;
   _firstPreviousEdge = _firstNode->getPreviousEdge(_id);
 
     // Set second node's next and previous pointer.
-    _secondNextEdge = _secondNode->getNextEdge(_id);
-    _secondPreviousEdge = _secondNode->getPreviousEdge(_id);
+  _secondNextEdge = _secondNode->getNextEdge(_id);
+  _secondPreviousEdge = _secondNode->getPreviousEdge(_id);
 
 }
 
