@@ -26,7 +26,7 @@ public:
   Edge();
   Edge(NodePtr vs, NodePtr vd);
   
-protected:
+  //protected:
   unsigned int _id;
 
   // Pointer to first node.

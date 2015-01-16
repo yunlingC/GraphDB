@@ -19,7 +19,8 @@ public:
   EdgePtr getNextEdge(EdgeDescriptor ed);
   EdgePtr getPreviousEdge(EdgeDescriptor ed);
   void dump();
-
+  void setNextEdge(EdgePtr e);
+  std::vector<EdgePtr> & getEdges();
 
 protected:
   // Node id.

@@ -29,24 +29,31 @@ public:
 
   EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd) {
     // Create new edge by retrieving NodePtr from vertices.
+     EdgePtr e = new Edge(_vertices[vs], _vertices[vd]);
 
-    // cout << "vertices: " << _vertices.size() << endl;
-    // cout << "get: (" << vs << ", " << vd << ")\n" ;
-    // cout << "create new edge: (" << _vertices[vs] << ", " << _vertices[vd] << ")\n";
-
-    EdgePtr e = new Edge(_vertices[vs], _vertices[vd]);
-
-    e->setId(ne);    ne++;
-
-    e->setEdges();
-    
-    _edges.push_back(e);
-    return e->getId();
+     e->setId(ne);    
+     ne++;
+     //     e->setEdges();
+     _edges.push_back(e);
+     return e->getId();
   }
 
   void dump() {
     for (int i = 0; i < _vertices.size(); i++) {
       _vertices[i]->dump();
+    }
+    
+    for (int i =0; i < _edges.size(); i++) {
+      cout << "eid: " << _edges[i]->getId(); 
+      cout << ", prev: ";
+      if (_edges[i]->_firstPreviousEdge != NULL) {
+	cout << _edges[i]->getId() <<", ";
+      }
+      cout << ", next: ";
+      if (_edges[i]->_firstNextEdge != NULL) {
+	cout << _edges[i]->_firstNextEdge->getId();
+      }
+      cout << "\n";
     }
   }
 
@@ -61,6 +68,53 @@ public:
     }
   }
 
+  void updateEdges() {
+    // Set the first node edges
+    for (int i = 0; i < _vertices.size(); i++) {
+      NodePtr np = _vertices[i];
+
+      cout << "= Processing node: " << np->getId() << "\n";
+      std::vector<EdgePtr> & nodeEdges = np->getEdges();
+      if (! nodeEdges.empty()) {
+
+	EdgePtr ep = nodeEdges[0];
+	if (ep != NULL) {
+	  cout << "== Processing edge id: " << ep->getId() << "\n";
+	  ep->_firstPreviousEdge = NULL;
+	  np->setNextEdge(ep);
+
+	  cout << "== Need to hook up # of edges: " << nodeEdges.size() << "\n";
+	  EdgePtr nextEdge = NULL;
+	  // Iterate over all the edges and set the first/second
+	  if (np->getId() == ep->getFirstId()) {
+	    for (int j = 1; j < nodeEdges.size(); j++) {
+	      // Set the first
+	      nextEdge = nodeEdges[j];
+	      ep->_firstNextEdge = nextEdge;
+	      cout << " ==== setting: " << ep->getId() << ", " << nextEdge->getId() << "\n";
+	      nextEdge->_firstPreviousEdge = ep;
+	      ep = nextEdge;
+	    }
+	    ep->_firstNextEdge = NULL;
+	  } else {
+	    if (np->getId() == ep->getSecondId()) {
+	      for (int j = 1; j < nodeEdges.size(); j++) {
+		// Set the first
+		nextEdge = nodeEdges[j];
+		ep->_secondNextEdge = nextEdge;
+		cout << " ==== setting: " << ep->getId() << ", " << nextEdge->getId() << "\n";
+	      nextEdge->_secondPreviousEdge = ep;
+	      ep = nextEdge;
+	      }
+	    }
+	  }
+	}
+
+      }
+    }
+  }
+  
+
 protected:
   std::vector<Node*> _vertices;
   std::vector<Edge*> _edges;
@@ -70,3 +124,4 @@ protected:
 };
 
 #endif /* _BASE_GRAPH_H */
+
