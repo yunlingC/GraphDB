@@ -26,11 +26,11 @@ int main() {
   Graph::EdgeDescriptor e1 = g.addEdge(v0, v2);
   Graph::EdgeDescriptor e2 = g.addEdge(v0, v4);
 
-  // Graph::EdgeDescriptor e3 = g.addEdge(v0, v6);
-  // Graph::EdgeDescriptor e4 = g.addEdge(v1, v3);
-  // Graph::EdgeDescriptor e5 = g.addEdge(v2, v3);
-  // Graph::EdgeDescriptor e6 = g.addEdge(v3, v5);
-  // Graph::EdgeDescriptor e7 = g.addEdge(v4, v5);
+  Graph::EdgeDescriptor e3 = g.addEdge(v0, v6);
+  Graph::EdgeDescriptor e4 = g.addEdge(v1, v3);
+  Graph::EdgeDescriptor e5 = g.addEdge(v2, v3);
+  Graph::EdgeDescriptor e6 = g.addEdge(v3, v5);
+  Graph::EdgeDescriptor e7 = g.addEdge(v4, v5);
   cout << "Begin updating edges\n";
   g.updateEdges();
   g.dump();

@@ -43,18 +43,23 @@ public:
       _vertices[i]->dump();
     }
     
-    for (int i =0; i < _edges.size(); i++) {
-      cout << "eid: " << _edges[i]->getId(); 
-      cout << ", prev: ";
-      if (_edges[i]->_firstPreviousEdge != NULL) {
-	cout << _edges[i]->getId() <<", ";
-      }
-      cout << ", next: ";
-      if (_edges[i]->_firstNextEdge != NULL) {
-	cout << _edges[i]->_firstNextEdge->getId();
-      }
-      cout << "\n";
-    }
+    // for (int i =0; i < _edges.size(); i++) {
+    //   cout << "eid: " << _edges[i]->getId(); 
+    //   cout << ", prev: ";
+    //   if (_edges[i]->_firstPreviousEdge != NULL) {
+    // 	cout << _edges[i]->getId() <<", ";
+    //   } else  {
+    // 	//	cout << "NULL";
+    //   }
+	
+    //   cout << ", next: ";
+    //   if (_edges[i]->_firstNextEdge != NULL) {
+    // 	cout << _edges[i]->_firstNextEdge->getId();
+    //   } else {
+    // 	//	cout << "NULL";
+    //   }
+    //   cout << "\n";
+    // }
   }
 
   BaseGraph(): nv(0), ne(0) {}
@@ -85,7 +90,7 @@ public:
 
 	  cout << "== Need to hook up # of edges: " << nodeEdges.size() << "\n";
 	  EdgePtr nextEdge = NULL;
-	  // Iterate over all the edges and set the first/second
+	  // Connect the secondNode
 	  if (np->getId() == ep->getFirstId()) {
 	    for (int j = 1; j < nodeEdges.size(); j++) {
 	      // Set the first
@@ -97,6 +102,7 @@ public:
 	    }
 	    ep->_firstNextEdge = NULL;
 	  } else {
+	    // Connect the secondNode
 	    if (np->getId() == ep->getSecondId()) {
 	      for (int j = 1; j < nodeEdges.size(); j++) {
 		// Set the first
