@@ -107,8 +107,8 @@ public:
   
 
 protected:
-  std::vector<Node*> _vertices;
-  std::vector<Edge*> _edges;
+  std::vector<NodePtr> _vertices;
+  std::vector<EdgePtr> _edges;
   unsigned int nv;
   unsigned int ne;
 
