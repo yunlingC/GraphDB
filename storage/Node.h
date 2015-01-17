@@ -16,7 +16,7 @@ public:
   void setId(unsigned int id);
   unsigned int getId();
   void addEdge(EdgePtr ep);
-  EdgePtr getNextEdge(EdgeDescriptor ed);
+  EdgePtr getNextEdge();
   EdgePtr getPreviousEdge(EdgeDescriptor ed);
   void dump();
   void setNextEdge(EdgePtr e);

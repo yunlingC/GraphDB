@@ -16,10 +16,16 @@ public:
   typedef Edge* EdgePtr;
 
 public:
+  NodePtr getNodePointer(VertexDescriptor v) {
+    if ( (v > _vertices.size() - 1) || (v < 0) ) {
+      return NULL;
+    }
+    return _vertices[v];
+  }
+
   VertexDescriptor addVertex() {
     // Create new node
     NodePtr n = new Node();
-    // set Id.
     n->setId(nv); 
     nv++;
     // Insert into list.

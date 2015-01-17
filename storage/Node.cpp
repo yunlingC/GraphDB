@@ -27,19 +27,8 @@ void Node::addEdge(Edge::EdgePtr ep) {
     _outEdges.push_back(ep);
   }
 
-Edge::EdgePtr Node::getNextEdge(Edge::EdgeDescriptor ed) {
-    // Use ed to index _outedges to retrieve pointer.
-    // Next is ed + 1
-    
-    // No next edges then return NULL.
-  cout << "eid: " << ed << ", sz: " << _outEdges.size() << endl;
-  if (_outEdges.size() - 1<= ed) {
-      std::cout << "DBG: No NEXT vertices" << std::endl;
-      return NULL;
-    }
-    
-    // Return the next  edge.
-    return _outEdges[ed+1];
+Edge::EdgePtr Node::getNextEdge() {
+  return _nextEdge;
   }
 
 Edge::EdgePtr Node::getPreviousEdge(Edge::EdgeDescriptor ed) {

@@ -19,9 +19,12 @@ public:
   VertexDescriptor getSecondId();
   EdgePtr getFirstNextEdge();
   EdgePtr getFirstPreviousEdge();
-
-  
   EdgeDescriptor getId();
+
+  // Independent of who is first/second.
+  NodePtr getTarget(NodePtr from);
+  EdgePtr getNextEdge(NodePtr from);
+
 
   Edge();
   Edge(NodePtr vs, NodePtr vd);

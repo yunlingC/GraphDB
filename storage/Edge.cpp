@@ -5,6 +5,24 @@
 
 using namespace std;
 
+Edge::NodePtr Edge::getTarget(Edge::NodePtr from) {
+  if (from == _firstNode) {
+    return _secondNode;
+  } else if (from == _secondNode) {
+    return _firstNode;
+  }
+  return NULL;
+}
+
+Edge::EdgePtr Edge::getNextEdge(Edge::NodePtr from) {
+  if (from == _firstNode) {
+    return _firstNextEdge;
+  } else if (from == _secondNode) {
+    return _secondNextEdge;
+  }
+  return NULL;
+}
+
 Edge::EdgePtr Edge::getFirstNextEdge() {
   return _firstNextEdge;
 }

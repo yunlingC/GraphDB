@@ -3,7 +3,49 @@
 #include "BaseGraph.h"
 
 #include <iostream>
+#include <queue>
+#include <map>
 using namespace std;
+
+void bfs(BaseGraph::VertexDescriptor vs, BaseGraph & g) {
+  typedef pair<BaseGraph::NodePtr, bool> VisitPair;
+  cout << "================= BfS ===================== \n";
+  cout << "+ vertex: " << vs << "\n";
+
+  BaseGraph::NodePtr np = g.getNodePointer(vs);
+
+  // Start traversing the graph from here. 
+  std::queue<BaseGraph::NodePtr> Q;
+  std::map<BaseGraph::NodePtr, bool> C; // true = visited, false = not visited
+
+  Q.push(np);
+  C.insert(VisitPair(np,false));
+
+  BaseGraph::NodePtr targetNode = NULL;
+
+  while (!Q.empty()) {
+    np = Q.front();  Q.pop();
+    cout << "vid: " << np->getId() << "\n";
+
+    // Set to visited.    
+    C[np] = true;
+
+    BaseGraph::EdgePtr nextEdge = np->getNextEdge();
+    while (nextEdge != NULL) {
+      // Get the target
+      targetNode = nextEdge->getTarget(np);
+      if (C.find(targetNode) == C.end()) {
+	//      if (C[targetNode] == false) {
+	// queue the target for visitation
+	Q.push(targetNode);
+	C.insert(VisitPair(targetNode,false));
+      }
+      // Update nextEdge from np
+      nextEdge = nextEdge->getNextEdge(np);
+    }
+  }
+  cout << "================= END BFS ===================== \n";
+};
 
 int main() {
 
@@ -34,7 +76,8 @@ int main() {
   cout << "Begin updating edges\n";
   g.updateEdges();
   g.dump();
-  //  Graph::EdgeDescriptor e1 = g.addEdge(v1, v2, "1-2", q);
+  
+  bfs(v0, g);
 
 
   return 0;
