@@ -28,6 +28,8 @@ SET(GDB_LD_FLAGS storage)
 
 SET(TARGET t)
 
+# Set the release build for all optimizations
+SET(CMAKE_BUILD_TYPE Release)
 
 #foreach (ld_flag ${GDB_LD_FLAGS})
 #	target_link_libraries( ${TARGET} ${ld_flag} )
