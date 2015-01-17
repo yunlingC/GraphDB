@@ -74,7 +74,7 @@ public:
 
 	EdgePtr ep = nodeEdges[0];
 	if (ep != NULL) {
-	  ep->_firstPreviousEdge = NULL;
+	  ep->setFirstPreviousEdge(NULL); //_firstPreviousEdge = NULL;
 	  np->setNextEdge(ep);
 
 	  EdgePtr nextEdge = NULL;
@@ -86,21 +86,21 @@ public:
 	      // Get the edge into nextEdge.
 	      nextEdge = nodeEdges[j];
 	      // Use it to point to the next edge.
-	      ep->_firstNextEdge = nextEdge;
+	      ep->setFirstNextEdge(nextEdge); //_firstNextEdge = nextEdge;
 	      // The previous of this next edge would point to the current edge.
-	      nextEdge->_firstPreviousEdge = ep;
+	      nextEdge->setFirstPreviousEdge(ep); //_firstPreviousEdge = ep;
 	      // Update the iterating pointer.
 	      ep = nextEdge;
 	    }
 	    // Last one will be NULL>
-	    ep->_firstNextEdge = NULL;
+	    ep->setFirstNextEdge(NULL); //_firstNextEdge = NULL;
 	  } else {
 	    // Connect the secondNode
 	    if (np->getId() == ep->getSecondId()) {
 	      for (int j = 1; j < nodeEdges.size(); j++) {
 		nextEdge = nodeEdges[j];
-		ep->_secondNextEdge = nextEdge;
-	      nextEdge->_secondPreviousEdge = ep;
+		ep->setSecondNextEdge(nextEdge); //_secondNextEdge = nextEdge;
+		nextEdge->setSecondPreviousEdge(ep); //_secondPreviousEdge = ep;
 	      ep = nextEdge;
 	      }
 	    }

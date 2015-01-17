@@ -35,7 +35,6 @@ void bfs(BaseGraph::VertexDescriptor vs, BaseGraph & g) {
       // Get the target
       targetNode = nextEdge->getTarget(np);
       if (C.find(targetNode) == C.end()) {
-	//      if (C[targetNode] == false) {
 	// queue the target for visitation
 	Q.push(targetNode);
 	C.insert(VisitPair(targetNode,false));

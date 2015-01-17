@@ -23,13 +23,40 @@ Edge::EdgePtr Edge::getNextEdge(Edge::NodePtr from) {
   return NULL;
 }
 
+void Edge::setFirstNextEdge(EdgePtr e) {
+  _firstNextEdge = e;
+}
+
 Edge::EdgePtr Edge::getFirstNextEdge() {
   return _firstNextEdge;
+}
+
+void Edge::setFirstPreviousEdge(EdgePtr e) {
+  _firstPreviousEdge = e;
 }
 
 Edge::EdgePtr Edge::getFirstPreviousEdge() {
   return _firstPreviousEdge;
 }
+
+
+
+void Edge::setSecondNextEdge(EdgePtr e) {
+  _secondNextEdge = e;
+}
+
+Edge::EdgePtr Edge::getSecondNextEdge() {
+  return _secondNextEdge;
+}
+
+void Edge::setSecondPreviousEdge(EdgePtr e) {
+  _secondPreviousEdge = e;
+}
+
+Edge::EdgePtr Edge::getSecondPreviousEdge() {
+  return _secondPreviousEdge;
+}
+
 
 
 Edge::VertexDescriptor Edge::getFirstId() {
@@ -45,11 +72,9 @@ void Edge::setId(unsigned int id) {
   }
 
 Edge::EdgeDescriptor Edge::getId() {
-    return _id;
-  }
-
-void Edge::setEdges() {
+  return _id;
 }
+
 
 Edge::Edge(): _id(-1) { 
     _firstNode = NULL;     _secondNode = NULL;
