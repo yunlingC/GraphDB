@@ -31,30 +31,6 @@ Edge::EdgeDescriptor Edge::getId() {
   }
 
 void Edge::setEdges() {
-
-  // Must set the _id before doing this.
-
-  // Set first node's Next and previous pointer
-  _firstNextEdge = _firstNode->getNextEdge(_id);
-  _firstPreviousEdge = _firstNode->getPreviousEdge(_id);
-
-  cout << "==> this: " << _id << ", fn: ";
-  if (_firstNextEdge != NULL) 
-    cout << _firstNextEdge->getId();
-  else cout << "XX";
-
-  cout << ", fp: ";
-  if (_firstPreviousEdge != NULL)  {
-    cout << _firstPreviousEdge->getId();
-
-  }
-  else cout << "YY";
-
-  cout << "\n";
-  // Set second node's next and previous pointer.
-  _secondNextEdge = _secondNode->getNextEdge(_id);
-  _secondPreviousEdge = _secondNode->getPreviousEdge(_id);
-
 }
 
 Edge::Edge(): _id(-1) { 

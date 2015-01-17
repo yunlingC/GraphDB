@@ -33,7 +33,6 @@ public:
 
      e->setId(ne);    
      ne++;
-     //     e->setEdges();
      _edges.push_back(e);
      return e->getId();
   }
@@ -42,29 +41,14 @@ public:
     for (int i = 0; i < _vertices.size(); i++) {
       _vertices[i]->dump();
     }
-    
-    // for (int i =0; i < _edges.size(); i++) {
-    //   cout << "eid: " << _edges[i]->getId(); 
-    //   cout << ", prev: ";
-    //   if (_edges[i]->_firstPreviousEdge != NULL) {
-    // 	cout << _edges[i]->getId() <<", ";
-    //   } else  {
-    // 	//	cout << "NULL";
-    //   }
-	
-    //   cout << ", next: ";
-    //   if (_edges[i]->_firstNextEdge != NULL) {
-    // 	cout << _edges[i]->_firstNextEdge->getId();
-    //   } else {
-    // 	//	cout << "NULL";
-    //   }
-    //   cout << "\n";
-    // }
   }
 
   BaseGraph(): nv(0), ne(0) {}
 
   ~BaseGraph() {
+    // Must manually delete the objects.  
+    // However, only one place is necessary since everywhere else, I am storing pointers.
+    // Thus, _vertices and _edges contain all newly created objects.
     for (int i =0; i < _vertices.size(); i++) {
       delete _vertices[i];
     }
@@ -74,41 +58,42 @@ public:
   }
 
   void updateEdges() {
-    // Set the first node edges
+    // The basic idea is to iterate over all the vertices and update their first/second next/previous pointers.
+    // Since ordering of these pointers does not matter as long as they form a doubly linked list -- I use the vector of edges stored within a node to specify the order.  
+    // There are two main if statements here: first one sets pointers based on the firstNode and the second on the secondNode.
     for (int i = 0; i < _vertices.size(); i++) {
       NodePtr np = _vertices[i];
-
-      cout << "= Processing node: " << np->getId() << "\n";
       std::vector<EdgePtr> & nodeEdges = np->getEdges();
       if (! nodeEdges.empty()) {
 
 	EdgePtr ep = nodeEdges[0];
 	if (ep != NULL) {
-	  cout << "== Processing edge id: " << ep->getId() << "\n";
 	  ep->_firstPreviousEdge = NULL;
 	  np->setNextEdge(ep);
 
-	  cout << "== Need to hook up # of edges: " << nodeEdges.size() << "\n";
 	  EdgePtr nextEdge = NULL;
 	  // Connect the secondNode
 	  if (np->getId() == ep->getFirstId()) {
+	    // Iterate over all the edges after the first one.
+	    // Recall that first edge is set in the node object.
 	    for (int j = 1; j < nodeEdges.size(); j++) {
-	      // Set the first
+	      // Get the edge into nextEdge.
 	      nextEdge = nodeEdges[j];
+	      // Use it to point to the next edge.
 	      ep->_firstNextEdge = nextEdge;
-	      cout << " ==== setting: " << ep->getId() << ", " << nextEdge->getId() << "\n";
+	      // The previous of this next edge would point to the current edge.
 	      nextEdge->_firstPreviousEdge = ep;
+	      // Update the iterating pointer.
 	      ep = nextEdge;
 	    }
+	    // Last one will be NULL>
 	    ep->_firstNextEdge = NULL;
 	  } else {
 	    // Connect the secondNode
 	    if (np->getId() == ep->getSecondId()) {
 	      for (int j = 1; j < nodeEdges.size(); j++) {
-		// Set the first
 		nextEdge = nodeEdges[j];
 		ep->_secondNextEdge = nextEdge;
-		cout << " ==== setting: " << ep->getId() << ", " << nextEdge->getId() << "\n";
 	      nextEdge->_secondPreviousEdge = ep;
 	      ep = nextEdge;
 	      }
