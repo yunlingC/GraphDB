@@ -13,27 +13,26 @@ public:
 
 public:
 
-  void setId(unsigned int id);
-  EdgeDescriptor getId();
   VertexDescriptor getFirstId();
+  EdgePtr getFirstNextEdge();
+  EdgePtr getFirstPreviousEdge();
+  // Independent of who is first/second.
+  EdgePtr getNextEdge(NodePtr from);
+  EdgePtr getSecondNextEdge();
+  EdgePtr getSecondPreviousEdge();
+  // Independent of who is first/second.
+  NodePtr getTarget(NodePtr from);
+
+  EdgeDescriptor getId();
   VertexDescriptor getSecondId();
 
   void setFirstNextEdge(EdgePtr e);
-  EdgePtr getFirstNextEdge();
   void setFirstPreviousEdge(EdgePtr e);
-  EdgePtr getFirstPreviousEdge();
-
-  // Second
+  void setId(unsigned int id);
   void setSecondNextEdge(EdgePtr e);
-  EdgePtr getSecondNextEdge();
   void setSecondPreviousEdge(EdgePtr e);
-  EdgePtr getSecondPreviousEdge();
 
-  // Independent of who is first/second.
-  NodePtr getTarget(NodePtr from);
-  EdgePtr getNextEdge(NodePtr from);
-
-
+  // Constructors
   Edge();
   Edge(NodePtr vs, NodePtr vd);
   

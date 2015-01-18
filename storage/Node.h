@@ -4,6 +4,8 @@
 #include <vector>
 #include <iostream>
 
+//#include "Edge.h"
+
 class Edge;
 
 class Node { 
@@ -13,13 +15,13 @@ public:
   typedef unsigned int EdgeDescriptor;
 
   Node();
-  void setId(unsigned int id);
-  unsigned int getId();
   void addEdge(EdgePtr ep);
-  EdgePtr getNextEdge();
   void dump();
-  void setNextEdge(EdgePtr e);
   std::vector<EdgePtr> & getEdges();
+  unsigned int getId();
+  EdgePtr getNextEdge();
+  void setId(unsigned int id);
+  void setNextEdge(EdgePtr e);
 
 protected:
   // Node id.
