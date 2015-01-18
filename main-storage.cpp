@@ -1,4 +1,4 @@
-#include "Node.h"
+#include "Vertex.h"
 #include "Edge.h"
 #include "GraphType.h"
 
@@ -8,20 +8,20 @@
 using namespace std;
 
 void bfs(GraphType::VertexDescriptor vs, GraphType & g) {
-  typedef pair<GraphType::NodePtr, bool> VisitPair;
+  typedef pair<GraphType::VertexPtr, bool> VisitPair;
   cout << "================= BfS ===================== \n";
   cout << "+ vertex: " << vs << "\n";
 
-  GraphType::NodePtr np = g.getNodePointer(vs);
+  GraphType::VertexPtr np = g.getVertexPointer(vs);
 
   // Start traversing the graph from here. 
-  std::queue<GraphType::NodePtr> Q;
-  std::map<GraphType::NodePtr, bool> C; // true = visited, false = not visited
+  std::queue<GraphType::VertexPtr> Q;
+  std::map<GraphType::VertexPtr, bool> C; // true = visited, false = not visited
 
   Q.push(np);
   C.insert(VisitPair(np,false));
 
-  GraphType::NodePtr targetNode = NULL;
+  GraphType::VertexPtr targetVertex = NULL;
 
   while (!Q.empty()) {
     np = Q.front();  Q.pop();
@@ -33,11 +33,11 @@ void bfs(GraphType::VertexDescriptor vs, GraphType & g) {
     GraphType::EdgePtr nextEdge = np->getNextEdge();
     while (nextEdge != NULL) {
       // Get the target
-      targetNode = nextEdge->getTarget(np);
-      if (C.find(targetNode) == C.end()) {
+      targetVertex = nextEdge->getTarget(np);
+      if (C.find(targetVertex) == C.end()) {
 	// queue the target for visitation
-	Q.push(targetNode);
-	C.insert(VisitPair(targetNode,false));
+	Q.push(targetVertex);
+	C.insert(VisitPair(targetVertex,false));
       }
       // Update nextEdge from np
       nextEdge = nextEdge->getNextEdge(np);
@@ -51,7 +51,7 @@ int main() {
   typedef GraphType Graph;
 
   Graph g;
-  g.allocNodeMemory(50);
+  g.allocVertexMemory(50);
   g.allocEdgeMemory(100);
   cout << "Begin testing\n";
 

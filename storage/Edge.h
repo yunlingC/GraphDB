@@ -1,12 +1,12 @@
 #ifndef _EDGE_H_
 #define _EDGE_H_
 
-//#include "Node.h"
-class Node;
+//#include "Vertex.h"
+class Vertex;
 
 class Edge {
 public:
-  typedef Node* NodePtr;
+  typedef Vertex* VertexPtr;
   typedef Edge* EdgePtr;
   typedef unsigned int EdgeDescriptor;
   typedef unsigned int VertexDescriptor;
@@ -17,11 +17,11 @@ public:
   EdgePtr getFirstNextEdge();
   EdgePtr getFirstPreviousEdge();
   // Independent of who is first/second.
-  EdgePtr getNextEdge(NodePtr from);
+  EdgePtr getNextEdge(VertexPtr from);
   EdgePtr getSecondNextEdge();
   EdgePtr getSecondPreviousEdge();
   // Independent of who is first/second.
-  NodePtr getTarget(NodePtr from);
+  VertexPtr getTarget(VertexPtr from);
 
   EdgeDescriptor getId();
   VertexDescriptor getSecondId();
@@ -34,15 +34,15 @@ public:
 
   // Constructors
   Edge();
-  Edge(NodePtr vs, NodePtr vd);
+  Edge(VertexPtr vs, VertexPtr vd);
   
  protected:
   unsigned int _id;
 
   // Pointer to first node.
-  NodePtr  _firstNode;
+  VertexPtr  _firstVertex;
   // Pointer to second node.
-  NodePtr _secondNode;
+  VertexPtr _secondVertex;
 
   // Pointer to first pointer's next relationship.
   EdgePtr _firstNextEdge;

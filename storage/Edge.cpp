@@ -1,23 +1,23 @@
 #include <iostream>
 
-#include "Node.h"
+#include "Vertex.h"
 #include "Edge.h"
 
 using namespace std;
 
-Edge::NodePtr Edge::getTarget(Edge::NodePtr from) {
-  if (from == _firstNode) {
-    return _secondNode;
-  } else if (from == _secondNode) {
-    return _firstNode;
+Edge::VertexPtr Edge::getTarget(Edge::VertexPtr from) {
+  if (from == _firstVertex) {
+    return _secondVertex;
+  } else if (from == _secondVertex) {
+    return _firstVertex;
   }
   return NULL;
 }
 
-Edge::EdgePtr Edge::getNextEdge(Edge::NodePtr from) {
-  if (from == _firstNode) {
+Edge::EdgePtr Edge::getNextEdge(Edge::VertexPtr from) {
+  if (from == _firstVertex) {
     return _firstNextEdge;
-  } else if (from == _secondNode) {
+  } else if (from == _secondVertex) {
     return _secondNextEdge;
   }
   return NULL;
@@ -60,11 +60,11 @@ Edge::EdgePtr Edge::getSecondPreviousEdge() {
 
 
 Edge::VertexDescriptor Edge::getFirstId() {
-  return _firstNode->getId();
+  return _firstVertex->getId();
 }
 
 Edge::VertexDescriptor Edge::getSecondId() {
-  return _secondNode->getId();
+  return _secondVertex->getId();
 }
 
 void Edge::setId(unsigned int id) {
@@ -77,16 +77,16 @@ Edge::EdgeDescriptor Edge::getId() {
 
 
 Edge::Edge(): _id(-1) { 
-    _firstNode = NULL;     _secondNode = NULL;
+    _firstVertex = NULL;     _secondVertex = NULL;
     _firstNextEdge = NULL; _firstPreviousEdge = NULL;
     _secondNextEdge = NULL; _secondPreviousEdge = NULL;
   }
 
-Edge::Edge(NodePtr vs, NodePtr vd) {
+Edge::Edge(VertexPtr vs, VertexPtr vd) {
     // first is vs, second is vd
-  _firstNode = vs; 
-  _firstNode->addEdge(this);
-  _secondNode = vd; 
-  _secondNode->addEdge(this);
+  _firstVertex = vs; 
+  _firstVertex->addEdge(this);
+  _secondVertex = vd; 
+  _secondVertex->addEdge(this);
   }
   

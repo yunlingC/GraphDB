@@ -1,40 +1,40 @@
-#include "Node.h"
+#include "Vertex.h"
 #include "Edge.h"
 
 using namespace std;
 
-std::vector<Edge::EdgePtr> & Node::getEdges() {
+std::vector<Edge::EdgePtr> & Vertex::getEdges() {
   return _outEdges;
 }
 
-Node::Node(): _id(-1) {
+Vertex::Vertex(): _id(-1) {
     _nextEdge = NULL;
   }
 
-void Node::setId(unsigned int id) {
+void Vertex::setId(unsigned int id) {
     _id = id;
   }
 
-unsigned int Node::getId() {
+unsigned int Vertex::getId() {
   return _id;
 }
 
-void Node::setNextEdge(Edge::EdgePtr ep) {
+void Vertex::setNextEdge(Edge::EdgePtr ep) {
     _nextEdge = ep;
 }
   
-void Node::addEdge(Edge::EdgePtr ep) {
+void Vertex::addEdge(Edge::EdgePtr ep) {
     _outEdges.push_back(ep);
   }
 
-Edge::EdgePtr Node::getNextEdge() {
+Edge::EdgePtr Vertex::getNextEdge() {
   return _nextEdge;
   }
 
 
-void Node::dump() {
+void Vertex::dump() {
     std::cout << " ========================================= " << std::endl;
-    std::cout << " Node: " << _id << ", addr:" << this << ", node size: " << sizeof(Node) << std::endl;
+    std::cout << " Vertex: " << _id << ", addr:" << this << ", node size: " << sizeof(Vertex) << std::endl;
     std::cout << " Outedge ids: ";
     for (int i = 0; i < _outEdges.size(); i++) {
       EdgePtr ep = _outEdges[i];

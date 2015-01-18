@@ -4,17 +4,17 @@
 #include <vector>
 #include <iostream>
 
-//#include "Edge.h"
+#include "PropertyList.h"
 
 class Edge;
 
-class Node { 
+class Vertex { 
 public:
-  typedef Node* NodePtr;
+  typedef Vertex* VertexPtr;
   typedef Edge* EdgePtr;
   typedef unsigned int EdgeDescriptor;
 
-  Node();
+  Vertex();
   void addEdge(EdgePtr ep);
   void dump();
   std::vector<EdgePtr> & getEdges();
@@ -24,7 +24,7 @@ public:
   void setNextEdge(EdgePtr e);
 
 protected:
-  // Node id.
+  // Vertex id.
   unsigned int _id;
   // Pointer to next relationship
   EdgePtr _nextEdge;
