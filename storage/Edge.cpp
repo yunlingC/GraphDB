@@ -5,6 +5,26 @@
 
 using namespace std;
 
+Edge::PropertyListType & Edge::getPropertyList() {
+  return _list;
+}
+
+Edge::ReturnValueType Edge::getPropertyValue(Edge::KeyType k) {
+  return _list.get(k);
+}
+
+void Edge::setProperty(Edge::KeyType k, Edge::ValueType v) {
+  _list.set(k,v);
+}
+
+void Edge::setPropertyList(Edge::PropertyListType l) {
+  _list = l;
+}
+
+void Edge::setType(string t) {
+  _type = t;
+}
+
 Edge::VertexPtr Edge::getTarget(Edge::VertexPtr from) {
   if (from == _firstVertex) {
     return _secondVertex;

@@ -48,6 +48,20 @@ void bfs(GraphType::VertexDescriptor vs, GraphType & g) {
 
 int main() {
 
+  typedef PropertyList<string, string> PropertyListType;
+  PropertyListType p;
+  PropertyListType q;
+
+  p.set("a", "1");
+  p.set("b", "2");
+  p.set("c", "3");
+
+  q = p;
+  p.remove("b");
+
+  q.print();
+  p.print();
+
   typedef GraphType Graph;
 
   Graph g;

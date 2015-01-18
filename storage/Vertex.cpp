@@ -3,6 +3,23 @@
 
 using namespace std;
 
+Vertex::ReturnPropertyValueType Vertex::getPropertyValue(KeyType k) {
+    return _list.get(k);
+  }
+
+void Vertex::setProperty(Vertex::KeyType k, Vertex::ValueType v) {
+  _list.set(k,v);
+}
+
+void Vertex::setPropertyList(Vertex::PropertyListType l) {
+  _list = l;
+}
+
+// Remember you can change this when returned.
+Vertex::PropertyListType &  Vertex::getPropertyList() {
+  return _list;
+}
+
 std::vector<Edge::EdgePtr> & Vertex::getEdges() {
   return _outEdges;
 }

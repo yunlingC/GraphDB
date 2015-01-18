@@ -1,7 +1,10 @@
 #ifndef _EDGE_H_
 #define _EDGE_H_
 
-//#include "Vertex.h"
+#include <string>
+
+#include "PropertyList.h"
+
 class Vertex;
 
 class Edge {
@@ -10,6 +13,11 @@ public:
   typedef Edge* EdgePtr;
   typedef unsigned int EdgeDescriptor;
   typedef unsigned int VertexDescriptor;
+  
+  typedef std::string KeyType;
+  typedef std::string ValueType;
+  typedef PropertyList<KeyType, ValueType > PropertyListType;
+  typedef pair<ValueType, bool> ReturnValueType;
 
 public:
 
@@ -18,6 +26,8 @@ public:
   EdgePtr getFirstPreviousEdge();
   // Independent of who is first/second.
   EdgePtr getNextEdge(VertexPtr from);
+  PropertyListType & getPropertyList();
+  ReturnValueType getPropertyValue(KeyType k);
   EdgePtr getSecondNextEdge();
   EdgePtr getSecondPreviousEdge();
   // Independent of who is first/second.
@@ -29,9 +39,11 @@ public:
   void setFirstNextEdge(EdgePtr e);
   void setFirstPreviousEdge(EdgePtr e);
   void setId(unsigned int id);
+  void setProperty(KeyType k, ValueType v);
+  void setPropertyList(PropertyListType l);
   void setSecondNextEdge(EdgePtr e);
   void setSecondPreviousEdge(EdgePtr e);
-
+  void setType(string t);
   // Constructors
   Edge();
   Edge(VertexPtr vs, VertexPtr vd);
@@ -54,6 +66,11 @@ public:
   EdgePtr _secondPreviousEdge;
   
   // Properties can be done later.
+  // Label to denote type.
+  string _type;
+
+  // Property list/map.
+  PropertyListType _list;
 };
 
 #endif /* _EDGE_H_ */
