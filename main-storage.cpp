@@ -51,7 +51,8 @@ int main() {
   typedef BaseGraph Graph;
 
   Graph g;
-
+  g.allocNodeMemory(50);
+  g.allocEdgeMemory(100);
   cout << "Begin testing\n";
 
   Graph::VertexDescriptor v0 = g.addVertex();

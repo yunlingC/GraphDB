@@ -6,7 +6,7 @@ class Node;
 
 class Edge {
 public:
-  typedef Node * NodePtr;
+  typedef Node* NodePtr;
   typedef Edge* EdgePtr;
   typedef unsigned int EdgeDescriptor;
   typedef unsigned int VertexDescriptor;
