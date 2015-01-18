@@ -17,7 +17,6 @@ public:
   unsigned int getId();
   void addEdge(EdgePtr ep);
   EdgePtr getNextEdge();
-  EdgePtr getPreviousEdge(EdgeDescriptor ed);
   void dump();
   void setNextEdge(EdgePtr e);
   std::vector<EdgePtr> & getEdges();
