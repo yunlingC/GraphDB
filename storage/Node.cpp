@@ -34,7 +34,7 @@ Edge::EdgePtr Node::getNextEdge() {
 
 void Node::dump() {
     std::cout << " ========================================= " << std::endl;
-    std::cout << " Node: " << _id << std::endl;
+    std::cout << " Node: " << _id << ", addr:" << this << ", node size: " << sizeof(Node) << std::endl;
     std::cout << " Outedge ids: ";
     for (int i = 0; i < _outEdges.size(); i++) {
       EdgePtr ep = _outEdges[i];
