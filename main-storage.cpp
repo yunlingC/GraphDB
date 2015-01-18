@@ -1,27 +1,27 @@
 #include "Node.h"
 #include "Edge.h"
-#include "BaseGraph.h"
+#include "GraphType.h"
 
 #include <iostream>
 #include <queue>
 #include <map>
 using namespace std;
 
-void bfs(BaseGraph::VertexDescriptor vs, BaseGraph & g) {
-  typedef pair<BaseGraph::NodePtr, bool> VisitPair;
+void bfs(GraphType::VertexDescriptor vs, GraphType & g) {
+  typedef pair<GraphType::NodePtr, bool> VisitPair;
   cout << "================= BfS ===================== \n";
   cout << "+ vertex: " << vs << "\n";
 
-  BaseGraph::NodePtr np = g.getNodePointer(vs);
+  GraphType::NodePtr np = g.getNodePointer(vs);
 
   // Start traversing the graph from here. 
-  std::queue<BaseGraph::NodePtr> Q;
-  std::map<BaseGraph::NodePtr, bool> C; // true = visited, false = not visited
+  std::queue<GraphType::NodePtr> Q;
+  std::map<GraphType::NodePtr, bool> C; // true = visited, false = not visited
 
   Q.push(np);
   C.insert(VisitPair(np,false));
 
-  BaseGraph::NodePtr targetNode = NULL;
+  GraphType::NodePtr targetNode = NULL;
 
   while (!Q.empty()) {
     np = Q.front();  Q.pop();
@@ -30,7 +30,7 @@ void bfs(BaseGraph::VertexDescriptor vs, BaseGraph & g) {
     // Set to visited.    
     C[np] = true;
 
-    BaseGraph::EdgePtr nextEdge = np->getNextEdge();
+    GraphType::EdgePtr nextEdge = np->getNextEdge();
     while (nextEdge != NULL) {
       // Get the target
       targetNode = nextEdge->getTarget(np);
@@ -48,7 +48,7 @@ void bfs(BaseGraph::VertexDescriptor vs, BaseGraph & g) {
 
 int main() {
 
-  typedef BaseGraph Graph;
+  typedef GraphType Graph;
 
   Graph g;
   g.allocNodeMemory(50);
