@@ -1,10 +1,11 @@
 #include "Vertex.h"
 #include "Edge.h"
 #include "GraphType.h"
+#include "FixedString.h"
 
 #include <iostream>
 #include <queue>
-#include <map>
+
 using namespace std;
 
 void bfs(GraphType::VertexDescriptor vs, GraphType & g) {
@@ -93,6 +94,10 @@ int main() {
   
   bfs(v0, g);
 
-
+  FixedString fs("hello");
+  //FixedString ft = fs;
+  
+  cout << "s: " << fs.std_str() << endl;
+  
   return 0;
 }
