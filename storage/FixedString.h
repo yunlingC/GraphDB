@@ -15,19 +15,24 @@ public:
 
   FixedString(const string & s): _size(64) { 
     cout << "==> s: " << s <<endl;
-    strncpy(const_cast<char*>(s.c_str()), _string, _size);
+    strncpy(_string, const_cast<char*>(s.c_str()), _size);
     cout << "==> s: " << _string <<endl;
-    
   }
+
 
   FixedString & operator=(FixedString & from) {
     if (this != &from) {
-      strncpy(from._string, _string, _size);
+      strncpy(_string, from._string, _size);
     }
+  }
+  
+
+  int operator==(const FixedString& right) {
+    return strcmp(_string, right._string);
   }
 
   void setString(const string& s) {
-    strncpy(const_cast<char*>(s.c_str()), _string, _size);
+    strncpy(_string, const_cast<char*>(s.c_str()), _size);
   }
 
   FixedStringPtrType getString() {
