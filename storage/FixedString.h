@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <array>
 using namespace std;
 
 class FixedString {
