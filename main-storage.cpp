@@ -95,9 +95,22 @@ int main() {
   bfs(v0, g);
 
   FixedString fs("hello");
-  //FixedString ft = fs;
+  FixedString ft = fs;
   
   cout << "s: " << fs.std_str() << endl;
+  cout << "s: " << ft.getString() << endl;
   
+  ft.setString("World");
+  cout << "s: " << ft.getString() << endl;
+  if (ft == fs)
+    cout << "Yes!" << endl;
+
+  fs += ft;
+  cout << "s: " << fs.getString() << endl;
+
+  fs = fs + ft;
+  cout << "s: " << fs.getString() << endl;
+
+
   return 0;
 }

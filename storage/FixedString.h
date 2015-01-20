@@ -26,6 +26,14 @@ public:
     }
   }
   
+  FixedString & operator+=(const FixedString & appender){
+    strcat(_string, appender._string);
+    return *this;
+  }
+
+  friend FixedString & operator+(FixedString lhs, const FixedString &rhs) {
+    return lhs += rhs;
+ }
 
   int operator==(const FixedString& right) {
     return strcmp(_string, right._string);
@@ -47,4 +55,5 @@ protected:
   FixedStringType  _string[64];
   unsigned int _size;
 };
+
 #endif /* _FIXED_STRING_H_ */
