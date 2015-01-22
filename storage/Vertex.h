@@ -32,7 +32,7 @@ public:
   void setId(unsigned int id);
   void setNextEdge(EdgePtr e);
   void setProperty(KeyType k, ValueType v);
-  void setPropertyList(PropertyListType l);
+  void setPropertyList(PropertyListType & l);
   PropertyListType &  getPropertyList();
 
 protected:

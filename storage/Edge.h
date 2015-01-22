@@ -21,6 +21,7 @@ public:
 
 public:
 
+  void dump();
   VertexDescriptor getFirstId();
   EdgePtr getFirstNextEdge();
   EdgePtr getFirstPreviousEdge();
@@ -65,7 +66,6 @@ public:
   EdgePtr _secondNextEdge;
   EdgePtr _secondPreviousEdge;
   
-  // Properties can be done later.
   // Label to denote type.
   string _type;
 

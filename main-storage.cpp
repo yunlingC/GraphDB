@@ -3,8 +3,6 @@
 #include "GraphType.h"
 #include "FixedString.h"
 
-#include "LinkedList.h"
-
 #include <iostream>
 #include <queue>
 
@@ -62,26 +60,28 @@ int main() {
   q = p;
   p.remove("b");
 
+  cout << "Print property list q\n";
   q.print();
+  cout << "Print property list p\n";
   p.print();
 
   typedef GraphType Graph;
 
   Graph g;
-  g.allocVertexMemory(50);
-  g.allocEdgeMemory(100);
+  //  g.allocVertexMemory(50);
+  //  g.allocEdgeMemory(100);
   cout << "Begin testing\n";
 
-  Graph::VertexDescriptor v0 = g.addVertex();
+  Graph::VertexDescriptor v0 = g.addVertex(p);
   cout << "v0: " << v0 << endl;
-  Graph::VertexDescriptor v1 = g.addVertex();
+  Graph::VertexDescriptor v1 = g.addVertex(q);
   Graph::VertexDescriptor v2 = g.addVertex();
   Graph::VertexDescriptor v3 = g.addVertex();
   Graph::VertexDescriptor v4 = g.addVertex();
   Graph::VertexDescriptor v5 = g.addVertex();
   Graph::VertexDescriptor v6 = g.addVertex();
   cout << "start adding edges\n";
-  Graph::EdgeDescriptor e0 = g.addEdge(v0, v1);
+  Graph::EdgeDescriptor e0 = g.addEdge(v0, v1, p);
   Graph::EdgeDescriptor e1 = g.addEdge(v0, v2);
   Graph::EdgeDescriptor e2 = g.addEdge(v0, v4);
 
@@ -114,15 +114,15 @@ int main() {
   cout << "s: " << fs.getString() << endl;
 
   // Linked list test
-  LinkedList ll;
+  // LinkedList ll;
 
-  ll.insert("1", "abc");
-  ll.insert("2", "def");
-  ll.insert("3", "ghi");
-  ListNode * l = ll.find("2");
-  cout << "l: " << l->getValue() << endl;
-  l = ll.find("3");
-  cout << "l: " << l->getValue() << endl;
-  ll.print();
+  // ll.insert("1", "abc");
+  // ll.insert("2", "def");
+  // ll.insert("3", "ghi");
+  // ListNode * l = ll.find("2");
+  // cout << "l: " << l->getValue() << endl;
+  // l = ll.find("3");
+  // cout << "l: " << l->getValue() << endl;
+  // ll.print();
   return 0;
 }

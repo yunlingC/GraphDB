@@ -5,6 +5,12 @@
 
 using namespace std;
 
+void Edge::dump() {
+  cout << "Edge id: " << _id << "\n";
+  _list.print();  
+
+}
+
 Edge::PropertyListType & Edge::getPropertyList() {
   return _list;
 }

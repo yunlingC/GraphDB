@@ -7,6 +7,7 @@
 
 #include "Vertex.h"
 #include "Edge.h"
+#include "PropertyList.h"
 
 using namespace std;
 
@@ -16,6 +17,7 @@ public:
   typedef unsigned int EdgeDescriptor;
   typedef Vertex* VertexPtr;
   typedef Edge* EdgePtr;
+  typedef PropertyList<string, string> PropertyListType;
 
 public:
   VertexPtr getVertexPointer(VertexDescriptor v) {
@@ -26,16 +28,16 @@ public:
   }
 
   VertexDescriptor addVertex() {
-    if (_nodeMemory == NULL) {
-      cerr << "ERROR: Edge space not allocated\n";
-      exit(1);
-    }
+    /* if (_nodeMemory == NULL) { */
+    /*   cerr << "ERROR: Edge space not allocated\n"; */
+    /*   exit(1); */
+    /* } */
 
     // Create new node
-    char* placePtr = _nodeMemory + _numVertices*sizeof(Vertex);
-    cout << "Place node at: " << reinterpret_cast<int*>(placePtr) << endl;
+    //    char* placePtr = _nodeMemory + _numVertices*sizeof(Vertex);
+    //    cout << "Place node at: " << reinterpret_cast<int*>(placePtr) << endl;
 
-    VertexPtr n = new(placePtr) Vertex();
+    VertexPtr n = new Vertex();
 
     n->setId(_numVertices); 
     _numVertices++;
@@ -44,16 +46,35 @@ public:
     return n->getId();
   }
 
-  EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd) {
-    if (_edgeMemory == NULL) {
-      cerr << "ERROR: Edge space not allocated\n";
-      exit(1);
-    }
-    // Create new edge by retrieving VertexPtr from vertices.
-    char * placePtr = _edgeMemory + _numEdges*sizeof(Edge);
-    cout << "Place edge at: " << reinterpret_cast<int*>(placePtr) << endl;
-    EdgePtr e = new (placePtr) Edge(_vertices[vs], _vertices[vd]);
+  VertexDescriptor addVertex(PropertyListType & p) {
+    VertexPtr n = new Vertex();
+    n->setPropertyList(p);
+    n->setId(_numVertices); 
+    _numVertices++;
+    // Insert into list.
+    _vertices.push_back(n);
+    return n->getId();
+  }
 
+  EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd) {
+    /* if (_edgeMemory == NULL) { */
+    /*   cerr << "ERROR: Edge space not allocated\n"; */
+    /*   exit(1); */
+    /* } */
+    // Create new edge by retrieving VertexPtr from vertices.
+    //    char * placePtr = _edgeMemory + _numEdges*sizeof(Edge);
+    //    cout << "Place edge at: " << reinterpret_cast<int*>(placePtr) << endl;
+    EdgePtr e = new Edge(_vertices[vs], _vertices[vd]);
+
+    e->setId(_numEdges);    
+    _numEdges++;
+    _edges.push_back(e);
+    return e->getId();
+  }
+
+  EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd, PropertyListType & p) {
+    EdgePtr e = new Edge(_vertices[vs], _vertices[vd]);
+    e->setPropertyList(p);
     e->setId(_numEdges);    
     _numEdges++;
     _edges.push_back(e);
@@ -66,7 +87,7 @@ public:
     }
   }
 
-  GraphType(): _numVertices(0), _numEdges(0), _nodeMemory(NULL), _edgeMemory(NULL) {
+ GraphType(): _numVertices(0), _numEdges(0) {//, _nodeMemory(NULL), _edgeMemory(NULL) {
   }
 
   ~GraphType() {
@@ -81,9 +102,9 @@ public:
     // }
 
     // Delete the memory spaces.
-    delete _nodeMemory;
+    //    delete _nodeMemory;
     //cout << "Delete edge  memory\n";
-    delete _edgeMemory;
+    //    delete _edgeMemory;
   }
 
   void updateEdges() {
@@ -137,17 +158,17 @@ public:
   void allocVertexMemory(unsigned int sz) {
 
     // Allocation sz number of Vertex objects.
-    _nodeMemory = new char[sizeof(Vertex)*sz];
-    cout << "Vertex Memory\n + Starting address: " << reinterpret_cast<int*>(_nodeMemory) 
-	 << ", ending address: " << reinterpret_cast<int*>(_nodeMemory + sizeof(Vertex)*sz) << "\n";
+    /* _nodeMemory = new char[sizeof(Vertex)*sz]; */
+    /* cout << "Vertex Memory\n + Starting address: " << reinterpret_cast<int*>(_nodeMemory)  */
+    /* 	 << ", ending address: " << reinterpret_cast<int*>(_nodeMemory + sizeof(Vertex)*sz) << "\n"; */
   }
 
   void allocEdgeMemory(unsigned int sz) {
     // Allocation sz number of Vertex objects.
     //cout << "Edge space: " << sizeof(Edge)*sz << "\n";
-    _edgeMemory = new char[sizeof(Edge)*sz];
-    cout << "Edge Memory\n + Starting address: " << reinterpret_cast<int*>(_edgeMemory) 
-	 << ", ending address: " << reinterpret_cast<int*>(_edgeMemory + sizeof(Edge)*sz) << "\n" << endl;
+    //    _edgeMemory = new char[sizeof(Edge)*sz];
+    //    cout << "Edge Memory\n + Starting address: " << reinterpret_cast<int*>(_edgeMemory) 
+    //	 << ", ending address: " << reinterpret_cast<int*>(_edgeMemory + sizeof(Edge)*sz) << "\n" << endl;
   }
 
 protected:
@@ -155,8 +176,8 @@ protected:
   vector<EdgePtr> _edges;
   unsigned int _numVertices;
   unsigned int _numEdges;
-  char* _nodeMemory;
-  char* _edgeMemory;
+  //  char* _nodeMemory;
+  //  char* _edgeMemory;
 
 };
 

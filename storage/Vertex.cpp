@@ -11,7 +11,7 @@ void Vertex::setProperty(Vertex::KeyType k, Vertex::ValueType v) {
   _list.set(k,v);
 }
 
-void Vertex::setPropertyList(Vertex::PropertyListType l) {
+void Vertex::setPropertyList(Vertex::PropertyListType & l) {
   _list = l;
 }
 
@@ -56,6 +56,8 @@ void Vertex::dump() {
     for (int i = 0; i < _outEdges.size(); i++) {
       EdgePtr ep = _outEdges[i];
       std::cout << ep->getId() << ": (" << ep->getFirstId() << ", " << ep->getSecondId() << ") ";
+      std::cout << "\nEdge property: \n";
+      ep->dump();
     }
     
     // For this node's next first edge
@@ -75,6 +77,10 @@ void Vertex::dump() {
     }
 
     std::cout << std::endl;
+
+    // Print property list.
+    std::cout << "Property list:\n";
+    _list.print();
     std::cout << " ========================================= " << std::endl;
 
   }
