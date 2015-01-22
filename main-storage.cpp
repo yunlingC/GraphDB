@@ -3,6 +3,8 @@
 #include "GraphType.h"
 #include "FixedString.h"
 
+#include "LinkedList.h"
+
 #include <iostream>
 #include <queue>
 
@@ -111,6 +113,16 @@ int main() {
   fs = fs + ft;
   cout << "s: " << fs.getString() << endl;
 
+  // Linked list test
+  LinkedList ll;
 
+  ll.insert("1", "abc");
+  ll.insert("2", "def");
+  ll.insert("3", "ghi");
+  ListNode * l = ll.find("2");
+  cout << "l: " << l->getValue() << endl;
+  l = ll.find("3");
+  cout << "l: " << l->getValue() << endl;
+  ll.print();
   return 0;
 }
