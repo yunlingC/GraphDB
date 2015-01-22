@@ -43,7 +43,6 @@ protected:
 
   std::vector<EdgePtr> _outEdges;
 
-  // TODO: pointer to property
   PropertyListType _list;
 };
 
