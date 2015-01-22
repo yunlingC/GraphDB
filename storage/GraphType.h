@@ -18,6 +18,8 @@ public:
   typedef Vertex* VertexPtr;
   typedef Edge* EdgePtr;
   typedef PropertyList<string, string> PropertyListType;
+  typedef PropertyListType VertexPropertyList;
+  typedef PropertyListType EdgePropertyList;
 
 public:
   VertexPtr getVertexPointer(VertexDescriptor v) {
@@ -81,6 +83,16 @@ public:
     return e->getId();
   }
 
+  EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd, const string & l, PropertyListType & p) {
+    EdgePtr e = new Edge(_vertices[vs], _vertices[vd]);
+    e->setType(l);
+    e->setPropertyList(p);
+    e->setId(_numEdges);    
+    _numEdges++;
+    _edges.push_back(e);
+    return e->getId();
+  }
+
   void dump() {
     for (int i = 0; i < _vertices.size(); i++) {
       _vertices[i]->dump();
@@ -114,8 +126,9 @@ public:
     for (int i = 0; i < _vertices.size(); i++) {
       VertexPtr np = _vertices[i];
       std::vector<EdgePtr> & nodeEdges = np->getEdges();
+      cout << "vid: " << np->getId() << ", # of nodes: " << nodeEdges.size() << endl;
       if (! nodeEdges.empty()) {
-
+	
 	EdgePtr ep = nodeEdges[0];
 	if (ep != NULL) {
 	  ep->setFirstPreviousEdge(NULL); //_firstPreviousEdge = NULL;
@@ -141,16 +154,21 @@ public:
 	  } else {
 	    // Connect the secondVertex
 	    if (np->getId() == ep->getSecondId()) {
+	      //	      ep->setSecondPreviousEdge(NULL);
 	      for (int j = 1; j < nodeEdges.size(); j++) {
 		nextEdge = nodeEdges[j];
 		ep->setSecondNextEdge(nextEdge); //_secondNextEdge = nextEdge;
 		nextEdge->setSecondPreviousEdge(ep); //_secondPreviousEdge = ep;
 		ep = nextEdge;
 	      }
+	      ep->setSecondNextEdge(NULL);
 	    }
 	  }
 	}
 
+      } else {
+	// No edges for that node.
+	np->setNextEdge(NULL);
       }
     }
   }

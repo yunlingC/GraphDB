@@ -6,8 +6,8 @@
 #include <map>
 #include <exception>
 #include <errno.h>
-#include "Graph.h"
-
+//#include "Graph.h"
+#include "GraphType.h"
 
 using namespace boost;
 using namespace std;
@@ -33,7 +33,8 @@ int  str2int(string str){
 }
 
 struct GDReader {
-
+public:
+  typedef GraphType Graph;
   private:
     Graph &_graph;
     unsigned int  _people;

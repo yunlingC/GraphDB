@@ -56,31 +56,34 @@ void Vertex::dump() {
     for (int i = 0; i < _outEdges.size(); i++) {
       EdgePtr ep = _outEdges[i];
       std::cout << ep->getId() << ": (" << ep->getFirstId() << ", " << ep->getSecondId() << ") ";
-      std::cout << "\nEdge property: \n";
-      ep->dump();
+      //      std::cout << "\nEdge property: \n";
+      //      ep->dump();
     }
     
     // For this node's next first edge
-    std::cout << "\nPrint edge traversals:" << _nextEdge << std::endl;
-    cout << "=> previous edge\n";
-    EdgePtr p = _nextEdge;
-    while ( p != NULL) {
-      std::cout << "=> " << p->getId() << " ";
-      p = p->getFirstPreviousEdge();
-    }
+    if (_nextEdge != NULL) {
+      std::cout << "\nPrint edge traversals:" << _nextEdge << std::endl;
+      cout << "=> current edge id: " << _nextEdge->getId() << ", previous edge ids: \n";
+      EdgePtr p = _nextEdge;
 
-    cout << "\n= next edge\n";
-    p = _nextEdge;
-    while ( p != NULL) {
-      std::cout << "=> " << p->getId() << " ";
-      p = p->getFirstNextEdge();
+      while ( p != NULL) {
+	std::cout << "=> " << p->getId() << " ";
+	p = p->getFirstPreviousEdge();
+      }
+
+      cout << "\n= next edge ids\n";
+      p = _nextEdge;
+      while ( p != NULL) {
+	std::cout << "=> " << p->getId() << " ";
+	p = p->getFirstNextEdge();
+      }
     }
 
     std::cout << std::endl;
 
     // Print property list.
-    std::cout << "Property list:\n";
-    _list.print();
+    //    std::cout << "Property list:\n";
+    //    _list.print();
     std::cout << " ========================================= " << std::endl;
 
   }

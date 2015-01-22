@@ -3,6 +3,7 @@
 #include "GraphType.h"
 #include "FixedString.h"
 #include "macros.h"
+#include "GDReader.h"
 
 #include <iostream>
 #include <queue>
@@ -38,6 +39,7 @@ void bfs(GraphType::VertexDescriptor vs, GraphType & g) {
       targetVertex = nextEdge->getTarget(np);
       if (C.find(targetVertex) == C.end()) {
 	// queue the target for visitation
+	cout << "push: " << targetVertex->getId() << "\n";
 	Q.push(targetVertex);
 	C.insert(VisitPair(targetVertex,false));
       }
@@ -50,21 +52,21 @@ void bfs(GraphType::VertexDescriptor vs, GraphType & g) {
 
 int main() {
 
-  typedef PropertyList<string, string> PropertyListType;
-  PropertyListType p;
-  PropertyListType q;
+  // typedef PropertyList<string, string> PropertyListType;
+  // PropertyListType p;
+  // PropertyListType q;
 
-  p.set("a", "1");
-  p.set("b", "2");
-  p.set("c", "3");
+  // p.set("a", "1");
+  // p.set("b", "2");
+  // p.set("c", "3");
 
-  q = p;
-  p.remove("b");
+  // q = p;
+  // p.remove("b");
 
-  cout << "Print property list q\n";
-  q.print();
-  cout << "Print property list p\n";
-  p.print();
+  // cout << "Print property list q\n";
+  // q.print();
+  // cout << "Print property list p\n";
+  // p.print();
 
   typedef GraphType Graph;
 
@@ -73,49 +75,55 @@ int main() {
   //  g.allocEdgeMemory(100);
   cout << "Begin testing\n";
 
-  Graph::VertexDescriptor v0 = g.addVertex(p);
-  cout << "v0: " << v0 << endl;
-  Graph::VertexDescriptor v1 = g.addVertex(q);
-  Graph::VertexDescriptor v2 = g.addVertex();
-  Graph::VertexDescriptor v3 = g.addVertex();
-  Graph::VertexDescriptor v4 = g.addVertex();
-  Graph::VertexDescriptor v5 = g.addVertex();
-  Graph::VertexDescriptor v6 = g.addVertex();
-  cout << "start adding edges\n";
-  Graph::EdgeDescriptor e0 = g.addEdge(v0, v1, p);
-  Graph::EdgeDescriptor e1 = g.addEdge(v0, v2);
-  Graph::EdgeDescriptor e2 = g.addEdge(v0, v4);
+  GDReader reader(g);
+  reader.readFile("../tests/gd/sndata.gd");
+  //  g.print();
 
-  Graph::EdgeDescriptor e3 = g.addEdge(v0, v6);
-  Graph::EdgeDescriptor e4 = g.addEdge(v1, v3);
-  Graph::EdgeDescriptor e5 = g.addEdge(v2, v3);
-  Graph::EdgeDescriptor e6 = g.addEdge(v3, v5);
-  Graph::EdgeDescriptor e7 = g.addEdge(v4, v5);
+
+  // Graph::VertexDescriptor v0 = g.addVertex(p);
+  // cout << "v0: " << v0 << endl;
+  // Graph::VertexDescriptor v1 = g.addVertex(q);
+  // Graph::VertexDescriptor v2 = g.addVertex();
+  // Graph::VertexDescriptor v3 = g.addVertex();
+  // Graph::VertexDescriptor v4 = g.addVertex();
+  // Graph::VertexDescriptor v5 = g.addVertex();
+  // Graph::VertexDescriptor v6 = g.addVertex();
+  // cout << "start adding edges\n";
+  // Graph::EdgeDescriptor e0 = g.addEdge(v0, v1, p);
+  // Graph::EdgeDescriptor e1 = g.addEdge(v0, v2);
+  // Graph::EdgeDescriptor e2 = g.addEdge(v0, v4);
+
+  // Graph::EdgeDescriptor e3 = g.addEdge(v0, v6);
+  // Graph::EdgeDescriptor e4 = g.addEdge(v1, v3);
+  // Graph::EdgeDescriptor e5 = g.addEdge(v2, v3);
+  // Graph::EdgeDescriptor e6 = g.addEdge(v3, v5);
+  // Graph::EdgeDescriptor e7 = g.addEdge(v4, v5);
   cout << "Begin updating edges\n";
   g.updateEdges();
   g.dump();
 
+  Graph::VertexPtr v0 = g.getVertexPointer(0);
   // Let sniper know fo source node.
   MAGIC_SOURCE_NODE(v0);
   MAGIC_PREFETCH_TRIGGER;
-  bfs(v0, g);
+  bfs(v0->getId(), g);
 
-  FixedString fs("hello");
-  FixedString ft = fs;
+  // FixedString fs("hello");
+  // FixedString ft = fs;
   
-  cout << "s: " << fs.std_str() << endl;
-  cout << "s: " << ft.getString() << endl;
+  // cout << "s: " << fs.std_str() << endl;
+  // cout << "s: " << ft.getString() << endl;
   
-  ft.setString("World");
-  cout << "s: " << ft.getString() << endl;
-  if (ft == fs)
-    cout << "Yes!" << endl;
+  // ft.setString("World");
+  // cout << "s: " << ft.getString() << endl;
+  // if (ft == fs)
+  //   cout << "Yes!" << endl;
 
-  fs += ft;
-  cout << "s: " << fs.getString() << endl;
+  // fs += ft;
+  // cout << "s: " << fs.getString() << endl;
 
-  fs = fs + ft;
-  cout << "s: " << fs.getString() << endl;
+  // fs = fs + ft;
+  // cout << "s: " << fs.getString() << endl;
 
   // Linked list test
   // LinkedList ll;
