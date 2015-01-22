@@ -2,6 +2,7 @@
 #include "Edge.h"
 #include "GraphType.h"
 #include "FixedString.h"
+#include "macros.h"
 
 #include <iostream>
 #include <queue>
@@ -93,7 +94,10 @@ int main() {
   cout << "Begin updating edges\n";
   g.updateEdges();
   g.dump();
-  
+
+  // Let sniper know fo source node.
+  MAGIC_SOURCE_NODE(v0);
+  MAGIC_PREFETCH_TRIGGER;
   bfs(v0, g);
 
   FixedString fs("hello");

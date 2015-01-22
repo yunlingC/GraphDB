@@ -17,7 +17,18 @@ public:
   typedef pair<ValueType, bool> ReturnValueType;
 
 public:
+PropertyList(): _maxSize(10) {
+
+  }
+
+PropertyList(unsigned int s): _maxSize(0) {
+  
+}
   bool set(const KeyType & k, const ValueType & v) {
+    if (_pl.size() >= _maxSize) {
+      return false;
+    }
+
     pair<KeyType, ValueType> p(k,v);
     _pl.insert(p);
     return true;
@@ -62,6 +73,7 @@ public:
   }
 private:
   map<KeyType, ValueType> _pl;
+  unsigned int _maxSize;
 };
 
 #endif /* _PROPERTY_LIST_H_ */
