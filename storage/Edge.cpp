@@ -11,6 +11,7 @@ void Edge::dump() {
 
 }
 
+  
 Edge::PropertyListType & Edge::getPropertyList() {
   return _list;
 }
