@@ -11,6 +11,13 @@ void Edge::dump() {
 
 }
 
+Edge::VertexPtr Edge::getFirstVertexPtr() {
+  return _firstVertex;
+}
+
+Edge::VertexPtr Edge::getSecondVertexPtr() {
+  return _secondVertex;
+}
   
 Edge::PropertyListType & Edge::getPropertyList() {
   return _list;

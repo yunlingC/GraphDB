@@ -58,6 +58,16 @@ public:
     return n->getId();
   }
 
+  void assignPointers(VertexDescriptor vs, VertexDescriptor vd, EdgePtr e) {
+    
+    // 1. See if first's nextEdge is set or not.
+    // Doesn't matter who the next really is.
+    //    if (e->getNextEdge() == NULL) {
+    //      e->setNextEdge();
+    //    }
+    
+  }
+
   EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd) {
     /* if (_edgeMemory == NULL) { */
     /*   cerr << "ERROR: Edge space not allocated\n"; */

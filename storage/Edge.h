@@ -23,6 +23,8 @@ public:
 
   void dump();
   VertexDescriptor getFirstId();
+  VertexPtr getFirstVertexPtr();
+  VertexPtr getSecondVertexPtr();
   EdgePtr getFirstNextEdge();
   EdgePtr getFirstPreviousEdge();
   // Independent of who is first/second.
