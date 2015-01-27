@@ -71,8 +71,10 @@ int main() {
   typedef GraphType Graph;
 
   Graph g;
-  //  g.allocVertexMemory(50);
-  //  g.allocEdgeMemory(100);
+#ifdef _FIXALLOC_
+  g.allocVertexMemory(50);
+  g.allocEdgeMemory(100);
+#endif /* _FIXALLOC */
   cout << "Begin testing\n";
 
   //  GDReader reader(g);

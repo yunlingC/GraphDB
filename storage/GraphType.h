@@ -30,16 +30,20 @@ public:
   }
 
   VertexDescriptor addVertex() {
-    /* if (_nodeMemory == NULL) { */
-    /*   cerr << "ERROR: Edge space not allocated\n"; */
-    /*   exit(1); */
-    /* } */
+#ifdef _FIXALLOC_
+    if (_nodeMemory == NULL) {
+      cerr << "ERROR: Edge space not allocated\n";
+      exit(1);
+    }
 
-    // Create new node
-    //    char* placePtr = _nodeMemory + _numVertices*sizeof(Vertex);
-    //    cout << "Place node at: " << reinterpret_cast<int*>(placePtr) << endl;
-
+    char* placePtr = _nodeMemory + _numVertices*sizeof(Vertex);
+    cout << "Place node at: " << reinterpret_cast<int*>(placePtr) << endl;
+       VertexPtr n = new(placePtr) Vertex();
+#else 
     VertexPtr n = new Vertex();
+#endif /* _FIXALLOC_ */
+
+
 
     n->setId(_numVertices); 
     _numVertices++;
@@ -135,14 +139,20 @@ public:
   }
 
   EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd) {
-    /* if (_edgeMemory == NULL) { */
-    /*   cerr << "ERROR: Edge space not allocated\n"; */
-    /*   exit(1); */
-    /* } */
-    // Create new edge by retrieving VertexPtr from vertices.
-    //    char * placePtr = _edgeMemory + _numEdges*sizeof(Edge);
-    //    cout << "Place edge at: " << reinterpret_cast<int*>(placePtr) << endl;
+#ifdef _FIXALLOC_
+    if (_edgeMemory == NULL) {
+      cerr << "ERROR: Edge space not allocated\n";
+      exit(1);
+    }
+    //    Create new edge by retrieving VertexPtr from vertices.
+       char * placePtr = _edgeMemory + _numEdges*sizeof(Edge);
+       cout << "Place edge at: " << reinterpret_cast<int*>(placePtr) << endl;
+       EdgePtr e = new(placePtr) Edge(_vertices[vs], _vertices[vd]);
+#else
     EdgePtr e = new Edge(_vertices[vs], _vertices[vd]);
+#endif /* _FIXALLOC_ */
+
+
     
     e->setId(_numEdges);
     cout << "\nassign pointers for edge: " << e->getId() << "\n";
@@ -189,7 +199,11 @@ public:
     }
   }
 
- GraphType(): _numVertices(0), _numEdges(0) {//, _nodeMemory(NULL), _edgeMemory(NULL) {
+ GraphType(): _numVertices(0), _numEdges(0) {
+#ifdef _FIXALLOC_
+   _nodeMemory = NULL;
+   _edgeMemory = NULL;
+#endif
   }
 
   ~GraphType() {
@@ -202,36 +216,40 @@ public:
     // for (int i =0; i < _edges.size(); i++) {
     //   //      delete _edges[i];
     // }
-
-    // Delete the memory spaces.
-    //    delete _nodeMemory;
-    //cout << "Delete edge  memory\n";
-    //    delete _edgeMemory;
+#ifdef _FIXALLOC_
+    //    Delete the memory spaces.
+    delete _nodeMemory;
+    delete _edgeMemory;
+#endif /* _FIXALLOC_ */
   }
 
+#ifdef _FIXALLOC_
   void allocVertexMemory(unsigned int sz) {
 
     // Allocation sz number of Vertex objects.
-    /* _nodeMemory = new char[sizeof(Vertex)*sz]; */
-    /* cout << "Vertex Memory\n + Starting address: " << reinterpret_cast<int*>(_nodeMemory)  */
-    /* 	 << ", ending address: " << reinterpret_cast<int*>(_nodeMemory + sizeof(Vertex)*sz) << "\n"; */
+    _nodeMemory = new char[sizeof(Vertex)*sz];
+    cout << "Vertex Memory\n + Starting address: " << reinterpret_cast<int*>(_nodeMemory)
+    	 << ", ending address: " << reinterpret_cast<int*>(_nodeMemory + sizeof(Vertex)*sz) << "\n";
   }
 
   void allocEdgeMemory(unsigned int sz) {
     // Allocation sz number of Vertex objects.
-    //cout << "Edge space: " << sizeof(Edge)*sz << "\n";
-    //    _edgeMemory = new char[sizeof(Edge)*sz];
-    //    cout << "Edge Memory\n + Starting address: " << reinterpret_cast<int*>(_edgeMemory) 
-    //	 << ", ending address: " << reinterpret_cast<int*>(_edgeMemory + sizeof(Edge)*sz) << "\n" << endl;
+    cout << "Edge space: " << sizeof(Edge)*sz << "\n";
+       _edgeMemory = new char[sizeof(Edge)*sz];
+       cout << "Edge Memory\n + Starting address: " << reinterpret_cast<int*>(_edgeMemory) 
+    	 << ", ending address: " << reinterpret_cast<int*>(_edgeMemory + sizeof(Edge)*sz) << "\n" << endl;
   }
+#endif /* _FIXALLOC_ */
 
 protected:
   vector<VertexPtr> _vertices;
   vector<EdgePtr> _edges;
   unsigned int _numVertices;
   unsigned int _numEdges;
-  //  char* _nodeMemory;
-  //  char* _edgeMemory;
+#ifdef _FIXALLOC_
+  char* _nodeMemory;
+  char* _edgeMemory;
+#endif /* _FIXALLOC_ */
 
 };
 
