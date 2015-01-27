@@ -152,7 +152,7 @@ public:
     _numEdges++;
     _edges.push_back(e);
 
-    cin.get();
+    //    cin.get();
     return e->getId();
   }
 
