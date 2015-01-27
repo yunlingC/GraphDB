@@ -58,14 +58,80 @@ public:
     return n->getId();
   }
 
+  void chainEdge(VertexPtr fvp, EdgePtr fnx, EdgePtr e) {
+    EdgePtr fne = fnx;
+    EdgePtr fpe = fne;
+    
+    // Setup  for the first vertex
+    while (fne != NULL) {
+      cout << "+ walk " << fne->getId() << endl;
+      fpe = fne;
+      if (fne->getFirstVertexPtr() == fvp) {
+	cout << "+ down firstNext\n";
+	fne = fne->getFirstNextEdge();
+      } else if (fne->getSecondVertexPtr() == fvp) {
+	cout << "+ down secondNext\n";
+	fne = fne->getSecondNextEdge();
+      }
+
+    }
+
+    cout << "end of chain edge: " << fpe->getId() << endl;
+    // Got to the end of the chain.
+    if (fpe == e)  {
+      cout << "FIRST EDGE: " << endl;
+      return;
+    }
+
+    if (fpe->getFirstVertexPtr() == fvp) {
+      cout << "hooking up " << fpe->getId() << " to " << e->getId() << endl;
+      fpe->setFirstNextEdge(e);
+      if (e->getFirstVertexPtr() == fvp) {
+	e->setFirstPreviousEdge(fpe);
+	e->setFirstNextEdge(NULL); 
+      } else {
+	e->setSecondPreviousEdge(fpe);
+	e->setSecondNextEdge(NULL); 
+      }
+
+    } else if (fpe->getSecondVertexPtr() == fvp) {
+      cout << "hooking up " << fpe->getId() << " to " << e->getId() << endl;
+      fpe->setSecondNextEdge(e);
+      if (e->getFirstVertexPtr() == fvp) {
+	e->setFirstPreviousEdge(fpe);
+	e->setFirstNextEdge(NULL);
+
+      } else {
+	e->setSecondPreviousEdge(fpe);
+	e->setSecondNextEdge(NULL);
+      }
+    }
+  }
+
   void assignPointers(VertexDescriptor vs, VertexDescriptor vd, EdgePtr e) {
     
-    // 1. See if first's nextEdge is set or not.
+    VertexPtr fvp = e->getFirstVertexPtr();
+    VertexPtr svp = e->getSecondVertexPtr();
+    // 1. See if first's and second's nextEdge is set or not.
     // Doesn't matter who the next really is.
-    //    if (e->getNextEdge() == NULL) {
-    //      e->setNextEdge();
-    //    }
-    
+    if (fvp->getNextEdge() == NULL) {
+      fvp->setNextEdge(e);
+    }
+    if (svp->getNextEdge() == NULL) {
+      svp->setNextEdge(e);
+    }
+
+    // 2. Find the end of the chain for each first/second node.
+    // The chain is going to iterate over first and second pointers based on who is source.
+    cout << "assign fvp pointers\n";
+    EdgePtr fne = fvp->getNextEdge();
+    chainEdge(fvp, fne, e);
+    e->dump();
+
+    cout << "assign svp pointers\n";
+    fne = svp->getNextEdge();
+    chainEdge(svp, fne, e);
+
   }
 
   EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd) {
@@ -77,10 +143,16 @@ public:
     //    char * placePtr = _edgeMemory + _numEdges*sizeof(Edge);
     //    cout << "Place edge at: " << reinterpret_cast<int*>(placePtr) << endl;
     EdgePtr e = new Edge(_vertices[vs], _vertices[vd]);
-
-    e->setId(_numEdges);    
+    
+    e->setId(_numEdges);
+    cout << "\nassign pointers for edge: " << e->getId() << "\n";
+    assignPointers(vs, vd, e);
+    e->dump();
+    cout << "\ndone assign pointers\n";
     _numEdges++;
     _edges.push_back(e);
+
+    cin.get();
     return e->getId();
   }
 
@@ -88,6 +160,7 @@ public:
     EdgePtr e = new Edge(_vertices[vs], _vertices[vd]);
     e->setPropertyList(p);
     e->setId(_numEdges);    
+    assignPointers(vs, vd, e);
     _numEdges++;
     _edges.push_back(e);
     return e->getId();
@@ -98,6 +171,7 @@ public:
     e->setType(l);
     e->setPropertyList(p);
     e->setId(_numEdges);    
+    assignPointers(vs, vd, e);
     _numEdges++;
     _edges.push_back(e);
     return e->getId();
@@ -106,6 +180,12 @@ public:
   void dump() {
     for (int i = 0; i < _vertices.size(); i++) {
       _vertices[i]->dump();
+    }
+
+    for (int i =0; i <_edges.size() ; i++) {
+      cout << "--------------------\n";
+      _edges[i]->dump();
+      cout << endl;
     }
   }
 
@@ -127,60 +207,6 @@ public:
     //    delete _nodeMemory;
     //cout << "Delete edge  memory\n";
     //    delete _edgeMemory;
-  }
-
-  void updateEdges() {
-    // The basic idea is to iterate over all the vertices and update their first/second next/previous pointers.
-    // Since ordering of these pointers does not matter as long as they form a doubly linked list -- I use the vector of edges stored within a node to specify the order.  
-    // There are two main if statements here: first one sets pointers based on the firstVertex and the second on the secondVertex.
-    for (int i = 0; i < _vertices.size(); i++) {
-      VertexPtr np = _vertices[i];
-      std::vector<EdgePtr> & nodeEdges = np->getEdges();
-      cout << "vid: " << np->getId() << ", # of nodes: " << nodeEdges.size() << endl;
-      if (! nodeEdges.empty()) {
-	
-	EdgePtr ep = nodeEdges[0];
-	if (ep != NULL) {
-	  ep->setFirstPreviousEdge(NULL); //_firstPreviousEdge = NULL;
-	  np->setNextEdge(ep);
-
-	  EdgePtr nextEdge = NULL;
-	  // Connect the secondVertex
-	  if (np->getId() == ep->getFirstId()) {
-	    // Iterate over all the edges after the first one.
-	    // Recall that first edge is set in the node object.
-	    for (int j = 1; j < nodeEdges.size(); j++) {
-	      // Get the edge into nextEdge.
-	      nextEdge = nodeEdges[j];
-	      // Use it to point to the next edge.
-	      ep->setFirstNextEdge(nextEdge); //_firstNextEdge = nextEdge;
-	      // The previous of this next edge would point to the current edge.
-	      nextEdge->setFirstPreviousEdge(ep); //_firstPreviousEdge = ep;
-	      // Update the iterating pointer.
-	      ep = nextEdge;
-	    }
-	    // Last one will be NULL>
-	    ep->setFirstNextEdge(NULL); //_firstNextEdge = NULL;
-	  } else {
-	    // Connect the secondVertex
-	    if (np->getId() == ep->getSecondId()) {
-	      //	      ep->setSecondPreviousEdge(NULL);
-	      for (int j = 1; j < nodeEdges.size(); j++) {
-		nextEdge = nodeEdges[j];
-		ep->setSecondNextEdge(nextEdge); //_secondNextEdge = nextEdge;
-		nextEdge->setSecondPreviousEdge(ep); //_secondPreviousEdge = ep;
-		ep = nextEdge;
-	      }
-	      ep->setSecondNextEdge(NULL);
-	    }
-	  }
-	}
-
-      } else {
-	// No edges for that node.
-	np->setNextEdge(NULL);
-      }
-    }
   }
 
   void allocVertexMemory(unsigned int sz) {

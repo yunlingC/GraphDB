@@ -6,8 +6,58 @@
 using namespace std;
 
 void Edge::dump() {
-  cout << "Edge id: " << _id << "\n";
-  _list.print();  
+  cout << "\nEdge id: " << _id << " (" << _firstVertex->getId() << ", " << _secondVertex->getId() << ") " << endl;
+  //  cout << "first next eid: " << _firstVertex->getNextEdge()->getId() << "\n";
+  EdgePtr fne = getFirstNextEdge();
+  EdgePtr fpe = getFirstPreviousEdge();
+  EdgePtr sne = getSecondNextEdge();
+  EdgePtr spe = getSecondPreviousEdge();
+
+  if (fpe != NULL) {
+    cout << "- firstPreviousEdge: " << fpe->getId() << endl;
+  } else     cout << "- firstPreviousEdge: NULL" << endl;
+
+  if (fne != NULL) {
+    cout << "- firstNextEdge: " << fne->getId() << endl;
+  } else     cout << "- firstNextEdge: NULL" << endl;
+
+  if (spe != NULL) {
+    cout << "- secondPreviousEdge: " << spe->getId() << endl;
+  } else     cout << "- secondPreviousEdge: NULL" << endl;
+
+  if (sne != NULL) {
+    cout << "- secondNextEdge: " << sne->getId() << endl;
+  } else     cout << "- secondNextEdge: NULL" << endl;
+
+
+  
+  cout << "traverse firstNext: " ;
+  fne = _firstVertex->getNextEdge();
+  while (fne != NULL) {
+    cout << " => " << fne->getId();
+    fne = fne->getFirstNextEdge();
+  }
+ 
+  cout << "\ntraverse secondNext: ";
+  fne = _secondVertex->getNextEdge();
+  while (fne != NULL) {
+    cout << " => " << fne->getId();
+    fne = fne->getSecondNextEdge();
+  }
+  cout << "\ntraverse FirstPrevious: ";
+  fne = _firstVertex->getNextEdge();
+  while (fne != NULL) {
+    cout << " => " << fne->getId();
+    fne = fne->getFirstPreviousEdge();
+  }
+
+  cout << "\ntraverse secondPrevious: ";
+  fne = _firstVertex->getNextEdge(); 
+  while (fne != NULL) {
+    cout << "n=> " << fne->getId();
+    fne = fne->getSecondPreviousEdge();
+  }
+
 
 }
 

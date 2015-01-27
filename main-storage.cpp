@@ -80,16 +80,18 @@ int main() {
   //  g.print();
 
 
-  // Graph::VertexDescriptor v0 = g.addVertex(p);
+  // Graph::VertexDescriptor v0 = g.addVertex();
   // cout << "v0: " << v0 << endl;
-  // Graph::VertexDescriptor v1 = g.addVertex(q);
+  // Graph::VertexDescriptor v1 = g.addVertex();
   // Graph::VertexDescriptor v2 = g.addVertex();
   // Graph::VertexDescriptor v3 = g.addVertex();
   // Graph::VertexDescriptor v4 = g.addVertex();
   // Graph::VertexDescriptor v5 = g.addVertex();
   // Graph::VertexDescriptor v6 = g.addVertex();
   // cout << "start adding edges\n";
-  // Graph::EdgeDescriptor e0 = g.addEdge(v0, v1, p);
+  // Graph::EdgeDescriptor e0 = g.addEdge(v0, v1);
+
+  // cout << "add edge e1\n";
   // Graph::EdgeDescriptor e1 = g.addEdge(v0, v2);
   // Graph::EdgeDescriptor e2 = g.addEdge(v0, v4);
 
@@ -99,14 +101,14 @@ int main() {
   // Graph::EdgeDescriptor e6 = g.addEdge(v3, v5);
   // Graph::EdgeDescriptor e7 = g.addEdge(v4, v5);
   cout << "Begin updating edges\n";
-  g.updateEdges();
+  //  g.updateEdges();
   g.dump();
 
-  Graph::VertexPtr v0 = g.getVertexPointer(0);
+  Graph::VertexPtr vp0 = g.getVertexPointer(0);
   // Let sniper know fo source node.
-  MAGIC_SOURCE_NODE(v0);
+  MAGIC_SOURCE_NODE(vp0);
   MAGIC_PREFETCH_TRIGGER;
-  bfs(v0->getId(), g);
+  bfs(vp0->getId(), g);
 
   // FixedString fs("hello");
   // FixedString ft = fs;

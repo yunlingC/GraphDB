@@ -25,11 +25,11 @@ LINK_DIRECTORIES(${LINK_DIRECTORIES} ${Boost_LIBRARY_DIRS})
 ADD_SUBDIRECTORY(storage)
 SET( STORAGE_LIB storage)
 SET(GDB_LD_FLAGS storage) 
-#SET(CMAKE_CXX_FLAGS -std=c++11)
+SET(CMAKE_CXX_FLAGS -std=c++11)
 SET(TARGET t)
 
 # Set the release build for all optimizations
-SET(CMAKE_BUILD_TYPE Release)
+SET(CMAKE_BUILD_TYPE Debug)
 
 #foreach (ld_flag ${GDB_LD_FLAGS})
 #	target_link_libraries( ${TARGET} ${ld_flag} )
