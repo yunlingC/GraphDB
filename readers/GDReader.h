@@ -142,7 +142,8 @@ private:
       peopleProp.set("age", age);
       peopleProp.set("location",location);
       
-      Graph::VertexDescriptor vp = _graph.addVertex(peopleProp);
+      //      Graph::VertexDescriptor vp = _graph.addVertex(peopleProp);
+      Graph::VertexDescriptor vp = _graph.addVertex();
       _vertexMap.insert(pair<string, Graph::VertexDescriptor>(pid, vp));
       _people++;
     
@@ -179,7 +180,8 @@ private:
      webpagesProp.set("wpurl",wpurl);
      webpagesProp.set("wpdate",wpdate);
 
-     Graph::VertexDescriptor vw = _graph.addVertex(webpagesProp);
+     //     Graph::VertexDescriptor vw = _graph.addVertex(webpagesProp);
+     Graph::VertexDescriptor vw = _graph.addVertex();
      _vertexMap.insert(pair<string, Graph::VertexDescriptor>(wpid, vw));
      _webpages++;
     }
