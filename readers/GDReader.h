@@ -210,7 +210,8 @@ private:
       vs = _vertexMap.at(from);
       vd = _vertexMap.at(to) ;
       
-      _graph.addEdge(vs, vd, "FRIENDS", friendsProp);
+      //      _graph.addEdge(vs, vd, "FRIENDS", friendsProp);
+      _graph.addEdge(vs, vd, "FRIENDS");
       _friends++;
       }
   }
@@ -242,7 +243,8 @@ private:
       vs = _vertexMap.at(from);
       vd = _vertexMap.at(to);
 
-      _graph.addEdge(vs, vd, "LIKES", likesProp);
+      //      _graph.addEdge(vs, vd, "LIKES", likesProp);
+      _graph.addEdge(vs, vd, "LIKES");
       _likes++;
       }
   }

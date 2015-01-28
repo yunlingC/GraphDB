@@ -166,6 +166,35 @@ public:
     return e->getId();
   }
 
+  EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd, const string & l) {
+#ifdef _FIXALLOC_
+    if (_edgeMemory == NULL) {
+      cerr << "ERROR: Edge space not allocated\n";
+      exit(1);
+    }
+    //    Create new edge by retrieving VertexPtr from vertices.
+       char * placePtr = _edgeMemory + _numEdges*sizeof(Edge);
+       cout << "Place edge at: " << reinterpret_cast<int*>(placePtr) << endl;
+       EdgePtr e = new(placePtr) Edge(_vertices[vs], _vertices[vd]);
+#else
+    EdgePtr e = new Edge(_vertices[vs], _vertices[vd]);
+#endif /* _FIXALLOC_ */
+
+
+    
+    e->setId(_numEdges);
+    e->setType(l);
+    cout << "\nassign pointers for edge: " << e->getId() << "\n";
+    assignPointers(vs, vd, e);
+    e->dump();
+    cout << "\ndone assign pointers\n";
+    _numEdges++;
+    _edges.push_back(e);
+
+    //    cin.get();
+    return e->getId();
+  }
+
   EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd, PropertyListType & p) {
     EdgePtr e = new Edge(_vertices[vs], _vertices[vd]);
     e->setPropertyList(p);
