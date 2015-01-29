@@ -54,7 +54,7 @@ void Edge::dump() {
   cout << "\ntraverse secondPrevious: ";
   fne = _firstVertex->getNextEdge(); 
   while (fne != NULL) {
-    cout << "n=> " << fne->getId();
+    cout << "=> " << fne->getId();
     fne = fne->getSecondPreviousEdge();
   }
 
@@ -172,5 +172,8 @@ Edge::Edge(VertexPtr vs, VertexPtr vd) {
   _firstVertex->addEdge(this);
   _secondVertex = vd; 
   _secondVertex->addEdge(this);
+  _firstNextEdge = NULL; _firstPreviousEdge = NULL;
+  _secondNextEdge = NULL; _secondPreviousEdge = NULL;
+
   }
   
