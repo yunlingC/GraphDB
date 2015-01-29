@@ -41,7 +41,17 @@ add_subdirectory(storage)
 
 #ADD_EXECUTABLE(graphdb main.cpp)
 #ADD_EXECUTABLE(graphdb1 main1.cpp)
-add_executable(
-        ${TARGET} main-storage.cpp )
+set(TESTS 
+        main-storage.cpp 
+        main-fixstring.cpp
+        )
 
-target_link_libraries(${TARGET} ${STORAGE_LIB})
+foreach( testsourcefile ${TESTS} ) 
+        string( REPLACE ".cpp" "" testname ${testsourcefile} ) 
+        add_executable( ${testname} ${testsourcefile} ) 
+        # Make sure YourLib is linked to each app 
+        target_link_libraries( ${testname} ${STORAGE_LIB}) 
+endforeach( testsourcefile ${TESTS} )
+
+#add_executable( ${TARGET} main-storage.cpp ) 
+#target_link_libraries(${TARGET} ${STORAGE_LIB})
