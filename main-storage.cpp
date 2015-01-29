@@ -72,16 +72,17 @@ int main() {
 
   Graph g;
 #ifdef _FIXALLOC_
-  g.allocVertexMemory(50);
-  g.allocEdgeMemory(100);
+  g.allocVertexMemory(2000);
+  g.allocEdgeMemory(20000);
 #endif /* _FIXALLOC */
   cout << "Begin testing\n";
 
-  //  GDReader reader(g);
-  //  reader.readFile("../tests/gd/sndata.gd");
+  GDReader reader(g);
+  reader.readFile("../tests/gd/sndata-big.gd");
   //  g.print();
 
 
+  /*
   Graph::VertexDescriptor v0 = g.addVertex();
   cout << "v0: " << v0 << endl;
   Graph::VertexDescriptor v1 = g.addVertex();
@@ -104,6 +105,7 @@ int main() {
   Graph::EdgeDescriptor e7 = g.addEdge(v4, v5);
   cout << "Begin updating edges\n";
   g.dump();
+  */
 
   Graph::VertexPtr vp0 = g.getVertexPointer(0);
   // Let sniper know fo source node.
