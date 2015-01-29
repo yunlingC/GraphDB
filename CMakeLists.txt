@@ -21,16 +21,17 @@ INCLUDE_DIRECTORIES(
 
 LINK_DIRECTORIES(${LINK_DIRECTORIES} ${Boost_LIBRARY_DIRS})
 
+SET(CMAKE_CXX_FLAGS "$ENV{CMAKE_CXX_FLAGS} -std=c++11 -D_FIXALLOC_")
+SET(TARGET t)
+# Set the release build for all optimizations
+SET(CMAKE_BUILD_TYPE Release)
 
-ADD_SUBDIRECTORY(storage)
+
+
 SET(STORAGE_LIB storage)
 SET(GDB_LD_FLAGS storage) 
 
-SET(CMAKE_CXX_FLAGS "$ENV{CMAKE_CXX_FLAGS} -std=c++11")
-SET(TARGET t)
-
-# Set the release build for all optimizations
-SET(CMAKE_BUILD_TYPE Debug)
+ADD_SUBDIRECTORY(storage)
 
 #foreach (ld_flag ${GDB_LD_FLAGS})
 #	target_link_libraries( ${TARGET} ${ld_flag} )
