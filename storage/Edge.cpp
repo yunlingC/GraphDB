@@ -13,47 +13,47 @@ void Edge::dump() {
   EdgePtr sne = getSecondNextEdge();
   EdgePtr spe = getSecondPreviousEdge();
 
-  if (fpe != NULL) {
+  if (fpe != nullptr) {
     cout << "- firstPreviousEdge: " << fpe->getId() << endl;
-  } else     cout << "- firstPreviousEdge: NULL" << endl;
+  } else     cout << "- firstPreviousEdge: nullptr" << endl;
 
-  if (fne != NULL) {
+  if (fne != nullptr) {
     cout << "- firstNextEdge: " << fne->getId() << endl;
-  } else     cout << "- firstNextEdge: NULL" << endl;
+  } else     cout << "- firstNextEdge: nullptr" << endl;
 
-  if (spe != NULL) {
+  if (spe != nullptr) {
     cout << "- secondPreviousEdge: " << spe->getId() << endl;
-  } else     cout << "- secondPreviousEdge: NULL" << endl;
+  } else     cout << "- secondPreviousEdge: nullptr" << endl;
 
-  if (sne != NULL) {
+  if (sne != nullptr) {
     cout << "- secondNextEdge: " << sne->getId() << endl;
-  } else     cout << "- secondNextEdge: NULL" << endl;
+  } else     cout << "- secondNextEdge: nullptr" << endl;
 
 
   
   cout << "traverse firstNext: " ;
   fne = _firstVertex->getNextEdge();
-  while (fne != NULL) {
+  while (fne != nullptr) {
     cout << " => " << fne->getId();
     fne = fne->getFirstNextEdge();
   }
  
   cout << "\ntraverse secondNext: ";
   fne = _secondVertex->getNextEdge();
-  while (fne != NULL) {
+  while (fne != nullptr) {
     cout << " => " << fne->getId();
     fne = fne->getSecondNextEdge();
   }
   cout << "\ntraverse FirstPrevious: ";
   fne = _firstVertex->getNextEdge();
-  while (fne != NULL) {
+  while (fne != nullptr) {
     cout << " => " << fne->getId();
     fne = fne->getFirstPreviousEdge();
   }
 
   cout << "\ntraverse secondPrevious: ";
   fne = _firstVertex->getNextEdge(); 
-  while (fne != NULL) {
+  while (fne != nullptr) {
     cout << "=> " << fne->getId();
     fne = fne->getSecondPreviousEdge();
   }
@@ -95,7 +95,7 @@ Edge::VertexPtr Edge::getTarget(Edge::VertexPtr from) {
   } else if (from == _secondVertex) {
     return _firstVertex;
   }
-  return NULL;
+  return nullptr;
 }
 
 Edge::EdgePtr Edge::getNextEdge(Edge::VertexPtr from) {
@@ -104,7 +104,7 @@ Edge::EdgePtr Edge::getNextEdge(Edge::VertexPtr from) {
   } else if (from == _secondVertex) {
     return _secondNextEdge;
   }
-  return NULL;
+  return nullptr;
 }
 
 void Edge::setFirstNextEdge(EdgePtr e) {
@@ -161,9 +161,9 @@ Edge::EdgeDescriptor Edge::getId() {
 
 
 Edge::Edge(): _id(-1) { 
-    _firstVertex = NULL;     _secondVertex = NULL;
-    _firstNextEdge = NULL; _firstPreviousEdge = NULL;
-    _secondNextEdge = NULL; _secondPreviousEdge = NULL;
+    _firstVertex = nullptr;     _secondVertex = nullptr;
+    _firstNextEdge = nullptr; _firstPreviousEdge = nullptr;
+    _secondNextEdge = nullptr; _secondPreviousEdge = nullptr;
   }
 
 Edge::Edge(VertexPtr vs, VertexPtr vd) {
@@ -172,8 +172,8 @@ Edge::Edge(VertexPtr vs, VertexPtr vd) {
   _firstVertex->addEdge(this);
   _secondVertex = vd; 
   _secondVertex->addEdge(this);
-  _firstNextEdge = NULL; _firstPreviousEdge = NULL;
-  _secondNextEdge = NULL; _secondPreviousEdge = NULL;
+  _firstNextEdge = nullptr; _firstPreviousEdge = nullptr;
+  _secondNextEdge = nullptr; _secondPreviousEdge = nullptr;
 
   }
   

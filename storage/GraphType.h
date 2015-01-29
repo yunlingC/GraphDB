@@ -24,13 +24,13 @@ public:
 public:
   VertexPtr getVertexPointer(VertexDescriptor v) {
     if ( (v > _vertices.size() - 1) || (v < 0) ) {
-      return NULL;
+      return nullptr;
     }
     return _vertices[v];
   }
 
   VertexDescriptor addVertex() {
-    /* if (_nodeMemory == NULL) { */
+    /* if (_nodeMemory == nullptr) { */
     /*   cerr << "ERROR: Edge space not allocated\n"; */
     /*   exit(1); */
     /* } */
@@ -60,9 +60,9 @@ public:
 
   void chainEdge(VertexPtr v, EdgePtr fnx, EdgePtr newEdge) {
     EdgePtr next = fnx;
-    EdgePtr prev = NULL;
+    EdgePtr prev = nullptr;
 
-    while (next != NULL) {
+    while (next != nullptr) {
       prev = next;
       if (next->getFirstVertexPtr()->getId() == v->getId()) {
 	cout << "+ down firstNext\n";
@@ -92,10 +92,10 @@ public:
       prev->setFirstNextEdge(newEdge);
       if (newEdge->getFirstVertexPtr() == v) {
 	newEdge->setFirstPreviousEdge(prev);
-	newEdge->setFirstNextEdge(NULL); 
+	newEdge->setFirstNextEdge(nullptr); 
       } else if (newEdge->getSecondVertexPtr() == v) {
 	newEdge->setSecondPreviousEdge(prev);
-	newEdge->setSecondNextEdge(NULL); 
+	newEdge->setSecondNextEdge(nullptr); 
       }
 
     } else if (prev->getSecondVertexPtr() == v) {
@@ -103,12 +103,12 @@ public:
       prev->setSecondNextEdge(newEdge);
       if (newEdge->getFirstVertexPtr() == v) {
 	newEdge->setFirstPreviousEdge(prev);
-	newEdge->setFirstNextEdge(NULL);
+	newEdge->setFirstNextEdge(nullptr);
 
       } else if (newEdge->getSecondVertexPtr() == v) {
 	cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
 	newEdge->setSecondPreviousEdge(prev);
-	newEdge->setSecondNextEdge(NULL);
+	newEdge->setSecondNextEdge(nullptr);
       }
     }
   }
@@ -119,10 +119,10 @@ public:
     VertexPtr svp = e->getSecondVertexPtr();
     // 1. See if first's and second's nextEdge is set or not.
     // Doesn't matter who the next really is.
-    if (fvp->getNextEdge() == NULL) {
+    if (fvp->getNextEdge() == nullptr) {
       fvp->setNextEdge(e);
     }
-    if (svp->getNextEdge() == NULL) {
+    if (svp->getNextEdge() == nullptr) {
       svp->setNextEdge(e);
     }
 
@@ -140,7 +140,7 @@ public:
   }
 
   EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd) {
-    /* if (_edgeMemory == NULL) { */
+    /* if (_edgeMemory == nullptr) { */
     /*   cerr << "ERROR: Edge space not allocated\n"; */
     /*   exit(1); */
     /* } */
@@ -162,7 +162,7 @@ public:
   }
 
   EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd, const string & l) {
-    /* if (_edgeMemory == NULL) { */
+    /* if (_edgeMemory == nullptr) { */
     /*   cerr << "ERROR: Edge space not allocated\n"; */
     /*   exit(1); */
     /* } */
@@ -220,7 +220,7 @@ e->setType(l);
     }
   }
 
- GraphType(): _numVertices(0), _numEdges(0) {//, _nodeMemory(NULL), _edgeMemory(NULL) {
+ GraphType(): _numVertices(0), _numEdges(0) {//, _nodeMemory(nullptr), _edgeMemory(nullptr) {
   }
 
   ~GraphType() {

@@ -27,7 +27,7 @@ void bfs(GraphType::VertexDescriptor vs, GraphType & g) {
   Q.push(np);
   C.insert(VisitPair(np,false));
 
-  GraphType::VertexPtr targetVertex = NULL;
+  GraphType::VertexPtr targetVertex = nullptr;
 
   while (!Q.empty()) {
     np = Q.front();  Q.pop();
@@ -37,7 +37,7 @@ void bfs(GraphType::VertexDescriptor vs, GraphType & g) {
     C[np] = true;
 
     GraphType::EdgePtr nextEdge = np->getNextEdge();
-    while (nextEdge != NULL) {
+    while (nextEdge != nullptr) {
       // Get the target
       targetVertex = nextEdge->getTarget(np);
       if (C.find(targetVertex) == C.end()) {

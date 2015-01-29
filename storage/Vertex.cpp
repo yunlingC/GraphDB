@@ -25,7 +25,7 @@ std::vector<Edge::EdgePtr> & Vertex::getEdges() {
 }
 
 Vertex::Vertex(): _id(-1) {
-    _nextEdge = NULL;
+    _nextEdge = nullptr;
   }
 
 void Vertex::setId(unsigned int id) {
@@ -62,34 +62,34 @@ void Vertex::dump() {
     
     // For this node's next first edge
 
-    if (_nextEdge != NULL) {
+    if (_nextEdge != nullptr) {
       std::cout << "\nPrint edge traversals:" << _nextEdge << std::endl;
       cout << "=> current edge id: " << _nextEdge->getId() << ", previous edge ids: \n";
       EdgePtr p = _nextEdge;
       cout << "\n=> firstEdges\n";
       cout << "=> previous eids\n";
-      while ( p != NULL) {
+      while ( p != nullptr) {
 	std::cout << "=> " << p->getId() << " ";
 	p = p->getFirstPreviousEdge();
       }
 
       cout << "\n= next eids\n";
       p = _nextEdge;
-      while ( p != NULL) {
+      while ( p != nullptr) {
 	std::cout << "=> " << p->getId() << " ";
 	p = p->getFirstNextEdge();
       }
 
       cout << "\n\n=> secondEdges\n";
       cout << "=> previous eids\n";
-      while ( p != NULL) {
+      while ( p != nullptr) {
 	std::cout << "=> " << p->getId() << " ";
 	p = p->getSecondPreviousEdge();
       }
 
       cout << "\n= next eids\n";
       p = _nextEdge;
-      while ( p != NULL) {
+      while ( p != nullptr) {
 	std::cout << "=> " << p->getId() << " ";
 	p = p->getSecondNextEdge();
       }
