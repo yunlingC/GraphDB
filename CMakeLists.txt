@@ -41,11 +41,10 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -D_FIXALLOC_")
 # Storage sub directory
 add_subdirectory(storage)
 
-#ADD_EXECUTABLE(graphdb main.cpp)
-#ADD_EXECUTABLE(graphdb1 main1.cpp)
 set(TESTS 
         main-storage.cpp 
         main-fixstring.cpp
+        main-prop.cpp
         )
 
 foreach( testsourcefile ${TESTS} ) 
@@ -54,6 +53,5 @@ foreach( testsourcefile ${TESTS} )
         # Make sure YourLib is linked to each app 
         target_link_libraries( ${testname} ${STORAGE_LIB}) 
 endforeach( testsourcefile ${TESTS} )
-
 #add_executable( ${TARGET} main-storage.cpp ) 
 #target_link_libraries(${TARGET} ${STORAGE_LIB})
