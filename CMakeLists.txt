@@ -8,6 +8,7 @@ find_package(Boost 1.57 COMPONENTS required)
 set(READERS_INCLUDE_DIR "readers")
 set(SRC_DIR "src")
 set(STORAGE_DIR "storage")
+set(TRAVERSALS_DIR "traversals")
 
 include_directories( 
         ${INCLUDE_DIRECTORIES} 
@@ -16,6 +17,7 @@ include_directories(
         ${READERS_INCLUDE_DIR}
         ${SRC_DIR} 
         ${STORAGE_DIR}
+	${TRAVERSALS_DIR}
         )
 
 link_directories(
