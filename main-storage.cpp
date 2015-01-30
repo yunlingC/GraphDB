@@ -14,6 +14,14 @@
 
 using namespace std;
 
+class VisitedVertex : public VertexVisitor {
+public:
+  VisitedVertex() { }
+  virtual bool visitVertex(VertexPointer vp) {
+    cout << "visited vertex: " << vp->getId() << endl;
+    return true;
+  }
+};
 // void bfs(GraphType::VertexDescriptor vs, GraphType & g) {
 //   typedef pair<GraphType::VertexPtr, bool> VisitPair;
 //   cout << "================= BfS ===================== \n";
@@ -68,12 +76,14 @@ int main() {
 
   //createGraph(g);
 
+  VisitedVertex VV;
+
   Graph::VertexPtr vp0 = g.getVertexPointer(0);
   // Let sniper know fo source node.
   MAGIC_SOURCE_NODE(vp0);
   MAGIC_PREFETCH_TRIGGER;
   cout << "BFS start\n";
-  breadth_first_search(vp0->getId(), g);
+  breadth_first_search(vp0->getId(), g, VV);
 
   
   //  g.dump();

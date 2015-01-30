@@ -4,16 +4,14 @@
 #include <queue>
 #include <map>
 
-
 #include "GraphType.h"
+#include "VertexVisitor.h"
 
 using namespace std;
 
-void breadth_first_search(GraphType::VertexDescriptor vs, GraphType & g) {
+void breadth_first_search(GraphType::VertexDescriptor vs, GraphType & g, VertexVisitor & vv) {
   typedef pair<GraphType::VertexPtr, bool> VisitPair;
   cout << "================= BfS ===================== \n";
-  cout << "+ vertex: " << vs << "\n";
-
   GraphType::VertexPtr np = g.getVertexPointer(vs);
 
   // Start traversing the graph from here. 
@@ -27,8 +25,7 @@ void breadth_first_search(GraphType::VertexDescriptor vs, GraphType & g) {
 
   while (!Q.empty()) {
     np = Q.front();  Q.pop();
-    cout << "vid: " << np->getId() << "\n";
-
+    vv.visitVertex(np);
     // Set to visited.    
     C[np] = true;
 
@@ -38,8 +35,8 @@ void breadth_first_search(GraphType::VertexDescriptor vs, GraphType & g) {
       targetVertex = nextEdge->getTarget(np);
       if (C.find(targetVertex) == C.end()) {
 	// queue the target for visitation
-	//	cout << "push: " << targetVertex->getId() << "\n";
 	Q.push(targetVertex);
+	vv.scheduleVertex(targetVertex);
 	C.insert(VisitPair(targetVertex,false));
       }
       // Update nextEdge from np
@@ -48,7 +45,5 @@ void breadth_first_search(GraphType::VertexDescriptor vs, GraphType & g) {
   }
   cout << "================= END BFS ===================== \n";
 };
-
-
 
 #endif /* _BREADTH_FIRST_SEARCH_H_ */
