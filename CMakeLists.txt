@@ -40,7 +40,6 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -D_FIXALLOC_")
 
 # Storage sub directory
 add_subdirectory(storage)
-
 set(TESTS 
         main-storage.cpp 
         main-fixstring.cpp
