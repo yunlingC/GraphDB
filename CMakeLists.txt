@@ -45,7 +45,6 @@ set(TESTS
         main-fixstring.cpp
         main-prop.cpp
         )
-
 foreach( testsourcefile ${TESTS} ) 
         string( REPLACE ".cpp" "" testname ${testsourcefile} ) 
         add_executable( ${testname} ${testsourcefile} ) 
