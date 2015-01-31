@@ -4,6 +4,7 @@
 #include <string>
 
 #include "PropertyList.h"
+#include "FixedString.h"
 
 class Vertex;
 
@@ -69,7 +70,7 @@ public:
   EdgePtr _secondPreviousEdge;
   
   // Label to denote type.
-  string _type;
+  FixedString _type;
 
   // Property list/map.
   PropertyListType _list;

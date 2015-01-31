@@ -197,7 +197,7 @@ e->setType(l);
   EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd, const string & l, PropertyListType & p) {
     EdgePtr e = new Edge(_vertices[vs], _vertices[vd]);
     e->setType(l);
-    //    e->setPropertyList(p);
+    e->setPropertyList(p);
     e->setId(_numEdges);    
     cout << "\n\naddEdge:: assign pointers for edge: " << e->getId() << "\n";
     assignPointers(vs, vd, e);

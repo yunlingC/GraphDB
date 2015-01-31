@@ -10,7 +10,7 @@
 
 #include "breadth_first_search.h"
 /// Test
-#include "tests/gs/g1.h"
+//#include "tests/gs/g1.h"
 
 using namespace std;
 

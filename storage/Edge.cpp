@@ -8,6 +8,9 @@ using namespace std;
 void Edge::dump() {
   cout << "\nEdge id: " << _id << " (" << _firstVertex->getId() << ", " << _secondVertex->getId() << ") " << endl;
   //  cout << "first next eid: " << _firstVertex->getNextEdge()->getId() << "\n";
+  cout << "\nEdge PropertyList\n";
+  _list.print();
+
   EdgePtr fne = getFirstNextEdge();
   EdgePtr fpe = getFirstPreviousEdge();
   EdgePtr sne = getSecondNextEdge();

@@ -14,16 +14,17 @@ public:
   FixedString() { }
 
   FixedString(const string & s): _size(64) { 
-    cout << "==> s: " << s <<endl;
+//    cout << "==> s: " << s <<endl;
     strncpy(_string, const_cast<char*>(s.c_str()), _size);
-    cout << "==> s: " << _string <<endl;
+//    cout << "==> s: " << _string <<endl;
   }
 
 
-  FixedString & operator=(FixedString & from) {
+  FixedString & operator=(const FixedString & from) {
     if (this != &from) {
       strncpy(_string, from._string, _size);
     }
+    return *this;
   }
   
   FixedString & operator+=(const FixedString & appender){
@@ -34,9 +35,25 @@ public:
   friend FixedString & operator+(FixedString lhs, const FixedString &rhs) {
     return lhs += rhs;
  }
+  friend bool  operator<(const FixedString & lhs, const FixedString & rhs) {
+    if(strcmp(lhs._string, rhs._string) <= 0)
+      return true;
+    else 
+      return false;
+  }
 
-  int operator==(const FixedString& right) {
-    return strcmp(_string, right._string);
+  friend bool  operator>(const FixedString & lhs, const FixedString & rhs) {
+    if(strcmp(lhs._string, rhs._string) > 0)
+      return true;
+    else 
+      return false;
+  }
+
+  bool operator==(const FixedString& right) {
+    if(strcmp(_string, right._string) == 0)
+      return true;
+    else 
+      return false;
   }
 
   void setString(const string& s) {
@@ -47,7 +64,7 @@ public:
     return &(_string[0]);
   }
 
-  string std_str() {
+  string std_str() const {
     return string(_string);
   }
 

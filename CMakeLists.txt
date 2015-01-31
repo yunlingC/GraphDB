@@ -42,8 +42,7 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -D_FIXALLOC_")
 add_subdirectory(storage)
 set(TESTS 
         main-storage.cpp 
-        main-fixstring.cpp
-        main-prop.cpp
+        main-fixedstring.cpp
         )
 foreach( testsourcefile ${TESTS} ) 
         string( REPLACE ".cpp" "" testname ${testsourcefile} ) 
