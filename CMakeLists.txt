@@ -45,11 +45,10 @@ set(TESTS
         main-fixstring.cpp
         )
 
+# This will generate all the executables listed in the TESTS variable
 foreach( testsourcefile ${TESTS} ) 
         string( REPLACE ".cpp" "" testname ${testsourcefile} ) 
         add_executable( ${testname} ${testsourcefile} ) 
         # Make sure YourLib is linked to each app 
         target_link_libraries( ${testname} ${STORAGE_LIB}) 
 endforeach( testsourcefile ${TESTS} )
-#add_executable( ${TARGET} main-storage.cpp ) 
-#target_link_libraries(${TARGET} ${STORAGE_LIB})
