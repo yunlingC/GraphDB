@@ -15,7 +15,9 @@ class GraphType {
 public:
   typedef unsigned int VertexDescriptor;
   typedef unsigned int EdgeDescriptor;
+  typedef Vertex* VertexPointer;
   typedef Vertex* VertexPtr;
+  typedef Edge* EdgePointer;
   typedef Edge* EdgePtr;
   typedef PropertyList<string, string> PropertyListType;
   typedef PropertyListType VertexPropertyList;
