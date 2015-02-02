@@ -15,8 +15,8 @@ public:
   typedef unsigned int EdgeDescriptor;
   typedef unsigned int VertexDescriptor;
   
-  typedef std::string KeyType;
-  typedef std::string ValueType;
+  typedef FixedString KeyType;
+  typedef FixedString ValueType;
   typedef PropertyList<KeyType, ValueType > PropertyListType;
   typedef pair<ValueType, bool> ReturnValueType;
 

@@ -19,6 +19,9 @@ public:
   VisitedVertex() { }
   virtual bool visitVertex(VertexPointer vp) {
     cout << "visited vertex: " << vp->getId() << endl;
+    cout << "print property list\n";
+    Vertex::PropertyListType pl = vp->getPropertyList();
+    pl.print();
     return true;
   }
 };

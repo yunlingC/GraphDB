@@ -6,6 +6,7 @@
 #include <string>
 
 #include "PropertyList.h"
+#include "FixedString.h"
 
 class Edge;
 
@@ -14,8 +15,8 @@ public:
   typedef Vertex* VertexPtr;
   typedef Edge* EdgePtr;
   typedef unsigned int EdgeDescriptor;
-  typedef std::string KeyType;
-  typedef std::string ValueType;
+  typedef FixedString KeyType;
+  typedef FixedString ValueType;
 
   // PropertyList typedefs.
   typedef PropertyList< KeyType, ValueType > PropertyListType;

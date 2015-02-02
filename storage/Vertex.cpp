@@ -4,8 +4,8 @@
 using namespace std;
 
 Vertex::ReturnPropertyValueType Vertex::getPropertyValue(KeyType k) {
-    return _list.get(k);
-  }
+  return _list.get(k);
+}
 
 void Vertex::setProperty(Vertex::KeyType k, Vertex::ValueType v) {
   _list.set(k,v);

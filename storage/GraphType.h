@@ -19,7 +19,7 @@ public:
   typedef Vertex* VertexPtr;
   typedef Edge* EdgePointer;
   typedef Edge* EdgePtr;
-  typedef PropertyList<string, string> PropertyListType;
+  typedef PropertyList<FixedString, FixedString> PropertyListType;
   typedef PropertyListType VertexPropertyList;
   typedef PropertyListType EdgePropertyList;
 

@@ -64,8 +64,12 @@ public:
     return &(_string[0]);
   }
 
-  string std_str() const {
+  std::string std_str() const {
     return string(_string);
+  }
+
+  unsigned int size() {
+    return _size;
   }
 
 protected:

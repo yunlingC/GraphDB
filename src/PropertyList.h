@@ -5,31 +5,32 @@
 
 // TODO: This should be replaced with debug function.
 #include <iostream>
-#include <string>
-#include "FixedString.h"
+//#include <string>
+//#include "FixedString.h"
 
 using namespace std;
 
-
-typedef FixedString KeyType;
-typedef FixedString ValueType;
-
-template <typename Key, typename Value>
+template <typename KeyType, typename ValueType>
 struct PropertyList {
 
 public:  
   typedef typename map<KeyType, ValueType>::iterator mapIteratorType;
-
-  typedef pair<Value, bool> ReturnValueType;
+  typedef pair<ValueType, bool> ReturnValueType;
 
 public:
 PropertyList(): _maxSize(10) {
-
-  }
+}
 
 PropertyList(unsigned int s): _maxSize(0) {
+
 }
-  bool set(const Key & k, const Value & v) {
+
+  bool set(const std::string & k, const std::string & v) {
+    KeyType kk(k); ValueType vv(v);
+    set(kk, vv);
+  }
+ 
+  bool set(const KeyType & k, const ValueType & v) {
     if (_pl.size() >= _maxSize) {
       return false;
     }
@@ -41,15 +42,16 @@ PropertyList(unsigned int s): _maxSize(0) {
     return true;
   }
 
-  void remove(const Key & k) {
+  void remove(const KeyType & k) {
     KeyType kt(k);
     _pl.erase(kt);
   }
 
-  ReturnValueType get(const Key & k) {
+  ReturnValueType get(const KeyType & k) {
     // Only initialize if known type parameters.
     // Assume <string, bool>
-    ReturnValueType rv("null", true);
+    ValueType str("null");
+    ReturnValueType rv(str, true);
 
     KeyType kt(k);
     mapIteratorType mi = _pl.find(kt);
@@ -61,7 +63,7 @@ PropertyList(unsigned int s): _maxSize(0) {
     }
     //    cout << "copy value: " << mi->first << ", " << mi->second << endl;
     // Copy the value.
-    rv.first = mi->second.std_str();
+    rv.first = mi->second;
     return rv;
   }
 
@@ -77,7 +79,7 @@ PropertyList(unsigned int s): _maxSize(0) {
   void print() {
     mapIteratorType mbeg, mend;
     for (mbeg = _pl.begin(), mend = _pl.end(); mbeg != mend; mbeg++) {
-      cout << "[" << (mbeg->first).std_str() << ", " << (mbeg->second).std_str() << "]" << endl;
+      cout << "[" << mbeg->first.std_str() << ", " << mbeg->second.std_str() << "]" << endl;
     }
   }
 private:
