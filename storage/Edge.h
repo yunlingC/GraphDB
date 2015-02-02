@@ -51,7 +51,8 @@ public:
   // Constructors
   Edge();
   Edge(VertexPtr vs, VertexPtr vd);
-  
+  void deleteEdge();
+
  protected:
   unsigned int _id;
 
@@ -72,7 +73,6 @@ public:
   // Label to denote type.
   FixedString _type;
 
-  // Property list/map.
   PropertyListType _list;
 };
 

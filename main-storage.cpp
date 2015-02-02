@@ -4,6 +4,7 @@
 #include "FixedString.h"
 #include "macros.h"
 #include "GDReader.h"
+#include "LinkedList.h"
 
 #include <iostream>
 #include <queue>
@@ -75,7 +76,7 @@ int main() {
   cout << "Begin testing\n";
 
   GDReader reader(g);
-  reader.readFile("../tests/gd/sndata.gd");
+  reader.readFile("../tests/gd/sndata-big.gd");
 
   //createGraph(g);
 
@@ -88,7 +89,6 @@ int main() {
   cout << "BFS start\n";
   breadth_first_search(vp0->getId(), g, VV);
 
-  
-  //  g.dump();
+
   return 0;
 }

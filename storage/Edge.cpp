@@ -180,3 +180,7 @@ Edge::Edge(VertexPtr vs, VertexPtr vd) {
 
   }
   
+void Edge::deleteEdge() {
+  cout << "- edge: " << _id << "\n";
+  _list.deletePropertyList();
+}

@@ -229,12 +229,16 @@ e->setType(l);
     // Must manually delete the objects.  
     // However, only one place is necessary since everywhere else, I am storing pointers.
     // Thus, _vertices and _edges contain all newly created objects.
-    // for (int i =0; i < _vertices.size(); i++) {
-    //   //      delete _vertices[i];
-    // }
-    // for (int i =0; i < _edges.size(); i++) {
-    //   //      delete _edges[i];
-    // }
+    cout << "Delete everything\n";
+    for (int i =0; i < _vertices.size(); i++) {
+      _vertices[i]->deleteVertex();
+      delete _vertices[i];
+    }
+
+    for (int i =0; i < _edges.size(); i++) {
+      _edges[i]->deleteEdge();
+      delete _edges[i];
+    }
 
     // Delete the memory spaces.
     //    delete _nodeMemory;

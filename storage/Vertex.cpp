@@ -106,3 +106,7 @@ void Vertex::dump() {
 
   }
 
+void Vertex::deleteVertex() {
+  cout << "- vertex: " << _id << "\n";
+  _list.deletePropertyList();
+}

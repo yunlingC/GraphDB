@@ -35,6 +35,7 @@ public:
   void setProperty(KeyType k, ValueType v);
   void setPropertyList(PropertyListType & l);
   PropertyListType &  getPropertyList();
+  void deleteVertex();
 
 protected:
   // Vertex id.

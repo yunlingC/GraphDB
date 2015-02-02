@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
 
 using namespace std;
 
@@ -11,7 +12,9 @@ public:
   typedef char FixedStringType;
   typedef char* FixedStringPtrType;
 public:
-  FixedString() { }
+  FixedString(): _size(64) { 
+
+  }
 
   FixedString(const string & s): _size(64) { 
 //    cout << "==> s: " << s <<endl;
@@ -19,10 +22,10 @@ public:
 //    cout << "==> s: " << _string <<endl;
   }
 
-
   FixedString & operator=(const FixedString & from) {
+    cout << "FixedString:: assignment operator\n";
     if (this != &from) {
-      strncpy(_string, from._string, _size);
+      strncpy(this->_string, from._string, _size);
     }
     return *this;
   }
@@ -32,9 +35,15 @@ public:
     return *this;
   }
 
+  friend std::ostream & operator<<(std::ostream & os, const FixedString & s)  {
+    os << s._string ;
+    return os;
+  }
+
   friend FixedString & operator+(FixedString lhs, const FixedString &rhs) {
     return lhs += rhs;
  }
+
   friend bool  operator<(const FixedString & lhs, const FixedString & rhs) {
     if(strcmp(lhs._string, rhs._string) <= 0)
       return true;
@@ -49,7 +58,7 @@ public:
       return false;
   }
 
-  bool operator==(const FixedString& right) {
+  bool operator==(const FixedString & right) const {
     if(strcmp(_string, right._string) == 0)
       return true;
     else 
@@ -73,7 +82,7 @@ public:
   }
 
 protected:
-  FixedStringType  _string[64];
+  FixedStringType _string[64];
   unsigned int _size;
 };
 
