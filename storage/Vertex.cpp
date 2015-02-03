@@ -21,6 +21,10 @@ Vertex::PropertyListType &  Vertex::getPropertyList() {
 }
 
 std::vector<Edge::EdgePtr> & Vertex::getEdges() {
+  return _allEdges;
+}
+
+std::vector<Edge::EdgePtr> & Vertex::getOutEdges() {
   return _outEdges;
 }
 
@@ -41,8 +45,16 @@ void Vertex::setNextEdge(Edge::EdgePtr ep) {
 }
   
 void Vertex::addEdge(Edge::EdgePtr ep) {
-    _outEdges.push_back(ep);
-  }
+    _allEdges.push_back(ep);
+
+    if ( this == ep->getFirstVertexPtr() ) {
+      _outEdges.push_back(ep);
+    }
+}
+
+void Vertex::addOutEdge(Edge::EdgePtr ep) {
+
+}
 
 Edge::EdgePtr Vertex::getNextEdge() {
   return _nextEdge;
@@ -53,8 +65,8 @@ void Vertex::dump() {
     std::cout << " ========================================= " << std::endl;
     std::cout << " Vertex: " << _id << ", addr:" << this << ", node size: " << sizeof(Vertex) << std::endl;
     std::cout << " Outedge ids: ";
-    for (int i = 0; i < _outEdges.size(); i++) {
-      EdgePtr ep = _outEdges[i];
+    for (int i = 0; i < _allEdges.size(); i++) {
+      EdgePtr ep = _allEdges[i];
       std::cout << ep->getId() << ": (" << ep->getFirstId() << ", " << ep->getSecondId() << ") ";
       //      std::cout << "\nEdge property: \n";
       //      ep->dump();
@@ -95,7 +107,6 @@ void Vertex::dump() {
       }
 
     }
-
 
     std::cout << std::endl;
 

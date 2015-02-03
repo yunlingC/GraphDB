@@ -44,6 +44,7 @@ set(TESTS
         main-storage.cpp 
         main-fixstring.cpp
         main-linkedlist.cpp
+        main-dfs.cpp
         )
 
 # This will generate all the executables listed in the TESTS variable

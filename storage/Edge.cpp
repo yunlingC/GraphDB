@@ -127,7 +127,6 @@ Edge::EdgePtr Edge::getFirstPreviousEdge() {
 }
 
 
-
 void Edge::setSecondNextEdge(EdgePtr e) {
   _secondNextEdge = e;
 }
