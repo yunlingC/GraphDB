@@ -36,3 +36,5 @@
 auto-save-list
 tramp
 .\#*
+
+t/
