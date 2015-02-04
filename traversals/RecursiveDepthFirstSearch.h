@@ -1,60 +1,63 @@
+//===-- traversals/RecursiveDepthFirstSearch.h - DFS search ----*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is a simple recursive DFS search.
+///
+//===----------------------------------------------------------------------===//
 #ifndef _RECURSIVE_DEPTH_FIRST_SEARCH_H_
 #define _RECURSIVE_DEPTH_FIRST_SEARCH_H_
 
+/// Include the GraphType class.
 #include "GraphType.h"
 
-void RDFSImp(GraphType & g, GraphType::VertexDescriptor vs, std::map<GraphType::VertexPointer, bool> & colorMap) {
+void recursiveDepthFirstSearch(GraphType & Graph,
+			       GraphType::VertexDescriptor VertexSourceId,
+			       std::map<GraphType::VertexPointer, bool> &
+			       VisitedColor) {
 
-  typedef std::pair<GraphType::VertexPointer, bool> ColorPair;
+  typedef std::pair<GraphType::VertexPointer, bool> ColorMapPair;
   typedef std::map<GraphType::VertexPointer, bool> ColorMap;
 
-  GraphType::VertexPointer vp = g.getVertexPointer(vs);
-  colorMap.insert(ColorPair(vp, true));
-    cout << "==> vid: " << vp->getId() << endl;
+  GraphType::VertexPointer CurrentVertex =
+    Graph.getVertexPointer(VertexSourceId);
+  
+  VisitedColor.insert(ColorMapPair(CurrentVertex, true));
+
+  cout << "==> vid: " << CurrentVertex->getId() << endl;
   // Get the outgoing edges for vertex
-  std::vector<Edge::EdgePtr> & Edges = vp->getOutEdges();
+  std::vector<Edge::EdgePtr> & Edges = CurrentVertex->getOutEdges();
 
   // Iterate over all the edges.
-  for (auto eit = Edges.begin(); eit != Edges.end(); eit++) {
-    GraphType::VertexPointer target = (*eit)->getTarget(vp);
+  for ( auto EdgeIterator = Edges.begin();  EdgeIterator != Edges.end();
+       ++EdgeIterator ) {
+    GraphType::VertexPointer TargetVertex =
+      (*EdgeIterator)->getTarget(CurrentVertex);
 
     // Get color and check if false.
-    auto visitedVertex = colorMap.find(target);
-    if ( visitedVertex == colorMap.end() ) {
-      RDFSImp(g, target->getId(), colorMap);
+    auto VisitedVertex = VisitedColor.find(TargetVertex);
+    if ( VisitedVertex == VisitedColor.end() ) {
+      recursiveDepthFirstSearch(Graph, TargetVertex->getId(), VisitedColor);
     } else {
-      colorMap.insert(ColorPair(target, true));
+      VisitedColor.insert(ColorMapPair(TargetVertex, true));
     }
   }
 
 };
 
-void RecursiveDepthFirstSearch(GraphType & g, GraphType::VertexDescriptor vs) {
+void depthFirstSearch(GraphType & Graph,
+		      GraphType::VertexDescriptor StartVertex ) {
 
-  typedef std::pair<GraphType::VertexPointer, bool> ColorPair;
+  //  typedef std::pair<GraphType::VertexPointer, bool> ColorMapPair;
   typedef std::map<GraphType::VertexPointer, bool> ColorMap;
-
-  //  GraphType::VertexPointer vp = g.getVertexPointer(vs);
   ColorMap Color;
-  //Color.insert(ColorPair(vp, true));
-  RDFSImp(g, vs, Color);
 
-  // // Get the outgoing edges for vertex
-  // std::vector<Edge::EdgePtr> & Edges = vp->getEdges();
-
-  // // Iterate over all the edges.
-  // for (Edge::EdgePtr eit = Edges.begin(); eit != Edges.end(); eit++) {
-  //   VertexPointer target = eit->getTarget(vp);
-
-  //   // Get color and check if false.
-  //   auto visitedVertex = Color.find(target);
-  //   if ( visitedVertex == Color.end() ) {
-  //     RecursiveDepthFirstSearchImplementation(target->getId(), g, Color);
-  //   } else {
-  //     Color.insert(ColorPair(target, true));
-  //   }
-  // }
-  
-  
+  recursiveDepthFirstSearch(Graph, StartVertex, Color);
 };
 #endif /* _RECURSIVE_DEPTH_FIRST_SEARCH_H_ */

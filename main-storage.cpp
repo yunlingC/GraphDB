@@ -1,3 +1,18 @@
+//===-- main-storage.cpp - Main driver for neo4j storage -------*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This file contains the driver code to construct the graph using a 
+/// neo4j-like storage for in-memory databases.
+///
+//===----------------------------------------------------------------------===//
+
 #include "Vertex.h"
 #include "Edge.h"
 #include "GraphType.h"
@@ -76,7 +91,7 @@ int main() {
   cout << "Begin testing\n";
 
   GDReader reader(g);
-  reader.readFile("../tests/gd/sndata-big.gd");
+  reader.readFile("../tests/gd/sndata.gd");
 
   //createGraph(g);
 

@@ -22,13 +22,12 @@ int main() {
   Graph g;
   cout << "Begin testing\n";
   GDReader reader(g);
-  reader.readFile("../tests/gd/sndata-big.gd");
+  reader.readFile("../tests/gd/sndata.gd");
 
   //createGraph(g);
   Graph::VertexPtr vp0 = g.getVertexPointer(0);
   cout << "DFS start\n";
-  //  breadth_first_search(vp0->getId(), g, VV);
-  RecursiveDepthFirstSearch(g, 0);
+  depthFirstSearch(g, 0);
 
   return 0;
 }
