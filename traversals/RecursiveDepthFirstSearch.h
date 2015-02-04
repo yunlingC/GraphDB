@@ -30,7 +30,7 @@ void recursiveDepthFirstSearch(GraphType & Graph,
   
   VisitedColor.insert(ColorMapPair(CurrentVertex, true));
 
-  cout << "==> vid: " << CurrentVertex->getId() << endl;
+  std::cout << "==> vid: " << CurrentVertex->getId() << "\n";
   // Get the outgoing edges for vertex
   std::vector<Edge::EdgePtr> & Edges = CurrentVertex->getOutEdges();
 
@@ -48,13 +48,11 @@ void recursiveDepthFirstSearch(GraphType & Graph,
       VisitedColor.insert(ColorMapPair(TargetVertex, true));
     }
   }
-
 };
 
 void depthFirstSearch(GraphType & Graph,
 		      GraphType::VertexDescriptor StartVertex ) {
 
-  //  typedef std::pair<GraphType::VertexPointer, bool> ColorMapPair;
   typedef std::map<GraphType::VertexPointer, bool> ColorMap;
   ColorMap Color;
 

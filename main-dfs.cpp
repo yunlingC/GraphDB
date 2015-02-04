@@ -1,3 +1,16 @@
+//===-- main-dfs.cpp - Main driver file for testing DFS   ch ----*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief Driver file for testing recursive DFS.
+///
+//===----------------------------------------------------------------------===//
 #include "Vertex.h"
 #include "Edge.h"
 #include "GraphType.h"
