@@ -1,49 +1,65 @@
+//===-- traversals/breadth_first_search.h - BFS search ----*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is a breadth first search.
+///
+//===----------------------------------------------------------------------===//
 #ifndef _BREADTH_FIRST_SEARCH_H_
 #define _BREADTH_FIRST_SEARCH_H_
 
+/// Standard includes.
 #include <queue>
 #include <map>
 
+/// Local includes.
 #include "GraphType.h"
 #include "VertexVisitor.h"
 
+/// This needs to be removed.
 using namespace std;
 
-void breadth_first_search(GraphType::VertexDescriptor vs, GraphType & g, VertexVisitor & vv) {
+void breadth_first_search(GraphType::VertexDescriptor StartVertex, GraphType & Graph, VertexVisitor & Visitor) {
   typedef pair<GraphType::VertexPtr, bool> VisitPair;
-  cout << "================= BfS ===================== \n";
-  GraphType::VertexPtr np = g.getVertexPointer(vs);
+  auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
 
+  std::cout << "================= BFS ===================== \n";
   // Start traversing the graph from here. 
-  std::queue<GraphType::VertexPtr> Q;
-  std::map<GraphType::VertexPtr, bool> C; // true = visited, false = not visited
+  std::queue<GraphType::VertexPtr> VertexQueue;
+  std::map<GraphType::VertexPtr, bool> ColorMap; // true = visited, false = not visited
 
-  Q.push(np);
-  C.insert(VisitPair(np,false));
+  VertexQueue.push(ScheduledVertex);
+  ColorMap.insert(VisitPair(ScheduledVertex,false));
 
-  GraphType::VertexPtr targetVertex = nullptr;
+  GraphType::VertexPtr TargetVertex = nullptr;
 
-  while (!Q.empty()) {
-    np = Q.front();  Q.pop();
-    vv.visitVertex(np);
+  while ( !VertexQueue.empty() ) {
+    ScheduledVertex = VertexQueue.front();  VertexQueue.pop();
+    Visitor.visitVertex(ScheduledVertex);
     // Set to visited.    
-    C[np] = true;
+    ColorMap[ScheduledVertex] = true;
 
-    GraphType::EdgePtr nextEdge = np->getNextEdge();
-    while (nextEdge != nullptr) {
+    auto NextEdge = ScheduledVertex->getNextEdge();
+    while ( NextEdge != nullptr ) {
       // Get the target
-      targetVertex = nextEdge->getTarget(np);
-      if (C.find(targetVertex) == C.end()) {
+      TargetVertex = NextEdge->getTarget(ScheduledVertex);
+      if ( ColorMap.find(TargetVertex) == ColorMap.end() ) {
 	// queue the target for visitation
-	Q.push(targetVertex);
-	vv.scheduleVertex(targetVertex);
-	C.insert(VisitPair(targetVertex,false));
+	VertexQueue.push(TargetVertex);
+	Visitor.scheduleVertex(TargetVertex);
+	ColorMap.insert(VisitPair(TargetVertex,false));
       }
-      // Update nextEdge from np
-      nextEdge = nextEdge->getNextEdge(np);
+      // Update NextEdge from ScheduledVertex
+      NextEdge = NextEdge->getNextEdge(ScheduledVertex);
     }
   }
-  cout << "================= END BFS ===================== \n";
+  std::cout << "================= END BFS ===================== \n";
 };
 
 #endif /* _BREADTH_FIRST_SEARCH_H_ */
