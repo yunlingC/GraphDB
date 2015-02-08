@@ -17,6 +17,7 @@ public:
   
   typedef FixedString KeyType;
   typedef FixedString ValueType;
+  typedef FixedString Type;
   typedef PropertyList<KeyType, ValueType > PropertyListType;
   typedef pair<ValueType, bool> ReturnValueType;
 
@@ -39,6 +40,7 @@ public:
 
   EdgeDescriptor getId();
   VertexDescriptor getSecondId();
+  Type getType();
 
   void setFirstNextEdge(EdgePtr e);
   void setFirstPreviousEdge(EdgePtr e);
@@ -71,7 +73,7 @@ public:
   EdgePtr _secondPreviousEdge;
   
   // Label to denote type.
-  FixedString _type;
+  Type _type;
 
   PropertyListType _list;
 };

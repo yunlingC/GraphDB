@@ -92,6 +92,11 @@ void Edge::setType(string t) {
   _type = t;
 }
 
+
+Edge::Type Edge::getType() {
+  return _type;
+}
+
 Edge::VertexPtr Edge::getTarget(Edge::VertexPtr from) {
   if (from == _firstVertex) {
     return _secondVertex;
@@ -180,6 +185,6 @@ Edge::Edge(VertexPtr vs, VertexPtr vd) {
   }
   
 void Edge::deleteEdge() {
-  cout << "- edge: " << _id << "\n";
+//  cout << "- edge: " << _id << "\n";
   _list.deletePropertyList();
 }

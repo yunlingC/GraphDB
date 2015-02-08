@@ -23,7 +23,7 @@ public:
   }
 
   FixedString & operator=(const FixedString & from) {
-    cout << "FixedString:: assignment operator\n";
+//    cout << "FixedString:: assignment operator\n";
     if (this != &from) {
       strncpy(this->_string, from._string, _size);
     }

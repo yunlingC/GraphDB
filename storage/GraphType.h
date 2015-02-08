@@ -67,13 +67,13 @@ public:
     while (next != nullptr) {
       prev = next;
       if (next->getFirstVertexPtr()->getId() == v->getId()) {
-	cout << "+ down firstNext\n";
+//	cout << "+ down firstNext\n";
 	next = next->getFirstNextEdge();
       } else if (next->getSecondVertexPtr()->getId() == v->getId()) {
-	cout << "+ down secondNext: \n";
+//	cout << "+ down secondNext: \n";
 	next = next->getSecondNextEdge();
       } else {
-	cout << "+ \nERROR: no forward movement" << endl;
+//	cout << "+ \nERROR: no forward movement" << endl;
 	//	cout << "+ Vertex focus: " << v->getId() << endl;
 	//	cout << "+ next: End of chain edge" << endl;
 	//	next->dump();
@@ -82,15 +82,15 @@ public:
       }
     }
 
-    cout << "end of chain edge: " << prev->getId() << endl;
+//    cout << "end of chain edge: " << prev->getId() << endl;
     if (prev == newEdge)  {
-      cout << "FIRST EDGE: Not hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
+//      cout << "FIRST EDGE: Not hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
       return;
     }
     
     // Got to the end of the chain.
     if (prev->getFirstVertexPtr() == v) {
-      cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
+//      cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
       prev->setFirstNextEdge(newEdge);
       if (newEdge->getFirstVertexPtr() == v) {
 	newEdge->setFirstPreviousEdge(prev);
@@ -101,14 +101,14 @@ public:
       }
 
     } else if (prev->getSecondVertexPtr() == v) {
-      cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
+//      cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
       prev->setSecondNextEdge(newEdge);
       if (newEdge->getFirstVertexPtr() == v) {
 	newEdge->setFirstPreviousEdge(prev);
 	newEdge->setFirstNextEdge(nullptr);
 
       } else if (newEdge->getSecondVertexPtr() == v) {
-	cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
+//	cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
 	newEdge->setSecondPreviousEdge(prev);
 	newEdge->setSecondNextEdge(nullptr);
       }
@@ -130,12 +130,12 @@ public:
 
     // 2. Find the end of the chain for each first/second node.
     // The chain is going to iterate over first and second pointers based on who is source.
-    cout << "\nassignPointers: fvp pointers\n";
+//    cout << "\nassignPointers: fvp pointers\n";
     EdgePtr fne = fvp->getNextEdge();
     chainEdge(fvp, fne, e);
-    e->dump();
+//    e->dump();
 
-    cout << "\nassignPointers:: svp pointers\n";
+//    cout << "\nassignPointers:: svp pointers\n";
     fne = svp->getNextEdge();
     chainEdge(svp, fne, e);
 
@@ -152,10 +152,10 @@ public:
     EdgePtr e = new Edge(_vertices[vs], _vertices[vd]);
     
     e->setId(_numEdges);
-    cout << "\nassign pointers for edge: " << e->getId() << "\n";
+//    cout << "\nassign pointers for edge: " << e->getId() << "\n";
     assignPointers(vs, vd, e);
-    e->dump();
-    cout << "\ndone assign pointers\n";
+//    e->dump();
+//    cout << "\ndone assign pointers\n";
     _numEdges++;
     _edges.push_back(e);
 
@@ -175,10 +175,10 @@ public:
     
     e->setId(_numEdges);
 e->setType(l);
- cout << "\n\nassign pointers for edge: " << e->getId() << "(" << vs << ", " << vd <<")\n";
+// cout << "\n\nassign pointers for edge: " << e->getId() << "(" << vs << ", " << vd <<")\n";
     assignPointers(vs, vd, e);
-    e->dump();
-    cout << "\ndone assign pointers\n";
+//    e->dump();
+//    cout << "\ndone assign pointers\n";
     _numEdges++;
     _edges.push_back(e);
 
@@ -201,10 +201,10 @@ e->setType(l);
     e->setType(l);
     e->setPropertyList(p);
     e->setId(_numEdges);    
-    cout << "\n\naddEdge:: assign pointers for edge: " << e->getId() << "\n";
+ //   cout << "\n\naddEdge:: assign pointers for edge: " << e->getId() << "\n";
     assignPointers(vs, vd, e);
-    cout << "\naddEdge:: done assign pointers\n";
-    e->dump();
+//    cout << "\naddEdge:: done assign pointers\n";
+//    e->dump();
     _numEdges++;
     _edges.push_back(e);
     return e->getId();
@@ -216,7 +216,7 @@ e->setType(l);
     }
 
     for (int i =0; i <_edges.size() ; i++) {
-      cout << "--------------------\n";
+//      cout << "--------------------\n";
       _edges[i]->dump();
       cout << endl;
     }
@@ -229,7 +229,7 @@ e->setType(l);
     // Must manually delete the objects.  
     // However, only one place is necessary since everywhere else, I am storing pointers.
     // Thus, _vertices and _edges contain all newly created objects.
-    cout << "Delete everything\n";
+//    cout << "Delete everything\n";
     for (int i =0; i < _vertices.size(); i++) {
       _vertices[i]->deleteVertex();
       delete _vertices[i];

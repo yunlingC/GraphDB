@@ -33,7 +33,7 @@ public:
 
   void deletePropertyList() {
     // Must manually delete the linked list.
-    cout << "-- property list: " << _pl.size() << "\n";
+//    cout << "-- property list: " << _pl.size() << "\n";
     if (_pl.size() > 0) 
       _pl.deleteList();
 
@@ -74,7 +74,7 @@ public:
     //    KeyType kt(k);
     mapIteratorType mi = _pl.find(k);
     // Check if it's not found.
-    if (mi == _pl.end()) {
+    if (mi == nullptr) {
       // Set the bool flag if not found.
       rv.second = false;
       return rv;
