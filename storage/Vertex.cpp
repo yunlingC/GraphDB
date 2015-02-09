@@ -3,7 +3,8 @@
 
 using namespace std;
 
-Vertex::ReturnPropertyValueType Vertex::getPropertyValue(KeyType Key) {
+/// New format for return types
+auto Vertex::getPropertyValue(KeyType Key) -> ReturnPropertyValueType {
   return VertexPropertyList.get(Key);
 }
 
@@ -11,20 +12,23 @@ void Vertex::setProperty(Vertex::KeyType Key, Vertex::ValueType Value) {
   VertexPropertyList.set(Key,Value);
 }
 
-void Vertex::setPropertyList(Vertex::PropertyListType & l) {
-  VertexPropertyList = l;
+void Vertex::setPropertyList(Vertex::PropertyListType & InitialList) {
+  VertexPropertyList = InitialList;
 }
 
 // Remember you can change this when returned.
-Vertex::PropertyListType &  Vertex::getPropertyList() {
+//Vertex::PropertyListType &  
+auto Vertex::getPropertyList() -> PropertyListTypeReference  {
   return VertexPropertyList;
 }
 
-std::vector<Edge::EdgePtr> & Vertex::getEdges() {
+///std::vector<Edge::EdgePtr> & 
+auto Vertex::getEdges() -> EdgeListReference {
   return AllEdges;
 }
 
-std::vector<Edge::EdgePtr> & Vertex::getOutEdges() {
+//std::vector<Edge::EdgePtr> & 
+auto Vertex::getOutEdges() -> EdgeListReference {
   return OutEdges;
 }
 
@@ -44,11 +48,11 @@ void Vertex::setNextEdge(Edge::EdgePtr ep) {
     _nextEdge = ep;
 }
   
-void Vertex::addEdge(Edge::EdgePtr ep) {
-    AllEdges.push_back(ep);
+void Vertex::addEdge(Edge::EdgePtr NewEdge) {
+    AllEdges.push_back(NewEdge);
 
-    if ( this == ep->getFirstVertexPtr() ) {
-      OutEdges.push_back(ep);
+    if ( this == NewEdge->getFirstVertexPtr() ) {
+      OutEdges.push_back(NewEdge);
     }
 }
 
@@ -56,9 +60,9 @@ void Vertex::addOutEdge(Edge::EdgePtr ep) {
 
 }
 
-Edge::EdgePtr Vertex::getNextEdge() {
+auto Vertex::getNextEdge() -> EdgePtr{
   return _nextEdge;
-  }
+}
 
 
 void Vertex::dump() {
