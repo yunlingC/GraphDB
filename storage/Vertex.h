@@ -62,7 +62,7 @@ protected:
 
   std::vector<EdgePtr> AllEdges;
   std::vector<EdgePtr> OutEdges;
-  PropertyListType PropertyList;
+  PropertyListType VertexPropertyList;
 };
 
 #endif /* _VERTEX_H_ */

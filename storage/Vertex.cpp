@@ -3,21 +3,21 @@
 
 using namespace std;
 
-Vertex::ReturnPropertyValueType Vertex::getPropertyValue(KeyType k) {
-  return PropertyList.get(k);
+Vertex::ReturnPropertyValueType Vertex::getPropertyValue(KeyType Key) {
+  return VertexPropertyList.get(Key);
 }
 
-void Vertex::setProperty(Vertex::KeyType k, Vertex::ValueType v) {
-  PropertyList.set(k,v);
+void Vertex::setProperty(Vertex::KeyType Key, Vertex::ValueType Value) {
+  VertexPropertyList.set(Key,Value);
 }
 
 void Vertex::setPropertyList(Vertex::PropertyListType & l) {
-  PropertyList = l;
+  VertexPropertyList = l;
 }
 
 // Remember you can change this when returned.
 Vertex::PropertyListType &  Vertex::getPropertyList() {
-  return PropertyList;
+  return VertexPropertyList;
 }
 
 std::vector<Edge::EdgePtr> & Vertex::getEdges() {
@@ -110,14 +110,12 @@ void Vertex::dump() {
 
     std::cout << std::endl;
 
-    // Print property list.
     std::cout << "\nVertex Propertylist:\n";
-    PropertyList.print();
-    std::cout << " ========================================= " << std::endl;
+    VertexPropertyList.print();
+    std::cout << " ========================================= \n";
 
   }
 
 void Vertex::deleteVertex() {
-//  cout << "- vertex: " << _id << "\n";
-  PropertyList.deletePropertyList();
+  VertexPropertyList.deletePropertyList();
 }
