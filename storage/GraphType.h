@@ -50,20 +50,18 @@ public:
     return NewVertex->getId();
   }
 
-  void chainEdge(VertexPointer v, EdgePointer fnx, EdgePointer newEdge) {
+  void chainEdges(VertexPointer Vertex, EdgePointer fnx, EdgePointer newEdge) {
     EdgePointer next = fnx;
     EdgePointer prev = nullptr;
 
     while (next != nullptr) {
       prev = next;
-      if (next->getFirstVertexPtr()->getId() == v->getId()) {
-//	cout << "+ down firstNext\n";
+      if (next->getFirstVertexPtr()->getId() == Vertex->getId()) {
 	next = next->getFirstNextEdge();
-      } else if (next->getSecondVertexPtr()->getId() == v->getId()) {
-//	cout << "+ down secondNext: \n";
+      } else if (next->getSecondVertexPtr()->getId() == Vertex->getId()) {
 	next = next->getSecondNextEdge();
       } else {
-//	cout << "+ \nERROR: no forward movement" << endl;
+        std::cout << "+ \nERROR: no forward movement \n";
 	//	cout << "+ Vertex focus: " << v->getId() << endl;
 	//	cout << "+ next: End of chain edge" << endl;
 	//	next->dump();
@@ -79,25 +77,25 @@ public:
     }
     
     // Got to the end of the chain.
-    if (prev->getFirstVertexPtr() == v) {
+    if (prev->getFirstVertexPtr() == Vertex) {
 //      cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
       prev->setFirstNextEdge(newEdge);
-      if (newEdge->getFirstVertexPtr() == v) {
+      if (newEdge->getFirstVertexPtr() == Vertex) {
 	newEdge->setFirstPreviousEdge(prev);
 	newEdge->setFirstNextEdge(nullptr); 
-      } else if (newEdge->getSecondVertexPtr() == v) {
+      } else if (newEdge->getSecondVertexPtr() == Vertex) {
 	newEdge->setSecondPreviousEdge(prev);
 	newEdge->setSecondNextEdge(nullptr); 
       }
 
-    } else if (prev->getSecondVertexPtr() == v) {
+    } else if (prev->getSecondVertexPtr() == Vertex) {
 //      cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
       prev->setSecondNextEdge(newEdge);
-      if (newEdge->getFirstVertexPtr() == v) {
+      if (newEdge->getFirstVertexPtr() == Vertex) {
 	newEdge->setFirstPreviousEdge(prev);
 	newEdge->setFirstNextEdge(nullptr);
 
-      } else if (newEdge->getSecondVertexPtr() == v) {
+      } else if (newEdge->getSecondVertexPtr() == Vertex) {
 //	cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
 	newEdge->setSecondPreviousEdge(prev);
 	newEdge->setSecondNextEdge(nullptr);
@@ -122,12 +120,12 @@ public:
     // The chain is going to iterate over first and second pointers based on who is source.
 //    cout << "\nassignPointers: fvp pointers\n";
     EdgePointer fne = fvp->getNextEdge();
-    chainEdge(fvp, fne, e);
+    chainEdges(fvp, fne, e);
 //    e->dump();
 
 //    cout << "\nassignPointers:: svp pointers\n";
     fne = svp->getNextEdge();
-    chainEdge(svp, fne, e);
+    chainEdges(svp, fne, e);
 
   }
 
@@ -140,66 +138,60 @@ public:
     return NewEdge->getId();
   }
 
-  EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd, const string & l) {
-    /* if (_edgeMemory == nullptr) { */
-    /*   cerr << "ERROR: Edge space not allocated\n"; */
-    /*   exit(1); */
-    /* } */
-    // Create new edge by retrieving VertexPtr from vertices.
-    //    char * placePtr = _edgeMemory + NumberOfEdges*sizeof(Edge);
-    //    cout << "Place edge at: " << reinterpret_cast<int*>(placePtr) << endl;
-    EdgePointer e = new Edge(Vertices[vs], Vertices[vd]);
+  EdgeDescriptor addEdge(VertexDescriptor StartVertex, 
+                         VertexDescriptor EndVertex, const string & Label) {
+    EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
     
-    e->setId(NumberOfEdges);
-e->setType(l);
-// cout << "\n\nassign pointers for edge: " << e->getId() << "(" << vs << ", " << vd <<")\n";
-    assignPointers(vs, vd, e);
-//    e->dump();
-//    cout << "\ndone assign pointers\n";
-    NumberOfEdges++;
-    Edges.push_back(e);
-
-    //    cin.get();
-    return e->getId();
+    NewEdge->setId(NumberOfEdges);
+    NewEdge->setType(Label);
+    assignPointers(StartVertex, EndVertex, NewEdge);
+    ++NumberOfEdges;
+    Edges.push_back(NewEdge);
+    return NewEdge->getId();
   }
 
-  EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd, PropertyListType & p) {
-    EdgePointer e = new Edge(Vertices[vs], Vertices[vd]);
-    e->setPropertyList(p);
-    e->setId(NumberOfEdges);    
-    assignPointers(vs, vd, e);
-    NumberOfEdges++;
-    Edges.push_back(e);
-    return e->getId();
+  EdgeDescriptor addEdge(VertexDescriptor StartVertex, 
+                         VertexDescriptor EndVertex, 
+                         PropertyListType & InitialPropertyList) {
+
+    EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
+
+    NewEdge->setPropertyList(InitialPropertyList);
+    NewEdge->setId(NumberOfEdges);    
+    assignPointers(StartVertex, EndVertex, NewEdge);
+    ++NumberOfEdges;
+    Edges.push_back(NewEdge);
+    return NewEdge->getId();
   }
 
-  EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd, const string & l, PropertyListType & p) {
-    EdgePointer e = new Edge(Vertices[vs], Vertices[vd]);
-    e->setType(l);
-    e->setPropertyList(p);
-    e->setId(NumberOfEdges);    
- //   cout << "\n\naddEdge:: assign pointers for edge: " << e->getId() << "\n";
-    assignPointers(vs, vd, e);
-//    cout << "\naddEdge:: done assign pointers\n";
-//    e->dump();
-    NumberOfEdges++;
-    Edges.push_back(e);
-    return e->getId();
+  EdgeDescriptor addEdge(VertexDescriptor StartVertex, VertexDescriptor EndVertex, 
+                         const string & Label, 
+                         PropertyListType & InitialPropertyList) {
+
+    EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
+
+    NewEdge->setType(Label);
+    NewEdge->setPropertyList(InitialPropertyList);
+    NewEdge->setId(NumberOfEdges);    
+    assignPointers(StartVertex, EndVertex, NewEdge);
+    ++NumberOfEdges;
+    Edges.push_back(NewEdge);
+    return NewEdge->getId();
   }
 
   void dump() {
-    for (int i = 0; i < Vertices.size(); i++) {
+    for (auto i = 0; i < Vertices.size(); i++) {
       Vertices[i]->dump();
     }
 
-    for (int i =0; i <Edges.size() ; i++) {
-//      cout << "--------------------\n";
+    for (auto i =0; i <Edges.size() ; i++) {
       Edges[i]->dump();
-      cout << endl;
+      std::cout << endl;
     }
   }
 
- GraphType(): NumberOfVertices(0), NumberOfEdges(0) {//, _nodeMemory(nullptr), _edgeMemory(nullptr) {
+ GraphType(): NumberOfVertices(0), NumberOfEdges(0) {
+
   }
 
   ~GraphType() {
@@ -207,12 +199,12 @@ e->setType(l);
     // However, only one place is necessary since everywhere else, I am storing pointers.
     // Thus, Vertices and _edges contain all newly created objects.
 //    cout << "Delete everything\n";
-    for (int i =0; i < Vertices.size(); i++) {
+    for (auto i =0; i < Vertices.size(); i++) {
       Vertices[i]->deleteVertex();
       delete Vertices[i];
     }
 
-    for (int i =0; i < Edges.size(); i++) {
+    for (auto i =0; i < Edges.size(); i++) {
       Edges[i]->deleteEdge();
       delete Edges[i];
     }
