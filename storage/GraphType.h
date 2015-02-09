@@ -8,7 +8,7 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// \brief This is the class for the Graph.
+/// \brief This is the main class for the Graph structure.
 ///
 //===----------------------------------------------------------------------===//
 #ifndef _GRAPH_TYPE_H_ 
@@ -190,11 +190,11 @@ public:
   }
 
   void dump() {
-    for (auto i = 0; i < Vertices.size(); i++) {
+    for ( auto i = 0; i < Vertices.size(); i++ ) {
       Vertices[i]->dump();
     }
 
-    for (auto i =0; i <Edges.size() ; i++) {
+    for ( auto i =0; i <Edges.size() ; i++ ) {
       Edges[i]->dump();
       std::cout << endl;
     }
@@ -209,21 +209,23 @@ public:
     /// However, only one place is necessary since everywhere else, I am storing pointers.
     /// Thus, Vertices and _edges contain all newly created objects.
 
-    for (auto i =0; i < Vertices.size(); i++) {
+    for ( auto i=0; i < Vertices.size(); i++ ) {
       Vertices[i]->deleteVertex();
       delete Vertices[i];
     }
 
-    for (auto i =0; i < Edges.size(); i++) {
+    for ( auto i=0; i < Edges.size(); i++ ) {
       Edges[i]->deleteEdge();
       delete Edges[i];
     }
-
   }
 
 protected:
+  /// Hold pointers to all vertices.
   vector<VertexPointer> Vertices;
+  /// Hold pointers to all edges.
   vector<EdgePointer> Edges;
+  /// Keep a count of vertices and edges.
   unsigned int NumberOfVertices;
   unsigned int NumberOfEdges;
 };
