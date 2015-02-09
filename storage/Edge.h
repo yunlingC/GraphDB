@@ -10,37 +10,40 @@ class Vertex;
 
 class Edge {
 public:
-  typedef Vertex* VertexPtr;
+  typedef Vertex* VertexPointer;
   typedef Edge* EdgePtr;
   typedef unsigned int EdgeDescriptor;
   typedef unsigned int VertexDescriptor;
   
   typedef FixedString KeyType;
   typedef FixedString ValueType;
-  typedef FixedString Type;
+  typedef FixedString LabelType;
   typedef PropertyList<KeyType, ValueType > PropertyListType;
-  typedef pair<ValueType, bool> ReturnValueType;
+  typedef PropertyListType& PropertyListReference;
+  typedef std::pair<ValueType, bool> ReturnValueType;
 
 public:
 
   void dump();
   VertexDescriptor getFirstId();
-  VertexPtr getFirstVertexPtr();
-  VertexPtr getSecondVertexPtr();
+  VertexPointer getFirstVertexPtr();
+  VertexPointer getSecondVertexPtr();
   EdgePtr getFirstNextEdge();
   EdgePtr getFirstPreviousEdge();
-  // Independent of who is first/second.
-  EdgePtr getNextEdge(VertexPtr from);
-  PropertyListType & getPropertyList();
+
+  /// Independent of who is first/second.
+  EdgePtr getNextEdge(VertexPointer from);
+  PropertyListReference getPropertyList();
   ReturnValueType getPropertyValue(KeyType k);
   EdgePtr getSecondNextEdge();
   EdgePtr getSecondPreviousEdge();
+
   // Independent of who is first/second.
-  VertexPtr getTarget(VertexPtr from);
+  VertexPointer getTarget(VertexPointer from);
 
   EdgeDescriptor getId();
   VertexDescriptor getSecondId();
-  Type getType();
+  LabelType getType();
 
   void setFirstNextEdge(EdgePtr e);
   void setFirstPreviousEdge(EdgePtr e);
@@ -50,32 +53,33 @@ public:
   void setSecondNextEdge(EdgePtr e);
   void setSecondPreviousEdge(EdgePtr e);
   void setType(string t);
-  // Constructors
+
+  /// Constructors.
   Edge();
-  Edge(VertexPtr vs, VertexPtr vd);
+  Edge(VertexPointer vs, VertexPointer vd);
   void deleteEdge();
 
- protected:
-  unsigned int _id;
+protected:
+  unsigned int EdgeId;
 
   // Pointer to first node.
-  VertexPtr  _firstVertex;
+  VertexPointer  FirstVertex;
   // Pointer to second node.
-  VertexPtr _secondVertex;
+  VertexPointer SecondVertex;
 
   // Pointer to first pointer's next relationship.
-  EdgePtr _firstNextEdge;
+  EdgePtr FirstNextEdge;
   // Pointer to first pointer's previous relationship.
-  EdgePtr _firstPreviousEdge;
+  EdgePtr FirstPreviousEdge;
 
   // Repeat for second.
-  EdgePtr _secondNextEdge;
-  EdgePtr _secondPreviousEdge;
+  EdgePtr SecondNextEdge;
+  EdgePtr SecondPreviousEdge;
   
   // Label to denote type.
-  Type _type;
+  LabelType EdgeLabel;
 
-  PropertyListType _list;
+  PropertyListType EdgePropertyList;
 };
 
 #endif /* _EDGE_H_ */

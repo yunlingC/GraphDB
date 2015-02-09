@@ -6,10 +6,10 @@
 using namespace std;
 
 void Edge::dump() {
-  cout << "\nEdge id: " << _id << " (" << _firstVertex->getId() << ", " << _secondVertex->getId() << ") " << endl;
-  //  cout << "first next eid: " << _firstVertex->getNextEdge()->getId() << "\n";
+  cout << "\nEdge id: " << EdgeId << " (" << FirstVertex->getId() << ", " << SecondVertex->getId() << ") " << endl;
+  //  cout << "first next eid: " << FirstVertex->getNextEdge()->getId() << "\n";
   cout << "\nEdge PropertyList\n";
-  _list.print();
+  EdgePropertyList.print();
 
   EdgePtr fne = getFirstNextEdge();
   EdgePtr fpe = getFirstPreviousEdge();
@@ -31,160 +31,153 @@ void Edge::dump() {
   if (sne != nullptr) {
     cout << "- secondNextEdge: " << sne->getId() << endl;
   } else     cout << "- secondNextEdge: nullptr" << endl;
-
-
   
   cout << "traverse firstNext: " ;
-  fne = _firstVertex->getNextEdge();
+  fne = FirstVertex->getNextEdge();
   while (fne != nullptr) {
     cout << " => " << fne->getId();
     fne = fne->getFirstNextEdge();
   }
  
   cout << "\ntraverse secondNext: ";
-  fne = _secondVertex->getNextEdge();
+  fne = SecondVertex->getNextEdge();
   while (fne != nullptr) {
     cout << " => " << fne->getId();
     fne = fne->getSecondNextEdge();
   }
   cout << "\ntraverse FirstPrevious: ";
-  fne = _firstVertex->getNextEdge();
+  fne = FirstVertex->getNextEdge();
   while (fne != nullptr) {
     cout << " => " << fne->getId();
     fne = fne->getFirstPreviousEdge();
   }
 
   cout << "\ntraverse secondPrevious: ";
-  fne = _firstVertex->getNextEdge(); 
+  fne = FirstVertex->getNextEdge(); 
   while (fne != nullptr) {
     cout << "=> " << fne->getId();
     fne = fne->getSecondPreviousEdge();
   }
-
-
 }
 
-Edge::VertexPtr Edge::getFirstVertexPtr() {
-  return _firstVertex;
+auto Edge::getFirstVertexPtr() -> VertexPointer {
+  return FirstVertex;
 }
 
-Edge::VertexPtr Edge::getSecondVertexPtr() {
-  return _secondVertex;
+auto Edge::getSecondVertexPtr() -> VertexPointer {
+  return SecondVertex;
 }
   
-Edge::PropertyListType & Edge::getPropertyList() {
-  return _list;
+auto Edge::getPropertyList() -> PropertyListReference {
+  return EdgePropertyList;
 }
 
-Edge::ReturnValueType Edge::getPropertyValue(Edge::KeyType k) {
-  return _list.get(k);
+auto Edge::getPropertyValue(Edge::KeyType Key) -> ReturnValueType {
+  return EdgePropertyList.get(Key);
 }
 
-void Edge::setProperty(Edge::KeyType k, Edge::ValueType v) {
-  _list.set(k,v);
+void Edge::setProperty(Edge::KeyType Key, Edge::ValueType Value) {
+  EdgePropertyList.set(Key,Value);
 }
 
-void Edge::setPropertyList(Edge::PropertyListType l) {
-  _list = l;
+void Edge::setPropertyList(Edge::PropertyListType InitialList) {
+  EdgePropertyList = InitialList;
 }
 
-void Edge::setType(string t) {
-  _type = t;
+void Edge::setType(string Label) {
+  EdgeLabel = Label;
 }
 
-
-Edge::Type Edge::getType() {
-  return _type;
+auto Edge::getType() -> LabelType {
+  return EdgeLabel;
 }
 
-Edge::VertexPtr Edge::getTarget(Edge::VertexPtr from) {
-  if (from == _firstVertex) {
-    return _secondVertex;
-  } else if (from == _secondVertex) {
-    return _firstVertex;
+auto Edge::getTarget(Edge::VertexPointer from) -> VertexPointer {
+  if (from == FirstVertex) {
+    return SecondVertex;
+  } else if (from == SecondVertex) {
+    return FirstVertex;
   }
   return nullptr;
 }
 
-Edge::EdgePtr Edge::getNextEdge(Edge::VertexPtr from) {
-  if (from == _firstVertex) {
-    return _firstNextEdge;
-  } else if (from == _secondVertex) {
-    return _secondNextEdge;
+auto Edge::getNextEdge(Edge::VertexPointer from) -> EdgePtr  {
+  if ( from == FirstVertex ) {
+    return FirstNextEdge;
+  } else if (from == SecondVertex) {
+    return SecondNextEdge;
   }
   return nullptr;
 }
 
 void Edge::setFirstNextEdge(EdgePtr e) {
-  _firstNextEdge = e;
+  FirstNextEdge = e;
 }
 
-Edge::EdgePtr Edge::getFirstNextEdge() {
-  return _firstNextEdge;
+auto Edge::getFirstNextEdge() -> EdgePtr {
+  return FirstNextEdge;
 }
 
 void Edge::setFirstPreviousEdge(EdgePtr e) {
-  _firstPreviousEdge = e;
+  FirstPreviousEdge = e;
 }
 
-Edge::EdgePtr Edge::getFirstPreviousEdge() {
-  return _firstPreviousEdge;
+auto Edge::getFirstPreviousEdge() -> EdgePtr {
+  return FirstPreviousEdge;
 }
-
 
 void Edge::setSecondNextEdge(EdgePtr e) {
-  _secondNextEdge = e;
+  SecondNextEdge = e;
 }
 
-Edge::EdgePtr Edge::getSecondNextEdge() {
-  return _secondNextEdge;
+auto Edge::getSecondNextEdge() -> EdgePtr {
+  return SecondNextEdge;
 }
 
 void Edge::setSecondPreviousEdge(EdgePtr e) {
-  _secondPreviousEdge = e;
+  SecondPreviousEdge = e;
 }
 
-Edge::EdgePtr Edge::getSecondPreviousEdge() {
-  return _secondPreviousEdge;
+auto Edge::getSecondPreviousEdge() -> EdgePtr {
+  return SecondPreviousEdge;
 }
 
-
-
-Edge::VertexDescriptor Edge::getFirstId() {
-  return _firstVertex->getId();
+auto Edge::getFirstId() -> VertexDescriptor {
+  return FirstVertex->getId();
 }
 
-Edge::VertexDescriptor Edge::getSecondId() {
-  return _secondVertex->getId();
+auto Edge::getSecondId() -> VertexDescriptor {
+  return SecondVertex->getId();
 }
 
 void Edge::setId(unsigned int id) {
-    _id = id;
-  }
-
-Edge::EdgeDescriptor Edge::getId() {
-  return _id;
+    EdgeId = id;
 }
 
+auto Edge::getId() -> EdgeDescriptor {
+  return EdgeId;
+}
 
-Edge::Edge(): _id(-1) { 
-    _firstVertex = nullptr;     _secondVertex = nullptr;
-    _firstNextEdge = nullptr; _firstPreviousEdge = nullptr;
-    _secondNextEdge = nullptr; _secondPreviousEdge = nullptr;
+Edge::Edge(): EdgeId(-1) { 
+    FirstVertex = nullptr;     
+    SecondVertex = nullptr;
+    FirstNextEdge = nullptr; 
+    FirstPreviousEdge = nullptr;
+    SecondNextEdge = nullptr; 
+    SecondPreviousEdge = nullptr;
   }
 
-Edge::Edge(VertexPtr vs, VertexPtr vd) {
-    // first is vs, second is vd
-  _firstVertex = vs; 
-  _firstVertex->addEdge(this);
-  _secondVertex = vd; 
-  _secondVertex->addEdge(this);
-  _firstNextEdge = nullptr; _firstPreviousEdge = nullptr;
-  _secondNextEdge = nullptr; _secondPreviousEdge = nullptr;
-
-  }
+Edge::Edge(VertexPointer StartVertex, VertexPointer EndVertex) {
+  FirstVertex = StartVertex; 
+  FirstVertex->addEdge(this);
+  SecondVertex = EndVertex; 
+  SecondVertex->addEdge(this);
+  FirstNextEdge = nullptr; 
+  FirstPreviousEdge = nullptr;
+  SecondNextEdge = nullptr; 
+  SecondPreviousEdge = nullptr;
+}
   
 void Edge::deleteEdge() {
-//  cout << "- edge: " << _id << "\n";
-  _list.deletePropertyList();
+  EdgePropertyList.deletePropertyList();
 }

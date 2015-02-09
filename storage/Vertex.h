@@ -36,7 +36,7 @@ public:
   // PropertyList typedefs.
   typedef PropertyList< KeyType, ValueType > PropertyListType;
   typedef PropertyListType& PropertyListTypeReference;
-  typedef std::vector<Edge*>& EdgeListReference;
+  typedef std::vector<EdgePtr>& EdgeListReference;
   typedef std::pair<ValueType, bool> ReturnPropertyValueType;
 
 public:

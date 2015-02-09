@@ -108,7 +108,7 @@ void Vertex::dump() {
       }
     }
 
-    std::cout << std::endl;
+    std::cout << "\n"; //std::endl;
 
     std::cout << "\nVertex Propertylist:\n";
     VertexPropertyList.print();
