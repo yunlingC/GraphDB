@@ -25,29 +25,33 @@
 /// This needs to be removed.
 using namespace std;
 
-void breadth_first_search(GraphType::VertexDescriptor StartVertex, GraphType & Graph, VertexVisitor & Visitor) {
-  typedef pair<GraphType::VertexPtr, bool> VisitPair;
+void breadth_first_search(GraphType::VertexDescriptor StartVertex, 
+                          GraphType & Graph, VertexVisitor & Visitor) {
+
+  typedef pair<GraphType::VertexPointer, bool> VisitPair;
   auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
 
   std::cout << "================= BFS ===================== \n";
   // Start traversing the graph from here. 
-  std::queue<GraphType::VertexPtr> VertexQueue;
-  std::map<GraphType::VertexPtr, bool> ColorMap; // true = visited, false = not visited
+  std::queue<GraphType::VertexPointer> VertexQueue;
+  /// True means visited and false means not visited.
+  std::map<GraphType::VertexPointer, bool> ColorMap;
 
   VertexQueue.push(ScheduledVertex);
   ColorMap.insert(VisitPair(ScheduledVertex,false));
 
-  GraphType::VertexPtr TargetVertex = nullptr;
+  GraphType::VertexPointer TargetVertex = nullptr;
 
   while ( !VertexQueue.empty() ) {
     ScheduledVertex = VertexQueue.front();  VertexQueue.pop();
     Visitor.visitVertex(ScheduledVertex);
+
     // Set to visited.    
     ColorMap[ScheduledVertex] = true;
 
     auto NextEdge = ScheduledVertex->getNextEdge();
     while ( NextEdge != nullptr ) {
-      // Get the target
+      /// Get the target node.
       TargetVertex = NextEdge->getTarget(ScheduledVertex);
       if ( ColorMap.find(TargetVertex) == ColorMap.end() ) {
 	// queue the target for visitation
@@ -55,7 +59,7 @@ void breadth_first_search(GraphType::VertexDescriptor StartVertex, GraphType & G
 	Visitor.scheduleVertex(TargetVertex);
 	ColorMap.insert(VisitPair(TargetVertex,false));
       }
-      // Update NextEdge from ScheduledVertex
+      // Get the next edge from the scheduled vertex. 
       NextEdge = NextEdge->getNextEdge(ScheduledVertex);
     }
   }
