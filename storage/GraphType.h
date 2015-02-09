@@ -1,18 +1,29 @@
-#ifndef _BASE_GRAPH_H_
-#define _BASE_GRAPH_H_
+//===-- storage/GraphType.h - Graph class type ------------------*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is the class for the Graph.
+///
+//===----------------------------------------------------------------------===//
+#ifndef _GRAPH_TYPE_H_ 
+#define _GRAPH_TYPE_H_ 
 
 #include <vector>
-#include <new>
 #include <stdlib.h>
 
 #include "Vertex.h"
 #include "Edge.h"
 #include "PropertyList.h"
 
-using namespace std;
-
 class GraphType {
 public:
+  /// Typedefs that are used to refer to within other classes.
   typedef unsigned int VertexDescriptor;
   typedef unsigned int EdgeDescriptor;
   typedef Vertex* VertexPointer;
@@ -49,7 +60,9 @@ public:
     return NewVertex->getId();
   }
 
-  void chainEdges(VertexPointer Vertex, EdgePointer FirstNextEdge, EdgePointer NewEdge) {
+  void chainEdges(VertexPointer Vertex, EdgePointer FirstNextEdge, 
+                  EdgePointer NewEdge) {
+
     EdgePointer NextEdge = FirstNextEdge;
     EdgePointer PreviousEdge = nullptr;
 
@@ -61,24 +74,25 @@ public:
 	NextEdge = NextEdge->getSecondNextEdge();
       } else {
         std::cout << "+ \nERROR: no forward movement \n";
-	//	cout << "+ Vertex focus: " << v->getId() << endl;
-	//	cout << "+ next: End of chain edge" << endl;
-	//	NextEdge->dump();
-	//	cout << "+ NewEdge: New edge to insert" << endl;
-	//	NewEdge->dump();
       }
     }
 
-    //    cout << "end of chain edge: " << PreviousEdge->getId() << endl;
+    /// The end of the chain is the new edge itself.
+    /// Exit since it is already set.
     if ( PreviousEdge == NewEdge )  {
-      //      cout << "FIRST EDGE: Not hooking up " << PreviousEdge->getId() << " to " << NewEdge->getId() << endl;
       return;
     }
     
     // Got to the end of the chain.
+    /// Is the end of chain's first vertex the same as the Vertex.
+    /// If it is then set the first edge pointers.
+    /// Otherwise, use the second edge pointers.
     if ( PreviousEdge->getFirstVertexPtr() == Vertex ) {
-      ///      cout << "hooking up " << PreviousEdge->getId() << " to " << NewEdge->getId() << endl;
+
       PreviousEdge->setFirstNextEdge(NewEdge);
+
+      /// If new edge's first vertex is same as vertex then set its first
+      /// previous and next edges.  Otherwise set second previous and next.
       if ( NewEdge->getFirstVertexPtr() == Vertex ) {
 	NewEdge->setFirstPreviousEdge(PreviousEdge);
 	NewEdge->setFirstNextEdge(nullptr); 
@@ -88,14 +102,12 @@ public:
       }
 
     } else if ( PreviousEdge->getSecondVertexPtr() == Vertex ) {
-      //      cout << "hooking up " << PreviousEdge->getId() << " to " << NewEdge->getId() << endl;
       PreviousEdge->setSecondNextEdge(NewEdge);
       if ( NewEdge->getFirstVertexPtr() == Vertex ) {
 	NewEdge->setFirstPreviousEdge(PreviousEdge);
 	NewEdge->setFirstNextEdge(nullptr);
 
       } else if ( NewEdge->getSecondVertexPtr() == Vertex ) {
-        //	cout << "hooking up " << PreviousEdge->getId() << " to " << NewEdge->getId() << endl;
 	NewEdge->setSecondPreviousEdge(PreviousEdge);
 	NewEdge->setSecondNextEdge(nullptr);
       }
@@ -193,10 +205,10 @@ public:
   }
 
   ~GraphType() {
-    // Must manually delete the objects.  
-    // However, only one place is necessary since everywhere else, I am storing pointers.
-    // Thus, Vertices and _edges contain all newly created objects.
-//    cout << "Delete everything\n";
+    /// Must manually delete the objects.  
+    /// However, only one place is necessary since everywhere else, I am storing pointers.
+    /// Thus, Vertices and _edges contain all newly created objects.
+
     for (auto i =0; i < Vertices.size(); i++) {
       Vertices[i]->deleteVertex();
       delete Vertices[i];
@@ -207,26 +219,6 @@ public:
       delete Edges[i];
     }
 
-    // Delete the memory spaces.
-    //    delete _nodeMemory;
-    //cout << "Delete edge  memory\n";
-    //    delete _edgeMemory;
-  }
-
-  void allocVertexMemory(unsigned int sz) {
-
-    // Allocation sz number of Vertex objects.
-    /* _nodeMemory = new char[sizeof(Vertex)*sz]; */
-    /* cout << "Vertex Memory\n + Starting address: " << reinterpret_cast<int*>(_nodeMemory)  */
-    /* 	 << ", ending address: " << reinterpret_cast<int*>(_nodeMemory + sizeof(Vertex)*sz) << "\n"; */
-  }
-
-  void allocEdgeMemory(unsigned int sz) {
-    // Allocation sz number of Vertex objects.
-    //cout << "Edge space: " << sizeof(Edge)*sz << "\n";
-    //    _edgeMemory = new char[sizeof(Edge)*sz];
-    //    cout << "Edge Memory\n + Starting address: " << reinterpret_cast<int*>(_edgeMemory) 
-    //	 << ", ending address: " << reinterpret_cast<int*>(_edgeMemory + sizeof(Edge)*sz) << "\n" << endl;
   }
 
 protected:
@@ -234,10 +226,7 @@ protected:
   vector<EdgePointer> Edges;
   unsigned int NumberOfVertices;
   unsigned int NumberOfEdges;
-  //  char* _nodeMemory;
-  //  char* _edgeMemory;
-
 };
 
-#endif /* _BASE_GRAPH_H */
+#endif /* _GRAPH_TYPE_H */
 
