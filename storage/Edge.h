@@ -1,3 +1,16 @@
+//===-- storage/Edge.h - Edge class type -------------------------*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is the main class for the Edge structure.
+///
+//===----------------------------------------------------------------------===//
 #ifndef _EDGE_H_
 #define _EDGE_H_
 

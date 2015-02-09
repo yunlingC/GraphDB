@@ -1,3 +1,16 @@
+//===-- storage/Edge.cpp - Edge implementation ------------------*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is the implementation for the Edge class.
+///
+//===----------------------------------------------------------------------===//
 #include <iostream>
 
 #include "Vertex.h"
