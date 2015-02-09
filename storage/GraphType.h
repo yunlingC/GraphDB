@@ -24,31 +24,30 @@ public:
   typedef PropertyListType EdgePropertyList;
 
 public:
-  VertexPointer getVertexPointer(VertexDescriptor v) {
-    if ( (v > Vertices.size() - 1) || (v < 0) ) {
+  VertexPointer getVertexPointer(VertexDescriptor Vertex) {
+    if ( (Vertex > Vertices.size() - 1) || (Vertex < 0) ) {
       return nullptr;
     }
-    return Vertices[v];
+    return Vertices[Vertex];
   }
 
   VertexDescriptor addVertex() {
-    VertexPointer n = new Vertex();
+    VertexPointer NewVertex = new Vertex();
 
-    n->setId(NumberOfVertices); 
+    NewVertex->setId(NumberOfVertices); 
     NumberOfVertices++;
     // Insert into list.
-    Vertices.push_back(n);
-    return n->getId();
+    Vertices.push_back(NewVertex);
+    return NewVertex->getId();
   }
 
-  VertexDescriptor addVertex(PropertyListType & p) {
-    VertexPointer n = new Vertex();
-    n->setPropertyList(p);
-    n->setId(NumberOfVertices); 
+  VertexDescriptor addVertex(PropertyListType & InitialPropertyList) {
+    VertexPointer NewVertex = new Vertex();
+    NewVertex->setPropertyList(InitialPropertyList);
+    NewVertex->setId(NumberOfVertices); 
     NumberOfVertices++;
-    // Insert into list.
-    Vertices.push_back(n);
-    return n->getId();
+    Vertices.push_back(NewVertex);
+    return NewVertex->getId();
   }
 
   void chainEdge(VertexPointer v, EdgePointer fnx, EdgePointer newEdge) {
@@ -132,26 +131,13 @@ public:
 
   }
 
-  EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd) {
-    /* if (_edgeMemory == nullptr) { */
-    /*   cerr << "ERROR: Edge space not allocated\n"; */
-    /*   exit(1); */
-    /* } */
-    // Create new edge by retrieving VertexPtr from vertices.
-    //    char * placePtr = _edgeMemory + _numEdges*sizeof(Edge);
-    //    cout << "Place edge at: " << reinterpret_cast<int*>(placePtr) << endl;
-    EdgePointer e = new Edge(Vertices[vs], Vertices[vd]);
-    
-    e->setId(NumberOfEdges);
-//    cout << "\nassign pointers for edge: " << e->getId() << "\n";
-    assignPointers(vs, vd, e);
-//    e->dump();
-//    cout << "\ndone assign pointers\n";
-    NumberOfEdges++;
-    Edges.push_back(e);
-
-    //    cin.get();
-    return e->getId();
+  EdgeDescriptor addEdge(VertexDescriptor StartVertex, VertexDescriptor EndVertex) {
+    EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
+    NewEdge->setId(NumberOfEdges);
+    assignPointers(StartVertex, EndVertex, NewEdge);
+    ++NumberOfEdges;
+    Edges.push_back(NewEdge);
+    return NewEdge->getId();
   }
 
   EdgeDescriptor addEdge(VertexDescriptor vs, VertexDescriptor vd, const string & l) {
