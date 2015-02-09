@@ -35,8 +35,7 @@ public:
     VertexPointer NewVertex = new Vertex();
 
     NewVertex->setId(NumberOfVertices); 
-    NumberOfVertices++;
-    // Insert into list.
+    ++NumberOfVertices;
     Vertices.push_back(NewVertex);
     return NewVertex->getId();
   }
@@ -45,87 +44,86 @@ public:
     VertexPointer NewVertex = new Vertex();
     NewVertex->setPropertyList(InitialPropertyList);
     NewVertex->setId(NumberOfVertices); 
-    NumberOfVertices++;
+    ++NumberOfVertices;
     Vertices.push_back(NewVertex);
     return NewVertex->getId();
   }
 
-  void chainEdges(VertexPointer Vertex, EdgePointer fnx, EdgePointer newEdge) {
-    EdgePointer next = fnx;
-    EdgePointer prev = nullptr;
+  void chainEdges(VertexPointer Vertex, EdgePointer FirstNextEdge, EdgePointer NewEdge) {
+    EdgePointer NextEdge = FirstNextEdge;
+    EdgePointer PreviousEdge = nullptr;
 
-    while (next != nullptr) {
-      prev = next;
-      if (next->getFirstVertexPtr()->getId() == Vertex->getId()) {
-	next = next->getFirstNextEdge();
-      } else if (next->getSecondVertexPtr()->getId() == Vertex->getId()) {
-	next = next->getSecondNextEdge();
+    while ( NextEdge != nullptr ) {
+      PreviousEdge = NextEdge;
+      if ( NextEdge->getFirstVertexPtr()->getId() == Vertex->getId() ) {
+	NextEdge = NextEdge->getFirstNextEdge();
+      } else if ( NextEdge->getSecondVertexPtr()->getId() == Vertex->getId() ) {
+	NextEdge = NextEdge->getSecondNextEdge();
       } else {
         std::cout << "+ \nERROR: no forward movement \n";
 	//	cout << "+ Vertex focus: " << v->getId() << endl;
 	//	cout << "+ next: End of chain edge" << endl;
-	//	next->dump();
-	//	cout << "+ newEdge: New edge to insert" << endl;
-	//	newEdge->dump();
+	//	NextEdge->dump();
+	//	cout << "+ NewEdge: New edge to insert" << endl;
+	//	NewEdge->dump();
       }
     }
 
-//    cout << "end of chain edge: " << prev->getId() << endl;
-    if (prev == newEdge)  {
-//      cout << "FIRST EDGE: Not hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
+    //    cout << "end of chain edge: " << PreviousEdge->getId() << endl;
+    if ( PreviousEdge == NewEdge )  {
+      //      cout << "FIRST EDGE: Not hooking up " << PreviousEdge->getId() << " to " << NewEdge->getId() << endl;
       return;
     }
     
     // Got to the end of the chain.
-    if (prev->getFirstVertexPtr() == Vertex) {
-//      cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
-      prev->setFirstNextEdge(newEdge);
-      if (newEdge->getFirstVertexPtr() == Vertex) {
-	newEdge->setFirstPreviousEdge(prev);
-	newEdge->setFirstNextEdge(nullptr); 
-      } else if (newEdge->getSecondVertexPtr() == Vertex) {
-	newEdge->setSecondPreviousEdge(prev);
-	newEdge->setSecondNextEdge(nullptr); 
+    if ( PreviousEdge->getFirstVertexPtr() == Vertex ) {
+      ///      cout << "hooking up " << PreviousEdge->getId() << " to " << NewEdge->getId() << endl;
+      PreviousEdge->setFirstNextEdge(NewEdge);
+      if ( NewEdge->getFirstVertexPtr() == Vertex ) {
+	NewEdge->setFirstPreviousEdge(PreviousEdge);
+	NewEdge->setFirstNextEdge(nullptr); 
+      } else if (NewEdge->getSecondVertexPtr() == Vertex ) {
+	NewEdge->setSecondPreviousEdge(PreviousEdge);
+	NewEdge->setSecondNextEdge(nullptr); 
       }
 
-    } else if (prev->getSecondVertexPtr() == Vertex) {
-//      cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
-      prev->setSecondNextEdge(newEdge);
-      if (newEdge->getFirstVertexPtr() == Vertex) {
-	newEdge->setFirstPreviousEdge(prev);
-	newEdge->setFirstNextEdge(nullptr);
+    } else if ( PreviousEdge->getSecondVertexPtr() == Vertex ) {
+      //      cout << "hooking up " << PreviousEdge->getId() << " to " << NewEdge->getId() << endl;
+      PreviousEdge->setSecondNextEdge(NewEdge);
+      if ( NewEdge->getFirstVertexPtr() == Vertex ) {
+	NewEdge->setFirstPreviousEdge(PreviousEdge);
+	NewEdge->setFirstNextEdge(nullptr);
 
-      } else if (newEdge->getSecondVertexPtr() == Vertex) {
-//	cout << "hooking up " << prev->getId() << " to " << newEdge->getId() << endl;
-	newEdge->setSecondPreviousEdge(prev);
-	newEdge->setSecondNextEdge(nullptr);
+      } else if ( NewEdge->getSecondVertexPtr() == Vertex ) {
+        //	cout << "hooking up " << PreviousEdge->getId() << " to " << NewEdge->getId() << endl;
+	NewEdge->setSecondPreviousEdge(PreviousEdge);
+	NewEdge->setSecondNextEdge(nullptr);
       }
     }
   }
 
-  void assignPointers(VertexDescriptor vs, VertexDescriptor vd, EdgePointer e) {
+  void assignPointers(VertexDescriptor vs, VertexDescriptor vd, 
+                      EdgePointer NewEdge) {
     
-    VertexPointer fvp = e->getFirstVertexPtr();
-    VertexPointer svp = e->getSecondVertexPtr();
-    // 1. See if first's and second's nextEdge is set or not.
-    // Doesn't matter who the next really is.
-    if (fvp->getNextEdge() == nullptr) {
-      fvp->setNextEdge(e);
+    VertexPointer FirstVertexPointer = NewEdge->getFirstVertexPtr();
+    VertexPointer SecondVertexPointer = NewEdge->getSecondVertexPtr();
+
+    /// 1. See if first's and second's nextEdge is set or not.
+    /// If it is not set then set it. Doesn't matter who the next really is.
+    if ( FirstVertexPointer->getNextEdge() == nullptr ) {
+      FirstVertexPointer->setNextEdge(NewEdge);
     }
-    if (svp->getNextEdge() == nullptr) {
-      svp->setNextEdge(e);
+    if ( SecondVertexPointer->getNextEdge() == nullptr ) {
+      SecondVertexPointer->setNextEdge(NewEdge);
     }
 
-    // 2. Find the end of the chain for each first/second node.
-    // The chain is going to iterate over first and second pointers based on who is source.
-//    cout << "\nassignPointers: fvp pointers\n";
-    EdgePointer fne = fvp->getNextEdge();
-    chainEdges(fvp, fne, e);
-//    e->dump();
-
-//    cout << "\nassignPointers:: svp pointers\n";
-    fne = svp->getNextEdge();
-    chainEdges(svp, fne, e);
+    /// 2. Find the end of the chain for each first/second node.
+    /// The chain is going to iterate over first and second pointers based on who is source.
+    EdgePointer FirstNextEdge = FirstVertexPointer->getNextEdge();
+    chainEdges(FirstVertexPointer, FirstNextEdge, NewEdge);
+    /// Chain the edges for the second vertex.
+    FirstNextEdge = SecondVertexPointer->getNextEdge();
+    chainEdges(SecondVertexPointer, FirstNextEdge, NewEdge);
 
   }
 
