@@ -4,28 +4,28 @@
 using namespace std;
 
 Vertex::ReturnPropertyValueType Vertex::getPropertyValue(KeyType k) {
-  return _list.get(k);
+  return PropertyList.get(k);
 }
 
 void Vertex::setProperty(Vertex::KeyType k, Vertex::ValueType v) {
-  _list.set(k,v);
+  PropertyList.set(k,v);
 }
 
 void Vertex::setPropertyList(Vertex::PropertyListType & l) {
-  _list = l;
+  PropertyList = l;
 }
 
 // Remember you can change this when returned.
 Vertex::PropertyListType &  Vertex::getPropertyList() {
-  return _list;
+  return PropertyList;
 }
 
 std::vector<Edge::EdgePtr> & Vertex::getEdges() {
-  return _allEdges;
+  return AllEdges;
 }
 
 std::vector<Edge::EdgePtr> & Vertex::getOutEdges() {
-  return _outEdges;
+  return OutEdges;
 }
 
 Vertex::Vertex(): _id(-1) {
@@ -45,10 +45,10 @@ void Vertex::setNextEdge(Edge::EdgePtr ep) {
 }
   
 void Vertex::addEdge(Edge::EdgePtr ep) {
-    _allEdges.push_back(ep);
+    AllEdges.push_back(ep);
 
     if ( this == ep->getFirstVertexPtr() ) {
-      _outEdges.push_back(ep);
+      OutEdges.push_back(ep);
     }
 }
 
@@ -65,8 +65,8 @@ void Vertex::dump() {
     std::cout << " ========================================= " << std::endl;
     std::cout << " Vertex: " << _id << ", addr:" << this << ", node size: " << sizeof(Vertex) << std::endl;
     std::cout << " Outedge ids: ";
-    for (int i = 0; i < _allEdges.size(); i++) {
-      EdgePtr ep = _allEdges[i];
+    for (int i = 0; i < AllEdges.size(); i++) {
+      EdgePtr ep = AllEdges[i];
       std::cout << ep->getId() << ": (" << ep->getFirstId() << ", " << ep->getSecondId() << ") ";
       //      std::cout << "\nEdge property: \n";
       //      ep->dump();
@@ -112,12 +112,12 @@ void Vertex::dump() {
 
     // Print property list.
     std::cout << "\nVertex Propertylist:\n";
-    _list.print();
+    PropertyList.print();
     std::cout << " ========================================= " << std::endl;
 
   }
 
 void Vertex::deleteVertex() {
 //  cout << "- vertex: " << _id << "\n";
-  _list.deletePropertyList();
+  PropertyList.deletePropertyList();
 }

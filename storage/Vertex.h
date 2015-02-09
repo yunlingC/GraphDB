@@ -1,3 +1,17 @@
+//===-- storage/Vertex.h - Vertex class type --------------------*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is the main class for the Vertex structure.
+///
+//===----------------------------------------------------------------------===//
+
 #ifndef _VERTEX_H_
 #define _VERTEX_H_
 
@@ -8,11 +22,12 @@
 #include "PropertyList.h"
 #include "FixedString.h"
 
+/// Forward declaration.
 class Edge;
 
 class Vertex { 
 public:
-  typedef Vertex* VertexPtr;
+  //  typedef Vertex* VertexPtr;
   typedef Edge* EdgePtr;
   typedef unsigned int EdgeDescriptor;
   typedef FixedString KeyType;
@@ -20,7 +35,7 @@ public:
 
   // PropertyList typedefs.
   typedef PropertyList< KeyType, ValueType > PropertyListType;
-  typedef pair<ValueType, bool> ReturnPropertyValueType;
+  typedef std::pair<ValueType, bool> ReturnPropertyValueType;
 
 public:
   Vertex();
@@ -45,9 +60,9 @@ protected:
   // Pointer to next relationship
   EdgePtr _nextEdge;
 
-  std::vector<EdgePtr> _allEdges;
-  std::vector<EdgePtr> _outEdges;
-  PropertyListType _list;
+  std::vector<EdgePtr> AllEdges;
+  std::vector<EdgePtr> OutEdges;
+  PropertyListType PropertyList;
 };
 
 #endif /* _VERTEX_H_ */
