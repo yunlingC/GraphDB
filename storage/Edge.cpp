@@ -123,6 +123,15 @@ auto Edge::getNextEdge(Edge::VertexPointer from) -> EdgePtr  {
   return nullptr;
 }
 
+auto Edge::getPreviousEdge(Edge::VertexPointer from) -> EdgePtr  {
+  if ( from == FirstVertex ) {
+    return FirstPreviousEdge;
+  } else if (from == SecondVertex) {
+    return SecondPreviousEdge;
+  }
+  return nullptr;
+}
+
 void Edge::setFirstNextEdge(EdgePtr e) {
   FirstNextEdge = e;
 }
@@ -182,9 +191,7 @@ Edge::Edge(): EdgeId(-1) {
 
 Edge::Edge(VertexPointer StartVertex, VertexPointer EndVertex) {
   FirstVertex = StartVertex; 
-  FirstVertex->addEdge(this);
   SecondVertex = EndVertex; 
-  SecondVertex->addEdge(this);
   FirstNextEdge = nullptr; 
   FirstPreviousEdge = nullptr;
   SecondNextEdge = nullptr; 

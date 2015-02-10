@@ -31,11 +31,13 @@ void recursiveDepthFirstSearch(GraphType & Graph,
   VisitedColor.insert(ColorMapPair(CurrentVertex, true));
 
   std::cout << "==> vid: " << CurrentVertex->getId() << "\n";
-  // Get the outgoing edges for vertex
-  std::vector<Edge::EdgePtr> & Edges = CurrentVertex->getOutEdges();
+
+
+  /// Get all outgoing edges.
+  auto OutEdges = Graph.getOutEdges(CurrentVertex);
 
   // Iterate over all the edges.
-  for ( auto EdgeIterator = Edges.begin();  EdgeIterator != Edges.end();
+  for ( auto EdgeIterator = OutEdges.begin();  EdgeIterator != OutEdges.end();
        ++EdgeIterator ) {
     GraphType::VertexPointer TargetVertex =
       (*EdgeIterator)->getTarget(CurrentVertex);

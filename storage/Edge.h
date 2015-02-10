@@ -46,6 +46,7 @@ public:
 
   /// Independent of who is first/second.
   EdgePtr getNextEdge(VertexPointer from);
+  EdgePtr getPreviousEdge(VertexPointer from);
   PropertyListReference getPropertyList();
   ReturnValueType getPropertyValue(KeyType k);
   EdgePtr getSecondNextEdge();

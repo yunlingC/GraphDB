@@ -30,6 +30,7 @@ public:
   typedef Vertex* VertexPtr;
   typedef Edge* EdgePointer;
   typedef Edge* EdgePtr;
+  typedef std::vector<EdgePointer> EdgeList;
   typedef PropertyList<FixedString, FixedString> PropertyListType;
   typedef PropertyListType VertexPropertyList;
   typedef PropertyListType EdgePropertyList;
@@ -40,6 +41,61 @@ public:
       return nullptr;
     }
     return Vertices[Vertex];
+  }
+
+  EdgeList getOutEdges(VertexPointer CurrentVertex) {
+    EdgeList OutEdges;
+
+    auto NextEdge = CurrentVertex->getNextEdge();
+    if ( CurrentVertex == NextEdge->getFirstVertexPtr() ) {
+      OutEdges.push_back(NextEdge);
+    }
+    auto EdgeIterator = NextEdge->getNextEdge(CurrentVertex);
+
+    while ( EdgeIterator != nullptr ) {
+      if ( CurrentVertex == EdgeIterator->getFirstVertexPtr() ) {
+        OutEdges.push_back(EdgeIterator);
+      }
+      EdgeIterator = EdgeIterator->getNextEdge(CurrentVertex);
+    }
+
+    EdgeIterator = NextEdge->getPreviousEdge(CurrentVertex);
+    while ( EdgeIterator != nullptr ) {
+      if ( CurrentVertex == EdgeIterator->getFirstVertexPtr() ) {
+        OutEdges.push_back(EdgeIterator);
+      }
+      EdgeIterator = EdgeIterator->getPreviousEdge(CurrentVertex);
+    }
+    
+    return OutEdges;
+  }
+
+  /// TODO: untested
+  EdgeList getInEdges(VertexPointer CurrentVertex) {
+    EdgeList InEdges;
+
+    auto NextEdge = CurrentVertex->getNextEdge();
+    if ( CurrentVertex == NextEdge->getSecondVertexPtr() ) {
+      InEdges.push_back(NextEdge);
+    }
+    auto EdgeIterator = NextEdge->getNextEdge(CurrentVertex);
+
+    while ( EdgeIterator != nullptr ) {
+      if ( CurrentVertex == EdgeIterator->getSecondVertexPtr() ) {
+        InEdges.push_back(EdgeIterator);
+      }
+      EdgeIterator = EdgeIterator->getNextEdge(CurrentVertex);
+    }
+
+    EdgeIterator = NextEdge->getPreviousEdge(CurrentVertex);
+    while ( EdgeIterator != nullptr ) {
+      if ( CurrentVertex == EdgeIterator->getSecondVertexPtr() ) {
+        InEdges.push_back(EdgeIterator);
+      }
+      EdgeIterator = EdgeIterator->getPreviousEdge(CurrentVertex);
+    }
+    
+    return InEdges;
   }
 
   VertexDescriptor addVertex() {
@@ -220,6 +276,7 @@ public:
     }
   }
 
+  
 protected:
   /// Hold pointers to all vertices.
   vector<VertexPointer> Vertices;
