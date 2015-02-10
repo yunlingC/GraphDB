@@ -55,9 +55,9 @@ public:
 
 protected:
   // Vertex id.
-  unsigned int _id;
+  unsigned int VertexId;
   // Pointer to next relationship
-  EdgePtr _nextEdge;
+  EdgePtr NextEdge;
 
   PropertyListType VertexPropertyList;
 };
