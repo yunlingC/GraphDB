@@ -4,15 +4,18 @@
 //using namespace std;
 
 /// New format for return types
-auto Vertex::getPropertyValue(KeyType Key) -> ReturnPropertyValueType {
+auto Vertex::getPropertyValue(KeyType Key) 
+  -> ReturnPropertyValueType {
   return VertexPropertyList.get(Key);
 }
 
-void Vertex::setProperty(Vertex::KeyType Key, Vertex::ValueType Value) {
+auto Vertex::setProperty(KeyType Key, ValueType Value)
+  -> void {
   VertexPropertyList.set(Key,Value);
 }
 
-void Vertex::setPropertyList(Vertex::PropertyListType & InitialList) {
+auto Vertex::setPropertyList(PropertyListTypeReference InitialList) 
+  -> void {
   VertexPropertyList = InitialList;
 }
 
@@ -26,16 +29,19 @@ Vertex::Vertex():
   NextEdge = nullptr;
 }
 
-void Vertex::setId(unsigned int id) {
-  VertexId = id;
+auto Vertex::setId(unsigned int Id) 
+  -> void {
+  VertexId = Id;
 }
 
-unsigned int Vertex::getId() {
+auto Vertex::getId() 
+  -> unsigned int {
   return VertexId;
 }
 
-void Vertex::setNextEdge(Edge::EdgePtr ep) {
-    NextEdge = ep;
+auto Vertex::setNextEdge(EdgePtr NewEdge) 
+  -> void {
+    NextEdge = NewEdge;
 }
   
 auto Vertex::getNextEdge() -> EdgePtr {
@@ -43,7 +49,9 @@ auto Vertex::getNextEdge() -> EdgePtr {
 }
 
 
-void Vertex::dump() {
+auto Vertex::dump() 
+  -> void {
+
     std::cout << " ========================================= " << std::endl;
     std::cout << " Vertex: " << VertexId << ", addr:" << this << ", node size: " << sizeof(Vertex) << std::endl;
     std::cout << " Outedge ids: ";
@@ -94,6 +102,7 @@ void Vertex::dump() {
 
   }
 
-void Vertex::deleteVertex() {
+auto Vertex::deleteVertex() 
+  -> void {
   VertexPropertyList.deletePropertyList();
 }
