@@ -25,6 +25,7 @@ class Edge {
 public:
   typedef Vertex* VertexPointer;
   typedef Edge* EdgePtr;
+  typedef Edge* EdgePointer;
   typedef unsigned int EdgeDescriptor;
   typedef unsigned int VertexDescriptor;
   
@@ -41,16 +42,16 @@ public:
   VertexDescriptor getFirstId();
   VertexPointer getFirstVertexPtr();
   VertexPointer getSecondVertexPtr();
-  EdgePtr getFirstNextEdge();
-  EdgePtr getFirstPreviousEdge();
+  EdgePointer getFirstNextEdge();
+  EdgePointer getFirstPreviousEdge();
 
   /// Independent of who is first/second.
-  EdgePtr getNextEdge(VertexPointer from);
-  EdgePtr getPreviousEdge(VertexPointer from);
+  EdgePointer getNextEdge(VertexPointer from);
+  EdgePointer getPreviousEdge(VertexPointer from);
   PropertyListReference getPropertyList();
   ReturnValueType getPropertyValue(KeyType k);
-  EdgePtr getSecondNextEdge();
-  EdgePtr getSecondPreviousEdge();
+  EdgePointer getSecondNextEdge();
+  EdgePointer getSecondPreviousEdge();
 
   // Independent of who is first/second.
   VertexPointer getTarget(VertexPointer from);
@@ -59,13 +60,13 @@ public:
   VertexDescriptor getSecondId();
   LabelType getType();
 
-  void setFirstNextEdge(EdgePtr e);
-  void setFirstPreviousEdge(EdgePtr e);
+  void setFirstNextEdge(EdgePointer e);
+  void setFirstPreviousEdge(EdgePointer e);
   void setId(unsigned int id);
   void setProperty(KeyType k, ValueType v);
   void setPropertyList(PropertyListType l);
-  void setSecondNextEdge(EdgePtr e);
-  void setSecondPreviousEdge(EdgePtr e);
+  void setSecondNextEdge(EdgePointer e);
+  void setSecondPreviousEdge(EdgePointer e);
   void setType(string t);
 
   /// Constructors.
@@ -82,13 +83,13 @@ protected:
   VertexPointer SecondVertex;
 
   // Pointer to first pointer's next relationship.
-  EdgePtr FirstNextEdge;
+  EdgePointer FirstNextEdge;
   // Pointer to first pointer's previous relationship.
-  EdgePtr FirstPreviousEdge;
+  EdgePointer FirstPreviousEdge;
 
   // Repeat for second.
-  EdgePtr SecondNextEdge;
-  EdgePtr SecondPreviousEdge;
+  EdgePointer SecondNextEdge;
+  EdgePointer SecondPreviousEdge;
   
   // Label to denote type.
   LabelType EdgeLabel;

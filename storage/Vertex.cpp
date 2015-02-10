@@ -1,7 +1,18 @@
+//===-- storage/Vertex.cpp - Edge implementation ------------------*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is the implementation for the Vertex class.
+///
+//===----------------------------------------------------------------------===//
 #include "Vertex.h"
 #include "Edge.h"
-
-//using namespace std;
 
 /// New format for return types
 auto Vertex::getPropertyValue(KeyType Key) 
