@@ -44,7 +44,7 @@ public:
   void addEdge(EdgePtr ep);
   void addOutEdge(EdgePtr ep);
   void dump();
-  std::vector<EdgePtr> & getEdges();
+
   std::vector<EdgePtr> & getOutEdges();
   unsigned int getId();
   EdgePtr getNextEdge();
@@ -62,7 +62,6 @@ protected:
   // Pointer to next relationship
   EdgePtr _nextEdge;
 
-  std::vector<EdgePtr> AllEdges;
   std::vector<EdgePtr> OutEdges;
   PropertyListType VertexPropertyList;
 };

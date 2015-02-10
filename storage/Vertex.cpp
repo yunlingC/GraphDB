@@ -22,10 +22,6 @@ auto Vertex::getPropertyList() -> PropertyListTypeReference  {
   return VertexPropertyList;
 }
 
-///std::vector<Edge::EdgePtr> & 
-auto Vertex::getEdges() -> EdgeListReference {
-  return AllEdges;
-}
 
 //std::vector<Edge::EdgePtr> & 
 auto Vertex::getOutEdges() -> EdgeListReference {
