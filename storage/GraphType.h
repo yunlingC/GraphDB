@@ -94,7 +94,6 @@ public:
       }
       EdgeIterator = EdgeIterator->getPreviousEdge(CurrentVertex);
     }
-    
     return InEdges;
   }
 
@@ -252,14 +251,14 @@ public:
 
     for ( auto i =0; i <Edges.size() ; i++ ) {
       Edges[i]->dump();
-      std::cout << endl;
+      std::cout << "\n";
     }
   }
 
- GraphType(): NumberOfVertices(0), NumberOfEdges(0) {
+  GraphType(): NumberOfVertices(0), NumberOfEdges(0) {
 
   }
-
+  
   ~GraphType() {
     /// Must manually delete the objects.  
     /// However, only one place is necessary since everywhere else, I am storing pointers.
