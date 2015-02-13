@@ -3,15 +3,16 @@
 
 #include "FixedString.h"
 #include "TraversalDescription.h"
+
 #include <vector>
 #include <string>
 #include <iostream>
 
-
-struct Query {
+class Query {
   typedef std::string KeyType;
   typedef std::string ValueType;
   typedef GraphType Graph;
+  
 public:
   Query(Graph & g) : _graph(g)  {
   }

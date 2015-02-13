@@ -5,11 +5,31 @@
 
 using namespace std;
 
-class Q {
- public:
-  void h( int id ) {
-  for (auto i = 0; i < 500; i++) 
-    cout << "hello " << id << "\n";
+class BaseQuery {
+
+public:
+
+  virtual void h( int id ) {
+    for (auto i = 0; i < 10; i++) 
+      cout << "Base: " << id << "\n";
+  }
+};
+
+class Query1 : public BaseQuery {
+
+public:
+  virtual void h(int id) {
+    for (auto i = 0; i < 20; i++) 
+      cout << "Query1: " << id << "\n";
+  }
+};
+
+class Query2 : public BaseQuery {
+
+public:
+  virtual void h(int id) {
+    for (auto i = 0; i < 30; i++) 
+      cout << "Query2: " << id << "\n";
   }
 };
 
@@ -33,18 +53,40 @@ class Q {
 // };
 
 int main() {
-
-  Q q;
+  
+  
   // std::thread t(&Q::h,q,2);
   // t.join();
-  
+
+  Query1 q1;
+  Query2 q2;
+
+  vector<BaseQuery*> queries;
+  queries.push_back(&q1);
+  queries.push_back(&q2);
+
+  //  BaseQuery* bq1 = queries[0];
+
   vector<thread> threads;
   for (auto i = 0; i < 20; ++i) {
-    threads.push_back( thread( &Q::h, q, i ));
+    if (i <10) {
+      threads.push_back( thread( &Query1::h, q1, i ));
+    } else {
+      threads.push_back( thread( &Query2::h, q2, i ));
+    }
+    
   }
   
+  // for ( auto it = queries.begin(); it != queries.end();
+  // 	++it) {
+  //   BaseQuery* RunQuery = *it;
+  //   RunQuery->h(1);
+  // }
+  
+  
+  
   for_each(threads.begin(), threads.end(),
-           std::mem_fn(&thread::join));
+	   std::mem_fn(&thread::join));
 
   return 0;
 

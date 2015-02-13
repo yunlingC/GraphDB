@@ -19,12 +19,10 @@ int main() {
   cout << "Begin testing\n";
 
   GDReader reader(g);
-  reader.readFile("../tests/gd/sndata.gd");
+  reader.readFile("../tests/gd/sndata-big.gd");
 
   //createGraph(g);
-  Graph::VertexPtr vp0 = g.getVertexPointer(0);
-//  MAGIC_SOURCE_NODE(vp0);
-//  MAGIC_PREFETCH_TRIGGER;
+  //  Graph::VertexPtr vp0 = g.getVertexPointer(0);
   cout << "BFS start\n";
 
   Query Q(g);
