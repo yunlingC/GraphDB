@@ -11,7 +11,7 @@
 
 #include "breadth_first_search.h"
 #include "CustomVisitor.h"
-
+#include "QueryDescription.h"
 
 int main() {
 
@@ -32,90 +32,27 @@ int main() {
   cout << "BFS start\n";
 
   cout << "Query 1\n";
-  TraversalDescription Q1(g);
-//  Q1.traverseGraph(g);
-  Q1.traverseFromVertex(vp0->getId());
-  Q1.filtProperty("name", "KIRA VERLATO");
-  Q1.traverseThroughType("FRIENDS");
-  Q1.terminateAtTargetNumber(1);
-  Q1.breadth_first_search();
-  Q1.dumpVertexTarget();
-  Q1.dumpDepthList();
+  Query1 Qu1("name", "KIRA VERLATO", g);
+  cout << endl;
 
  
   cout << "===============================\n";
   cout << "Query 2\n";
-  TraversalDescription Q2(g);
-  Q2.traverseFromVertex(vp0->getId());
-  Q2.filtProperty("wpurl", "http://www.uwaterloo.ca/webpage15.html");
-//  Q2.filtProperty("wpid", "15");
-//  Q2.traverseThroughType("LIKES");
-//  Q2.filtProperty("name", "KIRA VERLATO");
-//  Q2.traverseThroughType("FRIENDS");
-  Q2.terminateAtTargetNumber(1);
-  Q2.breadth_first_search();
-//  Q2.startRecording();
-  Q2.dumpVertexTarget();
-  
-  auto targets2 = Q2.getVertexTargetSet();
- 
-  for(auto it = targets2.begin(); it != targets2.end(); ++it) {
-    TraversalDescription q(g);
-    cout << "start from vertex: " << (*it)->getId() << endl;
-    q.traverseFromVertex((*it)->getId());
-    q.traverseThroughType("LIKES");
-    q.filtType("LIKES");
-//    q.traverseThroughDirection("in");
-    q.terminateAtDepth(1);
-    q.breadth_first_search();
-    q.dumpVertexTarget();
-  }
-
+  Query2 Qu2("wpurl", "http://www.uwaterloo.ca/webpage15.html", g);
+  cout << endl;
 
   cout << "===============================\n";
   cout << "Query 3\n";
-  TraversalDescription Q3(g);
-  Q3.traverseFromVertex(vp0->getId());
-  Q3.filtProperty("name", "KIRA VERLATO");
-  Q3.traverseThroughType("FRIENDS");
-  Q3.terminateAtTargetNumber(1);
-  Q3.breadth_first_search();
-//  Q2.startRecording();
-  Q3.dumpVertexTarget();
-  
-  auto targets3 = Q3.getVertexTargetSet();
- 
-  for(auto it = targets3.begin(); it != targets3.end(); ++it) {
-    TraversalDescription q(g);
-    cout << "start from vertex: " << (*it)->getId() << endl;
-    q.traverseFromVertex((*it)->getId());
-    q.traverseThroughType("LIKES");
-    q.filtType("LIKES");
-//    q.traverseThroughDirection("in");
-    q.terminateAtDepth(1);
-    q.breadth_first_search();
-    q.dumpVertexTarget();
-  }
-
+  Query3 Qu3("name", "KIRA VERLATO", g);
+  cout << endl;
 
   cout << "===============================\n";
   cout << "Query 4\n";
-  TraversalDescription Q4(g);
-  Q4.traverseFromVertex(vp0->getId());
-  Q4.filtProperty("pid", "5");
-  Q4.traverseThroughType("FRIENDS");
-  Q4.terminateAtTargetNumber(1);
-  Q4.breadth_first_search();
-  Q4.dumpVertexTarget();
-  
-  auto targets4 = Q4.getVertexTargetSet();
- 
-  for(auto it = targets4.begin(); it != targets4.end(); ++it) {
-    FixedString key("name");
-    cout << (*it)->getPropertyValue(key).first;
-    cout << endl;
-  }
+  Query4 Qu4("pid", "5", g);
 
+  cout << "End of 4 queries\n";
+
+  cout << "===============================\n";
 
   return 0;
 }
