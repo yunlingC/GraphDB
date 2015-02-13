@@ -1,17 +1,13 @@
-#include "Vertex.h"
-#include "Edge.h"
-#include "GraphType.h"
-#include "FixedString.h"
-#include "macros.h"
+//#include "macros.h"
 #include "GDReader.h"
 #include "LinkedList.h"
+#include "breadth_first_search.h"
+#include "QueryDescription.h"
 
+#include <algorithm>
 #include <iostream>
 #include <queue>
-
-#include "breadth_first_search.h"
-#include "CustomVisitor.h"
-#include "QueryDescription.h"
+#include <thread>
 
 int main() {
 
@@ -27,36 +23,43 @@ int main() {
 
   //createGraph(g);
   Graph::VertexPtr vp0 = g.getVertexPointer(0);
-  MAGIC_SOURCE_NODE(vp0);
-  MAGIC_PREFETCH_TRIGGER;
+//  MAGIC_SOURCE_NODE(vp0);
+//  MAGIC_PREFETCH_TRIGGER;
   cout << "BFS start\n";
 
-  cout << "Query 1\n";
-  Query1 Q1("name", "KIRA VERLATO", g);
-  cout << endl;
+  Query Q(g);
+  Q.setPersonProperty("name" , "KIRA VERLATO");
+  Q.setWebId(14);
+  Q.setPersonId(4);
+  Q.setQuery4Property("pid" , "5");
 
- 
-  cout << "===============================\n";
-  cout << "Query 2\n";
-//  Query2 Q2("wpurl", "http://www.uwaterloo.ca/webpage15.html", g);
-  Query2 Q2(14, g); 
-  cout << endl;
 
-  cout << "===============================\n";
-  cout << "Query 3\n";
-  Query3 Q3(4, g);
-  cout << endl;
+  vector<thread> threads;
+  threads.push_back( thread( &Query::runQuery1, Q));
+  threads.push_back( thread( &Query::runQuery2, Q));
+  threads.push_back( thread( &Query::runQuery3, Q));
+  threads.push_back( thread( &Query::runQuery4, Q));
+  threads.push_back( thread( &Query::runQuery12, Q));
 
-  cout << "===============================\n";
-  cout << "Query 4\n";
-  Query4 Q4("pid", "5", g);
+  for_each(threads.begin(), threads.end(),
+           std::mem_fn(&thread::join));
 
-  cout << "End of 4 queries\n";
 
-  cout << "===============================\n";
 
-  cout << "Query 13\n";
-  Query12 Q12(4, g);
+/*
+  Q.runQuery1();
 
+//  Query Q2;
+  Q.runQuery2(); 
+
+//  Query Q3;
+  Q.runQuery3();
+
+//  Query Q4;
+  Q.runQuery4();
+
+//  Query1 Q12;
+  Q.runQuery12();
+*/
   return 0;
 }
