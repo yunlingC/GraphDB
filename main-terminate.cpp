@@ -32,27 +32,31 @@ int main() {
   cout << "BFS start\n";
 
   cout << "Query 1\n";
-  Query1 Qu1("name", "KIRA VERLATO", g);
+  Query1 Q1("name", "KIRA VERLATO", g);
   cout << endl;
 
  
   cout << "===============================\n";
   cout << "Query 2\n";
-  Query2 Qu2("wpurl", "http://www.uwaterloo.ca/webpage15.html", g);
+//  Query2 Q2("wpurl", "http://www.uwaterloo.ca/webpage15.html", g);
+  Query2 Q2(14, g); 
   cout << endl;
 
   cout << "===============================\n";
   cout << "Query 3\n";
-  Query3 Qu3("name", "KIRA VERLATO", g);
+  Query3 Q3(4, g);
   cout << endl;
 
   cout << "===============================\n";
   cout << "Query 4\n";
-  Query4 Qu4("pid", "5", g);
+  Query4 Q4("pid", "5", g);
 
   cout << "End of 4 queries\n";
 
   cout << "===============================\n";
+
+  cout << "Query 13\n";
+  Query12 Q12(4, g);
 
   return 0;
 }

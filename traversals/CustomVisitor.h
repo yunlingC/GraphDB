@@ -25,7 +25,7 @@ public:
     ReturnValueType rv = vp->getPropertyValue(key); 
     if((rv.second != false) && (rv.first == value))
     {
-      cout << "++++Gotcha++++\n" << "Vertex:\t" << vp->getId() << endl;
+//      cout << "++++Gotcha++++\n" << "Vertex:\t" << vp->getId() << endl;
       return true;
     }
     return false;

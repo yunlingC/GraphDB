@@ -93,7 +93,7 @@ public:
 
     void dumpVertexTarget() {
 
-      cout << "+++++++++Vertex Target Set+++++++++\n";
+//      cout << "+++++++++Vertex Target Set+++++++++\n";
       for (auto it = VertexTargetSet.begin(); it != VertexTargetSet.end(); ++it) {
         cout << "Vertex: "<< (*it)->getId() << endl;
 //      it->getPropertyList();

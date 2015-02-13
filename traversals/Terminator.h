@@ -59,7 +59,7 @@ public:
   bool TerminateAtVertex(VertexTargetSet vertexSet) {
     if(vertexSet.size() >= _targetNum) 
     {
-      cout << "targetNum: " << _targetNum << " targetSet size: " <<vertexSet.size() << endl;
+//      cout << "targetNum: " << _targetNum << " targetSet size: " <<vertexSet.size() << endl;
       return true;
     }
     else // not yet
