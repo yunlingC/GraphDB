@@ -31,7 +31,8 @@ auto Vertex::setPropertyList(PropertyListTypeReference InitialList)
 }
 
 // Remember you can change this when returned.
-auto Vertex::getPropertyList() -> PropertyListTypeReference  {
+auto Vertex::getPropertyList() 
+  -> PropertyListTypeReference  {
   return VertexPropertyList;
 }
 

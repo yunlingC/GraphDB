@@ -20,7 +20,9 @@ using namespace std;
 
 auto Edge::dump() 
   -> void {
-  std::cout << "\nEdge id: " << EdgeId << " (" << FirstVertex->getId() << ", " << SecondVertex->getId() << ") \n";
+  std::cout << "\nEdge id: " << EdgeId << " (" << FirstVertex->getId() 
+            << ", " << SecondVertex->getId() << ") \n";
+
   std::cout << "\nEdge PropertyList\n";
   EdgePropertyList.print();
 
@@ -144,7 +146,7 @@ auto Edge::getPreviousEdge(Edge::VertexPointer from)
 }
 
 auto Edge::setFirstNextEdge(EdgePointer e) 
--> void {
+  -> void {
   FirstNextEdge = e;
 }
 
@@ -164,7 +166,7 @@ auto Edge::getFirstPreviousEdge()
 }
 
 auto Edge::setSecondNextEdge(EdgePointer e) 
--> void {
+  -> void {
   SecondNextEdge = e;
 }
 
@@ -204,13 +206,13 @@ auto Edge::getId()
 }
 
 Edge::Edge(): EdgeId(-1) { 
-    FirstVertex = nullptr;     
-    SecondVertex = nullptr;
-    FirstNextEdge = nullptr; 
-    FirstPreviousEdge = nullptr;
-    SecondNextEdge = nullptr; 
-    SecondPreviousEdge = nullptr;
-  }
+  FirstVertex = nullptr;     
+  SecondVertex = nullptr;
+  FirstNextEdge = nullptr; 
+  FirstPreviousEdge = nullptr;
+  SecondNextEdge = nullptr; 
+  SecondPreviousEdge = nullptr;
+}
 
 Edge::Edge(VertexPointer StartVertex, VertexPointer EndVertex) {
   FirstVertex = StartVertex; 
@@ -221,6 +223,7 @@ Edge::Edge(VertexPointer StartVertex, VertexPointer EndVertex) {
   SecondPreviousEdge = nullptr;
 }
   
-void Edge::deleteEdge() {
+auto Edge::deleteEdge()
+  -> void {
   EdgePropertyList.deletePropertyList();
 }

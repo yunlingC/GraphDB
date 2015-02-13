@@ -2,9 +2,9 @@
 #define _MACRO_H_
 
 #define MAGIC_SOURCE_NODE(a) \
-  cout << "MAGIC_SOURCE_NODE: Source node address " << a << endl;
+  std::cout << "MAGIC_SOURCE_NODE: Source node address " << a << "\n";
 
 #define MAGIC_PREFETCH_TRIGGER \
-  cout << "MAGIC_PREFETCH_TRIGGER" << endl;
+  std::cout << "MAGIC_PREFETCH_TRIGGER" << "\n";
 
 #endif /* _MACRO_H_ */
