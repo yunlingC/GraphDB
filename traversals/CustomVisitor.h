@@ -3,56 +3,92 @@
 
 #include "VertexVisitor.h"
 #include "EdgeVisitor.h"
+#include "Filter.h"
+using namespace std;
 
 class VisitedVertex : public VertexVisitor<VisitedVertex> {
 public:
   typedef pair<FixedString, bool> ReturnValueType;
 public:
   VisitedVertex() { }
-  void setFilter(Filter f) {
+  void setFilter(Filter & f) {
     _f = f;
   }
 
   bool visitVertex(VertexPointer vp) {
+    if ((_f.getValue() == "") || (_f.getKey() == "") )
+      return false; 
+
     FixedString value(_f.getValue());
     FixedString key(_f.getKey());
 
-  cout << "Find vertex with key= " << key << "\tvalue= " << value << endl;
     ReturnValueType rv = vp->getPropertyValue(key); 
     if((rv.second != false) && (rv.first == value))
     {
       cout << "++++Gotcha++++\n" << "Vertex:\t" << vp->getId() << endl;
+      return true;
+    }
+    return false;
+  }
+ /// to select specified direction
+  bool scheduleVertex(VertexPointer vp, EdgePointer ep) {
+    int direction = 0;
+
+    if(_f.getDirection() == "" )
+      return true;
+
+    if (ep->getFirstId() == vp->getId())
+      direction = 1;     //first vertex == outEdge;
+    else if ( ep->getSecondId() == vp->getId())
+      direction = 2;     //second vertex == inEdge;
+    else 
+      cout <<"Err: Irrelevant edges.\n";
+
+    switch(direction) {
+    case 1:
+      if (_f.getDirection() == "out") {
+//        cout << "one catch on vertex: " << vp->getId() << endl;
+        return true;
+      }
+
+    case 2:
+      if (_f.getDirection() == "in") { 
+        cout << "one catch on vertex: " << vp->getId() << endl;
+        return true;
+      }
+    default:
       return false;
     }
-    return true;
+    return false;
   }
 
 private:
   Filter _f;
 };
 
-
 class VisitedEdge: public EdgeVisitor<VisitedEdge>  {
 public:
   VisitedEdge() { } 
 
-  void setFilter(Filter f) {
+  void setFilter(Filter & f) {
     _f = f;
   }
 
   bool  visitEdge(EdgePointer ep) {
-    return true;
+    return false;
   }
 
   bool  scheduleEdge(EdgePointer ep ) {
+    if (_f.getType() == "")
+      return true;
     FixedString type(_f.getType());
     if (ep->getType() == type)
     {
-      cout << "Edge:\t" << ep->getId() << endl;
+//      cout << "Edge:\t" << ep->getId() << endl;
       return true;
     }
     else  {
-      cout << "type= " << ep->getType() << endl;
+//      cout << "type= " << ep->getType() << endl;
       return false;
     }
   }

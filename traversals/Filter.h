@@ -7,14 +7,18 @@
 
 struct Filter {
 public:
+  ///TODO: enum every type
+
   typedef std::string KeyType;
   typedef std::string ValueType;
   typedef std::string Type;
+  typedef std::string Direction; 
   typedef unsigned int IdType;
 public:
   Filter() : _key(""), 
              _value(""), 
              _type(""), 
+             _direction(""),
              _vertexId(0), 
              _edgeId(0)  { }
 
@@ -35,6 +39,10 @@ public:
     _type = t;
   }
  
+  void setDirection(Direction d) {
+    _direction = d;
+  }
+
   void setVertexId(IdType vid) {
     _vertexId = vid;
   }
@@ -56,6 +64,10 @@ public:
     return _type; 
   }
 
+  Direction & getDirection() {
+    return _direction;
+  }
+
   IdType & getVertexId() {
     return _vertexId;
   }
@@ -68,6 +80,7 @@ private:
   KeyType   _key;
   ValueType _value;
   Type      _type;
+  Direction _direction;
   IdType    _vertexId;
   IdType    _edgeId;
 
