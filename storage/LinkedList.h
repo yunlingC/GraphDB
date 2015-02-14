@@ -1,3 +1,16 @@
+//===-- storage/LinkedList.h - Linked List class type -----------*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is a basic linked list implementation.
+///
+//===----------------------------------------------------------------------===//
 #ifndef _LINKED_LIST_H_
 #define _LINKED_LIST_H_
 

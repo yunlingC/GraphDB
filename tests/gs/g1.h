@@ -21,6 +21,7 @@ void createGraph(GraphType & g) {
   g.addEdge(v2, v3);
   g.addEdge(v2, v4);
   g.addEdge(v5, v6);
+  //  g.addEdge(v6, v3);
   // g.addEdge(v2, v4);
   // g.addEdge(v3, v5);
   // g.addEdge(v4, v5);

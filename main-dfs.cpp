@@ -22,7 +22,9 @@
 #include <iostream>
 #include <queue>
 
-#include "RecursiveDepthFirstSearch.h"
+//#include "RecursiveDepthFirstSearch.h"
+#include "DepthFirstSearch.h"
+
 /// Test
 #include "tests/gs/g1.h"
 
@@ -35,7 +37,7 @@ int main() {
   Graph g;
   cout << "Begin testing\n";
   GDReader reader(g);
-  reader.readFile("../tests/gd/sndata.gd");
+  reader.readFile("../tests/gd/sndata-big.gd");
 
   //createGraph(g);
   Graph::VertexPtr vp0 = g.getVertexPointer(0);
