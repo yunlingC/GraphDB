@@ -2,9 +2,7 @@
 #define _EDGE_VISITOR_H_ 
 
 #include "GraphType.h"
-//#include "Filter.h"
 
-template <typename CustomVisitor>
 class EdgeVisitor {
 public:
   typedef GraphType::EdgePtr  EdgePointer;
@@ -22,9 +20,6 @@ public:
   }
 
 private:
-   CustomVisitor& customVisitor() {
-     return *static_cast<CustomVisitor*>(this);
-   }
 //private:
 //   Filter _f;
 };

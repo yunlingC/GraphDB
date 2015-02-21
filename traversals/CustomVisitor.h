@@ -1,100 +1,117 @@
+//===-- traversals/CustomVisitor.h - Customed visitor class ----------*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is the customed class for Graph visitors.
+///
+//===----------------------------------------------------------------------===//
+
 #ifndef _CUSTOMVISITOR_H_
 #define _CUSTOMVISITOR_H_
 
-#include "VertexVisitor.h"
-#include "EdgeVisitor.h"
-#include "Filter.h"
+#include "Visitor.h"
+//#include "Filter.h"
+#include "Utilities.h"
+
 using namespace std;
 
-class VisitedVertex : public VertexVisitor<VisitedVertex> {
+class Q1Visitor : public Visitor {
 public:
   typedef pair<FixedString, bool> ReturnValueType;
+  typedef GraphType::VertexPointer VertexPointer;
+  typedef std::vector<VertexPointer> VertexTarget;
 public:
-  VisitedVertex() { }
+  Q1Visitor() { }
   void setFilter(Filter & f) {
-    _f = f;
+    _filter = f;
+  }
+
+  Filter & getFilter() { 
+    return _filter;
+  }
+
+  VertexTarget & getVertexTargetList() {
+    return _VertexTargetList;
   }
 
   bool visitVertex(VertexPointer vp) {
-    if ((_f.getValue() == "") || (_f.getKey() == "") )
-      return false; 
-
-    FixedString value(_f.getValue());
-    FixedString key(_f.getKey());
-
-    ReturnValueType rv = vp->getPropertyValue(key); 
-    if((rv.second != false) && (rv.first == value))
-    {
-//      cout << "++++Gotcha++++\n" << "Vertex:\t" << vp->getId() << endl;
-      return true;
-    }
-    return false;
-  }
- /// to select specified direction
-  bool scheduleVertex(VertexPointer vp, EdgePointer ep) {
-    int direction = 0;
-
-    if(_f.getDirection() == "" )
-      return true;
-
-    if (ep->getFirstId() == vp->getId())
-      direction = 1;     //first vertex == outEdge;
-    else if ( ep->getSecondId() == vp->getId())
-      direction = 2;     //second vertex == inEdge;
-    else 
-      cout <<"Err: Irrelevant edges.\n";
-
-    switch(direction) {
-    case 1:
-      if (_f.getDirection() == "out") {
-//        cout << "one catch on vertex: " << vp->getId() << endl;
-        return true;
-      }
-
-    case 2:
-      if (_f.getDirection() == "in") { 
-        cout << "one catch on vertex: " << vp->getId() << endl;
-        return true;
-      }
-    default:
-      return false;
-    }
-    return false;
-  }
-
-private:
-  Filter _f;
-};
-
-class VisitedEdge: public EdgeVisitor<VisitedEdge>  {
-public:
-  VisitedEdge() { } 
-
-  void setFilter(Filter & f) {
-    _f = f;
-  }
-
-  bool  visitEdge(EdgePointer ep) {
-    return false;
+    bool VertexMatch = checkProperty<ReturnValueType>(vp, getFilter());
+    if(VertexMatch == true) 
+      _VertexTargetList.push_back(vp);
+//    cout <<"VertexMatch = " << VertexMatch << endl;
+    return TerminateAtVertex(1, _VertexTargetList);
   }
 
   bool  scheduleEdge(EdgePointer ep ) {
-    if (_f.getType() == "")
-      return true;
-    FixedString type(_f.getType());
-    if (ep->getType() == type)
-    {
-//      cout << "Edge:\t" << ep->getId() << endl;
-      return true;
-    }
-    else  {
-//      cout << "type= " << ep->getType() << endl;
-      return false;
-    }
+    return checkType(ep, getFilter() );
+  }
+
+
+  void dumpTarget() {
+    dumpVertexTarget(_VertexTargetList);
   }
 
 private:
-  Filter _f;
+
+  VertexTarget _VertexTargetList;
+  Filter _filter;
 };
 
+class Q2Visitor : public Visitor {
+public:
+  typedef GraphType::VertexPointer VertexPointer;
+  typedef std::vector<VertexPointer> VertexTarget;
+public:
+  Q2Visitor() { }
+
+  void setFilter(Filter & f) {
+    _filter = f;
+  }
+
+  Filter & getFilter() {
+    return _filter;
+  }
+
+  VertexTarget & getVertexTargetList() {
+    return _VertexTargetList;
+  }
+
+  bool visitVertex(VertexPointer vertex) {
+    if(_depthList.find(vertex) != _depthList.end())
+      if(_depthList[vertex] >= 1)
+        return true;
+  }
+
+  bool scheduleEdge(EdgePointer edge) {
+    return checkType(edge, _filter);
+  }
+
+  bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
+    bool TypeMatch = checkType(edge, _filter);
+    if(TypeMatch == true) {
+//      cout << first->getId() << "\t" << edge->getId() << "\t"  << second->getId() << "\t" << edge->getType() << endl;
+      _VertexTargetList.push_back(second);
+    }
+    computeDepth(first, edge, second, _depthList);
+    return TerminateAtDepth(1, _depthList);
+  }
+/*
+  void dumpTarget() {
+    for (auto it = _VertexTargetList.begin(); it != _VertexTargetList.end(); ++it) {
+      cout << "Vertex: " << (*it)->getId() << "Name: " << (*it)->getProperty("name");
+    }
+  }
+*/
+
+private:
+  Filter _filter;
+  DepthList _depthList;
+  VertexTarget _VertexTargetList;
+};
 #endif /**_CUSOTMVISITOR_H_*/

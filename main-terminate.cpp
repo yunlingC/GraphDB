@@ -19,30 +19,43 @@ int main() {
   cout << "Begin testing\n";
 
   GDReader reader(g);
-  reader.readFile("../tests/gd/sndata-big.gd");
+  reader.readFile("../tests/gd/sndata.gd");
 
   //createGraph(g);
   //  Graph::VertexPtr vp0 = g.getVertexPointer(0);
   cout << "BFS start\n";
 
-  Query Q(g);
-  Q.setPersonProperty("name" , "KIRA VERLATO");
-  Q.setWebId(14);
-  Q.setPersonId(4);
-  Q.setQuery4Property("pid" , "5");
+  Query1 Q1;
+  Q1.setPersonProperty("name" , "KIRA VERLATO");
 
+  Query2 Q2;
+  Query3 Q3;
 
+  Query4 Q4;
+  Q4.setPersonProperty("pid", "5");
+
+  Query12 Q12;
+   
+  Q1.runQuery(g);
+  Q2.runQuery(g, 14);
+  Q3.runQuery(g, 4);
+  Q4.runQuery(g);
+  Q12.runQuery(g, 4);
+
+/*
   vector<thread> threads;
-  threads.push_back( thread( &Query::runQuery1, Q));
-  threads.push_back( thread( &Query::runQuery2, Q));
-  threads.push_back( thread( &Query::runQuery3, Q));
-  threads.push_back( thread( &Query::runQuery4, Q));
-  threads.push_back( thread( &Query::runQuery12, Q));
+  threads.push_back( thread([&]{Q1.runQuery(g);}));
+  threads.push_back( thread([&]{Q2.runQuery(g, 14);}));
+  threads.push_back( thread([&]{Q3.runQuery(g, 4);}));
+  
+//  threads.push_back( thread( &Query::runQuery3, Q));
+//  threads.push_back( thread( &Query::runQuery4, Q));
+//  threads.push_back( thread( &Query::runQuery12, Q));
 
   for_each(threads.begin(), threads.end(),
            std::mem_fn(&thread::join));
 
-
+*/
 
 /*
   Q.runQuery1();

@@ -2,11 +2,8 @@
 #define _TRAVERSALDESCRIPTION_H_
 
 #include <iostream>
-//#include "GraphType.h"
+
 #include "breadth_first_search.h"
-//#include "VertexVisitor.h"
-//#include "EdgeVisitor.h"
-//#include "Filter.h"
 #include "Terminator.h"
 
 class TraversalDescription {
@@ -21,12 +18,17 @@ public:
   typedef pair<GraphType::VertexPtr, int > DepthPair;
   typedef vector<VertexPath> PathType;
   typedef unsigned int IdType;
+
 public:
 
-//    TraversalDescription() { }
     TraversalDescription(GraphType & graph) : Graph(graph) { }
-    void traverseGraph(GraphType & graph) {
-      Graph = graph;
+//    void traverseGraph(GraphType & graph) {
+//      Graph = graph;
+//    }
+
+    void traverseVisitor(Visitor & graphVisitor) {
+      cout <<"Pass visitor to bfs\n";
+      GraphVisitor = graphVisitor;
     }
 
     void traverseFromVertex(GraphType::VertexDescriptor startvertex) {
@@ -36,42 +38,42 @@ public:
     void breadth_first_search(); 
 
     void depth_first_search();
-
+/**
     void filtProperty(KeyType key, ValueType value ) {
       TraversalFilter.setKey(key);
       TraversalFilter.setValue(value);
-      VVisitor.setFilter(TraversalFilter);
+      GraphVisitor.setFilter(TraversalFilter);
     }
 
     void filtVertexId(IdType vid) {
       TraversalFilter.setVertexId(vid);
-      VVisitor.setFilter(TraversalFilter);
+      GraphVisitor.setFilter(TraversalFilter);
     }
 
     void filtEdgeId (IdType eid) {
       TraversalFilter.setEdgeId(eid);
-      EVisitor.setFilter(TraversalFilter);
+      GraphVisitor.setFilter(TraversalFilter);
     }
 
     void filtType (Type type) {
       TraversalFilter.setType(type);
-      EVisitor.setFilter(TraversalFilter);
+      GraphVisitor.setFilter(TraversalFilter);
       filtTypeFlag = true;
     }
 
     std::vector<GraphType::VertexPtr> 
-    getVertexTargetSet() {
+    & getVertexTargetSet() {
       return VertexTargetSet;
     }
     
     void traverseThroughDirection(Direction direction) {
       TraversalFilter.setDirection(direction);
-      VVisitor.setFilter(TraversalFilter);
+      GraphVisitor.setFilter(TraversalFilter);
     }
 
     void traverseThroughType(Type type) {
       TraversalFilter.setType(type);
-      EVisitor.setFilter(TraversalFilter);
+      GraphVisitor.setFilter(TraversalFilter);
     }
 
     bool terminateAtDepth(unsigned int depth) {
@@ -136,36 +138,38 @@ public:
         cout << it->first->getId() << "\t" << it->second << endl;
 
     }
-
+*/
 protected:
     /// to pass property/type as arguments to check/match 
-    Filter TraversalFilter;  
+//    Filter TraversalFilter;  
     /// to specify how should traversal stop
-    Terminator TraversalTerminator;
+//    Terminator TraversalTerminator;
     /// to record useful paths with all info(not only target vertices)
-    PathType ReturnPaths;
+//    PathType ReturnPaths;
     /// only have the scope of filters and set single flag for current vertexto be included/listed to be search/added as target/
 //    VertexVisitor<VisitedVertex> VVisitor;
-    VisitedVertex VVisitor;
+//    VisitedVertex VVisitor;
+    Visitor GraphVisitor; 
     /// the same as vv
 //    VertexVisitor<ScheduleVertex> SVisitor;
-    VisitedEdge   EVisitor;
+//    VisitedEdge   EVisitor;
 //    EdgeVisitor<VisitedEdge> EVisitor;
+
+    bool DepthMatch = false;
 
     unsigned int Depth;
     
-    unsigned int filtTypeFlag = false;
+    bool filtTypeFlag = false;
     
 //    std::queue<VertexType> _startNode;
     GraphType::VertexDescriptor  StartVertex;
 //    GraphType::VertexPtr StartVertex;
 
 //    std::vector<VertexPath> _paths; 
-    std::map<GraphType::VertexPtr, int> OutDegreeList;
-    std::map<GraphType::VertexPtr, int> InDegreeList;
-    std::map<GraphType::VertexPtr, int> DepthList;
-    std::vector<GraphType::VertexPtr> VertexTargetSet;
-    std::vector<GraphType::EdgePtr> EdgeTargetSet;
+//    std::map<GraphType::VertexPtr, int> OutDegreeList;
+//    std::map<GraphType::VertexPtr, int> InDegreeList;
+//    std::vector<GraphType::VertexPtr> VertexTargetSet;
+//    std::vector<GraphType::EdgePtr> EdgeTargetSet;
 
     ///TO be added : subgraph
 
