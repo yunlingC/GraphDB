@@ -30,6 +30,9 @@ public:
     _filter = filter;
   }
 
+  virtual bool visitStartVertex(VertexPointer vp) {
+    return false;
+  }
   virtual bool discoverVertex(VertexPointer vp) {
     return false;
   }
@@ -55,6 +58,14 @@ public:
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second){
      return false;
+  }
+
+  virtual bool scheduleTree(VertexPointer first, EdgePointer edge, VertexPointer second) {
+    return false;
+  }
+
+  virtual bool revisitVertex(VertexPointer vertex) {
+    return false;
   }
 
   virtual bool finishVisit()

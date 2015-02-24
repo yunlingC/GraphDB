@@ -14,6 +14,8 @@
 #ifndef _UTILITIES_H_
 #define _UTILITIES_H_
 
+#include <stack>
+
 #include "Filter.h"
 #include "GraphType.h"
 
@@ -27,6 +29,9 @@ typedef GraphType::EdgePointer    EdgePointer;
 typedef std::map<VertexPointer, unsigned int> DepthList;
 typedef std::map<VertexPointer, unsigned int> DegreeList;
 typedef std::vector<VertexPointer> VertexTargetSet;
+typedef std::stack<unsigned int > LayerStack;
+typedef std::map<unsigned int, VertexTargetSet> LayerMap;
+
 
 void filtProperty(KeyType key, ValueType value, Filter & TraversalFilter){
   TraversalFilter.setKey(key);
@@ -67,6 +72,12 @@ void traverseThroughType(Type type, Filter & TraversalFilter) {
 //  GraphVisitor.setFilter(TraversalFilter);
 }
 
+void traverseThroughTypeAndDirection(Type type, Direction direction, Filter & TraversalFilter) {
+  TraversalFilter.setDirection(direction);
+  TraversalFilter.setType(type);
+//  GraphVisitor.setFilter(TraversalFilter);
+}
+
 bool TerminateAtVertex(unsigned int targetNum, VertexTargetSet vertexSet) {
 
 //      cout << "targetNum: " << targetNum << " targetSet size: " <<vertexSet.size() << endl;
@@ -93,23 +104,110 @@ bool terminateAtTargetNumber(unsigned int tnum) {
 }
 
 */
-
-void computeDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthList &dl) {
+/// compute and return the depth for second
+unsigned int computeDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthList &dl) {
   typedef pair<VertexPointer, unsigned int> DepthPair;
 
+  unsigned int depth = 1;
   if (dl.find(first) == dl.end()) {
     dl.insert(DepthPair(first, 0));
-    dl.insert(DepthPair(second, 1));
+    if(dl.find(second) == dl.end())
+      dl.insert(DepthPair(second, 1));
+    else 
+      dl[second] = 1;
+//    cout << "vertex: " << first->getId() << " depth: 0" << endl;
+//    cout << "vertex: " << second->getId() << " depth: 1" << endl;
+  }
+  else {
+    depth = dl[first] + 1;
+    if(dl.find(second) == dl.end()) {
+      dl.insert(DepthPair(second, depth));
+    }
+    else {
+      if(depth < dl[second])
+        dl[second] = depth;
+    }
+  }
+
+  return  depth;
+
+}
+
+void recordDepth(VertexPointer first, EdgePointer edge, VertexPointer second, LayerMap &lm, LayerStack& ls) {
+/**   unsigned int layerNum ;
+    if(_layerMap.empty()) {
+      VertexTarget newLayer;
+      newLayer.push_back(first);
+      layerNum = 0;
+      _layerMap.insert(LayerPair(layerNum, newLayer));
+      _layerStack.push(layerNum);
+    }// else {
+      layerNum = _layerStack.top();
+      cout << "Now come to layer: " << layerNum << endl;
+      auto layerList = _layerMap.find(layerNum);
+      if(layerList != _layerMap.end()) {
+        for(auto it = layerList->second.begin(); it != layerList->second.end(); ++it) {
+//          cout << "traverse list id " << (*it)->getId() << "first id " << first->getId() << endl;
+          if( (*it)->getId() == first->getId() ) {
+            if(_layerMap.find(layerNum+1) == _layerMap.end()) {
+              VertexTarget newLayer;
+              newLayer.push_back(second);
+              cout <<"vertex " << second->getId() << " is pushed into layer\n";
+              _layerMap.insert(LayerPair(layerNum+1, newLayer));
+            }//endif
+            else  {
+              _layerMap[layerNum+1].push_back(second);
+              cout <<"vertex " << second->getId() << " is pushed into layer\n";
+            }//end_else
+          }//end_if
+//          else 
+//            cout << "Error: Failed to match child vertex with parent\n";
+        }//end_for
+        if((edge->getNextEdge(first) == nullptr) && (first == layerList->second.back())) {
+          layerNum ++;
+          _layerStack.push(layerNum);
+          cout << "first " << first->getId() << " second " << second->getId() << " to layernum " << layerNum << endl;
+        }//end_if
+      }//end_if
+      else
+        cout << "Error: Failed to match the layerNum with layerList\n";
+//    }
+*/
+}
+
+void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthList &dl) {
+  typedef pair<VertexPointer, unsigned int> DepthPair;
+
+  unsigned int depth = 1;
+  if (dl.find(first) == dl.end()) {
+    dl.insert(DepthPair(first, 0));
+    if(dl.find(second) == dl.end())
+      dl.insert(DepthPair(second, 1));
+    else 
+      dl[second] = 1;
 //    cout << "vertex: " << first->getId() << " depth: 0" << endl;
 //    cout << "vertex: " << second->getId() << " depth: 1" << endl;
    
   }
   else {
-    unsigned int depth = dl[first] + 1;
-    dl.insert(DepthPair(second, depth));
+    depth = dl[first] + 1;
+    if(dl.find(second) == dl.end()) {
+      dl.insert(DepthPair(second, depth));
+    }
+    else 
+      dl[second] = depth;
 //    cout << "Vertex: " << second->getId() << "depth: " << depth << endl;
   }
+  return  ;
 
+}
+
+/// check if the vertex's depth == given depth
+bool checkDepth(unsigned int depth, VertexPointer vertex, DepthList & depthList) {
+  if (depthList.find(vertex) != depthList.end())
+    if(depthList[vertex]  == depth)
+      return true;
+  return false;
 }
 
 template<typename ReturnValueType>
@@ -170,35 +268,39 @@ bool checkType(EdgePointer edge, Filter &filter) {
     }
 }
 
-
+/// check if the direction of vertex to edge is 
 bool checkDirection(VertexPointer vertex, EdgePointer edge, Filter & filter ) {
     int direction = 0;
 
     if(filter.getDirection() == "" )
       return true;
 
-    if (edge->getFirstId() == vertex->getId())
-      direction = 1;     //first vertex == outEdge;
-    else if ( edge->getSecondId() == vertex->getId())
-      direction = 2;     //second vertex == inEdge;
+    if ( filter.getDirection() == "out")
+      direction = 1;     //first vertex => outEdge for vertex;
+    else if ( filter.getDirection() == "in")
+      direction = 2;     //second vertex => inEdge for vertex;
     else 
       cout <<"Err: Irrelevant edges.\n";
 
     switch(direction) {
     case 1:
-      if (filter.getDirection() == "out") {
+      if (edge->getFirstId() == vertex->getId()) {
 //        cout << "one catch on vertex: " << vertex->getId() << endl;
-        return true;
+        return false;
       }
+      break;
 
     case 2:
-      if (filter.getDirection() == "in") { 
-        cout << "one catch on vertex: " << vertex->getId() << endl;
-        return true;
+      if (edge->getSecondId() == vertex->getId()) { 
+//        cout << "one catch on vertex: " << vertex->getId() << endl;
+        return false;
       }
+      break;
+
     default:
-      return false;
+      return true;
     }
+    return true;
 }
 
 

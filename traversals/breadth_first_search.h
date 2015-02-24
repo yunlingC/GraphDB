@@ -36,8 +36,9 @@ void breadth_first_search(GraphType & Graph, const GraphType::VertexDescriptor &
   /// True means visited and false means not visited.
   std::map<GraphType::VertexPointer, bool> ColorMap;
 
+//  bool RevisitFlag = GraphVisitor.discoverVertex(ScheduledVertex);
   VertexQueue.push(ScheduledVertex);               
-//  GraphVisitor.discover(ScheduledVertex);
+  GraphVisitor.visitStartVertex(ScheduledVertex);
   ColorMap.insert(VisitPair(ScheduledVertex,false));
 
   GraphType::VertexPointer TargetVertex = nullptr;
@@ -57,18 +58,27 @@ void breadth_first_search(GraphType & Graph, const GraphType::VertexDescriptor &
       bool EdgeMatch = GraphVisitor.visitEdge(NextEdge);
       /// Get the target node.
       TargetVertex = NextEdge->getTarget(ScheduledVertex);     
-      GraphVisitor.discoverVertex(TargetVertex);             
+      bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);             
+
+      bool BranchMatch = GraphVisitor.scheduleBranch(ScheduledVertex, NextEdge, TargetVertex);
       bool TypeMatch =  GraphVisitor.scheduleEdge(NextEdge);
       bool DirectionMatch = GraphVisitor.visitDirection(TargetVertex, NextEdge);
-      bool BranchMatch = GraphVisitor.scheduleBranch(ScheduledVertex, NextEdge, TargetVertex);
+
       if(BranchMatch == true)
         return;
 
-      if ( ColorMap.find(TargetVertex) == ColorMap.end() ) {
+      if ( ColorMap.find(TargetVertex) == ColorMap.end() || RevisitFlag) {
 	// queue the target for visitation
-        if(TypeMatch == true)   //control the vertex to be visited filtered by type
+        bool TreeMatch = GraphVisitor.scheduleTree(ScheduledVertex, NextEdge, TargetVertex);
+
+//      cout << "---> NextEdge: " << NextEdge->getId() << "type direction match " << TypeMatch << DirectionMatch << endl;
+        if(TypeMatch && DirectionMatch)   {//control the vertex to be visited filtered by type
 	        VertexQueue.push(TargetVertex);
+//          cout << "---> TargetVertex: " << TargetVertex->getId() << endl;
+        }
 	      ColorMap.insert(VisitPair(TargetVertex,false));
+      } else {
+        bool RevisitMatch = GraphVisitor.revisitVertex( TargetVertex );
       }
       // Get the next edge from the scheduled vertex. 
       NextEdge = NextEdge->getNextEdge(ScheduledVertex);

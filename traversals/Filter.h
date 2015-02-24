@@ -51,6 +51,14 @@ public:
     _edgeId = eid;
   }
 
+  void setDefault() {
+    _key = "";
+    _value = "";
+    _type = "";
+    _direction = "";
+    _vertexId = 0;
+    _edgeId = 0;
+  }
 
   KeyType & getKey() {
     return _key;
@@ -87,34 +95,4 @@ private:
 
 };
 
-/*
-struct TypeFilter : public Filter {
-public:
-  typedef std::string Type;
-public:
-
-//  TypeFilter() {}
-  TypeFilter(Type t = "") : _type(t) {}
-
-  virtual void setType(Type t) {
-    _type = t;
-  }
-
- virtual Type & getType() {
-    return _type;
-  }
-
-private:
-  Type _type;
-};
-
-
-struct PropertyFilter : public Filter {
-public:
-
-
-private:
-
-};
-*/
 #endif /*_FILTER_H_*/

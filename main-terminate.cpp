@@ -19,7 +19,7 @@ int main() {
   cout << "Begin testing\n";
 
   GDReader reader(g);
-  reader.readFile("../tests/gd/sndata.gd");
+  reader.readFile("../tests/gd/sndata100.gd");
 
   //createGraph(g);
   //  Graph::VertexPtr vp0 = g.getVertexPointer(0);
@@ -34,13 +34,37 @@ int main() {
   Query4 Q4;
   Q4.setPersonProperty("pid", "5");
 
+  Query5 Q5;
+
+  Query6 Q6;
+
+  Query7 Q7;
+
+  Query8 Q8;
+  
+  Query9 Q9;
+
+  Query10 Q10;
+
+  Query11 Q11;
+
   Query12 Q12;
+  
+  Query13 Q13;
    
   Q1.runQuery(g);
   Q2.runQuery(g, 14);
   Q3.runQuery(g, 4);
   Q4.runQuery(g);
+  Q5.runQuery(g, 0);
+  Q6.runQuery(g, 0);
+  Q7.runQuery(g, 0);
+  Q8.runQuery(g, 0, 2);
+  Q9.runQuery(g, 0, 99);
+  Q10.runQuery(g, 0, 1);
+  Q11.runQuery(g, 0, 1);
   Q12.runQuery(g, 4);
+  Q13.runQuery(g, 0);
 
 /*
   vector<thread> threads;
