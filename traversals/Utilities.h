@@ -27,6 +27,7 @@ typedef std::string Direction;
 typedef GraphType::VertexPointer VertexPointer;
 typedef GraphType::EdgePointer    EdgePointer;
 typedef std::map<VertexPointer, unsigned int> DepthList;
+typedef std::multimap<VertexPointer, unsigned int> MultiDepthList;
 typedef std::map<VertexPointer, unsigned int> DegreeList;
 typedef std::vector<VertexPointer> VertexTargetSet;
 typedef std::stack<unsigned int > LayerStack;
@@ -128,12 +129,45 @@ unsigned int computeDepth(VertexPointer first, EdgePointer ep, VertexPointer sec
         dl[second] = depth;
     }
   }
-
   return  depth;
-
 }
 
-void recordDepth(VertexPointer first, EdgePointer edge, VertexPointer second, LayerMap &lm, LayerStack& ls) {
+void recordDepth(VertexPointer first, EdgePointer ep, VertexPointer second, MultiDepthList &dl) {
+  typedef pair<VertexPointer, unsigned int> DepthPair;
+
+  unsigned int depth = 1;
+  if (dl.find(first) == dl.end()) {
+    dl.insert(DepthPair(first, 0));
+    dl.insert(DepthPair(second, 1));
+//    cout << "vertex: " << first->getId() << " depth: 0" << endl;
+//    cout << "vertex: " << second->getId() << " depth: 1" << endl;
+  }
+  else {
+    auto range = dl.equal_range(second);
+    for( auto it = dl.equal_range(first).first; it != dl.equal_range(first).second; ++it ) {
+//        cout << "it " << (*it).first->getId() << " depth " << (*it).second << endl;
+        depth = (*it).second + 1;
+        unsigned int unique = true;
+        if(dl.count(second) != 0)
+        for(auto iter = dl.equal_range(second).first; iter != dl.equal_range(second).second; ++iter) {
+//          cout << "iter " << (*iter).first->getId() << " depth " << (*iter).second << endl;
+          if((*iter).second == depth) {
+            unique = false;
+            break;
+          }
+        }
+          if(unique == true) {
+//            cout << "vertex " << second->getId() << " depth " << depth << endl;
+            dl.insert(DepthPair(second, depth));
+          }
+    }
+  }
+
+  return ;
+}
+
+
+void recordLayer(VertexPointer first, EdgePointer edge, VertexPointer second, LayerMap &lm, LayerStack& ls) {
 /**   unsigned int layerNum ;
     if(_layerMap.empty()) {
       VertexTarget newLayer;
@@ -210,6 +244,15 @@ bool checkDepth(unsigned int depth, VertexPointer vertex, DepthList & depthList)
   return false;
 }
 
+unsigned int  checkMaxDepth(MultiDepthList & dl) {
+  int depth = 0;
+  for(auto it = dl.begin(); it != dl.end(); it ++) {
+    if( (*it).second > depth)
+      depth = (*it).second;
+  }
+  return depth;
+}
+
 template<typename ReturnValueType>
 bool checkProperty(VertexPointer vertex, Filter &filter) {
   if ((filter.getValue() == "") || (filter.getKey() == "") )
@@ -226,18 +269,12 @@ bool checkProperty(VertexPointer vertex, Filter &filter) {
   }
 }
 
-void dumpDepthList(DepthList depthList){
-//  cout<< "++++++++++++Depth List++++++++++++++\n";
-  cout << "depth list\n";
-  for (auto it = depthList.begin(); it != depthList.end(); ++it)
-    cout << it->first->getId() << "\t" << it->second << endl;
-}
 
 void dumpVertexTarget(VertexTargetSet & VertexTargetList) {
 
 //      cout << "+++++++++Vertex Target Set+++++++++\n";
   for (auto it = VertexTargetList.begin(); it != VertexTargetList.end(); ++it) {
-    cout << "Vertex: "<< (*it)->getId() << endl;
+//    cout << "Vertex: "<< (*it)->getId() << endl;
 //      it->getPropertyList();
   }
 }

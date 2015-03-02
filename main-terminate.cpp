@@ -53,7 +53,7 @@ int main() {
   Query13 Q13;
    
   Q1.runQuery(g);
-  Q2.runQuery(g, 14);
+  Q2.runQuery(g, 63);
   Q3.runQuery(g, 4);
   Q4.runQuery(g);
   Q5.runQuery(g, 0);
@@ -65,6 +65,50 @@ int main() {
   Q11.runQuery(g, 0, 1);
   Q12.runQuery(g, 4);
   Q13.runQuery(g, 0);
+
+  Query1d Q1d;
+  Q1d.setPersonProperty("name" , "KIRA VERLATO");
+  Q1d.runQuery(g);
+
+  Query2d Q2d;
+  Q2d.runQuery(g, 63);
+
+  Query3d Q3d;
+  Q3d.runQuery(g, 4);
+
+  Query4d Q4d;
+  Q4d.setPersonProperty("pid", "5");
+  Q4d.runQuery(g);
+
+  Query5d Q5d;
+  Q5d.runQuery(g, 0);
+
+  Query6d Q6d;
+  Q6d.runQuery(g, 0);
+
+  Query7d Q7d;
+  Q7d.runQuery(g, 0);
+
+
+  Query12d Q12d;
+  Q12d.runQuery(g, 4);
+
+  Query13d Q13d;
+  Q13d.runQuery(g, 0);
+
+  Query10d Q10d;
+  Q10d.runQuery(g, 0, 1);
+  
+  Query11d Q11d;
+  Q11d.runQuery(g, 0, 1);
+
+  Query8d Q8d;
+  Q8d.runQuery(g, 0, 2);
+
+  Query9d Q9d;
+  Q9d.runQuery(g, 0, 2);
+
+
 
 /*
   vector<thread> threads;

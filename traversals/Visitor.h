@@ -33,6 +33,7 @@ public:
   virtual bool visitStartVertex(VertexPointer vp) {
     return false;
   }
+
   virtual bool discoverVertex(VertexPointer vp) {
     return false;
   }
@@ -52,10 +53,16 @@ public:
     return true; /// default vaue = true so that the vertex will be pushed into queue 
   }
 
+  /// for bfs only
   virtual bool visitDirection(VertexPointer target, EdgePointer edge){
     return true; /// the same above
   }
 
+  /// for dfs only 0: all direction  1: outedges 2: incoming edges 
+  virtual unsigned int visitDirection(VertexPointer) {
+    return 0;
+  }
+  
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second){
      return false;
   }

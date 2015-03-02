@@ -43,7 +43,7 @@ add_subdirectory(storage)
 set(TESTS 
   # main-storage.cpp 
         main-linkedlist.cpp
-        main-dfs.cpp
+        #      main-dfs.cpp
         main-terminate.cpp
         )
 

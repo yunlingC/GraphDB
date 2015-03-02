@@ -39,6 +39,7 @@ void breadth_first_search(GraphType & Graph, const GraphType::VertexDescriptor &
 //  bool RevisitFlag = GraphVisitor.discoverVertex(ScheduledVertex);
   VertexQueue.push(ScheduledVertex);               
   GraphVisitor.visitStartVertex(ScheduledVertex);
+
   ColorMap.insert(VisitPair(ScheduledVertex,false));
 
   GraphType::VertexPointer TargetVertex = nullptr;
@@ -55,7 +56,6 @@ void breadth_first_search(GraphType & Graph, const GraphType::VertexDescriptor &
 
     auto NextEdge = ScheduledVertex->getNextEdge();
     while ( NextEdge != nullptr ) {                  
-      bool EdgeMatch = GraphVisitor.visitEdge(NextEdge);
       /// Get the target node.
       TargetVertex = NextEdge->getTarget(ScheduledVertex);     
       bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);             

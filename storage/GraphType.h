@@ -47,26 +47,27 @@ public:
     EdgeList OutEdges;
 
     auto NextEdge = CurrentVertex->getNextEdge();
-    if ( CurrentVertex == NextEdge->getFirstVertexPtr() ) {
-      OutEdges.push_back(NextEdge);
-    }
-    auto EdgeIterator = NextEdge->getNextEdge(CurrentVertex);
-
-    while ( EdgeIterator != nullptr ) {
-      if ( CurrentVertex == EdgeIterator->getFirstVertexPtr() ) {
-        OutEdges.push_back(EdgeIterator);
+    if( NextEdge != nullptr) {
+      if ( CurrentVertex == NextEdge->getFirstVertexPtr() ) {
+        OutEdges.push_back(NextEdge);
       }
-      EdgeIterator = EdgeIterator->getNextEdge(CurrentVertex);
-    }
+      auto EdgeIterator = NextEdge->getNextEdge(CurrentVertex);
 
-    EdgeIterator = NextEdge->getPreviousEdge(CurrentVertex);
-    while ( EdgeIterator != nullptr ) {
-      if ( CurrentVertex == EdgeIterator->getFirstVertexPtr() ) {
-        OutEdges.push_back(EdgeIterator);
+      while ( EdgeIterator != nullptr ) {
+        if ( CurrentVertex == EdgeIterator->getFirstVertexPtr() ) {
+          OutEdges.push_back(EdgeIterator);
+        }
+        EdgeIterator = EdgeIterator->getNextEdge(CurrentVertex);
       }
-      EdgeIterator = EdgeIterator->getPreviousEdge(CurrentVertex);
-    }
-    
+
+      EdgeIterator = NextEdge->getPreviousEdge(CurrentVertex);
+      while ( EdgeIterator != nullptr ) {
+        if ( CurrentVertex == EdgeIterator->getFirstVertexPtr() ) {
+          OutEdges.push_back(EdgeIterator);
+        }
+        EdgeIterator = EdgeIterator->getPreviousEdge(CurrentVertex);
+      }
+    } 
     return OutEdges;
   }
 
@@ -75,24 +76,27 @@ public:
     EdgeList InEdges;
 
     auto NextEdge = CurrentVertex->getNextEdge();
-    if ( CurrentVertex == NextEdge->getSecondVertexPtr() ) {
-      InEdges.push_back(NextEdge);
-    }
-    auto EdgeIterator = NextEdge->getNextEdge(CurrentVertex);
+    if( NextEdge != nullptr) {
 
-    while ( EdgeIterator != nullptr ) {
-      if ( CurrentVertex == EdgeIterator->getSecondVertexPtr() ) {
-        InEdges.push_back(EdgeIterator);
+      if ( CurrentVertex == NextEdge->getSecondVertexPtr() ) {
+        InEdges.push_back(NextEdge);
       }
-      EdgeIterator = EdgeIterator->getNextEdge(CurrentVertex);
-    }
+      auto EdgeIterator = NextEdge->getNextEdge(CurrentVertex);
 
-    EdgeIterator = NextEdge->getPreviousEdge(CurrentVertex);
-    while ( EdgeIterator != nullptr ) {
-      if ( CurrentVertex == EdgeIterator->getSecondVertexPtr() ) {
-        InEdges.push_back(EdgeIterator);
+      while ( EdgeIterator != nullptr ) {
+        if ( CurrentVertex == EdgeIterator->getSecondVertexPtr() ) {
+          InEdges.push_back(EdgeIterator);
+        }
+        EdgeIterator = EdgeIterator->getNextEdge(CurrentVertex);
       }
-      EdgeIterator = EdgeIterator->getPreviousEdge(CurrentVertex);
+
+      EdgeIterator = NextEdge->getPreviousEdge(CurrentVertex);
+      while ( EdgeIterator != nullptr ) {
+        if ( CurrentVertex == EdgeIterator->getSecondVertexPtr() ) {
+          InEdges.push_back(EdgeIterator);
+        }
+        EdgeIterator = EdgeIterator->getPreviousEdge(CurrentVertex);
+      }
     }
     return InEdges;
   }
