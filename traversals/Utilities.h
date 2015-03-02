@@ -272,10 +272,9 @@ bool checkProperty(VertexPointer vertex, Filter &filter) {
 
 void dumpVertexTarget(VertexTargetSet & VertexTargetList) {
 
-//      cout << "+++++++++Vertex Target Set+++++++++\n";
   for (auto it = VertexTargetList.begin(); it != VertexTargetList.end(); ++it) {
-//    cout << "Vertex: "<< (*it)->getId() << endl;
-//      it->getPropertyList();
+    cout << "Vertex: "<< (*it)->getId() << endl;
+//      (*it)->getPropertyList();
   }
 }
 

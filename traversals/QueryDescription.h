@@ -29,136 +29,135 @@ public:
   typedef std::string KeyType;
   typedef std::string ValueType;
   typedef GraphType Graph;
+  typedef unsigned int  TMSwitch; //traversalMethodSwitch: 1: bfs 2: dfs
   typedef GraphType::VertexDescriptor Vertex;
 public:
   Query() { }
 
-private:
-  KeyType   _key;
-  ValueType _value; 
-    
 };
 
 class Query1 : public Query {
 public:
- void runQuery(Graph & graph ) {
+ void runQuery(Graph & graph, const KeyType & key, const ValueType & value, TMSwitch c) {
     cout << "===============================\n";
     cout << "Query 1\n";
     SelectionVisitor v1;
-    filtProperty(_key, _value, v1.getFilter());
+    filtProperty(key, value, v1.getFilter());
     traverseThroughType("FRIENDS", v1.getFilter());
-    breadth_first_search(graph, 0, v1 );
-    cout <<"People with " << _key << " = " << _value <<" is(are) as below\n";
+    switch(c) {
+      case 1:
+        cout << "---------------------BFS---------------------\n";
+        breadth_first_search(graph, 0, v1 );
+        break;
+      case 2:
+        cout << "---------------------DFS---------------------\n";
+        depthFirstSearch(graph, 0, v1);
+        break;
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
+    }
+
+    cout <<"People with " << key << " = " << value <<" is(are) as below\n";
+    v1.getVertexTargetList();
     v1.dumpTarget();
     cout << endl;
  }
-  void setPersonProperty(KeyType key, ValueType value)
-  {
-    _key = key;
-    _value = value;
-  }
 
-private:
- KeyType     _key;
- ValueType   _value;
 };
 
 
 class Query2 : public Query {
 public:
-  typedef GraphType::VertexDescriptor Vertex;
-public:
- void runQuery(Graph & graph, Vertex startVertex ) {
+ void runQuery(Graph & graph, Vertex startVertex, TMSwitch c) {
     cout << "===============================\n";
     cout << "Query 2 \n";
     AdjacencyVisitor v2; 
     traverseThroughType("LIKES", v2.getFilter());
-    breadth_first_search(graph, startVertex, v2);
-    cout << "People who likes webpage id = " << startVertex   << " are as below\n";
+    switch(c) {
+      case 1:
+        cout << "---------------------BFS---------------------\n";
+        breadth_first_search(graph, startVertex, v2);
+        break;
+      case 2:
+        cout << "---------------------DFS---------------------\n";
+        depthFirstSearch(graph, startVertex, v2);
+        break;
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
+    }
 
-    auto targetName = v2.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
+    cout << "People who likes webpage id = " << startVertex   << " are as below\n";
+    auto target= v2.getVertexTargetList();
+    for(auto it = target.begin(); it != target.end(); ++it) {
       FixedString key("name");
       cout << "Vertex " << (*it)->getId() <<"\t" << (*it)->getPropertyValue(key).first;
       cout << endl;
     }
     cout << endl;
  }
-  void setPersonProperty(KeyType key, ValueType value)
-  {
-    _key = key;
-    _value = value;
-  }
-
-private:
- KeyType     _key;
- ValueType   _value;
-
 };
 
 
 class Query3 : public Query {
 public:
-  typedef GraphType::VertexDescriptor Vertex;
-public:
- void runQuery(Graph & graph, Vertex startVertex ) {
+ void runQuery(Graph & graph, Vertex startVertex, TMSwitch c ) {
     cout << "===============================\n";
     cout << "Query 3\n";
     AdjacencyVisitor v3; 
     traverseThroughType("LIKES", v3.getFilter());
-    breadth_first_search(graph, startVertex, v3);
-    cout << "Person with vid = " << startVertex << " likes webpages:\n";
+    switch(c) {
+      case 1:
+        cout << "---------------------BFS---------------------\n";
+        breadth_first_search(graph, startVertex, v3);
+        break;
+      case 2:
+        cout << "---------------------DFS---------------------\n";
+        depthFirstSearch(graph, startVertex, v3);
+        break;
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
+    }
 
-    auto targetName = v3.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
+    cout << "Person with vid = " << startVertex << " likes webpages:\n";
+    auto target = v3.getVertexTargetList();
+    for(auto it = target.begin(); it != target.end(); ++it) {
       FixedString key("wpurl");
       cout <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
       cout << endl;
     }
     cout << endl;
  }
-  void setPersonProperty(KeyType key, ValueType value)
-  {
-    _key = key;
-    _value = value;
-  }
-
-private:
- KeyType     _key;
- ValueType   _value;
-
 };
 
 class Query4 : public Query {
 public:
-  void runQuery(Graph & graph ) {
+  void runQuery(Graph & graph, KeyType key, ValueType value, TMSwitch c) {
     cout << "===============================\n";
     cout << "Query 4 \n";
     SelectionVisitor  v4;
-    filtProperty(_key, _value, v4.getFilter());
+    filtProperty(key, value, v4.getFilter());
     traverseThroughType("FRIENDS", v4.getFilter());
-    breadth_first_search(graph, 0, v4 );
-    cout <<"People with " << _key << " = " << _value <<" is(are) as below\n";
+    switch(c) {
+      case 1:
+        cout << "---------------------BFS---------------------\n";
+        breadth_first_search(graph, 0, v4);
+        break;
+      case 2:
+        cout << "---------------------DFS---------------------\n";
+        depthFirstSearch(graph, 0, v4);
+        break;
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
+    }
 
-    auto targetName = v4.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
+    cout <<"People with " << key << " = " << value <<" is(are) as below\n";
+    auto target = v4.getVertexTargetList();
+    for(auto it = target.begin(); it != target.end(); ++it) {
       FixedString key("name");
-      cout <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
+      cout <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
       cout << endl;
     }
-    
-
-    cout << endl;
  }
-  void setPersonProperty(KeyType key, ValueType value)
-  {
-    _key = key;
-    _value = value;
-  }
-
-private:
- KeyType     _key;
- ValueType   _value;
 };
 
 class Query5 : public Query {
@@ -166,142 +165,275 @@ public:
  typedef GraphType::VertexDescriptor vertex;
  
 public:
-  void runQuery(Graph & graph, Vertex startVertex ) {
+  void runQuery(Graph & graph, Vertex startVertex, TMSwitch c ) {
     cout << "===============================\n";
     cout << "Query 5\n";
-    ReachabilityVisitor  v5;
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter);
-    v5.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter);
-    v5.setFilter(tmpFilter);
-    v5.setDepth(2);
-    breadth_first_search(graph, startVertex, v5);
+    Filter tmpFilter[2];
+    traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
+    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
     FixedString key("name");
-    cout << "The friends of Person with vid = " << startVertex << " has " << v5.getVertexTargetList().size() << " friends\n";
-    auto targetName = v5.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("name");
-      cout <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
-      cout << endl;
+    cout << "The friends of Person with vid = " << startVertex << " has friends\n";
+    switch(c) {
+      case 1: {
+        cout << "---------------------BFS---------------------\n";
+        ReachabilityVisitor  v5b;
+        v5b.setFilter(tmpFilter[0]);
+        v5b.setFilter(tmpFilter[1]);
+        v5b.setDepth(2);
+        breadth_first_search(graph, startVertex, v5b);
+        auto target = v5b.getVertexTargetList();
+        for(auto it = target.begin(); it != target.end(); ++it) {
+          cout <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
+        cout << endl;
+        }
+        break;
+              }
+      case 2: {
+        cout << "---------------------DFS---------------------\n";
+        DFSReachabilityVisitor v5d;
+        v5d.setFilter(tmpFilter[0]);
+        v5d.setFilter(tmpFilter[1]);
+        v5d.setDepth(2);
+        depthFirstSearch(graph, startVertex, v5d);
+        auto target = v5d.getVertexTargetMap();
+        for(auto it = target.begin(); it != target.end(); ++it) {
+          cout <<"Vertex " << (*it).first->getId() << "\t" << (*it).first->getPropertyValue(key).first;
+        cout << endl;
+        }
+        break;
+              }
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
     }
+
   }
 };
 
 class Query6: public Query {
 public:
- typedef GraphType::VertexDescriptor vertex;
- 
-public:
-  void runQuery(Graph & graph, Vertex startVertex ) {
+  void runQuery(Graph & graph, Vertex startVertex, TMSwitch c) {
     cout << "===============================\n";
     cout << "Query 6\n";
-    ReachabilityVisitor v6;
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter);
-    v6.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("LIKES", "out", tmpFilter);
-    v6.setFilter(tmpFilter);
-    v6.setDepth(2);
-    breadth_first_search(graph, startVertex, v6);
-    cout << "The friends of Person with vid = " << startVertex << " like " << v6.getVertexTargetList().size() << " webpages\n";
-    auto targetName = v6.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("wpurl");
-      cout <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
-      cout << endl;
+    FixedString key("wpurl");
+    Filter tmpFilter[2];
+    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
+    traverseThroughTypeAndDirection("LIKES", "out", tmpFilter[1]);
+    switch(c) {
+      case 1: {
+        cout << "---------------------BFS---------------------\n";
+        ReachabilityVisitor  v6b;
+        v6b.setFilter(tmpFilter[0]);
+        v6b.setFilter(tmpFilter[1]);
+        v6b.setDepth(2);
+        breadth_first_search(graph, startVertex, v6b);
+        auto target = v6b.getVertexTargetList();
+        cout << "The friends of Person with vid = " << startVertex << " like " << target.size() << " webpages\n";
+        for(auto it = target.begin(); it != target.end(); ++it) {
+          cout <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
+        cout << endl;
+        }
+        break;
+              }
+      case 2: {
+        cout << "---------------------DFS---------------------\n";
+        DFSReachabilityVisitor v6d;
+        v6d.setFilter(tmpFilter[0]);
+        v6d.setFilter(tmpFilter[1]);
+        v6d.setDepth(2);
+        depthFirstSearch(graph, startVertex, v6d);
+        auto target = v6d.getVertexTargetMap();
+        cout << "The friends of Person with vid = " << startVertex << " like " << target.size() << " webpages\n";
+        for(auto it = target.begin(); it != target.end(); ++it) {
+          cout <<"Vertex " << (*it).first->getId() << "\t" << (*it).first->getPropertyValue(key).first;
+        cout << endl;
+        }
+        break;
+              }
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
     }
   }
 };
 
 class Query7: public Query {
 public:
- typedef GraphType::VertexDescriptor vertex;
- 
-public:
-  void runQuery(Graph & graph, Vertex startVertex ) {
+  void runQuery(Graph & graph, Vertex startVertex, TMSwitch c ) {
     cout << "===============================\n";
     cout << "Query 7\n";
-    ReachabilityVisitor v7;
-    Filter tmpFilter;
-    traverseThroughType("LIKES", tmpFilter);
-    v7.setFilter(tmpFilter);
-    traverseThroughType("LIKES", tmpFilter);
-    v7.setFilter(tmpFilter);
-    v7.setDepth(2);
-    breadth_first_search(graph, startVertex, v7);
-    cout << "The webpages liked by person vid = " << startVertex << " are liked by " << v7.getVertexTargetList().size() << " people: \n";
-    auto targetName = v7.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("name");
-      cout <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
-      cout << endl;
+    Filter tmpFilter[2];
+    traverseThroughType("LIKES", tmpFilter[0]);
+    traverseThroughType("LIKES", tmpFilter[1]);
+    FixedString key("name");
+    switch(c) {
+      case 1: {
+        cout << "---------------------BFS---------------------\n";
+        ReachabilityVisitor  v7b;
+        v7b.setFilter(tmpFilter[0]);
+        v7b.setFilter(tmpFilter[1]);
+        v7b.setDepth(2);
+        breadth_first_search(graph, startVertex, v7b);
+        auto target = v7b.getVertexTargetList();
+        cout << "The webpages liked by person vid = " << startVertex << " are liked by " << target.size() << " people: \n";
+        for(auto it = target.begin(); it != target.end(); ++it) {
+          cout <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
+        cout << endl;
+        }
+        break;
+              }
+      case 2: {
+        cout << "---------------------DFS---------------------\n";
+        DFSReachabilityVisitor v7d;
+        v7d.setFilter(tmpFilter[0]);
+        v7d.setFilter(tmpFilter[1]);
+        v7d.setDepth(2);
+        depthFirstSearch(graph, startVertex, v7d);
+        auto target = v7d.getVertexTargetMap();
+        cout << "The friends of Person with vid = " << startVertex << " like " << target.size() << " webpages\n";
+        for(auto it = target.begin(); it != target.end(); ++it) {
+          cout <<"Vertex " << (*it).first->getId() << "\t" << (*it).first->getPropertyValue(key).first;
+        cout << endl;
+        }
+        break;
+              }
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
     }
+
   }
 };
 
 class Query8 : public Query {
 public:
- typedef GraphType::VertexDescriptor vertex;
- 
-public:
-  void runQuery(Graph & graph, Vertex startVertex, Vertex endVertex ) {
+  void runQuery(Graph & graph, Vertex startVertex, Vertex endVertex, TMSwitch c) {
     cout << "===============================\n";
     cout << "Query 8\n";
-    PathVisitor v8;
-    v8.setEndVertex(endVertex);
-    breadth_first_search(graph, startVertex, v8);
-//    depthFirstSearch(graph, startVertex, v8);
-    cout << "There are " << v8.getVertexTargetList().size() << " vertex on the path from " << startVertex << " to " <<  endVertex << endl;
-    auto targetName = v8.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      cout <<"Vertex " << (*it)->getId() << endl; 
+    switch(c) {
+      case 1: {
+        cout << "---------------------BFS---------------------\n";
+        PathVisitor v8b;
+        v8b.setEndVertex(endVertex);
+        breadth_first_search(graph, startVertex, v8b);
+        auto target = v8b.getVertexTargetList();
+        if(!target.empty())
+          cout << "There is path from " << startVertex << " to " <<  endVertex << endl;
+        else 
+          cout << startVertex << " and " <<  endVertex <<" are not connected" << endl;
+//        for(auto it = target.begin(); it != target.end(); ++it) {
+//          cout <<"Vertex " << (*it)->getId() << endl;
+//        }
+        break;
+              }
+      case 2: {
+        cout << "---------------------DFS---------------------\n";
+        DFSPathVisitor v8d;
+        v8d.setEndVertex(endVertex);
+        depthFirstSearch(graph, startVertex, v8d);
+        auto target = v8d.getPathList();
+        if(!target.empty())
+          cout << "There is path from " << startVertex << " to " <<  endVertex << endl;
+        else 
+          cout << startVertex << " and " <<  endVertex <<" are not connected" << endl;
+//        cout << "There are " << target.size() << " vertex on the path from " << startVertex << " to " <<  endVertex << endl;
+//        for(auto it = target.begin(); it != target.end(); ++it) {
+//          for (auto iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
+//            cout <<"Vertex " << (*iter)->getId() << endl;
+//        cout << endl;
+ //       }
+        break;
+              }
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
     }
   }
 };
 
 class Query9: public Query {
 public:
- typedef GraphType::VertexDescriptor vertex;
- 
-public:
-  void runQuery(Graph & graph, Vertex startVertex, Vertex endVertex ) {
+  void runQuery(Graph & graph, Vertex startVertex, Vertex endVertex, TMSwitch c ) {
     cout << "===============================\n";
     cout << "Query 9\n";
     PathVisitor v9;
     v9.setEndVertex(endVertex);
-    breadth_first_search(graph, startVertex, v9);
-    cout << "The shortest path from " << startVertex << " to " <<  endVertex << " has " << v9.getVertexTargetList().size() << " vertex" << endl;
-    auto targetName = v9.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      cout <<"Vertex " << (*it)->getId() << endl; 
+    switch(c) {
+      case 1: {
+        cout << "---------------------BFS---------------------\n";
+        PathVisitor v9b;
+        v9b.setEndVertex(endVertex);
+        breadth_first_search(graph, startVertex, v9b);
+        auto target = v9b.getVertexTargetList();
+        if(target.empty())
+          cout << startVertex << " and " <<  endVertex <<" are not connected" << endl;
+        else 
+          for(auto it = target.begin(); it != target.end(); ++it) {
+            cout <<"Vertex " << (*it)->getId() << endl;
+          }
+        break;
+              }
+      case 2: {
+        cout << "---------------------DFS---------------------\n";
+        DFSPathVisitor v9d;
+        v9d.setEndVertex(endVertex);
+        depthFirstSearch(graph, startVertex, v9d);
+        auto target = v9d.getPathList();
+        if(target.empty())
+          cout << startVertex << " and " <<  endVertex <<" are not connected" << endl;
+        else {
+        cout << "There are " << target.size() << " shortest paths from " << startVertex << " to " <<  endVertex << endl;
+         for(auto it = target.begin(); it != target.end(); ++it) {
+            for (auto iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
+              cout <<"Vertex " << (*iter)->getId() << endl;
+          cout << endl;
+         }
+       }
+        break;
+              }
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
     }
   }
-
 };
 
 class Query10 : public Query {
 public:
   typedef GraphType::VertexDescriptor vertex; 
 public: 
-  void runQuery(Graph & graph, Vertex startVertex, Vertex endVertex ) { 
+  void runQuery(Graph & graph, Vertex startVertex, Vertex endVertex, TMSwitch c ) { 
     cout << "===============================\n"; 
-    cout << "Query 10\n"; PatternVisitor v10;
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter);
-    v10.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("FRIENDS", "in", tmpFilter);
-    v10.setFilter(tmpFilter);
-    v10.setDepth(2);
-    v10.setEndVertex(endVertex);
-    breadth_first_search(graph, startVertex, v10);
+    cout << "Query 10\n"; 
+    Filter tmpFilter[2];
+    traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
+    traverseThroughTypeAndDirection("FRIENDS", "in", tmpFilter[1]);
     FixedString key("name");
-    cout << "There are " << v10.getVertexTargetList().size() << " common friends between  " << startVertex << " and " <<  endVertex << endl;
-    auto targetName = v10.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("name");
-      cout <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
-      cout << endl;
+    vector<VertexPointer> target;
+    switch(c) {
+      case 1: {
+        cout << "---------------------BFS---------------------\n";
+        PatternVisitor v10d;
+        v10d.setFilter(tmpFilter[0]);
+        v10d.setFilter(tmpFilter[1]);
+        v10d.setDepth(2);
+        v10d.setEndVertex(endVertex);
+        breadth_first_search(graph, startVertex, v10d);
+        target = v10d.getVertexTargetList();
+        break;
+              }
+      case 2: {
+        cout << "---------------------DFS---------------------\n";
+        DFSPathVisitor v10d;
+        v10d.setFilter(tmpFilter[0]);
+        v10d.setFilter(tmpFilter[1]);
+        v10d.setDepth(2);
+        depthFirstSearch(graph, startVertex, v10d);
+        target = v10d.getVertexTargetList();
+        break;
+              }
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
+    }
+    cout << "There are " << target.size() << " common friends between  " << startVertex << " and " <<  endVertex << endl;
+    for(auto it = target.begin(); it != target.end(); ++it) {
+      cout <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
+    cout << endl;
     }
   }
 };
@@ -309,424 +441,129 @@ public:
 
 class Query11: public Query {
 public:
- typedef GraphType::VertexDescriptor vertex;
- 
-public:
-  void runQuery(Graph & graph, Vertex startVertex, Vertex endVertex ) {
+  void runQuery(Graph & graph, Vertex startVertex, Vertex endVertex, TMSwitch c) {
     cout << "===============================\n";
     cout << "Query 11\n";
-    PatternVisitor v11;
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("LIKES", "out",  tmpFilter);
-    v11.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("LIKES", "in", tmpFilter);
-    v11.setFilter(tmpFilter);
-    v11.setDepth(2);
-    v11.setEndVertex(endVertex);
-    breadth_first_search(graph, startVertex, v11);
+    Filter tmpFilter[2];
+    traverseThroughTypeAndDirection("LIKES", "out",  tmpFilter[0]);
+    traverseThroughTypeAndDirection("LIKES", "in",   tmpFilter[1]);
     FixedString key("name");
-    cout << "There are " << v11.getVertexTargetList().size() << " common webpages liked by both " << startVertex << " and " <<  endVertex << endl;
-    auto targetName = v11.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
+    vector<VertexPointer> target;
+    switch(c) {
+      case 1: {
+        cout << "---------------------BFS---------------------\n";
+        PatternVisitor v11b;
+        v11b.setFilter(tmpFilter[0]);
+        v11b.setFilter(tmpFilter[1]);
+        v11b.setDepth(2);
+        v11b.setEndVertex(endVertex);
+        breadth_first_search(graph, startVertex, v11b);
+        target = v11b.getVertexTargetList();
+        break;
+              }
+      case 2: {
+        cout << "---------------------DFS---------------------\n";
+        DFSPatternVisitor v11d;
+        v11d.setFilter(tmpFilter[0]);
+        v11d.setFilter(tmpFilter[1]);
+        v11d.setDepth(2);
+        depthFirstSearch(graph, startVertex, v11d);
+        target = v11d.getVertexTargetList();
+        break;
+              }
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
+    }
+    cout << "There are " << target.size() << " common webpages liked by both " << startVertex << " and " <<  endVertex << endl;
+    for(auto it = target.begin(); it != target.end(); ++it) {
       FixedString key("wpurl");
-      cout <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
+      cout <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
       cout << endl;
     }
   }
 
 };
 
+class Query12 : public Query {
+public:
+  typedef GraphType::VertexDescriptor Vertex;
+public:
+ void runQuery(Graph & graph, Vertex startVertex, TMSwitch c ) {
+    cout << "===============================\n";
+    cout << "Query 12 \n";
+    AdjacencyVisitor v12; 
+    traverseThroughType("FRIENDS", v12.getFilter());
+    switch(c) {
+      case 1:
+        cout << "---------------------BFS---------------------\n";
+        breadth_first_search(graph, startVertex, v12);
+        break;
+      case 2:
+        cout << "---------------------DFS---------------------\n";
+        depthFirstSearch(graph, startVertex, v12);
+        break;
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
+    }
+    FixedString key("name");
+    cout << "Person with vid = " << startVertex << " has name: " << graph.getVertexPointer(startVertex)->getPropertyValue(key).first <<" and  " << v12.getVertexTargetList().size() << " friends\n";
+ }
+};
 
-    
 class Query13: public Query {
 public:
  typedef GraphType::VertexDescriptor vertex;
  
 public:
-  void runQuery(Graph & graph, Vertex startVertex ) {
+  void runQuery(Graph & graph, Vertex startVertex, TMSwitch c ) {
     cout << "===============================\n";
     cout << "Query 13\n";
-    ReachabilityVisitor v13;
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter);
-    v13.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter);
-    v13.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter);
-    v13.setFilter(tmpFilter);
-    v13.setDepth(3);
-    breadth_first_search(graph, startVertex, v13);
+    Filter tmpFilter[3];
+    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
+    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
+    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[2]);
     FixedString key("name");
-    cout << "The friends of friends of person vid = " << startVertex << " has " << v13.getVertexTargetList().size() << " friends: \n";
-    auto targetName = v13.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("name");
-      if( (*it)->getId() != startVertex ) {
-      cout <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
+    switch(c) {
+      case 1: {
+        cout << "---------------------BFS---------------------\n";
+        ReachabilityVisitor  v13b;
+        v13b.setFilter(tmpFilter[0]);
+        v13b.setFilter(tmpFilter[1]);
+        v13b.setFilter(tmpFilter[2]);
+        v13b.setDepth(3);
+        breadth_first_search(graph, startVertex, v13b);
+        auto target = v13b.getVertexTargetList();
+        cout << "The friends of friends of person vid = " << startVertex << " has " << target.size() << " friends: \n";
+        for(auto it = target.begin(); it != target.end(); ++it) {
+          cout <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
+        cout << endl;
+    }
+
+        break;
+              }
+      case 2: {
+        cout << "---------------------DFS---------------------\n";
+        DFSReachabilityVisitor v13d;
+        v13d.setFilter(tmpFilter[0]);
+        v13d.setFilter(tmpFilter[1]);
+        v13d.setFilter(tmpFilter[2]);
+        v13d.setDepth(3);
+        depthFirstSearch(graph, startVertex, v13d);
+        auto target = v13d.getVertexTargetMap();
+        cout << "The friends of friends of person vid = " << startVertex << " has " << target.size() << " friends: \n";
+        for(auto it = target.begin(); it != target.end(); ++it) {
+        if( (*it).first->getId() != startVertex ) {
+        cout <<"Vertex " << (*it).first->getId() << "\t"  << (*it).first->getPropertyValue(key).first;
       cout << endl;
       }
     }
-  }
-};
-
-
- 
-class Query12 : public Query {
-public:
-  typedef GraphType::VertexDescriptor Vertex;
-public:
- void runQuery(Graph & graph, Vertex startVertex ) {
-    cout << "===============================\n";
-    cout << "Query 12 \n";
-    AdjacencyVisitor v12; 
-    traverseThroughType("FRIENDS", v12.getFilter());
-    breadth_first_search(graph, startVertex, v12);
-    FixedString key("name");
-    cout << "Person with vid = " << startVertex << " has name: " << graph.getVertexPointer(startVertex)->getPropertyValue(key).first <<" and  " << v12.getVertexTargetList().size() << " friends\n";
- }
-
-};
-
-class Query1d : public Query {
-public:
- void runQuery(Graph & graph ) {
-    cout << "===============================\n";
-    cout << "dfs Query 1 \n";
-    SelectionVisitor v1;
-    filtProperty(_key, _value, v1.getFilter());
-    traverseThroughType("FRIENDS", v1.getFilter());
-    depthFirstSearch(graph, 0, v1 );
-    cout <<"People with " << _key << " = " << _value <<" is(are) as below\n";
-    v1.dumpTarget();
-    cout << endl;
- }
-  void setPersonProperty(KeyType key, ValueType value)
-  {
-    _key = key;
-    _value = value;
-  }
-
-private:
- KeyType     _key;
- ValueType   _value;
-};
-
-
-class Query2d : public Query {
-public:
-  typedef GraphType::VertexDescriptor Vertex;
-public:
- void runQuery(Graph & graph, Vertex startVertex ) {
-    cout << "===============================\n";
-    cout << "dfs Query 2 \n";
-    AdjacencyVisitor v2; 
-    traverseThroughType("LIKES", v2.getFilter());
-    depthFirstSearch(graph, startVertex, v2);
-    cout << "People who likes webpage id = " << startVertex   << " are as below\n";
-
-    auto targetName = v2.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("name");
-      cout << "Vertex " << (*it)->getId() <<"\t" <<  (*it)->getPropertyValue(key).first;
-      cout << endl;
-    }
-    cout << endl;
- }
-
-};
-
-class Query3d : public Query {
-public:
-  typedef GraphType::VertexDescriptor Vertex;
-public:
- void runQuery(Graph & graph, Vertex startVertex ) {
-    cout << "===============================\n";
-    cout << "dfs Query 3\n";
-    AdjacencyVisitor v3; 
-    traverseThroughType("LIKES", v3.getFilter());
-    depthFirstSearch(graph, startVertex, v3);
-    cout << "Person with vid = " << startVertex << " likes webpages:\n";
-
-    auto targetName = v3.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("wpurl");
-      cout <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
-      cout << endl;
-    }
-    cout << endl;
- }
-
-};
-
-
-
-class Query4d : public Query {
-public:
-  void runQuery(Graph & graph ) {
-    cout << "===============================\n";
-    cout << "dfs Query 4 \n";
-    SelectionVisitor  v4;
-    filtProperty(_key, _value, v4.getFilter());
-    traverseThroughType("FRIENDS", v4.getFilter());
-    depthFirstSearch(graph, 0, v4 );
-    cout <<"People with " << _key << " = " << _value <<" is(are) as below\n";
-
-    auto targetName = v4.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("name");
-      cout <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
-      cout << endl;
-    }
-    
-
-    cout << endl;
- }
-  void setPersonProperty(KeyType key, ValueType value)
-  {
-    _key = key;
-    _value = value;
-  }
-
-private:
- KeyType     _key;
- ValueType   _value;
-};
-
-class Query5d : public Query {
-public:
- typedef GraphType::VertexDescriptor vertex;
- 
-public:
-  void runQuery(Graph & graph, Vertex startVertex ) {
-    cout << "===============================\n";
-    cout << "dfs Query 5\n";
-    DFSVisitor v5;
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter);
-    v5.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter);
-    v5.setFilter(tmpFilter);
-    v5.setDepth(2);
-    depthFirstSearch(graph, startVertex, v5);
-    FixedString key("name");
-    cout << "The friends of Person with vid = " << startVertex << " has " << v5.getVertexTargetList().size() << " friends\n";
-    auto targetName = v5.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("name");
-      cout <<"Vertex " << (*it).first->getId() << "\t"  << (*it).first->getPropertyValue(key).first;
-      cout << endl;
+        break;
+              }
+      default:
+        cout << "Traverse Method: 1. BFS  2. DFS\n"; 
     }
   }
 };
-
-
-class Query6d: public Query {
-public:
- typedef GraphType::VertexDescriptor vertex;
- 
-public:
-  void runQuery(Graph & graph, Vertex startVertex ) {
-    cout << "===============================\n";
-    cout << "dfs Query 6\n";
-    DFSVisitor v6;
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter);
-    v6.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("LIKES", "out", tmpFilter);
-    v6.setFilter(tmpFilter);
-    v6.setDepth(2);
-    depthFirstSearch(graph, startVertex, v6);
-    cout << "The friends of Person with vid = " << startVertex << " like " << v6.getVertexTargetList().size() << " webpages\n";
-    auto targetName = v6.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("wpurl");
-      cout <<"Vertex " << (*it).first->getId() << "\t"  << (*it).first->getPropertyValue(key).first;
-      cout << endl;
-    }
-  }
-};
-
-class Query7d: public Query {
-public:
- typedef GraphType::VertexDescriptor vertex;
- 
-public:
-  void runQuery(Graph & graph, Vertex startVertex ) {
-    cout << "===============================\n";
-    cout << "dfs Query 7\n";
-    DFSVisitor v7;
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("LIKES", "out",  tmpFilter);
-    v7.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("LIKES", "in",  tmpFilter);
-    v7.setFilter(tmpFilter);
-    v7.setDepth(2);
-    depthFirstSearch(graph, startVertex, v7);
-    cout << "The webpages liked by person vid = " << startVertex << " are liked by " << v7.getVertexTargetList().size() << " people: \n";
-    auto targetName = v7.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("name");
-      cout <<"Vertex " << (*it).first->getId() << "\t"  << (*it).first->getPropertyValue(key).first;
-      cout << endl;
-    }
-  }
-};
-
-class Query8d : public Query {
-public:
- typedef GraphType::VertexDescriptor vertex;
- 
-public:
-  void runQuery(Graph & graph, Vertex startVertex, Vertex endVertex ) {
-    cout << "===============================\n";
-    cout << "dfs Query 8\n";
-    DFSPathVisitor v8;
-    v8.setEndVertex(endVertex);
-    depthFirstSearch(graph, startVertex, v8);
-    auto target = v8.getPathList();
-    if(target.empty()) {
-      cout << "There is no path between " << startVertex << " to " << endVertex << endl;
-      return ;
-    }
-    cout << "There are " << target.size() << " path from " << startVertex << " to " <<  endVertex << endl;
-    for(auto it = target.begin(); it != target.end(); ++it) {
-      for(auto iter = (*it).second.begin(); iter != (*it).second.end(); ++iter) 
-        cout <<"Vertex " << (*iter)->getId() << endl; 
-      cout << endl;
-    }
-  }
-};
-
-class Query9d: public Query {
-public:
- typedef GraphType::VertexDescriptor vertex;
- 
-public:
-  void runQuery(Graph & graph, Vertex startVertex, Vertex endVertex ) {
-    cout << "===============================\n";
-    cout << "dfs Query 9\n";
-    DFSPathVisitor v9;
-    v9.setEndVertex(endVertex);
-    depthFirstSearch(graph, startVertex, v9);
-    auto target= v9.getPathList();
-    if(target.empty()) {
-      cout << "There is no path between " << startVertex << " to " << endVertex << endl;
-      return;
-    }
-    cout << "The shortest path from " << startVertex << " to " <<  endVertex << " has vertex: " << endl;
-    for(auto it = target.begin(); it != target.end(); ++it) {
-      for(auto iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
-        cout <<"Vertex " << (*iter)->getId() << endl; 
-      cout << endl;
-    }
-  }
-};
-
-class Query10d : public Query {
-public:
-  typedef GraphType::VertexDescriptor vertex; 
-public: 
-  void runQuery(Graph & graph, Vertex startVertex, Vertex endVertex ) { 
-    cout << "===============================\n"; 
-    cout << "dfs Query 10\n"; 
-    DFSPatternVisitor v10;
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter);
-    v10.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("FRIENDS", "in",   tmpFilter);
-    v10.setFilter(tmpFilter);
-    v10.setDepth(2);
-    v10.setEndVertex(endVertex);
-    depthFirstSearch(graph, startVertex, v10);
-    FixedString key("name");
-    cout << "There are " << v10.getVertexTargetList().size() << " common friends between  " << startVertex << " and " <<  endVertex << endl;
-    auto targetName = v10.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("name");
-      cout <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
-      cout << endl;
-    }
-  }
-};
-
-class Query11d: public Query {
-public:
- typedef GraphType::VertexDescriptor vertex;
- 
-public:
-  void runQuery(Graph & graph, Vertex startVertex, Vertex endVertex ) {
-    cout << "===============================\n";
-    cout << "Query 11\n";
-    DFSPatternVisitor v11;
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("LIKES", "out",  tmpFilter);
-    v11.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("LIKES", "in", tmpFilter);
-    v11.setFilter(tmpFilter);
-    v11.setDepth(2);
-    v11.setEndVertex(endVertex);
-    depthFirstSearch(graph, startVertex, v11);
-    FixedString key("name");
-    cout << "There are " << v11.getVertexTargetList().size() << " common webpages liked by both " << startVertex << " and " <<  endVertex << endl;
-    auto targetName = v11.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("wpurl");
-      cout <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
-      cout << endl;
-    }
-  }
-
-};
-
-
-class Query12d : public Query {
-public:
-  typedef GraphType::VertexDescriptor Vertex;
-public:
- void runQuery(Graph & graph, Vertex startVertex ) {
-    cout << "===============================\n";
-    cout << "dfs Query 12 \n";
-    AdjacencyVisitor v12; 
-    traverseThroughType("FRIENDS", v12.getFilter());
-    depthFirstSearch(graph, startVertex, v12);
-    FixedString key("name");
-    cout << "Person with vid = " << startVertex << " has name: " << graph.getVertexPointer(startVertex)->getPropertyValue(key).first <<" and  " << v12.getVertexTargetList().size() << " friends\n";
- }
-
-};
-
-class Query13d: public Query {
-public:
- typedef GraphType::VertexDescriptor vertex;
- 
-public:
-  void runQuery(Graph & graph, Vertex startVertex ) {
-    cout << "===============================\n";
-    cout << "dfs Query 13\n";
-    DFSVisitor  v13;
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter);
-    v13.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter);
-    v13.setFilter(tmpFilter);
-    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter);
-    v13.setFilter(tmpFilter);
-    v13.setDepth(3);
-    depthFirstSearch(graph, startVertex, v13);
-    FixedString key("name");
-    cout << "The friends of friends of person vid = " << startVertex << " has " << v13.getVertexTargetList().size() << " friends: \n";
-    auto targetName = v13.getVertexTargetList();
-    for(auto it = targetName.begin(); it != targetName.end(); ++it) {
-      FixedString key("name");
-      if( (*it).first->getId() != startVertex ) {
-      cout <<"Vertex " << (*it).first->getId() << "\t"  << (*it).first->getPropertyValue(key).first;
-      cout << endl;
-      }
-    }
-  }
-};
-
-
 
 #endif 
 

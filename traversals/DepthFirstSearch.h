@@ -49,11 +49,12 @@ void depthFirstSearch(GraphType & Graph,
 
     bool VertexMatch = GraphVisitor.visitVertex(CurrentVertex);
     if(VertexMatch == true)
-      return;
+      return ;
  
     EdgeList Edges;
     auto InEdges = Graph.getInEdges(CurrentVertex);
     Edges = Graph.getOutEdges(CurrentVertex);
+    Edges.insert(Edges.end(), InEdges.begin(), InEdges.end());
     for (auto EdgeIterator = Edges.begin(); 
       EdgeIterator != Edges.end();
       ++EdgeIterator) {

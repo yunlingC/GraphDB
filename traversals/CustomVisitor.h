@@ -27,21 +27,8 @@ class SelectionVisitor: public Visitor {
 public:
   typedef pair<FixedString, bool> ReturnValueType;
   typedef GraphType::VertexPointer VertexPointer;
-  typedef std::vector<VertexPointer> VertexTarget;
 public:
   SelectionVisitor() { }
-
-  virtual void setFilter(Filter & f) {
-    _filter = f;
-  }
-
-  Filter & getFilter() { 
-    return _filter;
-  }
-
-  VertexTarget & getVertexTargetList() {
-    return _VertexTargetList;
-  }
 
   virtual bool visitVertex(VertexPointer vp) {
     bool VertexMatch = checkProperty<ReturnValueType>(vp, getFilter());
@@ -58,31 +45,14 @@ public:
   virtual void dumpTarget() {
     dumpVertexTarget(_VertexTargetList);
   }
-
-private:
-  VertexTarget _VertexTargetList;
-  Filter _filter;
 };
 
 /// visitor to deal with adjacency query : from query 2 to query 3
 class AdjacencyVisitor: public Visitor {
 public:
   typedef GraphType::VertexPointer VertexPointer;
-  typedef std::vector<VertexPointer> VertexTarget;
 public:
   AdjacencyVisitor() { }
-
-  void setFilter(Filter & f) {
-    _filter = f;
-  }
-
-  Filter & getFilter() {
-    return _filter;
-  }
-
-  VertexTarget & getVertexTargetList() {
-    return _VertexTargetList;
-  }
 
   virtual bool visitVertex(VertexPointer vertex) {
     if(_depthList.find(vertex) != _depthList.end())
@@ -100,13 +70,11 @@ public:
       _VertexTargetList.push_back(second);
     }
     computeDepth(first, edge, second, _depthList);
-    return TerminateAtDepth(1, _depthList);
+    return false;
   }
 
-private:
-  Filter _filter;
+protected:
   DepthList _depthList;
-  VertexTarget _VertexTargetList;
 };
 
 
@@ -363,7 +331,7 @@ private:
 };
 
 
-class DFSVisitor: public ReachabilityVisitor {
+class DFSReachabilityVisitor: public ReachabilityVisitor {
 public:
   typedef GraphType::VertexPointer VertexPointer;
   typedef std::map<VertexPointer,  unsigned int> VertexTarget;
@@ -380,7 +348,7 @@ public:
   }
 
 
-  virtual VertexTarget & getVertexTargetList() {
+  VertexTarget & getVertexTargetMap() {
     return _VertexTargetList;
   }
 

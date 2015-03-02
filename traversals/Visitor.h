@@ -25,9 +25,18 @@ public:
   typedef GraphType::EdgePointer   EdgePointer;
   typedef GraphType::VertexPropertyList VertexPropertyList;
   typedef GraphType::EdgePropertyList EdgePropertyList;
+  typedef std::vector<VertexPointer> VertexTarget;
 public:
-  virtual  void setFilter(Filter & filter) {
-    _filter = filter;
+  virtual void setFilter(Filter & f) {
+    _filter = f;
+  }
+
+  virtual Filter & getFilter() { 
+    return _filter;
+  }
+
+  virtual VertexTarget & getVertexTargetList() {
+    return _VertexTargetList;
   }
 
   virtual bool visitStartVertex(VertexPointer vp) {
@@ -81,8 +90,8 @@ public:
   }
 
 
-
-private:
+protected:
+  VertexTarget _VertexTargetList; 
   Filter _filter;
 
 };
