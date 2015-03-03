@@ -1,4 +1,4 @@
-//===-- traversals/CustomVisitor.h - Customed visitor class ----------*- C++ -*-===//
+//===-- traversals/CustomVisitor.h - Customed visitor class -----*- C++ -*-===//
 //
 //                     CAESR Graph Database 
 //
@@ -156,7 +156,7 @@ public:
     return false;
   }
 
-private:
+protected:
   unsigned int  _typeMatch;
   unsigned int  _direcMatch;
   unsigned int  _depthSetting;
@@ -200,7 +200,7 @@ public:
     return false;
   }
   
-private:
+protected:
   VertexDescriptor _endVertex;
   VertexDescriptor _startVertex;
   VertexPath   _prevPath;
@@ -287,7 +287,7 @@ public:
     return false;
   }
 
-private:
+protected:
   unsigned int  _typeMatch;
   unsigned int  _direcMatch;
   unsigned int  _depthSetting;
@@ -361,7 +361,7 @@ public:
     return _typeMatch;
   }
 
-private:
+protected:
   Filter _filter;
   MultiDepthList   _depthList;
   VertexPointer    _startVertex;
@@ -458,7 +458,7 @@ public:
     return false;
   }
 
-private:
+protected:
   unsigned int  _typeMatch;
   unsigned int  _direcMatch;
   unsigned int  _depthSetting;
@@ -557,7 +557,7 @@ public:
     return false;
   }
 
-private:
+protected:
   bool _turnFlag;
   unsigned int  _tmpMinDepth;
   unsigned int  _typeMatch;

@@ -1,17 +1,20 @@
 //#include "macros.h"
-#include "GDReader.h"
-#include "LinkedList.h"
-#include "breadth_first_search.h"
-#include "QueryDescription.h"
-
 #include <algorithm>
 #include <iostream>
 #include <queue>
 #include <thread>
 
+//#include "GDReader.h"
+#include "LinkedList.h"
+#include "breadth_first_search.h"
+#include "QueryDescription.h"
+#include "QueryRandomizer.h"
+
+
 int main() {
 
   typedef GraphType Graph;
+  typedef Graph::VertexDescriptor VertexDescriptor;
 
   Graph g;
   //  g.allocVertexMemory(50);
@@ -23,6 +26,20 @@ int main() {
 
   //createGraph(g);
   //  Graph::VertexPtr vp0 = g.getVertexPointer(0);
+
+  QueryRandomizer rand(reader);
+
+  unsigned int counter = 0;
+
+  string name = rand.getName();
+  string pid  = rand.getPid();
+  VertexDescriptor webId = rand.getAWebpageIndex();
+  VertexDescriptor personId1 = rand.getAPersonIndex();
+  VertexDescriptor personId2 = rand.getAPersonIndex();
+  VertexDescriptor personId3 = personId2;
+  while( personId3 == personId2)             //for query of connection with p1 and p2
+    personId3 = rand.getAPersonIndex();
+
   cout << "BFS start\n";
 
   Query1 Q1;
@@ -38,35 +55,35 @@ int main() {
   Query11 Q11;
   Query12 Q12;
   Query13 Q13;
-/**   
-  Q1.runQuery(g, "name", "KIRA VERLATO", 1);
-  Q1.runQuery(g, "name", "KIRA VERLATO", 2);
-  Q2.runQuery(g, 63, 1);
-  Q2.runQuery(g, 63, 2);
-  q3.runquery(g, 4, 1);
-  Q3.runQuery(g, 4, 2);
-  Q4.runQuery(g, "pid", "5", 1);
-  Q4.runQuery(g, "pid", "5", 2);
-  Q5.runQuery(g, 0, 1);
-  Q5.runQuery(g, 0, 2);
-  Q6.runQuery(g, 0, 1);
-  Q6.runQuery(g, 0, 2);
-  Q7.runQuery(g, 0, 1);
-  Q7.runQuery(g, 0, 2);
-  Q8.runQuery(g, 0, 2, 1);
-  Q8.runQuery(g, 0, 2, 2);
-  Q9.runQuery(g, 0, 99, 1);
-  Q9.runQuery(g, 0, 99, 2);
-  Q10.runQuery(g, 0, 1, 1);
-  Q10.runQuery(g, 0, 1, 2);
-  Q11.runQuery(g, 0, 1, 1);
-  Q11.runQuery(g, 0, 1, 2);
-  Q12.runQuery(g, 4, 1);
-  Q12.runQuery(g, 4, 2);
-  Q13.runQuery(g, 0, 1);
-  Q13.runQuery(g, 0, 2);
-*/
 
+  /// 1: BFS  2: DFS
+  Q1.runQuery(g, "name", name, 1);
+  Q1.runQuery(g, "name", name, 2);
+  Q2.runQuery(g, webId, 1);
+  Q2.runQuery(g, webId, 2);
+  Q3.runQuery(g, personId1, 1);
+  Q3.runQuery(g, personId1, 2);
+  Q4.runQuery(g, "pid", pid, 1);
+  Q4.runQuery(g, "pid", pid, 2);
+  Q5.runQuery(g, personId1, 1);
+  Q5.runQuery(g, personId1, 2);
+  Q6.runQuery(g, personId1, 1);
+  Q6.runQuery(g, personId1, 2);
+  Q7.runQuery(g, personId1, 1);
+  Q7.runQuery(g, personId1, 2);
+  Q8.runQuery(g, personId2, personId3, 1);
+  Q8.runQuery(g, personId2, personId3, 2);
+  Q9.runQuery(g, personId2, personId3, 1);
+  Q9.runQuery(g, personId2, personId3, 2);
+  Q10.runQuery(g, personId2, personId3, 1);
+  Q10.runQuery(g, personId2, personId3, 2);
+  Q11.runQuery(g, personId2, personId3, 1);
+  Q11.runQuery(g, personId2, personId3, 2);
+  Q12.runQuery(g, personId1, 1);
+  Q12.runQuery(g, personId1, 2);
+  Q13.runQuery(g, personId1, 1);
+  Q13.runQuery(g, personId1, 2);
+  /**
   vector<thread> threads;
   threads.push_back( thread([&]{Q1.runQuery(g, "name", "KIRA VERLATO", 1);}));
   threads.push_back( thread([&]{Q2.runQuery(g, 63, 1);}));
@@ -112,7 +129,7 @@ int main() {
   for_each(dthreads.begin(), dthreads.end(),
            std::mem_fn(&thread::join));
 
-
+*/
 
   return 0;
 }

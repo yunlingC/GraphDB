@@ -68,7 +68,7 @@ public:
 
 class Query2 : public Query {
 public:
- void runQuery(Graph & graph, Vertex startVertex, TMSwitch c) {
+ void runQuery(Graph & graph, const Vertex & startVertex, TMSwitch c) {
     cout << "===============================\n";
     cout << "Query 2 \n";
     AdjacencyVisitor v2; 
@@ -100,7 +100,7 @@ public:
 
 class Query3 : public Query {
 public:
- void runQuery(Graph & graph, Vertex startVertex, TMSwitch c ) {
+ void runQuery(Graph & graph, const Vertex &  startVertex, TMSwitch c ) {
     cout << "===============================\n";
     cout << "Query 3\n";
     AdjacencyVisitor v3; 
@@ -318,9 +318,6 @@ public:
           cout << "There is path from " << startVertex << " to " <<  endVertex << endl;
         else 
           cout << startVertex << " and " <<  endVertex <<" are not connected" << endl;
-//        for(auto it = target.begin(); it != target.end(); ++it) {
-//          cout <<"Vertex " << (*it)->getId() << endl;
-//        }
         break;
               }
       case 2: {
@@ -333,12 +330,6 @@ public:
           cout << "There is path from " << startVertex << " to " <<  endVertex << endl;
         else 
           cout << startVertex << " and " <<  endVertex <<" are not connected" << endl;
-//        cout << "There are " << target.size() << " vertex on the path from " << startVertex << " to " <<  endVertex << endl;
-//        for(auto it = target.begin(); it != target.end(); ++it) {
-//          for (auto iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
-//            cout <<"Vertex " << (*iter)->getId() << endl;
-//        cout << endl;
- //       }
         break;
               }
       default:
@@ -363,10 +354,12 @@ public:
         auto target = v9b.getVertexTargetList();
         if(target.empty())
           cout << startVertex << " and " <<  endVertex <<" are not connected" << endl;
-        else 
+        else {
+            cout << "There are  shortest paths from " << startVertex << " to " <<  endVertex << endl;
           for(auto it = target.begin(); it != target.end(); ++it) {
             cout <<"Vertex " << (*it)->getId() << endl;
           }
+        }
         break;
               }
       case 2: {

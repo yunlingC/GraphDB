@@ -47,8 +47,7 @@ void breadth_first_search(GraphType & Graph, const GraphType::VertexDescriptor &
     bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
     if(VertexMatch == true)
       return;
-    
-
+      
     // Set to visited.    
     ColorMap[ScheduledVertex] = true;
 

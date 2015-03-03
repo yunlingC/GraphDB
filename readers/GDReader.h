@@ -1,3 +1,18 @@
+//===-- readers/GDReader.h - class to read from GDbench output ---*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is the class to read output files from GDBench sndata.gd.
+///
+//===----------------------------------------------------------------------===//
+
+
 #ifndef _GDREADER_H_
 #define _GDREADER_H_
 
@@ -6,7 +21,7 @@
 #include <map>
 #include <exception>
 #include <errno.h>
-//#include "Graph.h"
+
 #include "GraphType.h"
 
 using namespace boost;
@@ -35,22 +50,27 @@ int  str2int(string str){
 struct GDReader {
 public:
   typedef GraphType Graph;
-  private:
+  typedef Graph::VertexDescriptor VertexDescriptor;
+  typedef Graph::VertexPropertyList VertexPropertyList;
+  typedef Graph::EdgePropertyList EdgePropertyList;
+private:
     Graph &_graph;
     unsigned int  _people;
     unsigned int  _webpages;
     unsigned int  _friends;
     unsigned int  _likes;
     
-    map<string, Graph::VertexDescriptor> _vertexMap;
+    vector<string> _nameList;
+    vector<string> _pidList;
+ 
+    map<string, VertexDescriptor> _vertexMap;
     ifstream _GDfile;
 
-  public:
+public:
     string line;
     GDReader(Graph &graph):_graph(graph){};
 
     void readFile(string filename) {
-
       try{
         _GDfile.open(filename.c_str());
         if (_GDfile.fail())
@@ -77,7 +97,6 @@ public:
 
             default:
               cout << "Error: " << "2" <<"\t Failed to recognize type" << endl;
-
           }//END_SWITCH
        } //END_WHILE
      }//END_TRY
@@ -85,7 +104,6 @@ public:
       cout << "Error:"<< i <<"\tFailed to open file" <<endl;
       cerr << strerror(errno) << endl;
    }
-
       _GDfile.close();
 
   }//END_READFILE
@@ -106,6 +124,14 @@ public:
     return _likes;
   }
 
+  vector<string> & getNameList() {
+    return _nameList;
+  }
+
+  vector<string> & getPidList() {
+    return _pidList;
+  }
+
 private:
 
   void readPeople(){
@@ -119,7 +145,7 @@ private:
 
     while(getline(_GDfile,line) != NULL){
 
-      Graph::VertexPropertyList peopleProp;
+      VertexPropertyList peopleProp;
 
       if(line == "</PEOPLE>") {
         return;
@@ -142,26 +168,25 @@ private:
       peopleProp.set("age", age);
       peopleProp.set("location",location);
       
-      Graph::VertexDescriptor vp = _graph.addVertex(peopleProp);
-      //Graph::VertexDescriptor vp = _graph.addVertex();
-      _vertexMap.insert(pair<string, Graph::VertexDescriptor>(pid, vp));
+      _nameList.push_back(name);
+      _pidList.push_back(pid);
+      VertexDescriptor vp = _graph.addVertex(peopleProp);
+      _vertexMap.insert(pair<string, VertexDescriptor>(pid, vp));
       _people++;
     
     }
   }
   
-
   void readWebpages(){
-
     _webpages = 0;
-    Graph::VertexPropertyList webpagesProp;
+    VertexPropertyList webpagesProp;
     string wpid = "";
     string wpurl = "";
     string wpdate = "";
     vector<string> attributes;
 
     while(getline(_GDfile, line) != NULL){
-      Graph::VertexPropertyList webpagesProp;
+      VertexPropertyList webpagesProp;
       if(line == "</WEBPAGES>"){
         return;
       }
@@ -180,23 +205,22 @@ private:
      webpagesProp.set("wpurl",wpurl);
      webpagesProp.set("wpdate",wpdate);
 
-     Graph::VertexDescriptor vw = _graph.addVertex(webpagesProp);
-     //Graph::VertexDescriptor vw = _graph.addVertex();
-     _vertexMap.insert(pair<string, Graph::VertexDescriptor>(wpid, vw));
+     VertexDescriptor vw = _graph.addVertex(webpagesProp);
+     _vertexMap.insert(pair<string, VertexDescriptor>(wpid, vw));
      _webpages++;
     }
   }
 
   void readFriends(){
 
-    Graph::VertexDescriptor vs, vd;
+    VertexDescriptor vs, vd;
     string eid  = "";
     string from = "";
     string to   = "";
     vector<string> attributes;
 
     while(getline(_GDfile, line) != NULL){
-      Graph::EdgePropertyList friendsProp;
+      EdgePropertyList friendsProp;
       if(line == "</FRIENDS>"){
         return;
       }
@@ -219,17 +243,14 @@ private:
   }
 
   void readLikes() {
-
-    Graph::VertexDescriptor vs, vd;
+    VertexDescriptor vs, vd;
     string eid  = "";
     string from = "";
     string to   = "";
     vector<string> attributes;
-    //property_visitor<string, string, Graph::VertexDescriptor> vis;
-    //property_visitor vis;
     
     while(getline(_GDfile, line) != NULL){
-      Graph::EdgePropertyList likesProp;
+      EdgePropertyList likesProp;
       if(line == "</LIKES>"){
         return;
       }
