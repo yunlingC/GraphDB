@@ -38,12 +38,12 @@ int main() {
   Query11 Q11;
   Query12 Q12;
   Query13 Q13;
-   
+/**   
   Q1.runQuery(g, "name", "KIRA VERLATO", 1);
   Q1.runQuery(g, "name", "KIRA VERLATO", 2);
   Q2.runQuery(g, 63, 1);
   Q2.runQuery(g, 63, 2);
-  Q3.runQuery(g, 4, 1);
+  q3.runquery(g, 4, 1);
   Q3.runQuery(g, 4, 2);
   Q4.runQuery(g, "pid", "5", 1);
   Q4.runQuery(g, "pid", "5", 2);
@@ -65,14 +65,23 @@ int main() {
   Q12.runQuery(g, 4, 2);
   Q13.runQuery(g, 0, 1);
   Q13.runQuery(g, 0, 2);
+*/
 
-
-/*
   vector<thread> threads;
-  threads.push_back( thread([&]{Q1.runQuery(g);}));
-  threads.push_back( thread([&]{Q2.runQuery(g, 14);}));
-  threads.push_back( thread([&]{Q3.runQuery(g, 4);}));
-  
+  threads.push_back( thread([&]{Q1.runQuery(g, "name", "KIRA VERLATO", 1);}));
+  threads.push_back( thread([&]{Q2.runQuery(g, 63, 1);}));
+  threads.push_back( thread([&]{Q3.runQuery(g, 4, 1);}));
+  threads.push_back( thread([&]{Q4.runQuery(g, "pid", "5", 1);}));
+  threads.push_back( thread([&]{Q5.runQuery(g, 0, 1);}));
+  threads.push_back( thread([&]{Q6.runQuery(g, 0, 1);}));
+  threads.push_back( thread([&]{Q7.runQuery(g, 0, 1);}));
+  threads.push_back( thread([&]{Q8.runQuery(g, 0, 2, 1);}));
+  threads.push_back( thread([&]{Q9.runQuery(g, 0, 99, 1);}));
+  threads.push_back( thread([&]{Q10.runQuery(g, 0, 1, 1);}));
+  threads.push_back( thread([&]{Q11.runQuery(g, 0, 1, 1);}));
+  threads.push_back( thread([&]{Q12.runQuery(g, 4, 1);}));
+  threads.push_back( thread([&]{Q13.runQuery(g, 0, 1);}));
+
 //  threads.push_back( thread( &Query::runQuery3, Q));
 //  threads.push_back( thread( &Query::runQuery4, Q));
 //  threads.push_back( thread( &Query::runQuery12, Q));
@@ -80,22 +89,30 @@ int main() {
   for_each(threads.begin(), threads.end(),
            std::mem_fn(&thread::join));
 
-*/
+  vector<thread> dthreads;
+  dthreads.push_back( thread([&]{Q1.runQuery(g, "name", "KIRA VERLATO", 2);}));
+  dthreads.push_back( thread([&]{Q2.runQuery(g, 63, 2);}));
+  dthreads.push_back( thread([&]{Q3.runQuery(g, 4, 2);}));
+  dthreads.push_back( thread([&]{Q4.runQuery(g, "pid", "5", 2);}));
+  dthreads.push_back( thread([&]{Q5.runQuery(g, 0, 2);}));
+  dthreads.push_back( thread([&]{Q6.runQuery(g, 0, 2);}));
+  dthreads.push_back( thread([&]{Q7.runQuery(g, 0, 2);}));
+  dthreads.push_back( thread([&]{Q8.runQuery(g, 0, 2, 2);}));
+  dthreads.push_back( thread([&]{Q9.runQuery(g, 0, 99, 2);}));
+  dthreads.push_back( thread([&]{Q10.runQuery(g, 0, 1, 2);}));
+  dthreads.push_back( thread([&]{Q11.runQuery(g, 0, 1, 2);}));
+  dthreads.push_back( thread([&]{Q12.runQuery(g, 4, 2);}));
+  dthreads.push_back( thread([&]{Q13.runQuery(g, 0, 2);}));
 
-/*
-  Q.runQuery1();
 
-//  Query Q2;
-  Q.runQuery2(); 
+//  threads.push_back( thread( &Query::runQuery3, Q));
+//  threads.push_back( thread( &Query::runQuery4, Q));
+//  threads.push_back( thread( &Query::runQuery12, Q));
 
-//  Query Q3;
-  Q.runQuery3();
+  for_each(dthreads.begin(), dthreads.end(),
+           std::mem_fn(&thread::join));
 
-//  Query Q4;
-  Q.runQuery4();
 
-//  Query1 Q12;
-  Q.runQuery12();
-*/
+
   return 0;
 }

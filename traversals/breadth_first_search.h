@@ -30,13 +30,11 @@ void breadth_first_search(GraphType & Graph, const GraphType::VertexDescriptor &
   typedef pair<GraphType::VertexPointer, bool> VisitPair;
   auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
 
-//  std::cout << "================= BFS ===================== \n";
   // Start traversing the graph from here. 
   std::queue<GraphType::VertexPointer> VertexQueue;
   /// True means visited and false means not visited.
   std::map<GraphType::VertexPointer, bool> ColorMap;
 
-//  bool RevisitFlag = GraphVisitor.discoverVertex(ScheduledVertex);
   VertexQueue.push(ScheduledVertex);               
   GraphVisitor.visitStartVertex(ScheduledVertex);
 
@@ -71,10 +69,8 @@ void breadth_first_search(GraphType & Graph, const GraphType::VertexDescriptor &
 	// queue the target for visitation
         bool TreeMatch = GraphVisitor.scheduleTree(ScheduledVertex, NextEdge, TargetVertex);
 
-//      cout << "---> NextEdge: " << NextEdge->getId() << "type direction match " << TypeMatch << DirectionMatch << endl;
         if(TypeMatch && DirectionMatch)   {//control the vertex to be visited filtered by type
 	        VertexQueue.push(TargetVertex);
-//          cout << "---> TargetVertex: " << TargetVertex->getId() << endl;
         }
 	      ColorMap.insert(VisitPair(TargetVertex,false));
       } else {
@@ -85,7 +81,6 @@ void breadth_first_search(GraphType & Graph, const GraphType::VertexDescriptor &
     }
   }
   GraphVisitor.finishVisit();
-  std::cout << "================= END BFS ===================== \n";
 };
 
 #endif /* _BREADTH_FIRST_SEARCH_H_ */

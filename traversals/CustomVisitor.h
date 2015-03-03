@@ -26,7 +26,6 @@ using namespace std;
 class SelectionVisitor: public Visitor {
 public:
   typedef pair<FixedString, bool> ReturnValueType;
-  typedef GraphType::VertexPointer VertexPointer;
 public:
   SelectionVisitor() { }
 
@@ -49,8 +48,6 @@ public:
 
 /// visitor to deal with adjacency query : from query 2 to query 3
 class AdjacencyVisitor: public Visitor {
-public:
-  typedef GraphType::VertexPointer VertexPointer;
 public:
   AdjacencyVisitor() { }
 
@@ -81,9 +78,6 @@ protected:
 /// visitor to deal with multiple typefilters: from query 5 to 7 
 class ReachabilityVisitor : public Visitor {
 public:
-  typedef GraphType::VertexPointer VertexPointer;
-  typedef std::vector<VertexPointer> VertexTarget;
-  typedef std::vector<VertexPointer> VertexPath;
   typedef std::queue<VertexPath>  PathQueue;
 public:
   ReachabilityVisitor () { }
@@ -96,9 +90,6 @@ public:
     _depthSetting = depth;
   }
 
-  VertexTarget & getVertexTargetList() {
-    return _vertexTargetList;
-  }
 
   virtual bool visitStartVertex(VertexPointer startVertex ) {
     VertexPath newPath;
@@ -115,18 +106,18 @@ public:
     _prevPath = _pathQueue.front();
     _pathQueue.pop();
     if(_prevPath.size() > _depthSetting) {
-      _vertexTargetList.push_back(_prevPath.at(_depthSetting));
+      _VertexTargetList.push_back(_prevPath.at(_depthSetting));
       while( !_pathQueue.empty()) {
         auto path = _pathQueue.front(); _pathQueue.pop();
         bool unique = true;
-        for (auto it = _vertexTargetList.begin() ; it != _vertexTargetList.end(); ++ it) {/// do not store repeated veretx
+        for (auto it = _VertexTargetList.begin() ; it != _VertexTargetList.end(); ++ it) {/// do not store repeated veretx
           if ( *it == path.at(_depthSetting)) {
             unique = false;
             break;
           }
         }
         if(unique == true) { 
-          _vertexTargetList.push_back(path.at(_depthSetting));
+          _VertexTargetList.push_back(path.at(_depthSetting));
         }//end if
       }
       return true;
@@ -170,7 +161,6 @@ private:
   unsigned int  _direcMatch;
   unsigned int  _depthSetting;
   std::vector<Filter> _filterList;
-  VertexTarget _vertexTargetList;
   VertexPath   _prevPath;
   PathQueue  _pathQueue;
 };
@@ -178,20 +168,12 @@ private:
 
 class PathVisitor : public Visitor {
 public:
-  typedef GraphType::VertexPointer VertexPointer;
-  typedef GraphType::VertexDescriptor VertexDescriptor;
-  typedef std::vector<VertexPointer> VertexTarget;
-  typedef std::vector<VertexPointer> VertexPath;
   typedef std::queue<VertexPath>  PathQueue;
 public:
   PathVisitor () { }
 
   void setEndVertex(VertexDescriptor vertex) {
     _endVertex =  vertex;
-  }
-
-  VertexTarget & getVertexTargetList() {
-    return _vertexTargetList;
   }
 
   virtual bool visitStartVertex(VertexPointer startVertex ) {
@@ -212,7 +194,7 @@ public:
       newPath.push_back(second);
       _pathQueue.push(newPath);
       if(second->getId() == _endVertex) {
-        _vertexTargetList = newPath;
+        _VertexTargetList = newPath;
         return true;
       }
     return false;
@@ -221,17 +203,12 @@ public:
 private:
   VertexDescriptor _endVertex;
   VertexDescriptor _startVertex;
-  VertexTarget _vertexTargetList;
   VertexPath   _prevPath;
   PathQueue  _pathQueue;
 };
 
 class PatternVisitor : public Visitor {
 public:
-  typedef GraphType::VertexPointer VertexPointer;
-  typedef GraphType::VertexDescriptor VertexDescriptor;
-  typedef std::vector<VertexPointer> VertexTarget;
-  typedef std::vector<VertexPointer> VertexPath;
   typedef std::queue<VertexPath>  PathQueue;
 public:
   PatternVisitor () { }
@@ -248,14 +225,6 @@ public:
     _endVertex =  vertex;
   }
 
-  Filter & getFilter() {
-    return _directionFilter;
-  }
-
-  VertexTarget & getVertexTargetList() {
-    return _vertexTargetList;
-  }
-
   virtual bool visitStartVertex(VertexPointer startVertex ) {
     VertexPath newPath;
     newPath.push_back(startVertex);
@@ -267,19 +236,19 @@ public:
     _pathQueue.pop();
     if(_prevPath.size() > _depthSetting) {
       if(_prevPath.at(_depthSetting)->getId() == _endVertex) 
-        _vertexTargetList.push_back(_prevPath.at(1));
+        _VertexTargetList.push_back(_prevPath.at(1));
       while( !_pathQueue.empty()) {
         auto path = _pathQueue.front(); _pathQueue.pop();
         if( path.at(_depthSetting)->getId() == _endVertex) {
           bool unique = true;
-          for (auto it = _vertexTargetList.begin() ; it != _vertexTargetList.end(); ++ it) {/// do not store repeated veretx
+          for (auto it = _VertexTargetList.begin() ; it != _VertexTargetList.end(); ++ it) {/// do not store repeated veretx
             if ( *it == path.at(1)) {
               unique = false;
               break;
             }
           }
           if(unique == true) 
-          _vertexTargetList.push_back(path.at(1));
+          _VertexTargetList.push_back(path.at(1));
         }
       }
       return true;
@@ -322,10 +291,8 @@ private:
   unsigned int  _typeMatch;
   unsigned int  _direcMatch;
   unsigned int  _depthSetting;
-  Filter _directionFilter;
   VertexDescriptor _endVertex;
   std::vector<Filter> _filterList;
-  VertexTarget _vertexTargetList;
   VertexPath   _prevPath;
   PathQueue  _pathQueue;
 };
@@ -333,7 +300,6 @@ private:
 
 class DFSReachabilityVisitor: public ReachabilityVisitor {
 public:
-  typedef GraphType::VertexPointer VertexPointer;
   typedef std::map<VertexPointer,  unsigned int> VertexTarget;
   typedef std::pair<VertexPointer, unsigned int> VertexTargetPair;
 public:
@@ -408,10 +374,6 @@ private:
 
 class DFSPatternVisitor : public PatternVisitor {
 public:
-  typedef GraphType::VertexPointer VertexPointer;
-  typedef GraphType::VertexDescriptor VertexDescriptor;
-  typedef std::vector<VertexPointer> VertexTarget;
-  typedef std::vector<VertexPointer> VertexPath;
   typedef std::vector<VertexPath>  PathStack;
 public:
 
@@ -427,10 +389,6 @@ public:
     _endVertex =  vertex;
   }
 
-  VertexTarget & getVertexTargetList() {
-    return _vertexTargetList;
-  }
-
   virtual bool visitStartVertex(VertexPointer startVertex ) {
     _startVertex = startVertex;
     VertexPath newPath;
@@ -444,14 +402,14 @@ public:
     if(_prevPath.size() > _depthSetting) {
       if(_prevPath.at(_depthSetting)->getId() == _endVertex) {
         bool unique = true;
-        for (auto it = _vertexTargetList.begin() ; it != _vertexTargetList.end(); ++ it) {/// do not store repeated veretx
+        for (auto it = _VertexTargetList.begin() ; it != _VertexTargetList.end(); ++ it) {/// do not store repeated veretx
           if ( *it == _prevPath.at(1)) {
             unique = false;
             break;
           }
         }
         if(unique == true) {
-          _vertexTargetList.push_back(_prevPath.at(1));
+          _VertexTargetList.push_back(_prevPath.at(1));
         }
       }
     }
@@ -464,7 +422,6 @@ public:
 
   virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
     return _direcMatch;
-
   }
 
   virtual bool scheduleEdge(EdgePointer edge) {
@@ -472,7 +429,6 @@ public:
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-
     _typeMatch = false;
     _direcMatch = false;
     if(_prevPath.size() > _depthSetting) {
@@ -509,7 +465,6 @@ private:
   VertexPointer _startVertex;
   VertexDescriptor _endVertex;
   std::vector<Filter> _filterList;
-  VertexTarget _vertexTargetList;
   VertexPath   _prevPath;
   PathStack _pathStack;
 };
@@ -517,10 +472,6 @@ private:
 
 class DFSPathVisitor : public Visitor {
 public:
-  typedef GraphType::VertexPointer VertexPointer;
-  typedef GraphType::VertexDescriptor VertexDescriptor;
-  typedef std::vector<VertexPointer> VertexTarget;
-  typedef std::vector<VertexPointer> VertexPath;
   typedef std::vector<VertexPath>  PathStack;
   typedef std::multimap<unsigned int, VertexPath> PathMap;
   typedef std::pair<unsigned int, VertexPath> PathPair;
@@ -538,9 +489,6 @@ public:
     _endVertex =  vertex;
   }
 
-  VertexTarget & getVertexTargetList() {
-    return _vertexTargetList;
-  }
 
   PathMap & getPathList() {
     return _pathMap;
@@ -574,7 +522,6 @@ public:
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-
     _typeMatch = false;
     _direcMatch = false;
     /// if the depth of this branch already exceeds the shortest path, then prune
@@ -619,7 +566,6 @@ private:
   VertexPointer _startVertex;
   VertexDescriptor _endVertex;
   std::vector<Filter> _filterList;
-  VertexTarget _vertexTargetList;
   PathMap     _pathMap;
   VertexPath   _prevPath;
   PathStack _pathStack;

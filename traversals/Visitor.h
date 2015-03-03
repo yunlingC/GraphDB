@@ -25,7 +25,9 @@ public:
   typedef GraphType::EdgePointer   EdgePointer;
   typedef GraphType::VertexPropertyList VertexPropertyList;
   typedef GraphType::EdgePropertyList EdgePropertyList;
+  typedef GraphType::VertexDescriptor VertexDescriptor;
   typedef std::vector<VertexPointer> VertexTarget;
+  typedef std::vector<VertexPointer> VertexPath;
 public:
   virtual void setFilter(Filter & f) {
     _filter = f;
