@@ -9,6 +9,7 @@ set(READERS_INCLUDE_DIR "readers")
 set(SRC_DIR "src")
 set(STORAGE_DIR "storage")
 set(TRAVERSALS_DIR "traversals")
+set(GDBENCH_DIR "GDBench")
 
 include_directories( 
         ${INCLUDE_DIRECTORIES} 
@@ -17,7 +18,8 @@ include_directories(
         ${READERS_INCLUDE_DIR}
         ${SRC_DIR} 
         ${STORAGE_DIR}
-	${TRAVERSALS_DIR}
+        ${GDBENCH_DIR}
+	      ${TRAVERSALS_DIR}
         )
 
 link_directories(
@@ -44,7 +46,7 @@ set(TESTS
   # main-storage.cpp 
         main-linkedlist.cpp
         #      main-dfs.cpp
-        main-terminate.cpp
+        main-gdbench.cpp
         )
 
 # This will generate all the executables listed in the TESTS variable
