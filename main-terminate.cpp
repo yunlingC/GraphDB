@@ -22,25 +22,26 @@ int main() {
   cout << "Begin testing\n";
 
   GDReader reader(g);
-  reader.readFile("../tests/gd/sndata100.gd");
+  reader.readFile("../tests/gd/sndata100000.gd");
 
   //createGraph(g);
   //  Graph::VertexPtr vp0 = g.getVertexPointer(0);
 
   QueryRandomizer rand(reader);
 
-  unsigned int counter = 0;
-
-  string name = rand.getName();
-  string pid  = rand.getPid();
-  VertexDescriptor webId = rand.getAWebpageIndex();
-  VertexDescriptor personId1 = rand.getAPersonIndex();
-  VertexDescriptor personId2 = rand.getAPersonIndex();
-  VertexDescriptor personId3 = personId2;
-  while( personId3 == personId2)             //for query of connection with p1 and p2
-    personId3 = rand.getAPersonIndex();
-
-  cout << "BFS start\n";
+  string name[5], pid[5] ;
+  VertexDescriptor webId[5], personId1[5], personId2[5], personId3[5];
+  
+  for(auto i = 0; i < 5; i++) {
+    name[i] = rand.getName();
+    pid[i]  = rand.getPid();
+    webId[i] = rand.getAWebpageIndex();
+    personId1[i] = rand.getAPersonIndex();
+    personId2[i] = rand.getAPersonIndex();
+    personId3[i] = personId2[i];
+    while( personId3[i] == personId2[i])     //for query of connection with p1 and p2
+    personId3[i] = rand.getAPersonIndex();
+  }
 
   Query1 Q1;
   Query2 Q2;
@@ -57,6 +58,7 @@ int main() {
   Query13 Q13;
 
   /// 1: BFS  2: DFS
+/* 
   Q1.runQuery(g, "name", name, 1);
   Q1.runQuery(g, "name", name, 2);
   Q2.runQuery(g, webId, 1);
@@ -83,53 +85,47 @@ int main() {
   Q12.runQuery(g, personId1, 2);
   Q13.runQuery(g, personId1, 1);
   Q13.runQuery(g, personId1, 2);
-  /**
-  vector<thread> threads;
-  threads.push_back( thread([&]{Q1.runQuery(g, "name", "KIRA VERLATO", 1);}));
-  threads.push_back( thread([&]{Q2.runQuery(g, 63, 1);}));
-  threads.push_back( thread([&]{Q3.runQuery(g, 4, 1);}));
-  threads.push_back( thread([&]{Q4.runQuery(g, "pid", "5", 1);}));
-  threads.push_back( thread([&]{Q5.runQuery(g, 0, 1);}));
-  threads.push_back( thread([&]{Q6.runQuery(g, 0, 1);}));
-  threads.push_back( thread([&]{Q7.runQuery(g, 0, 1);}));
-  threads.push_back( thread([&]{Q8.runQuery(g, 0, 2, 1);}));
-  threads.push_back( thread([&]{Q9.runQuery(g, 0, 99, 1);}));
-  threads.push_back( thread([&]{Q10.runQuery(g, 0, 1, 1);}));
-  threads.push_back( thread([&]{Q11.runQuery(g, 0, 1, 1);}));
-  threads.push_back( thread([&]{Q12.runQuery(g, 4, 1);}));
-  threads.push_back( thread([&]{Q13.runQuery(g, 0, 1);}));
-
-//  threads.push_back( thread( &Query::runQuery3, Q));
-//  threads.push_back( thread( &Query::runQuery4, Q));
-//  threads.push_back( thread( &Query::runQuery12, Q));
-
-  for_each(threads.begin(), threads.end(),
-           std::mem_fn(&thread::join));
-
-  vector<thread> dthreads;
-  dthreads.push_back( thread([&]{Q1.runQuery(g, "name", "KIRA VERLATO", 2);}));
-  dthreads.push_back( thread([&]{Q2.runQuery(g, 63, 2);}));
-  dthreads.push_back( thread([&]{Q3.runQuery(g, 4, 2);}));
-  dthreads.push_back( thread([&]{Q4.runQuery(g, "pid", "5", 2);}));
-  dthreads.push_back( thread([&]{Q5.runQuery(g, 0, 2);}));
-  dthreads.push_back( thread([&]{Q6.runQuery(g, 0, 2);}));
-  dthreads.push_back( thread([&]{Q7.runQuery(g, 0, 2);}));
-  dthreads.push_back( thread([&]{Q8.runQuery(g, 0, 2, 2);}));
-  dthreads.push_back( thread([&]{Q9.runQuery(g, 0, 99, 2);}));
-  dthreads.push_back( thread([&]{Q10.runQuery(g, 0, 1, 2);}));
-  dthreads.push_back( thread([&]{Q11.runQuery(g, 0, 1, 2);}));
-  dthreads.push_back( thread([&]{Q12.runQuery(g, 4, 2);}));
-  dthreads.push_back( thread([&]{Q13.runQuery(g, 0, 2);}));
-
-
-//  threads.push_back( thread( &Query::runQuery3, Q));
-//  threads.push_back( thread( &Query::runQuery4, Q));
-//  threads.push_back( thread( &Query::runQuery12, Q));
-
-  for_each(dthreads.begin(), dthreads.end(),
-           std::mem_fn(&thread::join));
-
 */
+  vector<thread> threads[5];
+  vector<thread> dthreads[5];
+  for (auto j = 0; j < 5; j++){
+  threads[j].push_back( thread([&]{Q1.runQuery(g, "name", name[j], 1);}));
+  threads[j].push_back( thread([&]{Q2.runQuery(g, webId[j], 1);}));
+  threads[j].push_back( thread([&]{Q3.runQuery(g, personId1[j], 1);}));
+  threads[j].push_back( thread([&]{Q4.runQuery(g, "pid", pid[j], 1);}));
+  threads[j].push_back( thread([&]{Q5.runQuery(g, personId1[j], 1);}));
+  threads[j].push_back( thread([&]{Q6.runQuery(g, personId1[j], 1);}));
+  threads[j].push_back( thread([&]{Q7.runQuery(g, personId1[j], 1);}));
+  threads[j].push_back( thread([&]{Q8.runQuery(g, personId2[j], personId3[j], 1);}));
+  threads[j].push_back( thread([&]{Q9.runQuery(g, personId2[j], personId3[j], 1);}));
+  threads[j].push_back( thread([&]{Q10.runQuery(g, personId2[j], personId3[j], 1);}));
+  threads[j].push_back( thread([&]{Q11.runQuery(g, personId2[j], personId3[j], 1);}));
+  threads[j].push_back( thread([&]{Q12.runQuery(g, personId1[j], 1);}));
+  threads[j].push_back( thread([&]{Q13.runQuery(g, personId1[j], 1);}));
 
+
+  for_each(threads[j].begin(), threads[j].end(),
+           std::mem_fn(&thread::join));
+
+  dthreads[j].push_back( thread([&]{Q1.runQuery(g, "name", name[j], 2);}));
+  dthreads[j].push_back( thread([&]{Q2.runQuery(g, webId[j], 2);}));
+  dthreads[j].push_back( thread([&]{Q3.runQuery(g, personId1[j], 2);}));
+  dthreads[j].push_back( thread([&]{Q4.runQuery(g, "pid", pid[j], 2);}));
+  dthreads[j].push_back( thread([&]{Q5.runQuery(g, personId1[j], 2);}));
+  dthreads[j].push_back( thread([&]{Q6.runQuery(g, personId1[j], 2);}));
+  dthreads[j].push_back( thread([&]{Q7.runQuery(g, personId1[j], 2);}));
+  dthreads[j].push_back( thread([&]{Q8.runQuery(g, personId2[j], personId3[j], 2);}));
+  dthreads[j].push_back( thread([&]{Q9.runQuery(g, personId2[j], personId3[j], 2);}));
+  dthreads[j].push_back( thread([&]{Q10.runQuery(g, personId2[j], personId3[j], 2);}));
+  dthreads[j].push_back( thread([&]{Q11.runQuery(g, personId2[j], personId3[j], 2);}));
+  dthreads[j].push_back( thread([&]{Q12.runQuery(g, personId1[j], 2);}));
+  dthreads[j].push_back( thread([&]{Q13.runQuery(g, personId1[j], 2);}));
+
+
+  for_each(dthreads[j].begin(), dthreads[j].end(),
+           std::mem_fn(&thread::join));
+  }
+
+  cout << "finish testing\n";
   return 0;
 }
