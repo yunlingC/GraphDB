@@ -51,6 +51,16 @@ auto Vertex::getId()
   return VertexId;
 }
 
+auto Vertex::setType (string Label)
+  -> void {
+  VertexLabel = Label;
+}
+
+auto Vertex::getType() 
+  ->LabelType {
+    return VertexLabel;
+}
+
 auto Vertex::setNextEdge(EdgePtr NewEdge) 
   -> void {
     NextEdge = NewEdge;

@@ -32,6 +32,7 @@ public:
   typedef unsigned int EdgeDescriptor;
   typedef FixedString KeyType;
   typedef FixedString ValueType;
+  typedef FixedString LabelType;
 
   // PropertyList typedefs.
   typedef PropertyList< KeyType, ValueType > PropertyListType;
@@ -45,8 +46,10 @@ public:
 
   unsigned int getId();
   EdgePtr getNextEdge();
+  LabelType getType();
   ReturnPropertyValueType getPropertyValue(KeyType k);
   void setId(unsigned int id);
+  void setType(string t);
   void setNextEdge(EdgePtr e);
   void setProperty(KeyType k, ValueType v);
   void setPropertyList(PropertyListType & l);
@@ -58,6 +61,8 @@ protected:
   unsigned int VertexId;
   // Pointer to next relationship
   EdgePtr NextEdge;
+
+  LabelType VertexLabel;
 
   PropertyListType VertexPropertyList;
 };
