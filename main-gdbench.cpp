@@ -1,4 +1,5 @@
 //#include "macros.h"
+#include <stdlib.h>
 #include <algorithm>
 #include <iostream>
 #include <queue>
@@ -26,20 +27,20 @@ int main() {
   //createGraph(g);
   //  Graph::VertexPtr vp0 = g.getVertexPointer(0);
 
-  QueryRandomizer rand(reader);
+  QueryRandomizer rander(reader);
 
   string name[5], pid[5] ;
   VertexDescriptor webId[5], personId1[5], personId2[5], personId3[5];
   
   for(auto i = 0; i < 5; i++) {
-    name[i] = rand.getName();
-    pid[i]  = rand.getPid();
-    webId[i] = rand.getAWebpageIndex();
-    personId1[i] = rand.getAPersonIndex();
-    personId2[i] = rand.getAPersonIndex();
+    name[i] = rander.getName();
+    pid[i]  = rander.getPid();
+    webId[i] = rander.getAWebpageIndex();
+    personId1[i] = rander.getAPersonIndex();
+    personId2[i] = rander.getAPersonIndex();
     personId3[i] = personId2[i];
     while( personId3[i] == personId2[i])     //for query of connection with p1 and p2
-    personId3[i] = rand.getAPersonIndex();
+    personId3[i] = rander.getAPersonIndex();
   }
 
   Query1 Q1;
@@ -56,35 +57,102 @@ int main() {
   Query12 Q12;
   Query13 Q13;
 
+  auto id = rand()%5;
+  Q1.setPersonProperty("name", name[id]);
+  id = rand()%5;
+  Q2.setWebId(webId[id]);
+  id = rand()%5;
+  Q3.setPersonId(personId1[id]);
+  id = rand()%5;
+  Q4.setPersonProperty("pid", pid[id]);
+  id = rand()%5;
+  Q5.setPersonId(personId1[id]);
+  id = rand()%5;
+  Q6.setPersonId(personId1[id]);
+  id = rand()%5;
+  Q7.setPersonId(personId1[id]);
+  id = rand()%5;
+  Q8.setEndPoints(personId2[id], personId3[id]);
+  id = rand()%5;
+  Q9.setEndPoints(personId2[id], personId3[id]);
+  id = rand()%5;
+  Q10.setEndPoints(personId2[id], personId3[id]);
+  id = rand()%5;
+  Q11.setEndPoints(personId2[id], personId3[id]);
+  id = rand()%5;
+  Q12.setPersonId(personId1[id]);
+  id = rand()%5;
+  Q13.setPersonId(personId1[id]);
+
+  vector<Query*> QueryList;
+  QueryList.push_back(&Q1);
+  QueryList.push_back(&Q2);
+  QueryList.push_back(&Q3);
+  QueryList.push_back(&Q4);
+  QueryList.push_back(&Q5);
+  QueryList.push_back(&Q6);
+  QueryList.push_back(&Q7);
+  QueryList.push_back(&Q8);
+  QueryList.push_back(&Q9);
+  QueryList.push_back(&Q10);
+  QueryList.push_back(&Q11);
+  QueryList.push_back(&Q12);
+  QueryList.push_back(&Q13);
+
+  for (auto i = 0; i < 13; i++) {
+    for (auto j = 0; j < 13; j++) {
+      for(auto k = 0; k < 13; k++) {
+        for(auto m = 0; m < 13; m++) {
+
+          auto query1 = QueryList.at(i);
+          auto query2 = QueryList.at(i);
+          auto query3 = QueryList.at(k);
+          auto query4 = QueryList.at(m);
+
+          vector<thread> MultiThread;
+
+          auto opt = rand() % 2  + 1;
+          MultiThread.push_back(thread([&]{query1->runQuery(g, opt);}) );
+          MultiThread.push_back(thread([&]{query2->runQuery(g, opt);}) );
+          MultiThread.push_back(thread([&]{query3->runQuery(g, opt);}) );
+          MultiThread.push_back(thread([&]{query4->runQuery(g, opt);}) );
+
+          for_each(MultiThread.begin(), MultiThread.end(),
+             std::mem_fn(&thread::join));
+        }
+      }
+    }
+  }
   /// 1: BFS  2: DFS
-/* 
-  Q1.runQuery(g, "name", name, 1);
-  Q1.runQuery(g, "name", name, 2);
-  Q2.runQuery(g, webId, 1);
-  Q2.runQuery(g, webId, 2);
-  Q3.runQuery(g, personId1, 1);
-  Q3.runQuery(g, personId1, 2);
-  Q4.runQuery(g, "pid", pid, 1);
-  Q4.runQuery(g, "pid", pid, 2);
-  Q5.runQuery(g, personId1, 1);
-  Q5.runQuery(g, personId1, 2);
-  Q6.runQuery(g, personId1, 1);
-  Q6.runQuery(g, personId1, 2);
-  Q7.runQuery(g, personId1, 1);
-  Q7.runQuery(g, personId1, 2);
-  Q8.runQuery(g, personId2, personId3, 1);
-  Q8.runQuery(g, personId2, personId3, 2);
-  Q9.runQuery(g, personId2, personId3, 1);
-  Q9.runQuery(g, personId2, personId3, 2);
-  Q10.runQuery(g, personId2, personId3, 1);
-  Q10.runQuery(g, personId2, personId3, 2);
-  Q11.runQuery(g, personId2, personId3, 1);
-  Q11.runQuery(g, personId2, personId3, 2);
-  Q12.runQuery(g, personId1, 1);
-  Q12.runQuery(g, personId1, 2);
-  Q13.runQuery(g, personId1, 1);
-  Q13.runQuery(g, personId1, 2);
+  /**
+  Q1.runQuery(g,  1);
+  Q1.runQuery(g,  2);
+  Q2.runQuery(g,  1);
+  Q2.runQuery(g, 2);
+  Q3.runQuery(g, 1);
+  Q3.runQuery(g, 2);
+  Q4.runQuery(g, 1);
+  Q4.runQuery(g, 2);
+  Q5.runQuery(g, 1);
+  Q5.runQuery(g, 2);
+  Q6.runQuery(g, 1);
+  Q6.runQuery(g, 2);
+  Q7.runQuery(g, 1);
+  Q7.runQuery(g, 2);
+  Q8.runQuery(g, 1);
+  Q8.runQuery(g, 2);
+  Q9.runQuery(g, 1);
+  Q9.runQuery(g, 2);
+  Q10.runQuery(g, 1);
+  Q10.runQuery(g, 2);
+  Q11.runQuery(g, 1);
+  Q11.runQuery(g, 2);
+  Q12.runQuery(g, 1);
+  Q12.runQuery(g, 2);
+  Q13.runQuery(g, 1);
+  Q13.runQuery(g, 2);
 */
+  /**
   vector<thread> threads[5];
   vector<thread> dthreads[5];
   for (auto j = 0; j < 5; j++){
@@ -124,7 +192,7 @@ int main() {
   for_each(dthreads[j].begin(), dthreads[j].end(),
            std::mem_fn(&thread::join));
   }
-
+*/
   cout << "finish testing\n";
   return 0;
 }
