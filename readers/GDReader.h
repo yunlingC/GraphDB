@@ -233,6 +233,11 @@ private:
       friendsProp.set("eid", eid);
       friendsProp.set("endpts", from + "-" + to);
 
+      if((_vertexMap.find(from) == _vertexMap.end()) || 
+          (_vertexMap.find(to) == _vertexMap.end()) ) {
+        cout << "Error: Failed to recognize " << from << "\t" << to << endl;
+        exit(0);
+      }
       vs = _vertexMap.at(from);
       vd = _vertexMap.at(to) ;
       
@@ -263,6 +268,11 @@ private:
       likesProp.set("eid", eid);
       likesProp.set("endpts", from + "-" + to);
 
+      if((_vertexMap.find(from) == _vertexMap.end()) || 
+          (_vertexMap.find(to) == _vertexMap.end()) ) {
+        cout << "Error: Failed to recognize " << from << "\t" << to << endl;
+        exit(0);
+      }
       vs = _vertexMap.at(from);
       vd = _vertexMap.at(to);
 
