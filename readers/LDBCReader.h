@@ -12,7 +12,6 @@
 ///
 //===----------------------------------------------------------------------===//
 
-
 #ifndef _LDBCREADER_H_
 #define _LDBCREADER_H_
 
@@ -24,227 +23,12 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <string>
 
 #include "GraphType.h"
+#include "FileTypes.h"
 
 using namespace std;
 
-class FileTypeReader {
-public:
-  auto readFileType(string FileName )
-    -> void { 
-    if (FileName == COMMENT) {
-      _FileTypeNum = 1; 
-    } else 
-    if (FileName == POST) {
-      _FileTypeNum = 1; 
-    } else 
-    if (FileName == PERSON) {
-      _FileTypeNum = 1; 
-    } else 
-    if (FileName == FORUM) {
-      _FileTypeNum = 1; 
-    } else 
-    if (FileName == TAG) {
-      _FileTypeNum = 1; 
-    } else 
-    if (FileName == TAGCLASS) {
-      _FileTypeNum = 1; 
-    } else 
-    if (FileName == ORGANIZATION) {
-      _FileTypeNum = 1; 
-    } else 
-    if (FileName == PLACE) {
-      _FileTypeNum = 1; 
-    } else 
-    if (FileName == COMMENT_REPLY_OF_COMMENT) {
-      _FileTypeNum = 2;
-      _Label = "REPLY_OF_COMMENT";
-    } else  
-    if (FileName == COMMENT_REPLY_OF_POST) {
-      _FileTypeNum = 2;
-      _Label = "REPLY_OF_POST";
-    } else  
-    if (FileName == COMMENT_LOCATED_IN_PLACE) {
-      _FileTypeNum = 2;
-      _Label = "COMMENT_LOCATED_IN_PLACE";
-    } else  
-    if (FileName == PLACE_IS_PART_OF_PLACE) {
-      _FileTypeNum = 2;
-      _Label = "IS_PART_OF";
-    } else  
-    if (FileName == PERSON_KNOWS_PERSON) {
-      _FileTypeNum = 2;
-      _Label = "KNOWS";
-    } else  
-    if (FileName == PERSON_STUDIES_AT_ORGANISATION) {
-      _FileTypeNum = 2;
-      _Label = "STUDY_AT";
-    } else  
-    if (FileName == COMMENT_HAS_CREATOR_PERSON) {
-      _FileTypeNum = 2;
-      _Label = "COMMENT_HAS_CREATOR";
-    } else  
-    if (FileName == POST_HAS_CREATOR_PERSON) {
-      _FileTypeNum = 2;
-      _Label = "POST_HAS_CREATOR";
-    } else  
-    if (FileName == FORUM_HAS_MODERATOR_PERSON) {
-      _FileTypeNum = 2;
-      _Label = "HAS_MODERATOR";
-    } else  
-    if (FileName == PERSON_WORKS_AT_ORGANISATION) {
-      _FileTypeNum = 2;
-      _Label = "WORKS_AT";
-    } else  
-    if (FileName == PERSON_IS_LOCATED_IN_PLACE) {
-      _FileTypeNum = 2;
-      _Label = "PERSON_IS_LOCATED_IN";
-    } else  
-    if (FileName == PERSON_HAS_INTEREST_TAG) {
-      _FileTypeNum = 2;
-      _Label = "HAS_INTEREST";
-    } else  
-    if (FileName == POST_HAS_INTEREST_TAG) {
-      _FileTypeNum = 2;
-      _Label = "POST_HAS_TAG";
-    } else  
-    if (FileName == PERSON_LIKES_POST) {
-      _FileTypeNum = 2;
-      _Label = "LIKES_POST";
-    } else  
-    if (FileName == POST_IS_LOCATED_IN_PLACE) {
-      _FileTypeNum = 2;
-      _Label = "POST_IS_LOCATED_IN";
-    } else  
-    if (FileName == FORUM_HAS_MEMBER_PERSON) {
-      _FileTypeNum = 2;
-      _Label = "HAS_MEMBER";
-    } else  
-    if (FileName == FORUM_HAS_TAG_TAG) {
-      _FileTypeNum = 2;
-      _Label = "FORUM_HAS_TAG";
-    } else  
-    if (FileName == TAG_HAS_TYPE_TAGCLASS) {
-      _FileTypeNum = 2;
-      _Label = "HAS_TYPE";
-    } else  
-    if (FileName == TAGCLASS_IS_SUBCLASS_OF_TAGCLASS) {
-      _FileTypeNum = 2;
-      _Label = "IS_SUBCLASS_OF";
-    } else  
-    if (FileName == ORGANISATION_IS_LOCATED_IN_PLACE) {
-      _FileTypeNum = 2;
-      _Label = "ORGANISATION_IS_LOCATED_IN";
-    } else  
-    if (FileName == PERSON_LIKES_COMMENT) {
-      _FileTypeNum = 2;
-      _Label = "LIKES_COMMENT";
-    } else  
-    if (FileName == COMMENT_HAS_TAG_TAG) {
-      _FileTypeNum = 2;
-      _Label = "COMMENT_HAS_TAG";
-    }   
-    if (FileName == FORUMS_CONTAINER_OF_POST) {
-      _FileTypeNum = 2;
-      _Label = "CONTAINER_OF";
-    }   
-  }
-
-  auto getFileTypeNum() 
-  -> unsigned int {
-    return _FileTypeNum;
-  }
-
-  auto getEdgeLabel() 
-  -> string {
-    return _Label;
-  }
-private:
-  unsigned int _FileTypeNum = 0; /// 0. default 1. vertex 2. relationship 3. property
-  string _Label = "";
-private:
-  /// Nodes:
-  const string COMMENT = "comment_0.csv";
-  const string POST = "post_0.csv";
-  const string PERSON = "person_0.csv";
-  const string FORUM = "forum_0.csv";
-  const string TAG = "tag_0.csv";
-  const string TAGCLASS = "tagclass_0.csv";
-  const string ORGANIZATION = "organisation_0.csv";
-  const string PLACE = "place_0.csv";
-
-  /// Nodes properties:
-  const string PERSON_SPEAKS_LANGUAGE = "person_speaks_language_0.csv";
-  const string PERSON_EMAIL_ADDRESS = "person_email_emailaddress_0.csv";
- 
-  /// Relationships
-  const string COMMENT_REPLY_OF_COMMENT = "comment_replyOf_comment_0.csv";
-  const string COMMENT_REPLY_OF_POST = "comment_replyOf_post_0.csv";
-  const string COMMENT_LOCATED_IN_PLACE = "comment_isLocatedIn_place_0.csv";
-  const string PLACE_IS_PART_OF_PLACE = "place_isPartOf_place_0.csv";
-  const string PERSON_KNOWS_PERSON = "person_knows_person_0.csv";
-  const string PERSON_STUDIES_AT_ORGANISATION = "person_studyAt_organisation_0.csv";
-  const string COMMENT_HAS_CREATOR_PERSON = "comment_hasCreator_person_0.csv";
-  const string POST_HAS_CREATOR_PERSON = "post_hasCreator_person_0.csv";
-  const string FORUM_HAS_MODERATOR_PERSON = "forum_hasModerator_person_0.csv";
-  const string PERSON_IS_LOCATED_IN_PLACE = "person_isLocatedIn_place_0.csv";
-  const string PERSON_WORKS_AT_ORGANISATION = "person_workAt_organisation_0.csv";
-  const string PERSON_HAS_INTEREST_TAG = "person_hasInterest_tag_0.csv";
-  const string POST_HAS_TAG_TAG = "post_hasTag_tag_0.csv";
-  const string PERSON_LIKES_POST = "person_likes_post_0.csv";
-  const string POST_IS_LOCATED_IN_PLACE = "post_isLocatedIn_place_0.csv";
-  const string FORUM_HAS_MEMBER_PERSON = "forum_hasMember_person_0.csv";
-  const string FORUMS_CONTAINER_OF_POST = "forum_containerOf_post_0.csv";
-  const string FORUM_HAS_TAG_TAG = "forum_hasTag_tag_0.csv";
-  const string TAG_HAS_TYPE_TAGCLASS = "tag_hasType_tagclass_0.csv";
-  const string TAGCLASS_IS_SUBCLASS_OF_TAGCLASS = "tagclass_isSubclassOf_tagclass_0.csv";
-  const string ORGANISATION_IS_LOCATED_IN_PLACE = "organisation_isLocatedIn_place_0.csv";
-  const string PERSON_LIKES_COMMENT = "person_likes_comment_0.csv";
-  const string COMMENT_HAS_TAG_TAG = "comment_hasTag_tag_0.csv";
-
-} ;
-
-/**
-class RelationshipTypes {
-  const string string STUDY_AT,
-        REPLY_OF_COMMENT,
-        REPLY_OF_POST,
-        PERSON_IS_LOCATED_IN,
-        ORGANISATION_IS_LOCATED_IN,
-        POST_IS_LOCATED_IN,
-        COMMENT_IS_LOCATED_IN,
-        IS_PART_OF,
-        KNOWS,
-        HAS_MODERATOR,
-        POST_HAS_CREATOR,
-        COMMENT_HAS_CREATOR,
-        WORKS_AT,
-        HAS_INTEREST,
-        LIKES_POST,
-        LIKES_COMMENT,
-        HAS_MEMBER,
-        CONTAINER_OF,
-        FORUM_HAS_TAG,
-        POST_HAS_TAG,
-        COMMENT_HAS_TAG,
-        HAS_TYPE,
-        IS_SUBCLASS_OF
-    }
-
-    public enum Nodes implements Label {
-        Comment,
-        Post,
-        Person,
-        Forum,
-        Tag,
-        TagClass
-    }
-
-
-}
-*/
 class LDBCReader {
 public:
   typedef GraphType::VertexPointer    VertexPointer;
@@ -252,22 +36,23 @@ public:
   typedef GraphType::VertexDescriptor VertexDescriptor;
   typedef vector<string> KeyListType;
   typedef vector<string> AttributeListType;
+  typedef vector<VertexDescriptor, string> MapType;
+  typedef vector<VertexDescriptor> ListTypeReference;
+  typedef map<string, VertexDescriptor> VertexMapType;
 private:
   GraphType & _Graph;
   ifstream _LDBCFile;
-  string  _EdgeLabel;
-//  string line;
-//  string DirName;
-  map<string, GraphType::VertexDescriptor> _VertexMap;
+  map<string, map<string, VertexDescriptor>> _VertexLabelMap;
+  vector<VertexDescriptor> _PersonList;
 public:
   LDBCReader(GraphType & graph) : _Graph( graph ) { }
 
   auto readDirectory(string  DirName) 
     -> int {
-    multimap<unsigned int, string> _FileTypeMap;
+    multimap<unsigned int, pair<string, RelLabel> > _FileTypeMap;
     DIR *_DirPointer;
     struct dirent *_DirEntry;
-    struct stat _FileStat;
+//    struct stat _FileStat;
 
     cout << "==========Read Directory " << DirName << "==========\n";
     _DirPointer = opendir( DirName.c_str() );
@@ -276,29 +61,33 @@ public:
       return errno;
     }
     while( (_DirEntry = readdir(_DirPointer)) != NULL ) {
-      auto filePath = DirName + "/" + _DirEntry->d_name;
-      if(stat(filePath.c_str(), & _FileStat)) continue;
-      if(S_ISDIR(_FileStat.st_mode))          continue;
+//      auto filePath = DirName + "/" + _DirEntry->d_name;
+//      if(stat(filePath.c_str(), & _FileStat)) continue;
+//      if(S_ISDIR(_FileStat.st_mode))          continue;
 
       FileTypeReader TypeReader;
       TypeReader.readFileType(_DirEntry->d_name);
       auto TypeNum = TypeReader.getFileTypeNum();
+      auto Label = TypeReader.getLabel();
+
       cout << "file to be read " << _DirEntry->d_name << TypeNum << endl;
-      _FileTypeMap.insert(pair<unsigned int, string>(TypeNum, _DirEntry->d_name));
+      auto FileInfo = make_pair(_DirEntry->d_name, Label);
+      _FileTypeMap.insert(pair<unsigned int, pair<string, RelLabel>>(TypeNum, FileInfo)); 
     }
     for (auto it = _FileTypeMap.begin(); it != _FileTypeMap.end(); ++it) {
       auto TypeNum = (*it).first;
-      auto FileName = DirName + "/" + (*it).second;
-      cout << "FileName " << FileName <<" FileTypeNum " << TypeNum << endl;
+      auto FileName = DirName + "/" + (*it).second.first;
+      auto Label = (*it).second.second;
+//      cout << "FileName " << FileName <<" FileTypeNum " << TypeNum << endl;
       switch (TypeNum ) {
         case 1:
-          readNodeInfo(FileName);
+          readNodeInfo(FileName, Label);
           break;
         case 2:
-          readEdgeInfo(FileName, "KNOWS");
+          readEdgeInfo(FileName, Label); 
           break;
         case 3:
-          readPropertyInfo(FileName);
+          readPropertyInfo(FileName, Label);
           break;
         case 0:
 //          cout <<"Error : Type is only initialized\n";
@@ -314,28 +103,35 @@ public:
     return 0;
   }
 
+  auto getPersonList() 
+    -> ListTypeReference {
+    return _PersonList;
+  }
 
   auto readPerson(string FileName) 
     -> void {
-    readNodeInfo(FileName);
+//    readNodeInfo(FileName, "PERSON");
   }
 
   auto readFriends(string FileName) 
     -> void {
-    readEdgeInfo(FileName, "KNOWS");
+//    readEdgeInfo(FileName, "KNOWS");
   }
 
   auto readProperty(string FileName)
     -> void {
-    readPropertyInfo(FileName);
-    }
+//    readPropertyInfo(FileName);
+  }
 private:
-  auto readNodeInfo(string FileName) 
+  auto readNodeInfo(string FileName, RelLabel & Label) 
     -> void {
-    unsigned int counter= 0;
+    auto counter= 0;
     string line;
     KeyListType keys;
     AttributeListType attributes;
+
+    VertexMapType VertexMap;
+    _VertexLabelMap.insert(pair<string, VertexMapType>(Label.First, VertexMap));
 
     try{
       _LDBCFile.open(FileName.c_str());
@@ -343,6 +139,8 @@ private:
         throw 1;
 
     cout << "---------->Start reading file: " << FileName << "<----------\n";
+    cout << "Node type " << Label.First << endl;
+    auto Counter = 0;
       if(getline(_LDBCFile, line) != NULL) {
         boost::split(keys, line, boost::is_any_of("|"));
       }
@@ -356,10 +154,14 @@ private:
         for(auto i = 0; i < attributes.size()-1; i++) {
           PropertyList.set(keys[i], attributes[i]); 
         }//END_FOR
-        GraphType::VertexDescriptor vd = _Graph.addVertex(PropertyList);
+
+        GraphType::VertexDescriptor vd = _Graph.addVertex(Label.First, PropertyList);
 //        PropertyList.print();
-        _VertexMap.insert(pair<string, VertexDescriptor>(attributes[0], vd));
-         counter++;
+        _VertexLabelMap[Label.First].insert(pair<string, VertexDescriptor>(attributes[0], vd));
+        if((Counter ++) < 5)
+          if (Label.First == "PERSON")
+            _PersonList.push_back(vd);
+        counter++;
       } //END_WHILE
       cout << counter << " Nodes are read in this file\n";
     }//END_TRY
@@ -371,10 +173,11 @@ private:
     _LDBCFile.close();
 
     cout << "---------->Finish reading file: " << FileName << "<----------\n";
+    cout << endl;
   }//END_READNODEINFO_
 
 
-  auto readEdgeInfo(string FileName, const string & EdgeLabel) 
+  auto readEdgeInfo(string FileName, RelLabel & EdgeLabel) 
     -> void {
     auto counter= 0;
     string line;
@@ -387,6 +190,7 @@ private:
         throw 1;
 
     cout << "---------->Start reading file: " << FileName << "<----------\n";
+    cout << "relationship label " << EdgeLabel.Edge << endl;
       if(getline(_LDBCFile, line) != NULL) {
         boost::split(keys, line, boost::is_any_of("|"));
       }
@@ -397,30 +201,30 @@ private:
       while(getline(_LDBCFile, line) != NULL){ 
         PropertyListType PropertyList; 
         boost::split(attributes, line, boost::is_any_of("|"));
-        // TODO :: to be deleted 
+
         for(auto i = 2; i < attributes.size()-1; i++) {
           PropertyList.set(keys[i], attributes[i]); 
         }//END_FOR
         auto flag = false;
-        for (auto j = 0; j < 2; j++) {
-         if (_VertexMap.find(attributes[j]) == _VertexMap.end() ) {
-           cout << "Error: Cannot find vertex " << attributes[j] << endl;
-           flag = true;
-           break;
+        if( (_VertexLabelMap.find(EdgeLabel.First) == _VertexLabelMap.end()) ||
+            (_VertexLabelMap.find(EdgeLabel.Second) == _VertexLabelMap.end()) ) {
+          cout << "Error: Cannot recognize vertex label\n";
+          exit(0);
+        }
+         if ((_VertexLabelMap[EdgeLabel.First].find(attributes[0]) == _VertexLabelMap[EdgeLabel.First].end()) ||
+             (_VertexLabelMap[EdgeLabel.Second].find(attributes[1]) == _VertexLabelMap[EdgeLabel.First].end())) {
+           cout << "Error: Cannot find vertex " << attributes[0] << attributes[1]  << endl;
+           exit(0);
          }
-        }
-        if(flag == false) {
-          auto vs = _VertexMap.at(attributes[0]);
-          auto vd = _VertexMap.at(attributes[1]);
-          _Graph.addEdge(vs,vd, EdgeLabel, PropertyList);
-          PropertyList.print();
-          counter++;
-        } else {
-          cout << "Error: Cannot find source or dest vertex\n";
-          break;
-        }
+
+        auto vs = _VertexLabelMap[EdgeLabel.First].at(attributes[0]);
+        auto vd = _VertexLabelMap[EdgeLabel.Second].at(attributes[1]);
+        _Graph.addEdge(vs,vd, EdgeLabel.Edge, PropertyList);
+//        cout << "vs " << attributes[0] << " vd " << attributes[1] << endl;
+//        PropertyList.print();
+        counter++;
       } //END_WHILE
-      cout << counter << " Nodes are read in this file\n";
+      cout << counter << " Rels are read in this file\n";
     }//END_TRY
     catch (int i){
       cout << "Error:"<< i <<"\tFailed to open file" <<endl;
@@ -430,9 +234,10 @@ private:
     _LDBCFile.close();
 
     cout << "---------->Finish reading file: " << FileName << "<----------\n";
+    cout << endl;
   }//END_READNODEINFO_
 
-  auto readPropertyInfo(string FileName) 
+  auto readPropertyInfo(string FileName, RelLabel & PropertyLabel) 
     -> void {
     auto counter= 0;
     string line;
@@ -454,11 +259,15 @@ private:
       } 
       while(getline(_LDBCFile, line) != NULL){ 
         boost::split(attributes, line, boost::is_any_of("|"));
-        if (_VertexMap.find(attributes[0]) == _VertexMap.end() ) {
+        if(_VertexLabelMap.find(PropertyLabel.First) == _VertexLabelMap.end()) {
+          cout << "Error: Cannot not recognize label " << PropertyLabel.First << endl;
+          exit(0);
+        }
+        if (_VertexLabelMap[PropertyLabel.First].find(attributes[0]) == _VertexLabelMap[PropertyLabel.First].end() ) {
           cout << "Error: Cannot find vertex " << attributes[0] << endl;
-          break; // TODO should not break
+          exit(0); // should not break
         } else {
-          auto vs = _VertexMap.at(attributes[0]);
+          auto vs = _VertexLabelMap[PropertyLabel.First].at(attributes[0]);
           auto vp = _Graph.getVertexPointer(vs);
           auto PropertyList = vp->getPropertyList();
           PropertyList.set(keys[1], attributes[1]); 
@@ -476,6 +285,7 @@ private:
     _LDBCFile.close();
 
     cout << "---------->Finish reading file: " << FileName << "<----------\n";
+    cout << endl;
   }//END_READNODEINFO_
 
 
