@@ -20,6 +20,11 @@ auto Vertex::getPropertyValue(KeyType Key)
   return VertexPropertyList.get(Key);
 }
 
+auto Vertex::getPropertyValue(std::string Key) 
+  -> ReturnPropertyValueType {
+  return VertexPropertyList.get(Key);
+}
+
 auto Vertex::setProperty(KeyType Key, ValueType Value)
   -> void {
   VertexPropertyList.set(Key,Value);

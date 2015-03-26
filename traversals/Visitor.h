@@ -16,6 +16,7 @@
 
 #include "GraphType.h"
 #include "Filter.h"
+#include "FixedString.h"
 
 class Visitor {
 public:
@@ -50,6 +51,8 @@ public:
   }
 
   virtual bool visitVertex(VertexPointer vp) {
+    FixedString key("id");
+    std::cout << "==>vid " << vp->getId() << " ==>pid " << vp->getPropertyValue(key).first << endl;
     return false;
   }
 
@@ -69,6 +72,7 @@ public:
     return true; /// the same above
   }
 
+  /// TODO delete this 
   /// for dfs only 0: all direction  1: outedges 2: incoming edges 
   virtual unsigned int visitDirection(VertexPointer) {
     return 0;

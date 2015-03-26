@@ -14,6 +14,9 @@ public:
   typedef std::string Type;
   typedef std::string Direction; 
   typedef unsigned int IdType;
+  typedef std::vector<Type> TypeList;
+  typedef std::vector<ValueType> ValueListType;
+  typedef std::vector<ValueType> &  ValueListTypeReference;
 public:
   Filter() : _key(""), 
              _value(""), 
@@ -51,6 +54,25 @@ public:
     _edgeId = eid;
   }
 
+  void setTypeList(TypeList & typeList) {
+    _typeList = typeList;
+  }
+
+  auto setValueRange(KeyType key, ValueType valueMin, ValueType valueMax) 
+    -> void {
+    _key = key;
+    ValueListType ValueList;
+    ValueList.push_back(valueMin);
+    ValueList.push_back(valueMax);
+    _valueRange = ValueList;
+  }
+
+  auto setValueList(KeyType key, ValueListType & ValueList) 
+    -> void {
+    _key = key;
+    _valueRange = ValueList;
+  }
+
   void setDefault() {
     _key = "";
     _value = "";
@@ -58,6 +80,7 @@ public:
     _direction = "";
     _vertexId = 0;
     _edgeId = 0;
+    _typeList.push_back("");
   }
 
   KeyType & getKey() {
@@ -84,6 +107,15 @@ public:
     return _edgeId;
   }
 
+  TypeList & getTypeList() {
+    return _typeList;
+  }
+
+  auto getValueRange() 
+    -> ValueListTypeReference {
+    return _valueRange;
+  }
+
 private:
   KeyType   _key;
   ValueType _value;
@@ -91,6 +123,8 @@ private:
   Direction _direction;
   IdType    _vertexId;
   IdType    _edgeId;
+  TypeList  _typeList;
+  ValueListType _valueRange;
 
 
 };

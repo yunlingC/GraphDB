@@ -110,6 +110,16 @@ public:
     return NewVertex->getId();
   }
 
+  VertexDescriptor addVertex(string Label, PropertyListType & InitialPropertyList) {
+    VertexPointer NewVertex = new Vertex();
+    NewVertex->setPropertyList(InitialPropertyList);
+    NewVertex->setId(NumberOfVertices); 
+    NewVertex->setType(Label);
+    ++NumberOfVertices;
+    Vertices.push_back(NewVertex);
+    return NewVertex->getId();
+  }
+
   VertexDescriptor addVertex(PropertyListType & InitialPropertyList) {
     VertexPointer NewVertex = new Vertex();
     NewVertex->setPropertyList(InitialPropertyList);

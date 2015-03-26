@@ -22,11 +22,12 @@ int main() {
   cout << "Begin testing\n";
 
   GDReader reader(g);
-  reader.readFile("../tests/gd/sndata100.gd");
+  reader.readFile("../tests/gd/sndata.gd");
 
   //createGraph(g);
   //  Graph::VertexPtr vp0 = g.getVertexPointer(0);
 
+  cout << "begin randomizing\n";
   QueryRandomizer rander(reader);
 
   string name[5], pid[5] ;
@@ -43,6 +44,19 @@ int main() {
     personId3[i] = rander.getAPersonIndex();
   }
 
+  Query8 Q8;
+  Query9 Q9;
+
+  auto id = rand()%5;
+  Q8.setEndPoints(personId2[id], personId3[id]);
+  Q9.setEndPoints(personId2[id], personId3[id]);
+
+  Q8.runQuery(g, 1);
+  Q8.runQuery(g, 2);
+  Q9.runQuery(g, 1);
+  Q9.runQuery(g, 2);
+
+/*/
   Query1 Q1;
   Query2 Q2;
   Query3 Q3;
@@ -84,6 +98,9 @@ int main() {
   id = rand()%5;
   Q13.setPersonId(personId1[id]);
 
+  Q8.runQuery(g, 1);
+  Q8.runQuery(g, 2);
+
   vector<Query*> QueryList;
   QueryList.push_back(&Q1);
   QueryList.push_back(&Q2);
@@ -99,6 +116,7 @@ int main() {
   QueryList.push_back(&Q12);
   QueryList.push_back(&Q13);
 
+  cout << "begin query\n";
   for (auto i = 0; i < 13; i++) {
     for (auto j = 0; j < 13; j++) {
       for(auto k = 0; k < 13; k++) {
@@ -123,6 +141,7 @@ int main() {
       }
     }
   }
+  */
   /// 1: BFS  2: DFS
   /**
   Q1.runQuery(g,  1);

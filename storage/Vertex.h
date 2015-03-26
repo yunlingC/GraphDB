@@ -48,6 +48,7 @@ public:
   EdgePtr getNextEdge();
   LabelType getType();
   ReturnPropertyValueType getPropertyValue(KeyType k);
+  ReturnPropertyValueType getPropertyValue(std::string k);
   void setId(unsigned int id);
   void setType(string t);
   void setNextEdge(EdgePtr e);
