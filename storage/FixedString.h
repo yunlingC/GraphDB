@@ -65,6 +65,13 @@ public:
       return false;
   }
 
+  bool operator!=(const FixedString & right) const {
+   if(strcmp(_string, right._string) != 0)
+     return true;
+   else 
+     return false;
+  }
+
   void setString(const string& s) {
     strncpy(_string, const_cast<char*>(s.c_str()), _size);
   }

@@ -90,13 +90,11 @@ public:
     _depthSetting = depth;
   }
 
-
   virtual bool visitStartVertex(VertexPointer startVertex ) {
     VertexPath newPath;
     newPath.push_back(startVertex);
     _pathQueue.push(newPath);
   }
-
 
   virtual bool discoverVertex(VertexPointer vertex) {
     return true;
@@ -470,7 +468,7 @@ protected:
 };
 
 
-class DFSPathVisitor : public Visitor {
+class DFSShortestPathVisitor : public Visitor {
 public:
   typedef std::vector<VertexPath>  PathStack;
   typedef std::multimap<unsigned int, VertexPath> PathMap;
@@ -571,5 +569,47 @@ protected:
   PathStack _pathStack;
 };
 
+class DFSPathVisitor : public DFSShortestPathVisitor {
+public:
+  virtual bool visitVertex(VertexPointer vertex) {
+    _prevPath = _pathStack.back();
+    _pathStack.pop_back();
+    if(_prevPath.size() >=  _tmpMinDepth) {
+      _turnFlag = true; //prune not to go on with this branch
+    } else 
+      _turnFlag = false;
+    return _TerminateFlag;
+  }
+
+  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
+    _typeMatch = false;
+    _direcMatch = false;
+    /// if the depth of this branch already exceeds the shortest path, then prune
+    if(_turnFlag == true) {
+      return true;
+    }
+
+    VertexPath newPath = _prevPath;
+    newPath.push_back(second);
+    /// if find the endVertex, add to map and never visit this branch and following branches again
+    if(second->getId() == _endVertex) {
+//      if (newPath.size() <= _tmpMinDepth) {
+//        if(newPath.size() < _tmpMinDepth)
+//          _pathMap.clear();
+        _pathMap.insert(PathPair(newPath.size(), newPath));
+        _tmpMinDepth = newPath.size();
+        _TerminateFlag = true;
+//      }
+      return true;
+    } else {
+      _typeMatch = true;
+      _direcMatch = true;
+      return false;
+    }
+  }
+
+protected:
+  bool _TerminateFlag = false;
+};
 
 #endif /**_CUSOTMVISITOR_H_*/

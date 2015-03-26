@@ -389,7 +389,7 @@ public:
               }
       case 2: {
         cout << "---------------------DFS---------------------\n";
-        DFSPathVisitor v9d;
+        DFSShortestPathVisitor v9d;
         v9d.setEndVertex(_PersonId2);
         depthFirstSearch(graph, _PersonId1, v9d);
         auto target = v9d.getPathList();

@@ -70,6 +70,7 @@ void breadthFirstSearch(GraphType & Graph, const GraphType::VertexDescriptor & S
 
         if(TypeMatch && DirectionMatch)   {//control the vertex to be visited filtered by type
 	        VertexQueue.push(TargetVertex);
+//          std::cout << "=>target " << TargetVertex->getPropertyValue("id").first << endl;
         }
 	      ColorMap.insert(VisitPair(TargetVertex,false));
       } else {
