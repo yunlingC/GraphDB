@@ -730,6 +730,8 @@ protected:
   TargetsMapType _ResultMap;
 };
 //// till here!
+// TODO unfinished
+/*
 class SimilarityVisitor : public VertexMatchVisitor {
 public:
   typedef pair<VertexPointer, bool> VertexPair;
@@ -785,5 +787,5 @@ protected:
   MemoryMapType  _MemoryMap;
 };
 
-
+*/
 #endif /*_LDBCCUSTOMVISITOR_H_*/

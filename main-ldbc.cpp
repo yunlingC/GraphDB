@@ -50,8 +50,8 @@ int main() {
 //  LdbcQuery9 q9;
 //  q9.runQuery(g, persons[0]);
 
-  LdbcQuery10 q10;
-  q10.runQuery(g, persons[0]);
+//  LdbcQuery10 q10;
+//  q10.runQuery(g, persons[0]);
 
 //  LdbcQuery11 q11;
 //  q11.runQuery(g, persons[0]);
