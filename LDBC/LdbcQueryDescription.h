@@ -403,13 +403,15 @@ public:
   }
 };
 
+//TODO unfinished 
+/**
 class LdbcQuery10 : public Query {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
     cout << "===============Query 11================\n";
     Filter tmpFilter[7];
-    traverseThroughMultiRelType("KNOWS", "", tmpFilter[0]);
-    traverseThroughMultiRelType("KNOWS", "", tmpFilter[1]);
+    traverseThroughMultiRelType("KNOWS",  tmpFilter[0]);
+    traverseThroughMultiRelType("KNOWS",  tmpFilter[1]);
     traverseThroughMultiRelType("POST_HAS_CREATOR", tmpFilter[2]); 
     traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[3]); 
     traverseThroughMultiRelType("HAS_INTEREST", tmpFilter[4]); 
@@ -430,7 +432,7 @@ public:
 
   }
 };
-
+*/
 class LdbcQuery11 : public Query {
 public:
   typedef pair<EdgePointer, VertexPointer> MapPair;

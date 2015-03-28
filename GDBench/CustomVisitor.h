@@ -61,6 +61,12 @@ public:
     return checkType(edge, _filter);
   }
 
+
+  virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
+    return _direcMatch;
+
+  }
+
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
     bool TypeMatch = checkType(edge, _filter);
     if(TypeMatch == true) {
