@@ -22,7 +22,7 @@ int main() {
   cout << "Begin testing\n";
 
   GDReader reader(g);
-  reader.readFile("../tests/gd/sndata.gd");
+  reader.readFile("../tests/gd/sndata100-new.gd");
 
   //createGraph(g);
   //  Graph::VertexPtr vp0 = g.getVertexPointer(0);
@@ -43,7 +43,7 @@ int main() {
     while( personId3[i] == personId2[i])     //for query of connection with p1 and p2
     personId3[i] = rander.getAPersonIndex();
   }
-
+/*
   Query8 Q8;
   Query9 Q9;
 
@@ -55,8 +55,8 @@ int main() {
   Q8.runQuery(g, 2);
   Q9.runQuery(g, 1);
   Q9.runQuery(g, 2);
+*/
 
-/*/
   Query1 Q1;
   Query2 Q2;
   Query3 Q3;
@@ -97,7 +97,7 @@ int main() {
   Q12.setPersonId(personId1[id]);
   id = rand()%5;
   Q13.setPersonId(personId1[id]);
-
+/**
   Q8.runQuery(g, 1);
   Q8.runQuery(g, 2);
 
@@ -143,7 +143,6 @@ int main() {
   }
   */
   /// 1: BFS  2: DFS
-  /**
   Q1.runQuery(g,  1);
   Q1.runQuery(g,  2);
   Q2.runQuery(g,  1);
@@ -170,7 +169,6 @@ int main() {
   Q12.runQuery(g, 2);
   Q13.runQuery(g, 1);
   Q13.runQuery(g, 2);
-*/
   /**
   vector<thread> threads[5];
   vector<thread> dthreads[5];

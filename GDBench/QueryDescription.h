@@ -100,7 +100,7 @@ public:
     cout << "===============================\n";
     cout << "Query 2 \n";
     AdjacencyVisitor v2; 
-    traverseThroughType("LIKES", v2.getFilter());
+    traverseThroughTypeAndDirection("LIKES","in", v2.getFilter());
     switch(c) {
       case 1:
         cout << "---------------------BFS---------------------\n";
@@ -114,7 +114,7 @@ public:
         cout << "Traverse Method: 1. BFS  2. DFS\n"; 
     }
 
-    cout << "People who likes webpage id = " << _WebId  < " are as below\n";
+    cout << "People who likes webpage id = " << _WebId  << " are as below\n";
     auto target= v2.getVertexTargetList();
     for(auto it = target.begin(); it != target.end(); ++it) {
       FixedString key("name");
@@ -313,7 +313,7 @@ public:
         v7d.setDepth(2);
         depthFirstSearch(graph, _PersonId, v7d);
         auto target = v7d.getVertexTargetMap();
-        cout << "The friends of Person with vid = " << _PersonId << " like " << target.size() << " webpages\n";
+        cout << "The webpages liked by person vid = " << _PersonId << " are liked by  " << target.size() << " people\n";
         for(auto it = target.begin(); it != target.end(); ++it) {
           cout <<"Vertex " << (*it).first->getId() << "\t" << (*it).first->getPropertyValue(key).first;
         cout << endl;
@@ -396,8 +396,8 @@ public:
         if(target.empty())
           cout << _PersonId1 << " and " <<  _PersonId2 <<" are not connected" << endl;
         else {
-        cout << "There are " << target.size() << " shortest paths from " << _PersonId1 << " to " <<  _PersonId2 << endl;
-         for(auto it = target.begin(); it != target.end(); ++it) {
+          cout << "There are " << target.size() << " shortest paths from " << _PersonId1 << " to " <<  _PersonId2 << endl;
+          for(auto it = target.begin(); it != target.end(); ++it) {
             for (auto iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
               cout <<"Vertex " << (*iter)->getId() << endl;
           cout << endl;
@@ -435,10 +435,11 @@ public:
               }
       case 2: {
         cout << "---------------------DFS---------------------\n";
-        DFSPathVisitor v10d;
+        DFSPatternVisitor v10d;
         v10d.setFilter(tmpFilter[0]);
         v10d.setFilter(tmpFilter[1]);
         v10d.setDepth(2);
+        v10d.setEndVertex(_PersonId2);
         depthFirstSearch(graph, _PersonId1, v10d);
         target = v10d.getVertexTargetList();
         break;
@@ -483,6 +484,7 @@ public:
         v11d.setFilter(tmpFilter[0]);
         v11d.setFilter(tmpFilter[1]);
         v11d.setDepth(2);
+        v11d.setEndVertex(_PersonId2);
         depthFirstSearch(graph, _PersonId1, v11d);
         target = v11d.getVertexTargetList();
         break;
@@ -505,22 +507,31 @@ public:
  virtual void runQuery(Graph & graph, TMSwitch c ) {
     cout << "===============================\n";
     cout << "Query 12 \n";
-    AdjacencyVisitor v12; 
-    traverseThroughType("FRIENDS", v12.getFilter());
+    vector<VertexPointer>  target;
     switch(c) {
-      case 1:
+      case 1: {
         cout << "---------------------BFS---------------------\n";
-        breadthFirstSearch(graph, _PersonId, v12);
+        AdjacencyVisitor v12b; 
+        traverseThroughTypeAndDirection("FRIENDS", "out", v12b.getFilter());
+        breadthFirstSearch(graph, _PersonId, v12b);
+        target = v12b.getVertexTargetList();
         break;
-      case 2:
+              }
+      case 2: {
         cout << "---------------------DFS---------------------\n";
-        depthFirstSearch(graph, _PersonId, v12);
+        AdjacencyVisitor v12d; 
+        traverseThroughTypeAndDirection("FRIENDS", "out",  v12d.getFilter());
+        depthFirstSearch(graph, _PersonId, v12d);
+        target = v12d.getVertexTargetList();
         break;
+              }
       default:
         cout << "Traverse Method: 1. BFS  2. DFS\n"; 
     }
     FixedString key("name");
-    cout << "Person with vid = " << _PersonId << " has name: " << graph.getVertexPointer(_PersonId)->getPropertyValue(key).first <<" and  " << v12.getVertexTargetList().size() << " friends\n";
+    cout << "Person with vid = " << _PersonId << " has name: " << graph.getVertexPointer(_PersonId)->getPropertyValue(key).first <<" and  " << target.size() << " friends\n";
+    for (auto it = target.begin(); it != target.end(); it++)
+      cout << "Vertex " << (*it)->getId() << endl;
  }
 };
 
