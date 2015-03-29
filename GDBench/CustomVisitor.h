@@ -69,7 +69,8 @@ public:
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
     bool TypeMatch = checkType(edge, _filter);
-    if(TypeMatch == true) {
+    _direcMatch = checkDirection(second, edge, _filter);
+    if(_direcMatch && TypeMatch ) {
       _VertexTargetList.push_back(second);
     }
     computeDepth(first, edge, second, _depthList);
@@ -78,6 +79,7 @@ public:
 
 protected:
   DepthList _depthList;
+  bool _direcMatch;
 };
 
 
@@ -268,6 +270,10 @@ public:
     return _typeMatch;
   }
 
+  virtual bool discoverVertex(VertexPointer vertex) {
+    return true; 
+  }
+
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
     unsigned int depthSecond;
     if(_prevPath.back() == first) {
@@ -282,7 +288,10 @@ public:
    
     _typeMatch = checkType(edge, filter);
     _direcMatch = checkDirection(second, edge, filter);
-    if(_typeMatch && _direcMatch )
+    return false;
+  }
+
+  virtual bool scheduleTree(VertexPointer first, EdgePointer edge, VertexPointer second) {
     if(_typeMatch && _direcMatch) {
       VertexPath newPath = _prevPath;
       newPath.push_back(second);
@@ -291,9 +300,10 @@ public:
     return false;
   }
 
+
 protected:
-  unsigned int  _typeMatch;
-  unsigned int  _direcMatch;
+  bool _typeMatch;
+  bool _direcMatch;
   unsigned int  _depthSetting;
   VertexDescriptor _endVertex;
   std::vector<Filter> _filterList;
@@ -369,14 +379,14 @@ protected:
   Filter _filter;
   MultiDepthList   _depthList;
   VertexPointer    _startVertex;
-  unsigned int     _typeMatch;
-  unsigned int     _direcMatch;
+  bool _typeMatch;
+  bool _direcMatch;
   unsigned int     _depthSetting;
   VertexTarget     _VertexTargetList;
   std::vector<Filter> _filterList;
 };
 
-class DFSPatternVisitor : public PatternVisitor {
+class DFSPatternVisitor : public Visitor {
 public:
   typedef std::vector<VertexPath>  PathStack;
 public:
@@ -436,7 +446,7 @@ public:
     _typeMatch = false;
     _direcMatch = false;
     if(_prevPath.size() > _depthSetting) {
-      return false;
+      return true;
     }
     unsigned int firstDepth;
     if(_prevPath.back() == first) {
@@ -452,19 +462,22 @@ public:
    if(second != _startVertex) {
       _typeMatch = checkType(edge, filter);
       _direcMatch = checkDirection(second, edge, filter);
-  
+   }
+    return false;
+  }
+
+  virtual bool scheduleTree(VertexPointer first, EdgePointer edge, VertexPointer second) {
     if(_typeMatch && _direcMatch) {
       VertexPath newPath = _prevPath;
       newPath.push_back(second);
       _pathStack.push_back(newPath);
     }
-   }
     return false;
   }
 
 protected:
-  unsigned int  _typeMatch;
-  unsigned int  _direcMatch;
+  bool _typeMatch;
+  bool _direcMatch;
   unsigned int  _depthSetting;
   VertexPointer _startVertex;
   VertexDescriptor _endVertex;

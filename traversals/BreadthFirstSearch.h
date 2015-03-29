@@ -22,9 +22,6 @@
 #include "GraphType.h"
 #include "Visitor.h"
 
-/// This needs to be removed.
-using namespace std;
-
 void breadthFirstSearch(GraphType & Graph, const GraphType::VertexDescriptor & StartVertex, Visitor & GraphVisitor) {
 
   typedef pair<GraphType::VertexPointer, bool> VisitPair;
@@ -64,15 +61,15 @@ void breadthFirstSearch(GraphType & Graph, const GraphType::VertexDescriptor & S
       if(BranchMatch == true)
         return;
 
-      if ( ColorMap.find(TargetVertex) == ColorMap.end() || RevisitFlag) {
+      if ( ColorMap.find(TargetVertex) == ColorMap.end()|| RevisitFlag) {
 	// queue the target for visitation
         bool TreeMatch = GraphVisitor.scheduleTree(ScheduledVertex, NextEdge, TargetVertex);
 
         if(TypeMatch && DirectionMatch)   {//control the vertex to be visited filtered by type
 	        VertexQueue.push(TargetVertex);
-//          std::cout << "=>target " << TargetVertex->getPropertyValue("id").first << endl;
+        //}
+	        ColorMap.insert(VisitPair(TargetVertex,false));
         }
-	      ColorMap.insert(VisitPair(TargetVertex,false));
       } else {
         bool RevisitMatch = GraphVisitor.revisitVertex( TargetVertex );
       }

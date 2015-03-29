@@ -39,14 +39,16 @@ void depthFirstSearch(GraphType & Graph,
 
   Stack.push_back(StackEntry(StartVertex, Graph.getOutEdges(StartVertex)));
 
+//  VisitedMap.insert(ColorMapPair(StartVertex, false));
+
   while ( !Stack.empty() ) {
     StackEntry& Back = Stack.back();
     auto CurrentVertex = Back.first;
     auto OutEdges = Back.second;
     Stack.pop_back();
 
+//    VisitedMap[CurrentVertex] == true;
     VisitedMap.insert(ColorMapPair(CurrentVertex, true));
-
     bool VertexMatch = GraphVisitor.visitVertex(CurrentVertex);
     if(VertexMatch == true)
       return ;
@@ -73,6 +75,7 @@ void depthFirstSearch(GraphType & Graph,
 
       auto VisitedVertex = VisitedMap.find(TargetVertex);
         
+//      if ( VisitedVertex == VisitedMap.end() || VisitedMap[TargetVertex] == false || RevisitFlag ) {
       if ( VisitedVertex == VisitedMap.end() || RevisitFlag ) {
         bool TreeMatch = GraphVisitor.scheduleTree(CurrentVertex, *EdgeIterator, TargetVertex);
 
@@ -80,10 +83,12 @@ void depthFirstSearch(GraphType & Graph,
          Stack.push_back(StackEntry(TargetVertex,
                                    Graph.getOutEdges(TargetVertex) 
                                    ));
+//          VisitedMap.insert(ColorMapPair(TargetVertex, false));
         }
-      } else {
-        VisitedMap.insert(ColorMapPair(TargetVertex, true));
-        bool RevisitMatch = GraphVisitor.revisitVertex(TargetVertex);
+        else {
+          VisitedMap.insert(ColorMapPair(TargetVertex, true));
+          bool RevisitMatch = GraphVisitor.revisitVertex(TargetVertex);
+        }
       }
     }   
   }
