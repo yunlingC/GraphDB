@@ -55,6 +55,10 @@ public:
     if(_depthList.find(vertex) != _depthList.end())
       if(_depthList[vertex] >= 1)
         return true;
+      else 
+        return false;
+    else 
+      return false;
   }
 
   virtual bool scheduleEdge(EdgePointer edge) {
@@ -128,6 +132,7 @@ public:
       }
       return true;
     }
+    return false;
   }
 
 
@@ -259,6 +264,7 @@ public:
       }
       return true;
     }
+    return false;
   }
 
   virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
@@ -344,6 +350,7 @@ public:
        }
      }
     }
+    return false;
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
