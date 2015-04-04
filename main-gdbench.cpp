@@ -5,6 +5,7 @@
 #include <queue>
 #include <thread>
 
+#include "GDBench/util.h"
 //#include "GDReader.h"
 #include "LinkedList.h"
 #include "QueryDescription.h"
@@ -70,9 +71,15 @@ int main() {
   Query11 Q11;
   Query12 Q12;
   Query13 Q13;
+  Query14 Q14;
+
+
+  passPtr(0,0,0,0,0,0);
+  //start prefetching trigger
 
   auto id = rand()%5;
   Q1.setPersonProperty("name", name[id]);
+  Q14.setPersonProperty("name", name[id]);
   id = rand()%5;
   Q2.setWebId(webId[id]);
   id = rand()%5;
@@ -143,6 +150,7 @@ int main() {
   }
   */
   /// 1: BFS  2: DFS
+  SimRoiStart();
   Q1.runQuery(g,  1);
   Q1.runQuery(g,  2);
   Q2.runQuery(g,  1);
@@ -169,6 +177,9 @@ int main() {
   Q12.runQuery(g, 2);
   Q13.runQuery(g, 1);
   Q13.runQuery(g, 2);
+  Q14.runQuery(g, 1);
+  Q14.runQuery(g, 2);
+  SimRoiEnd();
   /**
   vector<thread> threads[5];
   vector<thread> dthreads[5];
@@ -211,5 +222,6 @@ int main() {
   }
 */
   cout << "finish testing\n";
+  myfile.close();
   return 0;
 }
