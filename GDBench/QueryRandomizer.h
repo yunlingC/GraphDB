@@ -51,37 +51,29 @@ public:
 
 private:
   void createName(string & name) {
-    srand(time(NULL)); 
-    sleep(1);
     unsigned int nameCounter = _gdReader.getPeopleCounter();
-    unsigned int nameId = rand() % nameCounter;
+    unsigned int nameId = rand() % (nameCounter);
     name = _gdReader.getNameList().at(nameId);
 //    std::cout << "Random name is " << name << std::endl;
   }
 
   void createPid(string & pid) {
-    srand(time(NULL)); 
-    sleep(1);
     unsigned int pidCounter = _gdReader.getPeopleCounter();
-    unsigned int pidId = rand() % pidCounter;
+    unsigned int pidId = rand() % (pidCounter);
     pid = _gdReader.getPidList().at(pidId);
 //    std::cout << "Random pid is " << pid << std::endl;
   }
 
   void createPersonIndex(VertexDescriptor & person) {
-    srand(time(NULL)); 
-    sleep(1);
     unsigned int personCounter = _gdReader.getPeopleCounter();
-    person = rand() % personCounter;
+    person = rand() % (personCounter);
 //    std::cout << "Random person is " << person << std::endl;
   }
 
   void createWebpageIndex(VertexDescriptor & webpage) {
-    srand(time(NULL)); 
-    sleep(1);
     unsigned int personCounter = _gdReader.getPeopleCounter();
     unsigned int webCounter = _gdReader.getWebpagesCounter();
-    webpage = rand() % webCounter + personCounter ;
+    webpage = rand() % (webCounter) + personCounter ;
 //    std::cout << "Random webpage is " << webpage << std::endl;
   }
   

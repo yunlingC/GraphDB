@@ -252,7 +252,6 @@ public:
   virtual void runQuery(Graph & graph, TMSwitch c ) {
     myfile << "===============================\n";
     myfile << "Query 5\n";
-    cout << "Query 5\n";
     if(c == 1)
         myfile << "---------------------BFS---------------------\n";
     else
@@ -272,10 +271,9 @@ public:
         v5b.setDepth(2);
         breadthFirstSearch(graph, _PersonId, v5b);
         SimMarker(2, 9);
-        auto target = v5b.getVertexTargetList();
-        for(auto it = target.begin(); it != target.end(); ++it) {
-          myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
-        myfile << endl;
+        auto TargetSet = v5b.getTargetSet(); 
+        for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
+          myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
         }
         break;
               }
@@ -324,11 +322,10 @@ public:
         v6b.setDepth(2);
         breadthFirstSearch(graph, _PersonId, v6b);
         SimMarker(2, 11);
-        auto target = v6b.getVertexTargetList();
-        myfile << "The friends of Person with vid = " << _PersonId<< " like " << target.size() << " webpages\n";
-        for(auto it = target.begin(); it != target.end(); ++it) {
-          myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
-        myfile << endl;
+        auto TargetSet = v6b.getTargetSet(); 
+        myfile << "The friends of Person with vid = " << _PersonId<< " like " << TargetSet.size() << " webpages\n";
+        for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
+          myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
         }
         break;
               }
@@ -376,12 +373,12 @@ public:
         v7b.setDepth(2);
         breadthFirstSearch(graph, _PersonId, v7b);
         SimMarker(2, 13);
-        auto target = v7b.getVertexTargetList();
-        myfile << "The webpages liked by person vid = " << _PersonId<< " are liked by " << target.size() << " people: \n";
-        for(auto it = target.begin(); it != target.end(); ++it) {
-          myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
-        myfile << endl;
+        auto TargetSet = v7b.getTargetSet(); 
+        myfile << "The webpages liked by person vid = " << _PersonId<< " are liked by " << TargetSet.size() << " people: \n";
+        for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
+          myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
         }
+ 
         break;
               }
       case 2: {
@@ -663,13 +660,11 @@ public:
         v13b.setDepth(3);
         breadthFirstSearch(graph, _PersonId, v13b);
         SimMarker(2, 25);
-        auto target = v13b.getVertexTargetList();
-        myfile << "The friends of friends of person vid = " << _PersonId << " has " << target.size() << " friends: \n";
-        for(auto it = target.begin(); it != target.end(); ++it) {
-          myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
-        myfile << endl;
-    }
-
+        auto TargetSet = v13b.getTargetSet(); 
+        myfile << "The friends of friends of person vid = " << _PersonId << " has " << TargetSet.size() << " friends: \n";
+        for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
+          myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
+        }
         break;
               }
       case 2: {
