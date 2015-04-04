@@ -40,7 +40,7 @@ set(STORAGE_LIB storage)
 set(GDB_LD_FLAGS storage) 
 
 # Compiler flags
-set(CMAKE_CXX_FLAGS "-pthread -std=c++11 -D_FIXALLOC_")
+set(CMAKE_CXX_FLAGS "-pthread -std=c++11 -D_FIXALLOC_ -Wall")
 
 # Storage sub directory
 add_subdirectory(storage)
