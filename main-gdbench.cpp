@@ -27,22 +27,25 @@ int main() {
 
   //createGraph(g);
   //  Graph::VertexPtr vp0 = g.getVertexPointer(0);
-
   cout << "begin randomizing\n";
   QueryRandomizer rander(reader);
 
   string name[5], pid[5] ;
   VertexDescriptor webId[5], personId1[5], personId2[5], personId3[5];
-  
-  for(auto i = 0; i < 5; i++) {
+ 
+  ///not random now 
+  for(auto i = 0; i < 1; i++) {
     name[i] = rander.getName();
     pid[i]  = rander.getPid();
     webId[i] = rander.getAWebpageIndex();
     personId1[i] = rander.getAPersonIndex();
     personId2[i] = rander.getAPersonIndex();
     personId3[i] = personId2[i];
+
+    ///TODO maybe infinite loop !!
     while( personId3[i] == personId2[i])     //for query of connection with p1 and p2
     personId3[i] = rander.getAPersonIndex();
+//    cout << name[i] << endl << pid[i] << endl << webId[i] << endl << personId1[i] << endl << personId2[i] << endl << personId3[i] << endl;
   }
 
   Query1 Q1;
@@ -63,36 +66,22 @@ int main() {
 
   passPtr(0,0,0,0,0,0);
   //start prefetching trigger
-  
-  srand(time(NULL));
-  sleep(1);
-  auto id = rand()%5;
+ 
+  auto id = 0; //only one set of input right now
   Q1.setPersonProperty("name", name[id]);
-  Q14.setPersonProperty("name", name[id]);
-  id = rand()%5;
   Q2.setWebId(webId[id]);
-  id = rand()%5;
   Q3.setPersonId(personId1[id]);
-  id = rand()%5;
   Q4.setPersonProperty("pid", pid[id]);
-  id = rand()%5;
   Q5.setPersonId(personId1[id]);
-  id = rand()%5;
   Q6.setPersonId(personId1[id]);
-  id = rand()%5;
   Q7.setPersonId(personId1[id]);
-  id = rand()%5;
   Q8.setEndPoints(personId2[id], personId3[id]);
-  id = rand()%5;
   Q9.setEndPoints(personId2[id], personId3[id]);
-  id = rand()%5;
   Q10.setEndPoints(personId2[id], personId3[id]);
-  id = rand()%5;
   Q11.setEndPoints(personId2[id], personId3[id]);
-  id = rand()%5;
   Q12.setPersonId(personId1[id]);
-  id = rand()%5;
   Q13.setPersonId(personId1[id]);
+  Q14.setPersonProperty("name", name[id]);
 /**
   Q8.runQuery(g, 1);
   Q8.runQuery(g, 2);

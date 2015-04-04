@@ -173,7 +173,6 @@ private:
       VertexDescriptor vp = _graph.addVertex(peopleProp);
       _vertexMap.insert(pair<string, VertexDescriptor>(pid, vp));
       _people++;
-    
     }
   }
   

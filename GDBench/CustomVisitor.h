@@ -16,6 +16,7 @@
 #define _CUSTOMVISITOR_H_
 
 #include <queue>
+#include <set>
 
 #include "Visitor.h"
 #include "Utilities.h"
@@ -91,6 +92,7 @@ protected:
 class ReachabilityVisitor : public Visitor {
 public:
   typedef std::queue<VertexPath>  PathQueue;
+  typedef std::set<VertexPointer> VertexSetType;
 public:
   ReachabilityVisitor () { }
 
@@ -100,6 +102,10 @@ public:
 
   virtual void setDepth(unsigned int depth) {
     _depthSetting = depth;
+  }
+
+  virtual VertexSetType & getTargetSet() {
+    return _TargetSet;
   }
 
   virtual void visitStartVertex(VertexPointer startVertex ) {
@@ -117,18 +123,10 @@ public:
     _pathQueue.pop();
     if(_prevPath.size() > _depthSetting) {
       _VertexTargetList.push_back(_prevPath.at(_depthSetting));
+      _TargetSet.insert(_prevPath.at(_depthSetting));
       while( !_pathQueue.empty()) {
         auto path = _pathQueue.front(); _pathQueue.pop();
-        bool unique = true;
-        for (auto it = _VertexTargetList.begin() ; it != _VertexTargetList.end(); ++ it) {/// do not store repeated veretx
-          if ( *it == path.at(_depthSetting)) {
-            unique = false;
-            break;
-          }
-        }
-        if(unique == true) { 
-          _VertexTargetList.push_back(path.at(_depthSetting));
-        }//end if
+        _TargetSet.insert(path.at(_depthSetting));
       }
       return true;
     }
@@ -138,7 +136,6 @@ public:
 
   virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
     return _direcMatch;
-
   }
 
   virtual bool scheduleEdge(EdgePointer edge) {
@@ -174,6 +171,7 @@ protected:
   std::vector<Filter> _filterList;
   VertexPath   _prevPath;
   PathQueue  _pathQueue;
+  VertexSetType _TargetSet;
 };
 
 
