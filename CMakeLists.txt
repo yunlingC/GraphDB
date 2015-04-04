@@ -30,7 +30,7 @@ link_directories(
 
 
 # Set the release build for all optimizations
-set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
 
 # Set the target folder
 set(TARGET t)
@@ -40,7 +40,13 @@ set(STORAGE_LIB storage)
 set(GDB_LD_FLAGS storage) 
 
 # Compiler flags
-set(CMAKE_CXX_FLAGS "-pthread -std=c++11 -D_FIXALLOC_ -Wall")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
+
+# Debug flags
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
+
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
+
 
 # Storage sub directory
 add_subdirectory(storage)
