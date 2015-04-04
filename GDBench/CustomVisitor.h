@@ -102,7 +102,7 @@ public:
     _depthSetting = depth;
   }
 
-  virtual bool visitStartVertex(VertexPointer startVertex ) {
+  virtual void visitStartVertex(VertexPointer startVertex ) {
     VertexPath newPath;
     newPath.push_back(startVertex);
     _pathQueue.push(newPath);
@@ -187,7 +187,7 @@ public:
     _endVertex =  vertex;
   }
 
-  virtual bool visitStartVertex(VertexPointer startVertex ) {
+  virtual void visitStartVertex(VertexPointer startVertex ) {
     _startVertex = startVertex->getId();
     VertexPath newPath;
     newPath.push_back(startVertex);
@@ -236,7 +236,7 @@ public:
     _endVertex =  vertex;
   }
 
-  virtual bool visitStartVertex(VertexPointer startVertex ) {
+  virtual void visitStartVertex(VertexPointer startVertex ) {
     VertexPath newPath;
     newPath.push_back(startVertex);
     _pathQueue.push(newPath);
@@ -328,7 +328,7 @@ public:
     _filterList.push_back(f);
   }
 
-  virtual bool visitStartVertex(VertexPointer startVertex ) {
+  virtual void visitStartVertex(VertexPointer startVertex ) {
     _startVertex = startVertex;
     _depthList.insert(VertexTargetPair(startVertex, 0));
   }
@@ -410,7 +410,7 @@ public:
     _endVertex =  vertex;
   }
 
-  virtual bool visitStartVertex(VertexPointer startVertex ) {
+  virtual void visitStartVertex(VertexPointer startVertex ) {
     _startVertex = startVertex;
     VertexPath newPath;
     newPath.push_back(startVertex);
@@ -518,7 +518,7 @@ public:
     return _pathMap;
   }
 
-  virtual bool visitStartVertex(VertexPointer startVertex ) {
+  virtual void visitStartVertex(VertexPointer startVertex ) {
     _startVertex = startVertex;
     _tmpMinDepth = 500;
     _turnFlag = false;

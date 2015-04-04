@@ -34,6 +34,7 @@ void depthFirstSearch(GraphType & Graph,
   // Get outgoing edges of StartVertex.
   GraphType::VertexPointer StartVertex =
     Graph.getVertexPointer(StartVertexId);
+  passNodeHint(StartVertex);
 
   GraphVisitor.visitStartVertex( StartVertex );
 

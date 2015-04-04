@@ -42,8 +42,8 @@ public:
     return _VertexTargetList;
   }
 
-  virtual bool visitStartVertex(VertexPointer vp) {
-    return false;
+  virtual void  visitStartVertex(VertexPointer vp) {
+    //return false;
   }
 
   virtual bool discoverVertex(VertexPointer vp) {
@@ -52,7 +52,7 @@ public:
 
   virtual bool visitVertex(VertexPointer vp) {
     FixedString key("id");
-    std::cout << "==>vid " << vp->getId() << " ==>pid " << vp->getPropertyValue(key).first << endl;
+    //std::cout << "==>vid " << vp->getId() << " ==>pid " << vp->getPropertyValue(key).first << endl;
     return false;
   }
 
