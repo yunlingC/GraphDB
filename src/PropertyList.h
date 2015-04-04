@@ -29,6 +29,7 @@ public:
       _pl = from._pl;
       _maxSize = from._maxSize;
     }
+    return *this;
   }
 
   void deletePropertyList() {
@@ -45,7 +46,7 @@ public:
 
   bool set(const std::string & k, const std::string & v) {
     KeyType kk(k); ValueType vv(v);
-    set(kk, vv);
+    return set(kk, vv);
   }
  
   bool set(const KeyType & k, const ValueType & v) {

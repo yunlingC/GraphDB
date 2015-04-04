@@ -44,19 +44,6 @@ int main() {
     while( personId3[i] == personId2[i])     //for query of connection with p1 and p2
     personId3[i] = rander.getAPersonIndex();
   }
-/*
-  Query8 Q8;
-  Query9 Q9;
-
-  auto id = rand()%5;
-  Q8.setEndPoints(personId2[id], personId3[id]);
-  Q9.setEndPoints(personId2[id], personId3[id]);
-
-  Q8.runQuery(g, 1);
-  Q8.runQuery(g, 2);
-  Q9.runQuery(g, 1);
-  Q9.runQuery(g, 2);
-*/
 
   Query1 Q1;
   Query2 Q2;
@@ -76,7 +63,9 @@ int main() {
 
   passPtr(0,0,0,0,0,0);
   //start prefetching trigger
-
+  
+  srand(time(NULL));
+  sleep(1);
   auto id = rand()%5;
   Q1.setPersonProperty("name", name[id]);
   Q14.setPersonProperty("name", name[id]);

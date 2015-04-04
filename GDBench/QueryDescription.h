@@ -252,6 +252,7 @@ public:
   virtual void runQuery(Graph & graph, TMSwitch c ) {
     myfile << "===============================\n";
     myfile << "Query 5\n";
+    cout << "Query 5\n";
     if(c == 1)
         myfile << "---------------------BFS---------------------\n";
     else

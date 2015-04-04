@@ -16,7 +16,6 @@
 
 #include <stack>
 #include <time.h>
-//#include <stdio.h>
 #include <boost/algorithm/string.hpp>
 
 #include "Filter.h"
@@ -37,7 +36,6 @@ typedef std::map<VertexPointer, unsigned int> DegreeList;
 typedef std::vector<VertexPointer> VertexTargetSet;
 typedef std::stack<unsigned int > LayerStack;
 typedef std::map<unsigned int, VertexTargetSet> LayerMap;
-//typedef std::pair<FixedString, bool> ReturnValueType;
 
 
 void filtProperty(KeyType key, ValueType value, Filter & TraversalFilter){
@@ -59,20 +57,12 @@ void filtType (Type type, Filter & TraversalFilter) {
 //  filtTypeFlag = true;
 }
 
-/**
-std::vector<GraphType::VertexPtr> 
-& getVertexTargetSet() {
-  return VertexTargetSet;
-}
-*/   
 void traverseThroughDirection(Direction direction, Filter & TraversalFilter) {
   TraversalFilter.setDirection(direction);
-//  GraphVisitor.setFilter(TraversalFilter);
 }
 
 void traverseThroughType(Type type, Filter & TraversalFilter) {
   TraversalFilter.setType(type);
-//  GraphVisitor.setFilter(TraversalFilter);
 }
 
 void traverseThroughMultiRelType(RelType types, Filter & TypeFilter ) {
@@ -87,12 +77,10 @@ void traverseThroughMultiRelType(RelType types, Filter & TypeFilter ) {
 void traverseThroughTypeAndDirection(Type type, Direction direction, Filter & TraversalFilter) {
   TraversalFilter.setDirection(direction);
   TraversalFilter.setType(type);
-//  GraphVisitor.setFilter(TraversalFilter);
 }
 
 bool TerminateAtVertex(unsigned int targetNum, VertexTargetSet vertexSet) {
 
-//      cout << "targetNum: " << targetNum << " targetSet size: " <<vertexSet.size() << endl;
     if(vertexSet.size() >= targetNum) 
     {
       return true;
@@ -113,8 +101,6 @@ unsigned int computeDepth(VertexPointer first, EdgePointer ep, VertexPointer sec
       dl.insert(DepthPair(second, 1));
     else 
       dl[second] = 1;
-//    cout << "vertex: " << first->getId() << " depth: 0" << endl;
-//    cout << "vertex: " << second->getId() << " depth: 1" << endl;
   }
   else {
     depth = dl[first] + 1;
@@ -136,74 +122,24 @@ void recordDepth(VertexPointer first, EdgePointer ep, VertexPointer second, Mult
   if (dl.find(first) == dl.end()) {
     dl.insert(DepthPair(first, 0));
     dl.insert(DepthPair(second, 1));
-//    cout << "vertex: " << first->getId() << " depth: 0" << endl;
-//    cout << "vertex: " << second->getId() << " depth: 1" << endl;
   }
   else {
-    auto range = dl.equal_range(second);
     for( auto it = dl.equal_range(first).first; it != dl.equal_range(first).second; ++it ) {
-//        cout << "it " << (*it).first->getId() << " depth " << (*it).second << endl;
         depth = (*it).second + 1;
         unsigned int unique = true;
         if(dl.count(second) != 0)
         for(auto iter = dl.equal_range(second).first; iter != dl.equal_range(second).second; ++iter) {
-//          cout << "iter " << (*iter).first->getId() << " depth " << (*iter).second << endl;
           if((*iter).second == depth) {
             unique = false;
             break;
           }
         }
           if(unique == true) {
-//            cout << "vertex " << second->getId() << " depth " << depth << endl;
             dl.insert(DepthPair(second, depth));
           }
     }
   }
-
   return ;
-}
-
-
-void recordLayer(VertexPointer first, EdgePointer edge, VertexPointer second, LayerMap &lm, LayerStack& ls) {
-/**   unsigned int layerNum ;
-    if(_layerMap.empty()) {
-      VertexTarget newLayer;
-      newLayer.push_back(first);
-      layerNum = 0;
-      _layerMap.insert(LayerPair(layerNum, newLayer));
-      _layerStack.push(layerNum);
-    }// else {
-      layerNum = _layerStack.top();
-      cout << "Now come to layer: " << layerNum << endl;
-      auto layerList = _layerMap.find(layerNum);
-      if(layerList != _layerMap.end()) {
-        for(auto it = layerList->second.begin(); it != layerList->second.end(); ++it) {
-//          cout << "traverse list id " << (*it)->getId() << "first id " << first->getId() << endl;
-          if( (*it)->getId() == first->getId() ) {
-            if(_layerMap.find(layerNum+1) == _layerMap.end()) {
-              VertexTarget newLayer;
-              newLayer.push_back(second);
-              cout <<"vertex " << second->getId() << " is pushed into layer\n";
-              _layerMap.insert(LayerPair(layerNum+1, newLayer));
-            }//endif
-            else  {
-              _layerMap[layerNum+1].push_back(second);
-              cout <<"vertex " << second->getId() << " is pushed into layer\n";
-            }//end_else
-          }//end_if
-//          else 
-//            cout << "Error: Failed to match child vertex with parent\n";
-        }//end_for
-        if((edge->getNextEdge(first) == nullptr) && (first == layerList->second.back())) {
-          layerNum ++;
-          _layerStack.push(layerNum);
-          cout << "first " << first->getId() << " second " << second->getId() << " to layernum " << layerNum << endl;
-        }//end_if
-      }//end_if
-      else
-        cout << "Error: Failed to match the layerNum with layerList\n";
-//    }
-*/
 }
 
 void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthList &dl) {
@@ -216,8 +152,6 @@ void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, Dept
       dl.insert(DepthPair(second, 1));
     else 
       dl[second] = 1;
-//    cout << "vertex: " << first->getId() << " depth: 0" << endl;
-//    cout << "vertex: " << second->getId() << " depth: 1" << endl;
    
   }
   else {
@@ -227,7 +161,6 @@ void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, Dept
     }
     else 
       dl[second] = depth;
-//    cout << "Vertex: " << second->getId() << "depth: " << depth << endl;
   }
   return  ;
 
@@ -242,7 +175,7 @@ bool checkDepth(unsigned int depth, VertexPointer vertex, DepthList & depthList)
 }
 
 unsigned int  checkMaxDepth(MultiDepthList & dl) {
-  int depth = 0;
+  unsigned int depth = 0;
   for(auto it = dl.begin(); it != dl.end(); it ++) {
     if( (*it).second > depth)
       depth = (*it).second;
@@ -254,14 +187,12 @@ template<typename ReturnValueType>
 bool checkProperty(VertexPointer vertex, Filter &filter) {
   if ((filter.getValue() == "") || (filter.getKey() == "") )
       return true; 
-
   FixedString value(filter.getValue());
   FixedString key(filter.getKey());
 
   ReturnValueType rv = vertex->getPropertyValue(key); 
   if((rv.second == false) || (rv.first != value))
   {
-//      cout << "++++Gotcha++++\n" << "Vertex:\t" << vp->getId() << endl;
       return false;
   }
   return true;
@@ -270,14 +201,12 @@ bool checkProperty(VertexPointer vertex, Filter &filter) {
 
 int compareTime(time_t time1, time_t time2) {
   auto second = difftime(time1, time2);
-//  cout << "++diff time is : " << second << endl;
   if (second >= 0.0000001) 
     return 1; 
   else  if(second < -0.0000001)
     return -1;
   else 
     return 0;
-//  return difftime(time1, time2) > 0.0 ? true : false;
 }
 
 template<typename ReturnValueType, typename GraphElemPointer>
@@ -298,7 +227,6 @@ bool checkTimeRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
       memset(&time[i], 0, sizeof(struct tm));
       strptime(attributes[0].c_str(), "%H:%M:%S", &time[i]); 
       strftime(buf, sizeof(buf), "%H:%M:%S", &time[i]);
-//      cout << "time range is: " << buf << endl;
     } //END_ELSE
   } //END_FOR
   auto timeProp = GraphElem->getPropertyValue(filter.getKey());                          
@@ -314,7 +242,6 @@ bool checkTimeRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
       memset(&TimeToCheck, 0, sizeof(struct tm));
     strptime(attributes[0].c_str(), "%H:%M:%S", &TimeToCheck);
     strftime(buf, sizeof(buf), "%H:%M:%S", &TimeToCheck);
-//    cout << "time to be compare is " << buf << endl;
     auto t = mktime(&TimeToCheck); 
     if (cmpResult[0] != true) {
       auto t1 = mktime(&time[0]); 
@@ -323,9 +250,7 @@ bool checkTimeRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
         if ( cmp == 0) 
           EqualFlag = true;
         cmpResult[0] = true; 
-//        cout << "compare time " << cmp << endl;
       }
-//      cout << "cmpResult 1: " << cmpResult[0] << t1 <<  "\t" << t << endl;
     }
     if (cmpResult[1] != true) {
       auto t2 = mktime(&time[1]);
@@ -335,7 +260,6 @@ bool checkTimeRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
           EqualFlag = true;
         cmpResult[1] = true; 
       }
-//      cout << "cmpResult 2: " << cmpResult[1] << t2 <<  "\t" << t2 << endl;
     }
     return (cmpResult[0] && cmpResult[1]); 
   }
@@ -351,13 +275,11 @@ bool checkYearRange(GraphElemType elem, Filter & filter, bool & EqualFlag) {
       cmpResult[i] = true;
     else  {
       Year[i] = stoi(filter.getValueRange()[i]);
-//      cout << "Year range " << Year[i] << endl;
     }
   }
   if(elem->getPropertyValue(filter.getKey()).second == false)
     return false;
   auto YearProp = stoi(elem->getPropertyValue(filter.getKey()).first.std_str());
-//  cout << "Year to be compared " << YearProp << endl;
   if(cmpResult[0] == false)
     if( YearProp >= Year[0]) {
       if (YearProp == Year[0])
@@ -389,7 +311,6 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
       memset(&date[i], 0, sizeof(struct tm));
       strptime(attributes[0].c_str(), "%Y-%m-%d", &date[i]);
       strftime(buf, sizeof(buf), "%Y-%m-%d", &date[i]);
-//      cout << "date range is: " << buf << endl;
     }
   }
   auto timeProp = GraphElem->getPropertyValue(filter.getKey());                          
@@ -402,7 +323,6 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
      memset(&DateToCheck, 0, sizeof(struct tm));
     strptime(attributes[0].c_str(), "%Y-%m-%d", &DateToCheck);
     strftime(buf, sizeof(buf), "%Y-%m-%d", &DateToCheck);
-//    cout << "date to be compared is " << buf << endl;
     auto d = mktime(&DateToCheck);
     if(cmpResult[0] != true) {
       auto d1 = mktime(&date[0]);
@@ -412,7 +332,6 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
           EqualFlag = true;
         cmpResult[0] = true; 
       }
-//      cout << "cmpResult 1: " << cmpResult[0] << "\t" << d1 <<  "\t" << d << endl;
     }
     if(cmpResult[1] != true) {
       auto d2 = mktime(&date[1]);
@@ -422,9 +341,7 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
           EqualFlag = true;
         cmpResult[1] = true; 
       }
-//      cout << "cmpResult 2: " << cmpResult[1] << "\t" << d <<  "\t" << d2 << endl;
     }
-//    cout << " equal flag " << EqualFlag << endl;
     return (cmpResult[0] && cmpResult[1]); 
   }
  }
@@ -450,7 +367,6 @@ void dumpVertexTarget(VertexTargetSet & VertexTargetList) {
 
   for (auto it = VertexTargetList.begin(); it != VertexTargetList.end(); ++it) {
     cout << "Vertex: "<< (*it)->getId() << endl;
-//      (*it)->getPropertyList();
   }
 }
 
@@ -468,11 +384,9 @@ bool checkType(EdgePointer edge, Filter &filter) {
     FixedString type(filter.getType());
     if (edge->getType() == type)
     {
-//      cout << "Edge:\t" << ep->getId() << endl;
       return true;
     }
     else  {
-//      cout << "type= " << ep->getType() << endl;
       return false;
     }
 }
@@ -488,11 +402,9 @@ bool checkMultiRelType(EdgePointer edge, Filter & filter) {
     FixedString type(*it);
     if (edge->getType() == type)
     {
-//      cout << "Edge:\t" << ep->getId() << endl;
       return true;
     }
     else  {
-//      cout << "type= " << ep->getType() << endl;
       typeMatch = false;
     }
   }
@@ -516,14 +428,12 @@ bool checkDirection(VertexPointer vertex, EdgePointer edge, Filter & filter ) {
     switch(direction) {
     case 1:
       if (edge->getFirstId() == vertex->getId()) {
-//        cout << "one catch on vertex: " << vertex->getId() << endl;
         return false;
       }
       break;
 
     case 2:
       if (edge->getSecondId() == vertex->getId()) { 
-//        cout << "one catch on vertex: " << vertex->getId() << endl;
         return false;
       }
       break;

@@ -68,7 +68,7 @@ void breadthFirstSearch(GraphType & Graph, const GraphType::VertexDescriptor & S
 
       if ( ColorMap.find(TargetVertex) == ColorMap.end()|| RevisitFlag) {
 	// queue the target for visitation
-        bool TreeMatch = GraphVisitor.scheduleTree(ScheduledVertex, NextEdge, TargetVertex);
+        GraphVisitor.scheduleTree(ScheduledVertex, NextEdge, TargetVertex);
 
         if(TypeMatch && DirectionMatch)   {//control the vertex to be visited filtered by type
 	        VertexQueue.push(TargetVertex);
@@ -76,7 +76,7 @@ void breadthFirstSearch(GraphType & Graph, const GraphType::VertexDescriptor & S
 	        ColorMap.insert(VisitPair(TargetVertex,false));
         }
       } else {
-        bool RevisitMatch = GraphVisitor.revisitVertex( TargetVertex );
+        GraphVisitor.revisitVertex( TargetVertex );
       }
       // Get the next edge from the scheduled vertex. 
       NextEdge = NextEdge->getNextEdge(ScheduledVertex);

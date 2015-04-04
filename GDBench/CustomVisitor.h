@@ -146,7 +146,7 @@ public:
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    unsigned int depthSecond;
+    unsigned int depthSecond = 0;
     if(_prevPath.back() == first) {
       depthSecond = _prevPath.size();
     }
@@ -281,7 +281,7 @@ public:
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    unsigned int depthSecond;
+    unsigned int depthSecond = 0;
     if(_prevPath.back() == first) {
       depthSecond = _prevPath.size();
     }
@@ -455,7 +455,8 @@ public:
     if(_prevPath.size() > _depthSetting) {
       return true;
     }
-    unsigned int firstDepth;
+
+    unsigned int firstDepth = 1000; //default: get default filter later
     if(_prevPath.back() == first) {
       firstDepth = _prevPath.size() - 1;
     }

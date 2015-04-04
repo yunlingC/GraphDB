@@ -98,6 +98,7 @@ public:
       _tail = from._tail;
       _size = from._size;
     }
+    return *this;
   }
 
   void insert(const char * k, const char * v) {
@@ -143,7 +144,6 @@ public:
   void print() {
     // Iterate over the linked list and delete it.
     ListNode * it = _head;
-    ListNode * del = nullptr;
     
     while (it != nullptr) {
       cout << "k: " << it->getKey() << ", " << "v: " << it->getValue() << endl;
