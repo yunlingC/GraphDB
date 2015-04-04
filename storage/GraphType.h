@@ -259,11 +259,11 @@ public:
   }
 
   void dump() {
-    for ( auto i = 0; i < Vertices.size(); i++ ) {
+    for ( size_t  i = 0; i < Vertices.size(); i++ ) {
       Vertices[i]->dump();
     }
 
-    for ( auto i =0; i <Edges.size() ; i++ ) {
+    for ( size_t i = 0; i <Edges.size() ; i++ ) {
       Edges[i]->dump();
       std::cout << "\n";
     }
@@ -278,12 +278,12 @@ public:
     /// However, only one place is necessary since everywhere else, I am storing pointers.
     /// Thus, Vertices and _edges contain all newly created objects.
 
-    for ( auto i=0; i < Vertices.size(); i++ ) {
+    for ( size_t i=0; i < Vertices.size(); i++ ) {
       Vertices[i]->deleteVertex();
       delete Vertices[i];
     }
 
-    for ( auto i=0; i < Edges.size(); i++ ) {
+    for ( size_t i=0; i < Edges.size(); i++ ) {
       Edges[i]->deleteEdge();
       delete Edges[i];
     }

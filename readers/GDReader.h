@@ -27,10 +27,10 @@
 using namespace boost;
 using namespace std;
 
-enum readTypes  { people, webpages, friends, likes };
+enum readTypes  { people, webpages, friends, likes, defaultValue};
 
 int  str2int(string str){
-  readTypes retType;
+  readTypes retType = defaultValue;
 
   if (str == "<PEOPLE>")
     retType = people;

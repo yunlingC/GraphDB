@@ -78,7 +78,7 @@ void depthFirstSearch(GraphType & Graph,
         
 //      if ( VisitedVertex == VisitedMap.end() || VisitedMap[TargetVertex] == false || RevisitFlag ) {
       if ( VisitedVertex == VisitedMap.end() || RevisitFlag ) {
-        bool TreeMatch = GraphVisitor.scheduleTree(CurrentVertex, *EdgeIterator, TargetVertex);
+        GraphVisitor.scheduleTree(CurrentVertex, *EdgeIterator, TargetVertex);
 
         if( TypeMatch && DirectionMatch) {
          Stack.push_back(StackEntry(TargetVertex,
@@ -88,7 +88,7 @@ void depthFirstSearch(GraphType & Graph,
         }
         else {
           VisitedMap.insert(ColorMapPair(TargetVertex, true));
-          bool RevisitMatch = GraphVisitor.revisitVertex(TargetVertex);
+          GraphVisitor.revisitVertex(TargetVertex);
         }
       }
     }   
