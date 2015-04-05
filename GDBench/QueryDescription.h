@@ -71,15 +71,16 @@ class Query14 : public Query {
 public:
  virtual void runQuery(Graph & graph, TMSwitch c) {
     Visitor v1;
-    filtProperty(_Key, _Value, v1.getFilter());
     switch(c) {
       case 1:
         SimMarker(1, 27);
+        filtProperty(_Key, _Value, v1.getFilter());
         breadthFirstSearch(graph, 0, v1 );
         SimMarker(2, 27);
         break;
       case 2:
         SimMarker(1, 28);
+        filtProperty(_Key, _Value, v1.getFilter());
         depthFirstSearch(graph, 0, v1);
         SimMarker(2, 28);
         break;
@@ -453,8 +454,8 @@ public:
         myfile << "---------------------BFS---------------------\n";
     else
         myfile << "---------------------DFS---------------------\n";
-    PathVisitor v9;
-    v9.setEndVertex(_PersonId2);
+    //PathVisitor v9;
+    //v9.setEndVertex(_PersonId2);
     switch(c) {
       case 1: {
         SimMarker(1, 17);

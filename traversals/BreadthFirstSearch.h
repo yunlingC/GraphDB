@@ -25,9 +25,7 @@
 void breadthFirstSearch(GraphType & Graph, const GraphType::VertexDescriptor & StartVertex, Visitor & GraphVisitor) {
 
   typedef pair<GraphType::VertexPointer, bool> VisitPair;
-  typedef std::pair<GraphType::VertexPointer, GraphType::EdgeList> StackEntry;
   auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
-  std::vector<StackEntry> Stack;
   //pass hint
   passNodeHint(ScheduledVertex);
 
@@ -42,7 +40,6 @@ void breadthFirstSearch(GraphType & Graph, const GraphType::VertexDescriptor & S
   ColorMap.insert(VisitPair(ScheduledVertex,false));
 
   GraphType::VertexPointer TargetVertex = nullptr;
-  Stack.push_back(StackEntry(ScheduledVertex, Graph.getOutEdges(ScheduledVertex)));
 
   while ( !VertexQueue.empty() ) {
     ScheduledVertex = VertexQueue.front();  VertexQueue.pop();
