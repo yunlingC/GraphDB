@@ -18,46 +18,63 @@
 #include "GraphType.h"
 
 void depthFirstSearch(GraphType & Graph,
-                      GraphType::VertexDescriptor StartVertexId,
+                      GraphType::VertexDescriptor StartVertex,
                       Visitor & GraphVisitor ) {
 
 
-  typedef std::map<GraphType::VertexPointer, bool> ColorMap;
-  typedef std::pair<GraphType::VertexPointer, bool> ColorMapPair;
-  typedef std::pair<GraphType::VertexPointer, GraphType::EdgeList> StackEntry;
-  typedef std::vector<StackEntry> VertexStack;
-  typedef std::vector<GraphType::EdgePointer> EdgeList;
+  typedef std::pair<GraphType::VertexPointer, bool> VisitPair;
+  GraphType::VertexPointer ScheduledVertex = Graph.getVertexPointer(StartVertex);
+  //pass hint
+  passNodeHint(ScheduledVertex);
 
-  ColorMap VisitedMap;
-  VertexStack Stack;
+  std::vector<GraphType::VertexPointer> VertexStack;
+  std::map<GraphType::VertexPointer, bool> ColorMap;
 
-  // Get outgoing edges of StartVertex.
-  GraphType::VertexPointer StartVertex =
-    Graph.getVertexPointer(StartVertexId);
-  passNodeHint(StartVertex);
+  VertexStack.push_back(ScheduledVertex);
+  GraphVisitor.visitStartVertex(ScheduledVertex);
 
-  GraphVisitor.visitStartVertex( StartVertex );
+  ColorMap.insert(VisitPair(ScheduledVertex, false));
 
-  Stack.push_back(StackEntry(StartVertex, Graph.getOutEdges(StartVertex)));
+  GraphType::VertexPointer TargetVertex = nullptr;
 
-//  VisitedMap.insert(ColorMapPair(StartVertex, false));
-
-  while ( !Stack.empty() ) {
-    StackEntry& Back = Stack.back();
-    auto CurrentVertex = Back.first;
-    auto OutEdges = Back.second;
-    Stack.pop_back();
-
-//    VisitedMap[CurrentVertex] == true;
-    VisitedMap.insert(ColorMapPair(CurrentVertex, true));
-    bool VertexMatch = GraphVisitor.visitVertex(CurrentVertex);
+  while ( !VertexStack.empty() ) {
+    ScheduledVertex = VertexStack.back();  VertexStack.pop_back();
+    bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
     if(VertexMatch == true)
       return ;
  
-    EdgeList Edges;
-    auto InEdges = Graph.getInEdges(CurrentVertex);
-    Edges = Graph.getOutEdges(CurrentVertex);
-    Edges.insert(Edges.end(), InEdges.begin(), InEdges.end());
+    ColorMap[ScheduledVertex] = true;
+
+    auto NextEdge = ScheduledVertex->getNextEdge();
+    while( NextEdge != nullptr ){
+    
+      TargetVertex = NextEdge->getTarget(ScheduledVertex);
+      bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);
+      bool BranchMatch = GraphVisitor.scheduleBranch(ScheduledVertex, NextEdge, TargetVertex);
+      bool TypeMatch = GraphVisitor.scheduleEdge(NextEdge);
+      bool DirectionMatch = GraphVisitor.visitDirection(TargetVertex, NextEdge);
+
+      if(BranchMatch == true)
+        break;
+
+      if ( ColorMap.find(TargetVertex) == ColorMap.end() || RevisitFlag ) {
+
+        GraphVisitor.scheduleTree(ScheduledVertex, NextEdge, TargetVertex);
+
+        if( TypeMatch && DirectionMatch) {
+          VertexStack.push_back(TargetVertex);
+          ColorMap.insert(VisitPair(TargetVertex, false));
+        } else {
+          //VisitedMap.insert(ColorMapPair(TargetVertex, true));
+          GraphVisitor.revisitVertex(TargetVertex);
+        }
+      }
+      NextEdge = NextEdge->getNextEdge(ScheduledVertex);
+    
+    }
+  }
+  GraphVisitor.finishVisit();
+/*
     for (auto EdgeIterator = Edges.begin(); 
       EdgeIterator != Edges.end();
       ++EdgeIterator) {
@@ -94,6 +111,7 @@ void depthFirstSearch(GraphType & Graph,
     }   
   }
   GraphVisitor.finishVisit();
+*/
 }
                       
 
