@@ -74,44 +74,6 @@ void depthFirstSearch(GraphType & Graph,
     }
   }
   GraphVisitor.finishVisit();
-/*
-    for (auto EdgeIterator = Edges.begin(); 
-      EdgeIterator != Edges.end();
-      ++EdgeIterator) {
-      auto TargetVertex = (*EdgeIterator)->getTarget(CurrentVertex);
-
-      bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);
-
-      bool BranchMatch = GraphVisitor.scheduleBranch(CurrentVertex, *EdgeIterator, TargetVertex);
-      if(BranchMatch == true)
-        break;
-
-      bool TypeMatch = GraphVisitor.scheduleEdge(*EdgeIterator);
-
-      bool DirectionMatch = GraphVisitor.visitDirection(TargetVertex, *EdgeIterator);
-
-
-      auto VisitedVertex = VisitedMap.find(TargetVertex);
-        
-//      if ( VisitedVertex == VisitedMap.end() || VisitedMap[TargetVertex] == false || RevisitFlag ) {
-      if ( VisitedVertex == VisitedMap.end() || RevisitFlag ) {
-        GraphVisitor.scheduleTree(CurrentVertex, *EdgeIterator, TargetVertex);
-
-        if( TypeMatch && DirectionMatch) {
-         Stack.push_back(StackEntry(TargetVertex,
-                                   Graph.getOutEdges(TargetVertex) 
-                                   ));
-//          VisitedMap.insert(ColorMapPair(TargetVertex, false));
-        }
-        else {
-          VisitedMap.insert(ColorMapPair(TargetVertex, true));
-          GraphVisitor.revisitVertex(TargetVertex);
-        }
-      }
-    }   
-  }
-  GraphVisitor.finishVisit();
-*/
 }
                       
 

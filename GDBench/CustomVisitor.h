@@ -535,7 +535,11 @@ public:
       _turnFlag = false;
     return false;
   }
-  
+
+  virtual bool discoverVertex(VertexPointer vertex) {
+    return true; 
+  }
+
   virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
     return _direcMatch;
   }
