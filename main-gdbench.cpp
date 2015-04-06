@@ -23,7 +23,7 @@ int main() {
   cout << "Begin testing\n";
 
   GDReader reader(g);
-  reader.readFile("../tests/gd/sndata100-new.gd");
+  reader.readFile("../tests/gd/sndata1000.gd");
 
   //createGraph(g);
   //  Graph::VertexPtr vp0 = g.getVertexPointer(0);
