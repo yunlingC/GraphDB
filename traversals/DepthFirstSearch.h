@@ -39,6 +39,8 @@ void depthFirstSearch(GraphType & Graph,
 
   while ( !VertexStack.empty() ) {
     ScheduledVertex = VertexStack.back();  VertexStack.pop_back();
+    //pass hint
+    //passNodeHint(ScheduledVertex);
     bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
     if(VertexMatch == true)
       return ;

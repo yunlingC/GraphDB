@@ -10,8 +10,8 @@
 int main() {
 
   typedef GraphType Graph;
-  typedef Graph::VertexDescriptor VertexDescriptor;
-  typedef Graph::VertexPointer VertexPointer;
+  //typedef Graph::VertexDescriptor VertexDescriptor;
+  //typedef Graph::VertexPointer VertexPointer;
 
   Graph g;
   cout << "Begin testing\n";
@@ -20,14 +20,21 @@ int main() {
 //  reader.readPerson("../tests/ldbc/social_network/person_0.csv");
 //  reader.readFriends("../tests/ldbc/social_network/person_knows_person_0.csv");
 //  reader.readProperty("../tests/ldbc/social_network/person_email_emailaddress_0.csv");
-  reader.readDirectory("../tests/ldbc/test_network");
+  reader.readDirectory("../tests/ldbc/social_network_100/social_network");
 
   auto persons = reader.getPersonList();
   cout << "Finish reading \n";
 
   cout << "start person " << persons[1] << endl;
-//  LdbcQuery1 q1;
-//  q1.runQuery(g, persons[0]);
+
+  passPtr(0,0,0,0,0,0);
+  //start prefetching trigger
+  
+  LdbcQuery1 q1;
+
+  SimRoiStart();
+  q1.runQuery(g, persons[0]);
+  SimRoiEnd();
 
 //  LdbcQuery2 q2;
 //  q2.runQuery(g, persons[0]);

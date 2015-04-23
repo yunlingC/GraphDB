@@ -41,7 +41,7 @@ public:
   }
 
 
-  virtual bool visitStartVertex(VertexPointer startVertex ) {
+  virtual void visitStartVertex(VertexPointer startVertex ) {
     VertexPath newPath;
     newPath.push_back(startVertex);
     _pathQueue.push(newPath);
@@ -176,6 +176,7 @@ public:
       }
       return true;
     }
+    return false;
   }
 
   virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
@@ -275,6 +276,7 @@ public:
       }
       return true;
     }
+    return false;
   }
 
 protected:

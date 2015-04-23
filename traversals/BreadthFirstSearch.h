@@ -19,6 +19,7 @@
 #include <map>
 
 /// Local includes.
+#include "../GDBench/util.h"
 #include "GraphType.h"
 #include "Visitor.h"
 
@@ -43,6 +44,8 @@ void breadthFirstSearch(GraphType & Graph, const GraphType::VertexDescriptor & S
 
   while ( !VertexQueue.empty() ) {
     ScheduledVertex = VertexQueue.front();  VertexQueue.pop();
+    //pass hint
+    //passNodeHint(ScheduledVertex);
     bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
     if(VertexMatch == true)
       return;

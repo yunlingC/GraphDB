@@ -16,6 +16,7 @@
 
 #include <vector>
 #include <stdlib.h>
+#include <algorithm>
 
 #include "Vertex.h"
 #include "Edge.h"
@@ -289,12 +290,42 @@ public:
     }
   }
 
+  vector<VertexPointer> getAllVertices(){
+    return Vertices;
+  }
+
+  vector<EdgePointer> getAllEdges(){
+    return Edges;
+  }
+
+  void handleAddr(){
+    //g.dump();
+    //vector<VertexPointer> Vertices = getAllVertices();
+    //for(unsigned int i=0;i<Vertices.size();i++){
+    //for(unsigned int i=0;i<50;i++){
+    //  cout<<dec<<Vertices[i]->getId()<<" "<<hex<<Vertices[i]<<" ";
+    //}
+    //cout<<endl;
+
+    VerticesSort = Vertices;
+    EdgesSort = Edges;
+    sort(VerticesSort.begin(),VerticesSort.end());
+    sort(EdgesSort.begin(),EdgesSort.end());
+  //start prefetching trigger
+    passPtr(&VerticesSort,0,&EdgesSort,0,0,0);
+    //cout<<"sof:"<<&Vertices<<endl;
+    //cout<<"sof:"<<Vertices[1]<<endl;
+    //cout<<"sof:"<<Edges[1]<<endl;
+  }
+
   
 protected:
   /// Hold pointers to all vertices.
   vector<VertexPointer> Vertices;
+  vector<VertexPointer> VerticesSort;
   /// Hold pointers to all edges.
   vector<EdgePointer> Edges;
+  vector<EdgePointer> EdgesSort;
   /// Keep a count of vertices and edges.
   unsigned int NumberOfVertices;
   unsigned int NumberOfEdges;

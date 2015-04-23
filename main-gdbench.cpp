@@ -11,7 +11,6 @@
 #include "QueryDescription.h"
 #include "QueryRandomizer.h"
 
-
 int main() {
 
   typedef GraphType Graph;
@@ -63,9 +62,7 @@ int main() {
   Query13 Q13;
   Query14 Q14;
 
-
-  passPtr(0,0,0,0,0,0);
-  //start prefetching trigger
+  g.handleAddr();
  
   auto id = 0; //only one set of input right now
   Q1.setPersonProperty("name", name[id]);
@@ -130,33 +127,33 @@ int main() {
   /// 1: BFS  2: DFS
   SimRoiStart();
   Q1.runQuery(g,  1);
-  Q1.runQuery(g,  2);
-  Q2.runQuery(g,  1);
-  Q2.runQuery(g, 2);
-  Q3.runQuery(g, 1);
-  Q3.runQuery(g, 2);
-  Q4.runQuery(g, 1);
-  Q4.runQuery(g, 2);
-  Q5.runQuery(g, 1);
-  Q5.runQuery(g, 2);
-  Q6.runQuery(g, 1);
-  Q6.runQuery(g, 2);
-  Q7.runQuery(g, 1);
-  Q7.runQuery(g, 2);
-  Q8.runQuery(g, 1);
-  Q8.runQuery(g, 2);
-  Q9.runQuery(g, 1);
-  Q9.runQuery(g, 2);
-  Q10.runQuery(g, 1);
-  Q10.runQuery(g, 2);
-  Q11.runQuery(g, 1);
-  Q11.runQuery(g, 2);
-  Q12.runQuery(g, 1);
-  Q12.runQuery(g, 2);
-  Q13.runQuery(g, 1);
-  Q13.runQuery(g, 2);
-  Q14.runQuery(g, 1);
-  Q14.runQuery(g, 2);
+  //Q1.runQuery(g,  2);
+  //Q2.runQuery(g,  1);
+  //Q2.runQuery(g, 2);
+  //Q3.runQuery(g, 1);
+  //Q3.runQuery(g, 2);
+  //Q4.runQuery(g, 1);
+  //Q4.runQuery(g, 2);
+  //Q5.runQuery(g, 1);
+  //Q5.runQuery(g, 2);
+  //Q6.runQuery(g, 1);
+  //Q6.runQuery(g, 2);
+  //Q7.runQuery(g, 1);
+  //Q7.runQuery(g, 2);
+  //Q8.runQuery(g, 1);
+  //Q8.runQuery(g, 2);
+  //Q9.runQuery(g, 1);
+  //Q9.runQuery(g, 2);
+  //Q10.runQuery(g, 1);
+  //Q10.runQuery(g, 2);
+  //Q11.runQuery(g, 1);
+  //Q11.runQuery(g, 2);
+  //Q12.runQuery(g, 1);
+  //Q12.runQuery(g, 2);
+  //Q13.runQuery(g, 1);
+  //Q13.runQuery(g, 2);
+  //Q14.runQuery(g, 1);
+  //Q14.runQuery(g, 2);
   SimRoiEnd();
   /**
   vector<thread> threads[5];
