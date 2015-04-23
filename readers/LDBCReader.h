@@ -145,13 +145,13 @@ private:
         boost::split(keys, line, boost::is_any_of("|"));
       }
 
-      for (auto j = 0; j < keys.size()-1; j++) {
+      for (unsigned int j = 0; j < keys.size()-1; j++) {
        cout << "key " << keys[j] << endl;
       } 
       while(getline(_LDBCFile, line) != NULL){ 
         PropertyListType PropertyList; 
         boost::split(attributes, line, boost::is_any_of("|"));
-        for(auto i = 0; i < attributes.size()-1; i++) {
+        for(unsigned int i = 0; i < attributes.size()-1; i++) {
           PropertyList.set(keys[i], attributes[i]); 
         }//END_FOR
 
@@ -195,17 +195,17 @@ private:
         boost::split(keys, line, boost::is_any_of("|"));
       }
 
-      for (auto j = 0; j < keys.size()-1; j++) {
+      for (unsigned int j = 0; j < keys.size()-1; j++) {
         cout << "key " << keys[j] << endl;
       } 
       while(getline(_LDBCFile, line) != NULL){ 
         PropertyListType PropertyList; 
         boost::split(attributes, line, boost::is_any_of("|"));
 
-        for(auto i = 2; i < attributes.size()-1; i++) {
+        for(unsigned int i = 2; i < attributes.size()-1; i++) {
           PropertyList.set(keys[i], attributes[i]); 
         }//END_FOR
-        auto flag = false;
+        //auto flag = false;
         if( (_VertexLabelMap.find(EdgeLabel.First) == _VertexLabelMap.end()) ||
             (_VertexLabelMap.find(EdgeLabel.Second) == _VertexLabelMap.end()) ) {
           cout << "Error: Cannot recognize vertex label\n";
@@ -254,7 +254,7 @@ private:
         boost::split(keys, line, boost::is_any_of("|"));
       }
 
-      for (auto j = 0; j < keys.size()-1; j++) {
+      for (unsigned int j = 0; j < keys.size()-1; j++) {
         cout << "key " << keys[j] << endl;
       } 
       while(getline(_LDBCFile, line) != NULL){ 
