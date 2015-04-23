@@ -12,11 +12,11 @@ public:
   typedef char FixedStringType;
   typedef char* FixedStringPtrType;
 public:
-  FixedString(): _size(64) { 
+  FixedString(): _size(32) { 
 
   }
 
-  FixedString(const string & s): _size(64) { 
+  FixedString(const string & s): _size(32) { 
 //    cout << "==> s: " << s <<endl;
     strncpy(_string, const_cast<char*>(s.c_str()), _size);
 //    cout << "==> s: " << _string <<endl;
@@ -89,7 +89,7 @@ public:
   }
 
 protected:
-  FixedStringType _string[64];
+  FixedStringType _string[32];
   unsigned int _size;
 };
 
