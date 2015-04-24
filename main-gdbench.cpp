@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     personId2 = rander.getAPersonIndex(id);
     personId3 = 0;
     if(argc > 3) {
-      personId3 = atoi(argv[4]);
+      personId3 = atoi(argv[3]);
     }
 
     cout << "name\t" << name << endl << "pid\t" << pid << endl << "webId\t" << webId << endl << "personId1\t" <<  personId1 << endl << "personId\t" <<  personId2 << endl << "personId3\t" << personId3 << endl;
@@ -110,7 +110,6 @@ int main(int argc, char *argv[]) {
     Q13.setPersonId(personId1);
     Q14.setPersonProperty("name", name);
 
-    SimRoiStart();
 
     vector<Query*> QueryList;
     QueryList.push_back(&Q1);
@@ -140,9 +139,12 @@ int main(int argc, char *argv[]) {
         return 1;
       }
     }
-    auto query = QueryList[qid-1];
     cout <<"query number is " << qid << endl;
+    auto query = QueryList[qid-1];
+
+    SimRoiStart();
     query->runQuery(g, 1);
+    SimRoiEnd();
 
   }
 
@@ -174,7 +176,6 @@ int main(int argc, char *argv[]) {
   //Q13.runQuery(g, 2);
   //Q14.runQuery(g, 1);
   //Q14.runQuery(g, 2);
-  SimRoiEnd();
 
   cout << "finish testing\n";
   myfile.close();
