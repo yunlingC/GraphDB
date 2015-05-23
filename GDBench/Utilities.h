@@ -279,7 +279,7 @@ bool checkYearRange(GraphElemType elem, Filter & filter, bool & EqualFlag) {
   }
   if(elem->getPropertyValue(filter.getKey()).second == false)
     return false;
-  auto YearProp = stoi(elem->getPropertyValue(filter.getKey()).first.std_str());
+  unsigned int YearProp = stoi(elem->getPropertyValue(filter.getKey()).first.std_str());
   if(cmpResult[0] == false)
     if( YearProp >= Year[0]) {
       if (YearProp == Year[0])
@@ -326,7 +326,7 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
     auto d = mktime(&DateToCheck);
     if(cmpResult[0] != true) {
       auto d1 = mktime(&date[0]);
-      auto cmp = compareTime(d, d1);
+      unsigned int cmp = compareTime(d, d1);
       if (cmp >= 0) {
         if(cmp == 0) 
           EqualFlag = true;
@@ -335,7 +335,7 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
     }
     if(cmpResult[1] != true) {
       auto d2 = mktime(&date[1]);
-      auto cmp2 = compareTime(d2, d);
+      unsigned int cmp2 = compareTime(d2, d);
       if(cmp2 >= true) {
         if(cmp2 == true)
           EqualFlag = true;
