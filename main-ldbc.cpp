@@ -2,42 +2,50 @@
 #include <iostream>
 #include <thread>
 
+#include "GDBench/util.h"
 #include "LDBCReader.h"
 #include "LinkedList.h"
 #include "LdbcQueryDescription.h"
+//#include "LDBCTranslator.h"
 
 
 int main() {
 
   typedef GraphType Graph;
-  //typedef Graph::VertexDescriptor VertexDescriptor;
-  //typedef Graph::VertexPointer VertexPointer;
 
   Graph g;
   cout << "Begin testing\n";
 
   LDBCReader reader(g);
-//  reader.readPerson("../tests/ldbc/social_network/person_0.csv");
-//  reader.readFriends("../tests/ldbc/social_network/person_knows_person_0.csv");
-//  reader.readProperty("../tests/ldbc/social_network/person_email_emailaddress_0.csv");
-  reader.readDirectory("../tests/ldbc/social_network_100/social_network");
-
-  auto persons = reader.getPersonList();
+  reader.readDirectory("../tests/ldbc/social_network_10");
   cout << "Finish reading \n";
 
+  SimRoiStart();
+  g.handleAddr();
+
+  LdbcQuery1 q1;
+  auto persons = reader.getPersonList();
   cout << "start person " << persons[1] << endl;
 
-  passPtr(0,0,0,0,0,0);
+  q1.runQuery(g, persons[1]);
+
+  SimRoiEnd();
+  LdbcFile.close();
+//
+//  auto persons = reader.getPersonList();
+//  cout << "start person " << persons[1] << endl;
+
+//  passPtr(0,0,0,0,0,0);
   //start prefetching trigger
   
-  LdbcQuery1 q1;
+//  LdbcQuery1 q1;
 
-  SimRoiStart();
-  q1.runQuery(g, persons[0]);
-  SimRoiEnd();
+//  SimRoiStart()
+//  q1.runQuery(g, persons[1]);
+//  SimRoiEnd();
 
 //  LdbcQuery2 q2;
-//  q2.runQuery(g, persons[0]);
+//  q2.runQuery(g, persons[1]);
 
 //  LdbcQuery4 q4;
 //  q4.runQuery(g, persons[0]);

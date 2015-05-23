@@ -200,13 +200,37 @@ public:
     }
 
     /// 2. Find the end of the chain for each first/second node.
-    /// The chain is going to iterate over first and second pointers based on who is source.
-    EdgePointer FirstNextEdge = FirstVertexPointer->getNextEdge();
-    chainEdges(FirstVertexPointer, FirstNextEdge, NewEdge);
-    /// Chain the edges for the second vertex.
-    FirstNextEdge = SecondVertexPointer->getNextEdge();
-    chainEdges(SecondVertexPointer, FirstNextEdge, NewEdge);
+    /// get the pointer of the last edge directly from node->getLastNode (no iteration)
+    //TODO remove previous edge  
+    auto FirstLastEdge = FirstVertexPointer->getLastEdge();
+    auto SecondLastEdge = SecondVertexPointer->getLastEdge();
 
+    if ( FirstLastEdge == nullptr ) {
+      FirstVertexPointer->setLastEdge(NewEdge);
+    } else {
+      if ( FirstLastEdge->getFirstVertexPtr() == FirstVertexPointer ) {
+        FirstLastEdge->setFirstNextEdge(NewEdge);
+      }
+      else if( FirstLastEdge->getSecondVertexPtr() == FirstVertexPointer) {
+        FirstLastEdge->setSecondNextEdge(NewEdge);
+      }
+      NewEdge->setFirstPreviousEdge(FirstLastEdge);
+      NewEdge->setFirstNextEdge(nullptr);
+      FirstVertexPointer->setLastEdge(NewEdge);
+    }
+
+    if ( SecondLastEdge == nullptr) {
+      SecondVertexPointer->setLastEdge(NewEdge);
+    } else {
+      if( SecondLastEdge->getFirstVertexPtr() == SecondVertexPointer ) {
+        SecondLastEdge->setFirstNextEdge(NewEdge);
+      } else if ( SecondLastEdge->getSecondVertexPtr() == SecondVertexPointer ) {
+        SecondLastEdge->setSecondNextEdge(NewEdge);
+      }
+      NewEdge->setSecondPreviousEdge(SecondLastEdge);
+      NewEdge->setSecondNextEdge(nullptr);
+      SecondVertexPointer->setLastEdge(NewEdge);
+    }
   }
 
   EdgeDescriptor addEdge(VertexDescriptor StartVertex, VertexDescriptor EndVertex) {

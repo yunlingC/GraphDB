@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
   GDReader reader(g);
   reader.readFile("../tests/gd/sndata1000.gd");
 
-  cout << "begin randomizing\n";
+//  cout << "begin randomizing\n";
   QueryRandomizer rander(reader);
 
 //  string name[5], pid[5] ;
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 //    cout << name[i] << endl << pid[i] << endl << webId[i] << endl << personId1[i] << endl << personId2[i] << endl << personId3[i] << endl;
   }
 */
-
+/**
   if(argc < 3) {
     cout <<"Err: At least 2 arguments\n";
     return 1;
@@ -64,18 +64,23 @@ int main(int argc, char *argv[]) {
       cout <<"Err: Out of range(0:499)\n";
       return 0;
     }
+*/
 
+    string name, pid;
+    VertexDescriptor webId, personId1, personId2, personId3;
+
+    auto id = 1;
     name = rander.getName(id);
     pid  = rander.getPid(id);
     webId = rander.getAWebpageIndex(id);
     personId1 = rander.getAPersonIndex(id);
     personId2 = rander.getAPersonIndex(id);
     personId3 = 0;
-    if(argc > 3) {
-      personId3 = atoi(argv[3]);
-    }
+//    if(argc > 3) {
+//      personId3 = atoi(argv[3]);
+//    }
 
-    cout << "name\t" << name << endl << "pid\t" << pid << endl << "webId\t" << webId << endl << "personId1\t" <<  personId1 << endl << "personId\t" <<  personId2 << endl << "personId3\t" << personId3 << endl;
+//    cout << "name\t" << name << endl << "pid\t" << pid << endl << "webId\t" << webId << endl << "personId1\t" <<  personId1 << endl << "personId\t" <<  personId2 << endl << "personId3\t" << personId3 << endl;
 
     Query1 Q1;
     Query2 Q2;
@@ -127,6 +132,7 @@ int main(int argc, char *argv[]) {
     QueryList.push_back(&Q13);
     QueryList.push_back(&Q14);
 
+    /**
     auto qid = atoi(argv[1]);
     if((qid < 1) || (qid > 14)) {
       cout <<"Err: Out of range(1:14)\n";
@@ -141,12 +147,13 @@ int main(int argc, char *argv[]) {
     }
     cout <<"query number is " << qid << endl;
     auto query = QueryList[qid-1];
-
+   */
     SimRoiStart();
-    query->runQuery(g, 1);
+//    Q1.runQuery(g, 1);
+//    Q2.runQuery(g, 1);
     SimRoiEnd();
 
-  }
+//  }
 
 
   //Q1.runQuery(g,  2);
