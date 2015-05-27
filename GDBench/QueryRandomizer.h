@@ -64,7 +64,8 @@ public:
 //    unsigned int pidCounter = _gdReader.getPeopleCounter();
 //    unsigned int pidId = rand() % (pidCounter/3);
 //    pid = _gdReader.getPidList().at(pidId);
-    pid = _gdReader.getPidList().at(i);
+//    pid = _gdReader.getPidList().at(i);
+    pid = i + 1;
     //std::cout << "Random pid is " << pid << std::endl;
   }
 
