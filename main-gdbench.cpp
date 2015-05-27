@@ -21,17 +21,18 @@ int main(int argc, char *argv[]) {
 
   
   typedef GraphType Graph;
-  typedef Graph::VertexDescriptor VertexDescriptor;
+//  typedef Graph::VertexDescriptor VertexDescriptor;
 
   Graph g;
   cout << "Begin testing\n";
 
   GDReader reader(g);
   reader.setPrintInterval(10000);
-  reader.readFile("../tests/gd/sndata50000.gd");
+  reader.readFile("../tests/gd/sndata80000.gd");
 
   cout << "Finish reading\n";
-  QueryRandomizer rander(reader);
+
+//  QueryRandomizer rander(reader);
 
 //  string name[5], pid[5] ;
 //  VertexDescriptor webId[5], personId1[5], personId2[5], personId3[5];
@@ -67,6 +68,7 @@ int main(int argc, char *argv[]) {
     }
 */
 
+  /**
     string name, pid;
     VertexDescriptor webId, personId1, personId2, personId3;
 
@@ -133,6 +135,7 @@ int main(int argc, char *argv[]) {
     QueryList.push_back(&Q13);
     QueryList.push_back(&Q14);
 
+    */
     /**
     auto qid = atoi(argv[1]);
     if((qid < 1) || (qid > 14)) {
@@ -150,6 +153,7 @@ int main(int argc, char *argv[]) {
     auto query = QueryList[qid-1];
    */
     SimRoiStart();
+    /**
     Q1.runQuery(g, 1);
     Q2.runQuery(g, 1);
     Q3.runQuery(g, 1);
@@ -164,6 +168,7 @@ int main(int argc, char *argv[]) {
     Q12.runQuery(g, 1);
     Q13.runQuery(g, 1);
     Q14.runQuery(g, 1);
+    */
     SimRoiEnd();
 
 //  }
