@@ -27,9 +27,10 @@ int main(int argc, char *argv[]) {
   cout << "Begin testing\n";
 
   GDReader reader(g);
-  reader.readFile("../tests/gd/sndata1000.gd");
+  reader.setPrintInterval(10000);
+  reader.readFile("../tests/gd/sndata50000.gd");
 
-//  cout << "begin randomizing\n";
+  cout << "Finish reading\n";
   QueryRandomizer rander(reader);
 
 //  string name[5], pid[5] ;
@@ -149,8 +150,20 @@ int main(int argc, char *argv[]) {
     auto query = QueryList[qid-1];
    */
     SimRoiStart();
-//    Q1.runQuery(g, 1);
-//    Q2.runQuery(g, 1);
+    Q1.runQuery(g, 1);
+    Q2.runQuery(g, 1);
+    Q3.runQuery(g, 1);
+    Q4.runQuery(g, 1);
+    Q5.runQuery(g, 1);
+    Q6.runQuery(g, 1);
+    Q7.runQuery(g, 1);
+    Q8.runQuery(g, 1);
+    Q9.runQuery(g, 1);
+    Q10.runQuery(g, 1);
+    Q11.runQuery(g, 1);
+    Q12.runQuery(g, 1);
+    Q13.runQuery(g, 1);
+    Q14.runQuery(g, 1);
     SimRoiEnd();
 
 //  }

@@ -17,20 +17,20 @@ int main() {
   cout << "Begin testing\n";
 
   LDBCReader reader(g);
-  reader.readDirectory("../tests/ldbc/social_network_10");
+  reader.readDirectory("../tests/ldbc/social_network_part/New");
   cout << "Finish reading \n";
 
   SimRoiStart();
   g.handleAddr();
 
-  LdbcQuery1 q1;
-  auto persons = reader.getPersonList();
-  cout << "start person " << persons[1] << endl;
+//  LdbcQuery1 q1;
+//  auto persons = reader.getPersonList();
+//  cout << "start person " << persons[1] << endl;
 
-  q1.runQuery(g, persons[1]);
+//  q1.runQuery(g, persons[1]);
 
   SimRoiEnd();
-  LdbcFile.close();
+//  LdbcFile.close();
 //
 //  auto persons = reader.getPersonList();
 //  cout << "start person " << persons[1] << endl;
