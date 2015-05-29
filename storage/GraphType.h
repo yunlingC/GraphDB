@@ -21,6 +21,7 @@
 #include "Vertex.h"
 #include "Edge.h"
 #include "PropertyList.h"
+#include "util.h"
 
 class GraphType {
 public:

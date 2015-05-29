@@ -43,20 +43,17 @@ set(GDB_LD_FLAGS storage)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
 
 # Debug flags
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++11 -D_FIXALLOC_ -Wall -pg")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++11 -D_FIXALLOC_ -Wall ")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_FIXALLOC_ -Wall -pg")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_FIXALLOC_ -Wall ")
 
 
 # Storage sub directory
 add_subdirectory(storage)
 set(TESTS 
-  # main-storage.cpp 
-  #        main-linkedlist.cpp
-        #      main-dfs.cpp
         main-gdbench.cpp
         main-ldbc.cpp
-        main-reader.cpp
+        main-translator.cpp
         )
 
 # This will generate all the executables listed in the TESTS variable

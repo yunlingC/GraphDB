@@ -6,7 +6,6 @@
 #include "LDBCReader.h"
 #include "LinkedList.h"
 #include "LdbcQueryDescription.h"
-//#include "LDBCTranslator.h"
 
 
 int main() {
@@ -21,7 +20,7 @@ int main() {
   cout << "Finish reading \n";
 
   SimRoiStart();
-  g.handleAddr();
+//  g.handleAddr();
 
 //  LdbcQuery1 q1;
 //  auto persons = reader.getPersonList();
