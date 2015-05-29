@@ -19,11 +19,13 @@
 #include <map>
 
 /// Local includes.
-#include "../GDBench/util.h"
+#include "util.h"
 #include "GraphType.h"
 #include "Visitor.h"
 
-void breadthFirstSearch(GraphType & Graph, const GraphType::VertexDescriptor & StartVertex, Visitor & GraphVisitor) {
+void breadthFirstSearch(GraphType & Graph, 
+                        const GraphType::VertexDescriptor & StartVertex,  
+                        Visitor & GraphVisitor) {
 
   typedef pair<GraphType::VertexPointer, bool> VisitPair;
   auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
@@ -47,7 +49,7 @@ void breadthFirstSearch(GraphType & Graph, const GraphType::VertexDescriptor & S
     //pass hint
     //passNodeHint(ScheduledVertex);
     bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
-    if(VertexMatch == true)
+    if( VertexMatch == true )
       return;
       
     // Set to visited.    
@@ -63,14 +65,14 @@ void breadthFirstSearch(GraphType & Graph, const GraphType::VertexDescriptor & S
       bool TypeMatch =  GraphVisitor.scheduleEdge(NextEdge);
       bool DirectionMatch = GraphVisitor.visitDirection(TargetVertex, NextEdge);
 
-      if(BranchMatch == true)
+      if( BranchMatch == true )
         return;
 
-      if ( ColorMap.find(TargetVertex) == ColorMap.end()|| RevisitFlag) {
+      if ( ColorMap.find(TargetVertex ) == ColorMap.end() || RevisitFlag ) {
 	// queue the target for visitation
         GraphVisitor.scheduleTree(ScheduledVertex, NextEdge, TargetVertex);
 
-        if(TypeMatch && DirectionMatch)   {//control the vertex to be visited filtered by type
+        if( TypeMatch && DirectionMatch )   {//control the vertex to be visited filtered by type
 	        VertexQueue.push(TargetVertex);
         //}
 	        ColorMap.insert(VisitPair(TargetVertex,false));

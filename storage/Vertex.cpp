@@ -35,6 +35,17 @@ auto Vertex::setPropertyList(PropertyListTypeReference InitialList)
   VertexPropertyList = InitialList;
 }
 
+auto Vertex::updateProperty(KeyType Key, ValueType Value)
+  -> bool {
+  return VertexPropertyList.update(Key, Value);
+  }
+
+auto Vertex::updateProperty(std::string Key, std::string Value)
+  -> bool {
+  KeyType key(Key); ValueType value(Value);
+  return updateProperty(key, value);
+  }
+
 // Remember you can change this when returned.
 auto Vertex::getPropertyList() 
   -> PropertyListTypeReference  {

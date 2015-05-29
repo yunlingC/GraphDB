@@ -16,10 +16,6 @@
 
 #include <vector>
 #include <map>
-#include <stdlib.h>
-#include <algorithm>
-
-
 
 #include "Vertex.h"
 #include "Edge.h"
@@ -42,19 +38,25 @@ public:
 public:
   /// id cannot be removed, otherwise return wrong pointers
   VertexPointer getVertexPointer(VertexDescriptor Vertex) {
-    if( VertexMap.find(Vertex) != VertexMap.end() ) {
+//    if ( (Vertex > Vertices.size() - 1) || (Vertex < 0) ) {
+//      return nullptr;
+//    }
+    if(VertexMap.find(Vertex) != VertexMap.end()) {
       return VertexMap[Vertex];
     } else {
       return nullptr;
     }
+//    return Vertices[Vertex];
   }
 
+  // TODO
+  /// problem here: cannot delete edge from vector 
+  // solution could be vector-> map
   EdgePointer getEdgePointer(EdgeDescriptor Edge) {
-    if ( EdgeMap.find(Edge) != EdgeMap.end() ) {
-      return EdgeMap[Edge];
-    } else {
+    if ( (Edge > Edges.size() - 1) || (Edge < 0) ) {
       return nullptr;
     }
+    return Edges[Edge];
   }
 
   EdgeList getOutEdges(VertexPointer CurrentVertex) {
@@ -379,43 +381,32 @@ public:
     }
   }
 
-  vector<VertexPointer> getAllVertices(){
-    return Vertices;
-  }
-
-  vector<EdgePointer> getAllEdges(){
-    return Edges;
-  }
-
-
-  void handleAddr(){
-    //g.dump();
-    //vector<VertexPointer> Vertices = getAllVertices();
-    //for(unsigned int i=0;i<Vertices.size();i++){
-    //for(unsigned int i=0;i<50;i++){
-    //  cout<<dec<<Vertices[i]->getId()<<" "<<hex<<Vertices[i]<<" ";
-    //}
-    //cout<<endl;
-
-    VerticesSort = Vertices;
-    EdgesSort = Edges;
-    sort(VerticesSort.begin(),VerticesSort.end());
-    sort(EdgesSort.begin(),EdgesSort.end());
-  //start prefetching trigger
-    passPtr(&VerticesSort,0,&EdgesSort,0,0,0);
-    //cout<<"sof:"<<&Vertices<<endl;
-    //cout<<"sof:"<<Vertices[1]<<endl;
-    //cout<<"sof:"<<Edges[1]<<endl;
+private:
+  //cannot be called outside
+  //TODO delete id in map and mutex in lockmap too
+  bool removeEdgeId(EdgeDescriptor EdgeId) {
+    std::vector<EdgePointer>::iterator it = Edges.begin();
+    for(it = Edges.begin(); it != Edges.end(); it++) {
+      if((*it)->getId() == EdgeId )
+        break;
+    }
+    if(it == Edges.end())
+      /// EdgeId does not exist in graph
+      return false;
+    else {
+      // remove from vector
+      Edges.erase(it);
+      NumberOfEdges--;
+      return true;
+    }
   }
 
 protected:
   /// Hold pointers to all vertices.
   vector<VertexPointer> Vertices;
-  vector<VertexPointer> VerticesSort;
   VertexMapType VertexMap;
   /// Hold pointers to all edges.
   vector<EdgePointer> Edges;
-  vector<EdgePointer> EdgesSort;
   EdgeMapType EdgeMap;
   /// Keep a count of vertices and edges.
   unsigned int NumberOfVertices;

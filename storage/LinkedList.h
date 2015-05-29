@@ -56,6 +56,10 @@ public:
     return _value;
   }
 
+  void updateValue(const ValueType & value) {
+    _value = value;
+  }
+
   ListNode * getNext() {
     return _next;
   }
@@ -139,6 +143,16 @@ public:
       it = it->getNext();
     }
     return fit;
+  }
+  
+  bool update(const KeyType & k, const ValueType & value) {
+    ListNode * fit = find(k);
+    if (fit == nullptr) {
+      return false;
+    } else {
+      fit->updateValue(value);
+      return true;
+    }
   }
 
   void print() {

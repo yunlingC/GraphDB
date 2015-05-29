@@ -17,6 +17,8 @@
 #include "GraphType.h"
 #include "Filter.h"
 #include "FixedString.h"
+#include "LockManager.h"
+#include "TransactionManager.h"
 
 class Visitor {
 public:
@@ -29,55 +31,59 @@ public:
   typedef GraphType::VertexDescriptor VertexDescriptor;
   typedef std::vector<VertexPointer> VertexTarget;
   typedef std::vector<VertexPointer> VertexPath;
+  typedef LogRecord * LogRecordPointer;
+  typedef LockManager &  LockManagerType;
 public:
-  virtual void setFilter(Filter & f) {
-    _filter = f;
+
+  void requestLockManager(LockManager & lm) {
+    _LockManager = lm;
+  }
+  void requestLogRecord(LogRecordPointer log) {
+    _LogRecord = log;
+  }
+
+  void setSleepTime(unsigned int time) {
+    _SleepTime = time;
+  }
+
+  virtual void setFilter(Filter & filter) {
+    _Filter = filter;
   }
 
   virtual Filter & getFilter() { 
-    return _filter;
+    return _Filter;
   }
 
   virtual VertexTarget & getVertexTargetList() {
     return _VertexTargetList;
   }
 
-  virtual void  visitStartVertex(VertexPointer vp) {
-    //return false;
-  }
+  virtual void  visitStartVertex(VertexPointer vertex) { }
 
-  virtual bool discoverVertex(VertexPointer vp) {
+  virtual bool discoverVertex(VertexPointer vertex) {
     return false;
   }
 
-  virtual bool visitVertex(VertexPointer vp) {
-    FixedString key("id");
-    //std::cout << "==>vid " << vp->getId() << " ==>pid " << vp->getPropertyValue(key).first << endl;
+  virtual bool visitVertex(VertexPointer vertex) {
     return false;
   }
 
-  virtual bool scheduleVertex(VertexPointer vp, EdgePointer ep) {
+  virtual bool scheduleVertex(VertexPointer veretx, EdgePointer edge) {
     return false;
   }
 
-  virtual  bool visitEdge(EdgePointer ep) {
+  virtual  bool visitEdge(EdgePointer edge) {
     return false;
   }
-  virtual bool scheduleEdge(EdgePointer ep) {
-    return true; /// default vaue = true so that the vertex will be pushed into queue 
+
+  virtual bool scheduleEdge(EdgePointer edge) {
+    return true; /// default value = true so that the vertex will be pushed into queue 
   }
 
-  /// for bfs only
   virtual bool visitDirection(VertexPointer target, EdgePointer edge){
     return true; /// the same above
   }
 
-  /// TODO delete this 
-  /// for dfs only 0: all direction  1: outedges 2: incoming edges 
-  virtual unsigned int visitDirection(VertexPointer) {
-    return 0;
-  }
-  
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second){
      return false;
   }
@@ -90,16 +96,16 @@ public:
     return false;
   }
 
-  virtual bool finishVisit()
-  {
-    return false;
-  }
-
+  virtual void finishVisit()  { }
 
 protected:
+  unsigned int _SleepTime = 1;
   VertexTarget _VertexTargetList; 
-  Filter _filter;
-
+  Filter _Filter;
+  ///TODO need another variable to record 
+  // whether lockManager is requested
+  LockManager _LockManager;
+  LogRecordPointer _LogRecord;
 };
 
 #endif /*_VISITORS_H_ */

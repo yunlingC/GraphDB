@@ -61,11 +61,17 @@ public:
     return true;
   }
 
-  // void remove(const KeyType & k) {
-  //   KeyType kt(k);
-  //   _pl.erase(kt);
-  // }
-
+  /// in support for update propertylist -Yunling
+  // update the value with key == key to value
+  bool update(const KeyType & key, const ValueType & value) {
+    ReturnValueType returnValue = get(key);
+    if (returnValue.second == false) {
+      return false;
+    } else {
+//      cout << "PropertyList update: " << returnValue.first << "\t" << value << endl;
+      return _pl.update(key, value);
+    }
+  }
 
   ReturnValueType get(const KeyType & k) {
     // Only initialize if known type parameters.

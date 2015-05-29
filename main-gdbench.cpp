@@ -178,6 +178,6 @@ int main(int argc, char *argv[]) {
   //Q14.runQuery(g, 2);
 
   cout << "finish testing\n";
-  myfile.close();
+  MyFile.close();
   return 0;
 }

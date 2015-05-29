@@ -52,6 +52,8 @@ public:
   void setId(unsigned int id);
   void setType(string t);
   void setNextEdge(EdgePtr e);
+  bool updateProperty(KeyType k, ValueType v);
+  bool updateProperty(std::string k, std::string v);
   void setProperty(KeyType k, ValueType v);
   void setPropertyList(PropertyListType & l);
   PropertyListType &  getPropertyList();

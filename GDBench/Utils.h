@@ -1,4 +1,4 @@
-//===-- traversals/Utilities.h - functions to custom visitors---*- C++ -*-===//
+//===-- traversals/Utils.h - functions to custom visitors---*- C++ -*-===//
 //
 //                     CAESR Graph Database 
 //
@@ -11,8 +11,8 @@
 /// \brief This is the function utilities for Graph visitors.
 ///
 //===----------------------------------------------------------------------===//
-#ifndef _UTILITIES_H_
-#define _UTILITIES_H_
+#ifndef _UTILS_H_
+#define _UTILS_H_
 
 #include <stack>
 #include <time.h>
@@ -466,4 +466,4 @@ void computeInDegree(VertexPointer vertex, EdgePointer edge, DegreeList &list) {
   }
 }
 
-#endif /**_UTILITIES_H_*/
+#endif /**_UTILS_H_*/

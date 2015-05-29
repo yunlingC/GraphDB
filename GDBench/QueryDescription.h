@@ -26,7 +26,7 @@
 #include "DepthFirstSearch.h"
 #include "CustomVisitor.h"
 
-ofstream myfile("gd_execution.log", ios_base::out | ios_base::app);
+ofstream MyFile("gd_execution.log", ios_base::out | ios_base::app);
 
 class Query {
 public:
@@ -40,6 +40,15 @@ public:
   
   virtual void runQuery(Graph & graph, TMSwitch c) { }
 
+  virtual void runQuery(Graph & graph, TransactionManager & transM, TMSwitch c) { }
+
+  void setSleepTime(unsigned int time) {
+    _SleepTime = time;
+  }
+
+  void setLockManager(LockManager & lm) {
+    _LockManager = lm;
+  }
   void setPersonProperty(const KeyType & key, const ValueType & value) {
     _Key = key;
     _Value = value;
@@ -65,8 +74,10 @@ protected:
   VertexDescriptor _PersonId;
   VertexDescriptor _PersonId1;
   VertexDescriptor _PersonId2;
-
+  LockManager _LockManager;
+  unsigned int _SleepTime;
 };
+
 class Query14 : public Query {
 public:
  virtual void runQuery(Graph & graph, TMSwitch c) {
@@ -86,16 +97,15 @@ public:
         break;
     }
 
-    myfile << "===============================\n";
-    myfile << "Query 14\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 14\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile << "Traversal from vertex 0." << endl;
-    myfile << endl;
+        MyFile << "---------------------DFS---------------------\n";
+    MyFile << "Traversal from vertex 0." << endl;
+    MyFile << endl;
  }
-
 };
 
 
@@ -120,19 +130,19 @@ public:
         break;
     }
 
-    myfile << "===============================\n";
-    myfile << "Query 1\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 1\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile <<"People with " <<_Key << " = " << _Value <<" is(are) as below\n";
+        MyFile << "---------------------DFS---------------------\n";
+    MyFile <<"People with " <<_Key << " = " << _Value <<" is(are) as below\n";
     auto target = v1.getVertexTargetList();
     for(auto it = target.begin(); it != target.end(); ++it) {
-      myfile << "Vertex " << (*it)->getId();
-      myfile << endl;
+      MyFile << "Vertex " << (*it)->getId();
+      MyFile << endl;
     }
-    myfile << endl;
+    MyFile << endl;
  }
 
 };
@@ -157,20 +167,20 @@ public:
         break;
     }
 
-    myfile << "===============================\n";
-    myfile << "Query 2\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 2\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile << "People who likes webpage id = " << _WebId  << " are as below\n";
+        MyFile << "---------------------DFS---------------------\n";
+    MyFile << "People who likes webpage id = " << _WebId  << " are as below\n";
     auto target= v2.getVertexTargetList();
     for(auto it = target.begin(); it != target.end(); ++it) {
       FixedString key("name");
-      myfile << "Vertex " << (*it)->getId() <<"\t" << (*it)->getPropertyValue(key).first;
-      myfile << endl;
+      MyFile << "Vertex " << (*it)->getId() <<"\t" << (*it)->getPropertyValue(key).first;
+      MyFile << endl;
     }
-    myfile << endl;
+    MyFile << endl;
  }
 };
 
@@ -194,20 +204,20 @@ public:
         break;
     }
 
-    myfile << "===============================\n";
-    myfile << "Query 3\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 3\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile << "Person with vid = " << _PersonId << " likes webpages:\n";
+        MyFile << "---------------------DFS---------------------\n";
+    MyFile << "Person with vid = " << _PersonId << " likes webpages:\n";
     auto target = v3.getVertexTargetList();
     for(auto it = target.begin(); it != target.end(); ++it) {
       FixedString key("wpurl");
-      myfile <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
-      myfile << endl;
+      MyFile <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
+      MyFile << endl;
     }
-    myfile << endl;
+    MyFile << endl;
  }
 };
 
@@ -232,18 +242,18 @@ public:
         break;
     }
 
-    myfile << "===============================\n";
-    myfile << "Query 4\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 4\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile <<"People with " << _Key << " = " << _Value <<" is(are) as below\n";
+        MyFile << "---------------------DFS---------------------\n";
+    MyFile <<"People with " << _Key << " = " << _Value <<" is(are) as below\n";
     auto target = v4.getVertexTargetList();
     for(auto it = target.begin(); it != target.end(); ++it) {
       FixedString key("name");
-      myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
-      myfile << endl;
+      MyFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
+      MyFile << endl;
     }
  }
 };
@@ -251,13 +261,13 @@ public:
 class Query5 : public Query {
 public:
   virtual void runQuery(Graph & graph, TMSwitch c ) {
-    myfile << "===============================\n";
-    myfile << "Query 5\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 5\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile << "The friends of Person with vid = " << _PersonId << " has friends\n";
+        MyFile << "---------------------DFS---------------------\n";
+    MyFile << "The friends of Person with vid = " << _PersonId << " has friends\n";
     Filter tmpFilter[2];
     FixedString key("name");
     std::vector<VertexPointer> target;
@@ -274,7 +284,7 @@ public:
         SimMarker(2, 9);
         auto TargetSet = v5b.getTargetSet(); 
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
-          myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
+          MyFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
         }
         break;
               }
@@ -289,10 +299,10 @@ public:
         depthFirstSearch(graph, _PersonId, v5d);
         SimMarker(2, 10);
         auto target = v5d.getVertexTargetMap();
-        myfile << "---------------------DFS---------------------\n";
+        MyFile << "---------------------DFS---------------------\n";
         for(auto it = target.begin(); it != target.end(); ++it) {
-          myfile <<"Vertex " << (*it).first->getId() << "\t" << (*it).first->getPropertyValue(key).first;
-        myfile << endl;
+          MyFile <<"Vertex " << (*it).first->getId() << "\t" << (*it).first->getPropertyValue(key).first;
+        MyFile << endl;
         }
         break;
               }
@@ -304,12 +314,12 @@ public:
 class Query6: public Query {
 public:
   virtual void runQuery(Graph & graph, TMSwitch c) {
-    myfile << "===============================\n";
-    myfile << "Query 6\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 6\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
+        MyFile << "---------------------DFS---------------------\n";
     FixedString key("wpurl");
     Filter tmpFilter[2];
     switch(c) {
@@ -324,9 +334,9 @@ public:
         breadthFirstSearch(graph, _PersonId, v6b);
         SimMarker(2, 11);
         auto TargetSet = v6b.getTargetSet(); 
-        myfile << "The friends of Person with vid = " << _PersonId<< " like " << TargetSet.size() << " webpages\n";
+        MyFile << "The friends of Person with vid = " << _PersonId<< " like " << TargetSet.size() << " webpages\n";
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
-          myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
+          MyFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
         }
         break;
               }
@@ -341,10 +351,10 @@ public:
         depthFirstSearch(graph, _PersonId, v6d);
         SimMarker(2, 12);
         auto target = v6d.getVertexTargetMap();
-        myfile << "The friends of Person with vid = " << _PersonId << " like " << target.size() << " webpages\n";
+        MyFile << "The friends of Person with vid = " << _PersonId << " like " << target.size() << " webpages\n";
         for(auto it = target.begin(); it != target.end(); ++it) {
-          myfile <<"Vertex " << (*it).first->getId() << "\t" << (*it).first->getPropertyValue(key).first;
-        myfile << endl;
+          MyFile <<"Vertex " << (*it).first->getId() << "\t" << (*it).first->getPropertyValue(key).first;
+        MyFile << endl;
         }
         break;
               }
@@ -355,12 +365,12 @@ public:
 class Query7: public Query {
 public:
   virtual void runQuery(Graph & graph, TMSwitch c ) {
-    myfile << "===============================\n";
-    myfile << "Query 7\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 7\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
+        MyFile << "---------------------DFS---------------------\n";
     Filter tmpFilter[2];
     FixedString key("name");
     switch(c) {
@@ -375,9 +385,9 @@ public:
         breadthFirstSearch(graph, _PersonId, v7b);
         SimMarker(2, 13);
         auto TargetSet = v7b.getTargetSet(); 
-        myfile << "The webpages liked by person vid = " << _PersonId<< " are liked by " << TargetSet.size() << " people: \n";
+        MyFile << "The webpages liked by person vid = " << _PersonId<< " are liked by " << TargetSet.size() << " people: \n";
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
-          myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
+          MyFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
         }
  
         break;
@@ -393,10 +403,10 @@ public:
         depthFirstSearch(graph, _PersonId, v7d);
         SimMarker(2, 14);
         auto target = v7d.getVertexTargetMap();
-        myfile << "The webpages liked by person vid = " << _PersonId << " are liked by  " << target.size() << " people\n";
+        MyFile << "The webpages liked by person vid = " << _PersonId << " are liked by  " << target.size() << " people\n";
         for(auto it = target.begin(); it != target.end(); ++it) {
-          myfile <<"Vertex " << (*it).first->getId() << "\t" << (*it).first->getPropertyValue(key).first;
-        myfile << endl;
+          MyFile <<"Vertex " << (*it).first->getId() << "\t" << (*it).first->getPropertyValue(key).first;
+        MyFile << endl;
         }
         break;
               }
@@ -408,12 +418,12 @@ public:
 class Query8 : public Query {
 public:
   virtual void runQuery(Graph & graph, TMSwitch c) {
-    myfile << "===============================\n";
-    myfile << "Query 8\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 8\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
+        MyFile << "---------------------DFS---------------------\n";
     switch(c) {
       case 1: {
         SimMarker(1, 15);
@@ -423,9 +433,9 @@ public:
         SimMarker(2, 15);
         auto target = v8b.getVertexTargetList();
         if(!target.empty())
-          myfile << "There is path from " << _PersonId1 << " to " <<  _PersonId2 << endl;
+          MyFile << "There is path from " << _PersonId1 << " to " <<  _PersonId2 << endl;
         else 
-          myfile << _PersonId1 << " and " <<  _PersonId2 <<" are not connected" << endl;
+          MyFile << _PersonId1 << " and " <<  _PersonId2 <<" are not connected" << endl;
         break;
               }
       case 2: {
@@ -436,9 +446,9 @@ public:
         SimMarker(2, 16);
         auto target = v8d.getPathList();
         if(!target.empty())
-          myfile << "There is path from " << _PersonId1 << " to " <<  _PersonId2 << endl;
+          MyFile << "There is path from " << _PersonId1 << " to " <<  _PersonId2 << endl;
         else 
-          myfile << _PersonId1 << " and " <<  _PersonId2 <<" are not connected" << endl;
+          MyFile << _PersonId1 << " and " <<  _PersonId2 <<" are not connected" << endl;
         break;
               }
     }
@@ -448,12 +458,12 @@ public:
 class Query9: public Query {
 public:
   virtual void runQuery(Graph & graph, TMSwitch c ) {
-    myfile << "===============================\n";
-    myfile << "Query 9\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 9\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
+        MyFile << "---------------------DFS---------------------\n";
     //PathVisitor v9;
     //v9.setEndVertex(_PersonId2);
     switch(c) {
@@ -465,11 +475,11 @@ public:
         SimMarker(2, 17);
         auto target = v9b.getVertexTargetList();
         if(target.empty())
-          myfile << _PersonId1 << " and " <<  _PersonId2 <<" are not connected" << endl;
+          MyFile << _PersonId1 << " and " <<  _PersonId2 <<" are not connected" << endl;
         else {
-            myfile << "There are  shortest paths from " << _PersonId1 << " to " <<  _PersonId2 << endl;
+            MyFile << "There are  shortest paths from " << _PersonId1 << " to " <<  _PersonId2 << endl;
           for(auto it = target.begin(); it != target.end(); ++it) {
-            myfile <<"Vertex " << (*it)->getId() << endl;
+            MyFile <<"Vertex " << (*it)->getId() << endl;
           }
         }
         break;
@@ -482,13 +492,13 @@ public:
         SimMarker(2, 18);
         auto target = v9d.getPathList();
         if(target.empty())
-          myfile << _PersonId1 << " and " <<  _PersonId2 <<" are not connected" << endl;
+          MyFile << _PersonId1 << " and " <<  _PersonId2 <<" are not connected" << endl;
         else {
-          myfile << "There are " << target.size() << " shortest paths from " << _PersonId1 << " to " <<  _PersonId2 << endl;
+          MyFile << "There are " << target.size() << " shortest paths from " << _PersonId1 << " to " <<  _PersonId2 << endl;
           for(auto it = target.begin(); it != target.end(); ++it) {
             for (auto iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
-              myfile <<"Vertex " << (*iter)->getId() << endl;
-          myfile << endl;
+              MyFile <<"Vertex " << (*iter)->getId() << endl;
+          MyFile << endl;
          }
        }
         break;
@@ -533,16 +543,16 @@ public:
         break;
               }
     }
-    myfile << "===============================\n";
-    myfile << "Query 10\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 10\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile << "There are " << target.size() << " common friends between  " << _PersonId1 << " and " <<  _PersonId2 << endl;
+        MyFile << "---------------------DFS---------------------\n";
+    MyFile << "There are " << target.size() << " common friends between  " << _PersonId1 << " and " <<  _PersonId2 << endl;
     for(auto it = target.begin(); it != target.end(); ++it) {
-      myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
-    myfile << endl;
+      MyFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
+    MyFile << endl;
     }
   }
 };
@@ -584,17 +594,17 @@ public:
         break;
               }
     }
-    myfile << "===============================\n";
-    myfile << "Query 11\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 11\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile << "There are " << target.size() << " common webpages liked by both " << _PersonId1 << " and " <<  _PersonId2 << endl;
+        MyFile << "---------------------DFS---------------------\n";
+    MyFile << "There are " << target.size() << " common webpages liked by both " << _PersonId1 << " and " <<  _PersonId2 << endl;
     for(auto it = target.begin(); it != target.end(); ++it) {
       FixedString key("wpurl");
-      myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
-      myfile << endl;
+      MyFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
+      MyFile << endl;
     }
   }
 
@@ -624,28 +634,28 @@ public:
         break;
               }
     }
-    myfile << "===============================\n";
-    myfile << "Query 12\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 12\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
+        MyFile << "---------------------DFS---------------------\n";
     FixedString key("name");
-    myfile << "Person with vid = " << _PersonId << " has name: " << graph.getVertexPointer(_PersonId)->getPropertyValue(key).first <<" and  " << target.size() << " friends\n";
+    MyFile << "Person with vid = " << _PersonId << " has name: " << graph.getVertexPointer(_PersonId)->getPropertyValue(key).first <<" and  " << target.size() << " friends\n";
     for (auto it = target.begin(); it != target.end(); it++)
-      myfile << "Vertex " << (*it)->getId() << endl;
+      MyFile << "Vertex " << (*it)->getId() << endl;
  }
 };
 
 class Query13: public Query {
 public:
   virtual void runQuery(Graph & graph, TMSwitch c ) {
-    myfile << "===============================\n";
-    myfile << "Query 13\n";
+    MyFile << "===============================\n";
+    MyFile << "Query 13\n";
     if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+        MyFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
+        MyFile << "---------------------DFS---------------------\n";
     Filter tmpFilter[3];
     FixedString key("name");
     switch(c) {
@@ -662,9 +672,9 @@ public:
         breadthFirstSearch(graph, _PersonId, v13b);
         SimMarker(2, 25);
         auto TargetSet = v13b.getTargetSet(); 
-        myfile << "The friends of friends of person vid = " << _PersonId << " has " << TargetSet.size() << " friends: \n";
+        MyFile << "The friends of friends of person vid = " << _PersonId << " has " << TargetSet.size() << " friends: \n";
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
-          myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
+          MyFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
         }
         break;
               }
@@ -681,11 +691,11 @@ public:
         depthFirstSearch(graph, _PersonId, v13d);
         SimMarker(2, 26);
         auto target = v13d.getVertexTargetMap();
-        myfile << "The friends of friends of person vid = " << _PersonId << " has " << target.size() << " friends: \n";
+        MyFile << "The friends of friends of person vid = " << _PersonId << " has " << target.size() << " friends: \n";
         for(auto it = target.begin(); it != target.end(); ++it) {
         if( (*it).first->getId() != _PersonId ) {
-        myfile <<"Vertex " << (*it).first->getId() << "\t"  << (*it).first->getPropertyValue(key).first;
-      myfile << endl;
+        MyFile <<"Vertex " << (*it).first->getId() << "\t"  << (*it).first->getPropertyValue(key).first;
+      MyFile << endl;
       }
     }
         break;

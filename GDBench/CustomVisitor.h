@@ -2,14 +2,10 @@
 //
 //                     CAESR Graph Database 
 //
-// TODO: LICENSE
-// License. See LICENSE.TXT for details.
+// TODO: LICENSE License. See LICENSE.TXT for details.
 //
 //===----------------------------------------------------------------------===//
-///
-/// \file
-/// \brief This is the customed class for Graph visitors.
-///
+/// / \file / \brief This is the customed class for Graph visitors.  /
 //===----------------------------------------------------------------------===//
 
 #ifndef _CUSTOMVISITOR_H_
@@ -19,7 +15,7 @@
 #include <set>
 
 #include "Visitor.h"
-#include "Utilities.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -30,17 +26,16 @@ public:
 public:
   SelectionVisitor() { }
 
-  virtual bool visitVertex(VertexPointer vp) {
-    bool VertexMatch = checkProperty<ReturnValueType>(vp, getFilter());
+  virtual bool visitVertex(VertexPointer Vertex) {
+    bool VertexMatch = checkProperty<ReturnValueType>(Vertex, getFilter());
     if(VertexMatch == true) 
-      _VertexTargetList.push_back(vp);
-    return TerminateAtVertex(1, _VertexTargetList);
+      _VertexTargetList.push_back(Vertex);
+    return terminateAtVertex(1, _VertexTargetList);
   }
 
-  virtual bool  scheduleEdge(EdgePointer ep ) {
-    return checkType(ep, getFilter() );
+  virtual bool  scheduleEdge(EdgePointer Edge ) {
+    return checkType(Edge, getFilter() );
   }
-
 
   virtual void dumpTarget() {
     dumpVertexTarget(_VertexTargetList);
@@ -52,9 +47,9 @@ class AdjacencyVisitor: public Visitor {
 public:
   AdjacencyVisitor() { }
 
-  virtual bool visitVertex(VertexPointer vertex) {
-    if(_depthList.find(vertex) != _depthList.end())
-      if(_depthList[vertex] >= 1)
+  virtual bool visitVertex(VertexPointer Vertex) {
+    if(_DepthList.find(Vertex) != _DepthList.end())
+      if(_DepthList[Vertex] >= 1)
         return true;
       else 
         return false;
@@ -62,29 +57,27 @@ public:
       return false;
   }
 
-  virtual bool scheduleEdge(EdgePointer edge) {
-    return checkType(edge, _filter);
+  virtual bool scheduleEdge(EdgePointer Edge) {
+    return checkType(Edge, _Filter);
   }
 
-
-  virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
-    return _direcMatch;
-
+  virtual bool visitDirection(VertexPointer Second, EdgePointer Edge) {
+    return _DirecMatch;
   }
 
-  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    bool TypeMatch = checkType(edge, _filter);
-    _direcMatch = checkDirection(second, edge, _filter);
-    if(_direcMatch && TypeMatch ) {
-      _VertexTargetList.push_back(second);
+  virtual bool scheduleBranch(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
+    bool TypeMatch = checkType(Edge, _Filter);
+    _DirecMatch = checkDirection(Second, Edge, _Filter);
+    if(_DirecMatch && TypeMatch ) {
+      _VertexTargetList.push_back(Second);
     }
-    computeDepth(first, edge, second, _depthList);
+    computeDepth(First, Edge, Second, _DepthList);
     return false;
   }
 
 protected:
-  DepthList _depthList;
-  bool _direcMatch;
+  DepthList _DepthList;
+  bool _DirecMatch;
 };
 
 
@@ -97,11 +90,11 @@ public:
   ReachabilityVisitor () { }
 
   virtual void setFilter(Filter & f) {
-    _filterList.push_back(f);
+    _FilterList.push_back(f);
   }
 
   virtual void setDepth(unsigned int depth) {
-    _depthSetting = depth;
+    _DepthSetting = depth;
   }
 
   virtual VertexSetType & getTargetSet() {
@@ -109,9 +102,9 @@ public:
   }
 
   virtual void visitStartVertex(VertexPointer startVertex ) {
-    VertexPath newPath;
-    newPath.push_back(startVertex);
-    _pathQueue.push(newPath);
+    VertexPath NewPath;
+    NewPath.push_back(startVertex);
+    _PathQueue.push(NewPath);
   }
 
   virtual bool discoverVertex(VertexPointer vertex) {
@@ -119,14 +112,14 @@ public:
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-    _prevPath = _pathQueue.front();
-    _pathQueue.pop();
-    if(_prevPath.size() > _depthSetting) {
-      _VertexTargetList.push_back(_prevPath.at(_depthSetting));
-      _TargetSet.insert(_prevPath.at(_depthSetting));
-      while( !_pathQueue.empty()) {
-        auto path = _pathQueue.front(); _pathQueue.pop();
-        _TargetSet.insert(path.at(_depthSetting));
+    _PrevPath = _PathQueue.front();
+    _PathQueue.pop();
+    if(_PrevPath.size() > _DepthSetting) {
+      _VertexTargetList.push_back(_PrevPath.at(_DepthSetting));
+      _TargetSet.insert(_PrevPath.at(_DepthSetting));
+      while( !_PathQueue.empty()) {
+        auto Path = _PathQueue.front(); _PathQueue.pop();
+        _TargetSet.insert(Path.at(_DepthSetting));
       }
       return true;
     }
@@ -134,43 +127,43 @@ public:
   }
 
 
-  virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
-    return _direcMatch;
+  virtual bool visitDirection(VertexPointer Second, EdgePointer Edge) {
+    return _DirecMatch;
   }
 
-  virtual bool scheduleEdge(EdgePointer edge) {
-    return _typeMatch;
+  virtual bool scheduleEdge(EdgePointer Edge) {
+    return _TypeMatch;
   }
 
-  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
+  virtual bool scheduleBranch(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
     unsigned int depthSecond = 0;
-    if(_prevPath.back() == first) {
-      depthSecond = _prevPath.size();
+    if(_PrevPath.back() == First) {
+      depthSecond = _PrevPath.size();
     }
 
     Filter filter;
     if(depthSecond > 0)
-      filter = _filterList[depthSecond-1];
+      filter = _FilterList[depthSecond-1];
     else
       filter.setDefault();
    
-    _typeMatch = checkType(edge, filter);
-    _direcMatch = checkDirection(second, edge, filter);
-    if(_typeMatch && _direcMatch) {
-      VertexPath newPath = _prevPath;
-      newPath.push_back(second);
-      _pathQueue.push(newPath);
+    _TypeMatch = checkType(Edge, filter);
+    _DirecMatch = checkDirection(Second, Edge, filter);
+    if(_TypeMatch && _DirecMatch) {
+      VertexPath NewPath = _PrevPath;
+      NewPath.push_back(Second);
+      _PathQueue.push(NewPath);
     }
     return false;
   }
 
 protected:
-  unsigned int  _typeMatch;
-  unsigned int  _direcMatch;
-  unsigned int  _depthSetting;
-  std::vector<Filter> _filterList;
-  VertexPath   _prevPath;
-  PathQueue  _pathQueue;
+  unsigned int  _TypeMatch;
+  unsigned int  _DirecMatch;
+  unsigned int  _DepthSetting;
+  std::vector<Filter> _FilterList;
+  VertexPath   _PrevPath;
+  PathQueue  _PathQueue;
   VertexSetType _TargetSet;
 };
 
@@ -182,38 +175,38 @@ public:
   PathVisitor () { }
 
   void setEndVertex(VertexDescriptor vertex) {
-    _endVertex =  vertex;
+    _EndVertex =  vertex;
   }
 
   virtual void visitStartVertex(VertexPointer startVertex ) {
-    _startVertex = startVertex->getId();
-    VertexPath newPath;
-    newPath.push_back(startVertex);
-    _pathQueue.push(newPath);
+    _StartVertex = startVertex->getId();
+    VertexPath NewPath;
+    NewPath.push_back(startVertex);
+    _PathQueue.push(NewPath);
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-    _prevPath = _pathQueue.front();
-    _pathQueue.pop();
+    _PrevPath = _PathQueue.front();
+    _PathQueue.pop();
     return false;
   }
 
-  virtual bool scheduleTree(VertexPointer first, EdgePointer edge, VertexPointer second) {
-      VertexPath newPath = _prevPath;
-      newPath.push_back(second);
-      _pathQueue.push(newPath);
-      if(second->getId() == _endVertex) {
-        _VertexTargetList = newPath;
+  virtual bool scheduleTree(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
+      VertexPath NewPath = _PrevPath;
+      NewPath.push_back(Second);
+      _PathQueue.push(NewPath);
+      if(Second->getId() == _EndVertex) {
+        _VertexTargetList = NewPath;
         return true;
       }
     return false;
   }
   
 protected:
-  VertexDescriptor _endVertex;
-  VertexDescriptor _startVertex;
-  VertexPath   _prevPath;
-  PathQueue  _pathQueue;
+  VertexDescriptor _EndVertex;
+  VertexDescriptor _StartVertex;
+  VertexPath   _PrevPath;
+  PathQueue  _PathQueue;
 };
 
 class PatternVisitor : public Visitor {
@@ -223,32 +216,32 @@ public:
   PatternVisitor () { }
 
   void setFilter(Filter & f) {
-    _filterList.push_back(f);
+    _FilterList.push_back(f);
   }
 
   void setDepth(unsigned int depth) {
-    _depthSetting = depth;
+    _DepthSetting = depth;
   }
   
   void setEndVertex(VertexDescriptor vertex) {
-    _endVertex =  vertex;
+    _EndVertex =  vertex;
   }
 
   virtual void visitStartVertex(VertexPointer startVertex ) {
-    VertexPath newPath;
-    newPath.push_back(startVertex);
-    _pathQueue.push(newPath);
+    VertexPath NewPath;
+    NewPath.push_back(startVertex);
+    _PathQueue.push(NewPath);
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-    _prevPath = _pathQueue.front();
-    _pathQueue.pop();
-    if(_prevPath.size() > _depthSetting) {
-      if(_prevPath.at(_depthSetting)->getId() == _endVertex) 
-        _VertexTargetList.push_back(_prevPath.at(1));
-      while( !_pathQueue.empty()) {
-        auto path = _pathQueue.front(); _pathQueue.pop();
-        if( path.at(_depthSetting)->getId() == _endVertex) {
+    _PrevPath = _PathQueue.front();
+    _PathQueue.pop();
+    if(_PrevPath.size() > _DepthSetting) {
+      if(_PrevPath.at(_DepthSetting)->getId() == _EndVertex) 
+        _VertexTargetList.push_back(_PrevPath.at(1));
+      while( !_PathQueue.empty()) {
+        auto path = _PathQueue.front(); _PathQueue.pop();
+        if( path.at(_DepthSetting)->getId() == _EndVertex) {
           bool unique = true;
           for (auto it = _VertexTargetList.begin() ; it != _VertexTargetList.end(); ++ it) {/// do not store repeated veretx
             if ( *it == path.at(1)) {
@@ -265,54 +258,54 @@ public:
     return false;
   }
 
-  virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
-    return _direcMatch;
+  virtual bool visitDirection(VertexPointer target, EdgePointer Edge) {
+    return _DirecMatch;
 
   }
 
-  virtual bool scheduleEdge(EdgePointer edge) {
-    return _typeMatch;
+  virtual bool scheduleEdge(EdgePointer Edge) {
+    return _TypeMatch;
   }
 
   virtual bool discoverVertex(VertexPointer vertex) {
     return true; 
   }
 
-  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
+  virtual bool scheduleBranch(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
     unsigned int depthSecond = 0;
-    if(_prevPath.back() == first) {
-      depthSecond = _prevPath.size();
+    if(_PrevPath.back() == First) {
+      depthSecond = _PrevPath.size();
     }
 
     Filter filter;
       if(depthSecond > 0)
-        filter = _filterList[depthSecond-1];
+        filter = _FilterList[depthSecond-1];
     else
       filter.setDefault();
    
-    _typeMatch = checkType(edge, filter);
-    _direcMatch = checkDirection(second, edge, filter);
+    _TypeMatch = checkType(Edge, filter);
+    _DirecMatch = checkDirection(Second, Edge, filter);
     return false;
   }
 
-  virtual bool scheduleTree(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    if(_typeMatch && _direcMatch) {
-      VertexPath newPath = _prevPath;
-      newPath.push_back(second);
-      _pathQueue.push(newPath);
+  virtual bool scheduleTree(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
+    if(_TypeMatch && _DirecMatch) {
+      VertexPath NewPath = _PrevPath;
+      NewPath.push_back(Second);
+      _PathQueue.push(NewPath);
     }
     return false;
   }
 
 
 protected:
-  bool _typeMatch;
-  bool _direcMatch;
-  unsigned int  _depthSetting;
-  VertexDescriptor _endVertex;
-  std::vector<Filter> _filterList;
-  VertexPath   _prevPath;
-  PathQueue  _pathQueue;
+  bool _TypeMatch;
+  bool _DirecMatch;
+  unsigned int  _DepthSetting;
+  VertexDescriptor _EndVertex;
+  std::vector<Filter> _FilterList;
+  VertexPath   _PrevPath;
+  PathQueue  _PathQueue;
 };
 
 
@@ -323,12 +316,12 @@ public:
 public:
 
   virtual void setFilter(Filter & f) {
-    _filterList.push_back(f);
+    _FilterList.push_back(f);
   }
 
   virtual void visitStartVertex(VertexPointer startVertex ) {
-    _startVertex = startVertex;
-    _depthList.insert(VertexTargetPair(startVertex, 0));
+    _StartVertex = startVertex;
+    _DepthList.insert(VertexTargetPair(startVertex, 0));
   }
 
 
@@ -337,13 +330,13 @@ public:
   }
 
   virtual void setDepth(unsigned int depth) {
-    _depthSetting = depth;
+    _DepthSetting = depth;
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-    if( checkMaxDepth(_depthList) >= _depthSetting) {
-     for( auto it = _depthList.begin(); it != _depthList.end(); ++it ) {
-       if( (*it).second == _depthSetting) {
+    if( checkMaxDepth(_DepthList) >= _DepthSetting) {
+     for( auto it = _DepthList.begin(); it != _DepthList.end(); ++it ) {
+       if( (*it).second == _DepthSetting) {
          _VertexTargetList.insert(VertexTargetPair((*it).first, true));
        }
      }
@@ -351,20 +344,20 @@ public:
     return false;
   }
 
-  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    _typeMatch = false;
-    _direcMatch = false;
-    for(auto it = _depthList.equal_range(first).first; it != _depthList.equal_range(first).second; ++it) {
-      if((*it).first == first) {
-        if((*it).second < _depthSetting) {
-          Filter filter = _filterList[(*it).second];
-          if(_depthList.count(second) <= _depthSetting) {
-          if(checkType(edge, filter) == true)
-            _typeMatch = true;
-          if(checkDirection(second, edge, filter) == true)
-            _direcMatch = true;
-          if(_typeMatch && _direcMatch)
-            recordDepth(first, edge, second, _depthList);
+  virtual bool scheduleBranch(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
+    _TypeMatch = false;
+    _DirecMatch = false;
+    for(auto it = _DepthList.equal_range(First).first; it != _DepthList.equal_range(First).second; ++it) {
+      if((*it).first == First) {
+        if((*it).second < _DepthSetting) {
+          Filter filter = _FilterList[(*it).second];
+          if(_DepthList.count(Second) <= _DepthSetting) {
+          if(checkType(Edge, filter) == true)
+            _TypeMatch = true;
+          if(checkDirection(Second, Edge, filter) == true)
+            _DirecMatch = true;
+          if(_TypeMatch && _DirecMatch)
+            recordDepth(First, Edge, Second, _DepthList);
           } //end if 
         }
       }
@@ -372,23 +365,23 @@ public:
    return false;
   }
 
-  virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
-    return _direcMatch;
+  virtual bool visitDirection(VertexPointer target, EdgePointer Edge) {
+    return _DirecMatch;
   }
 
-  virtual bool scheduleEdge(EdgePointer edge) {
-    return _typeMatch;
+  virtual bool scheduleEdge(EdgePointer Edge) {
+    return _TypeMatch;
   }
 
 protected:
-  Filter _filter;
-  MultiDepthList   _depthList;
-  VertexPointer    _startVertex;
-  bool _typeMatch;
-  bool _direcMatch;
-  unsigned int     _depthSetting;
+  Filter _Filter;
+  MultiDepthList   _DepthList;
+  VertexPointer    _StartVertex;
+  bool _TypeMatch;
+  bool _DirecMatch;
+  unsigned int     _DepthSetting;
   VertexTarget     _VertexTargetList;
-  std::vector<Filter> _filterList;
+  std::vector<Filter> _FilterList;
 };
 
 class DFSPatternVisitor : public Visitor {
@@ -397,38 +390,38 @@ public:
 public:
 
   void setFilter(Filter & f) {
-    _filterList.push_back(f);
+    _FilterList.push_back(f);
   }
 
   void setDepth(unsigned int depth) {
-    _depthSetting = depth;
+    _DepthSetting = depth;
   }
   
   void setEndVertex(VertexDescriptor vertex) {
-    _endVertex =  vertex;
+    _EndVertex =  vertex;
   }
 
   virtual void visitStartVertex(VertexPointer startVertex ) {
-    _startVertex = startVertex;
-    VertexPath newPath;
-    newPath.push_back(startVertex);
-    _pathStack.push_back(newPath);
+    _StartVertex = startVertex;
+    VertexPath NewPath;
+    NewPath.push_back(startVertex);
+    _pathStack.push_back(NewPath);
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-    _prevPath = _pathStack.back();
+    _PrevPath = _pathStack.back();
     _pathStack.pop_back();
-    if(_prevPath.size() > _depthSetting) {
-      if(_prevPath.at(_depthSetting)->getId() == _endVertex) {
+    if(_PrevPath.size() > _DepthSetting) {
+      if(_PrevPath.at(_DepthSetting)->getId() == _EndVertex) {
         bool unique = true;
         for (auto it = _VertexTargetList.begin() ; it != _VertexTargetList.end(); ++ it) {/// do not store repeated veretx
-          if ( *it == _prevPath.at(1)) {
+          if ( *it == _PrevPath.at(1)) {
             unique = false;
             break;
           }
         }
         if(unique == true) {
-          _VertexTargetList.push_back(_prevPath.at(1));
+          _VertexTargetList.push_back(_PrevPath.at(1));
         }
       }
     }
@@ -439,56 +432,56 @@ public:
     return true; 
   }
 
-  virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
-    return _direcMatch;
+  virtual bool visitDirection(VertexPointer target, EdgePointer Edge) {
+    return _DirecMatch;
   }
 
-  virtual bool scheduleEdge(EdgePointer edge) {
-    return _typeMatch;
+  virtual bool scheduleEdge(EdgePointer Edge) {
+    return _TypeMatch;
   }
 
-  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    _typeMatch = false;
-    _direcMatch = false;
-    if(_prevPath.size() > _depthSetting) {
+  virtual bool scheduleBranch(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
+    _TypeMatch = false;
+    _DirecMatch = false;
+    if(_PrevPath.size() > _DepthSetting) {
       return true;
     }
 
     unsigned int firstDepth = 1000; //default: get default filter later
-    if(_prevPath.back() == first) {
-      firstDepth = _prevPath.size() - 1;
+    if(_PrevPath.back() == First) {
+      firstDepth = _PrevPath.size() - 1;
     }
 
     Filter filter;
-      if(firstDepth >= 0 && firstDepth < _depthSetting)
-        filter = _filterList[firstDepth];
+      if(firstDepth >= 0 && firstDepth < _DepthSetting)
+        filter = _FilterList[firstDepth];
     else
       filter.setDefault();
 
-   if(second != _startVertex) {
-      _typeMatch = checkType(edge, filter);
-      _direcMatch = checkDirection(second, edge, filter);
+   if(Second != _StartVertex) {
+      _TypeMatch = checkType(Edge, filter);
+      _DirecMatch = checkDirection(Second, Edge, filter);
    }
     return false;
   }
 
-  virtual bool scheduleTree(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    if(_typeMatch && _direcMatch) {
-      VertexPath newPath = _prevPath;
-      newPath.push_back(second);
-      _pathStack.push_back(newPath);
+  virtual bool scheduleTree(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
+    if(_TypeMatch && _DirecMatch) {
+      VertexPath NewPath = _PrevPath;
+      NewPath.push_back(Second);
+      _pathStack.push_back(NewPath);
     }
     return false;
   }
 
 protected:
-  bool _typeMatch;
-  bool _direcMatch;
-  unsigned int  _depthSetting;
-  VertexPointer _startVertex;
-  VertexDescriptor _endVertex;
-  std::vector<Filter> _filterList;
-  VertexPath   _prevPath;
+  bool _TypeMatch;
+  bool _DirecMatch;
+  unsigned int  _DepthSetting;
+  VertexPointer _StartVertex;
+  VertexDescriptor _EndVertex;
+  std::vector<Filter> _FilterList;
+  VertexPath   _PrevPath;
   PathStack _pathStack;
 };
 
@@ -501,38 +494,38 @@ public:
 public:
 
   void setFilter(Filter & f) {
-    _filterList.push_back(f);
+    _FilterList.push_back(f);
   }
 
   void setDepth(unsigned int depth) {
-    _depthSetting = depth;
+    _DepthSetting = depth;
   }
   
   void setEndVertex(VertexDescriptor vertex) {
-    _endVertex =  vertex;
+    _EndVertex =  vertex;
   }
 
 
   PathMap & getPathList() {
-    return _pathMap;
+    return _PathMap;
   }
 
   virtual void visitStartVertex(VertexPointer startVertex ) {
-    _startVertex = startVertex;
-    _tmpMinDepth = 500;
-    _turnFlag = false;
-    VertexPath newPath;
-    newPath.push_back(startVertex);
-    _pathStack.push_back(newPath);
+    _StartVertex = startVertex;
+    _TmpMinDepth = 500;
+    _TurnFlag = false;
+    VertexPath NewPath;
+    NewPath.push_back(startVertex);
+    _pathStack.push_back(NewPath);
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-    _prevPath = _pathStack.back();
+    _PrevPath = _pathStack.back();
     _pathStack.pop_back();
-    if(_prevPath.size() >=  _tmpMinDepth) {
-      _turnFlag = true; //prune not to go on with this branch
+    if(_PrevPath.size() >=  _TmpMinDepth) {
+      _TurnFlag = true; //prune not to go on with this branch
     } else 
-      _turnFlag = false;
+      _TurnFlag = false;
     return false;
   }
 
@@ -540,99 +533,99 @@ public:
     return true; 
   }
 
-  virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
-    return _direcMatch;
+  virtual bool visitDirection(VertexPointer target, EdgePointer Edge) {
+    return _DirecMatch;
   }
 
-  virtual bool scheduleEdge(EdgePointer edge) {
-    return _typeMatch;
+  virtual bool scheduleEdge(EdgePointer Edge) {
+    return _TypeMatch;
   }
 
-  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    _typeMatch = false;
-    _direcMatch = false;
+  virtual bool scheduleBranch(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
+    _TypeMatch = false;
+    _DirecMatch = false;
     /// if the depth of this branch already exceeds the shortest path, then prune
-    if(_turnFlag == true) {
+    if(_TurnFlag == true) {
       return true;
     }
 
-    VertexPath newPath = _prevPath;
-    newPath.push_back(second);
+    VertexPath NewPath = _PrevPath;
+    NewPath.push_back(Second);
     /// if find the endVertex, add to map and never visit this branch and following branches again
-    if(second->getId() == _endVertex) {
-      if (newPath.size() <= _tmpMinDepth) {
-        if(newPath.size() < _tmpMinDepth)
-          _pathMap.clear();
-        _pathMap.insert(PathPair(newPath.size(), newPath));
-        _tmpMinDepth = newPath.size();
+    if(Second->getId() == _EndVertex) {
+      if (NewPath.size() <= _TmpMinDepth) {
+        if(NewPath.size() < _TmpMinDepth)
+          _PathMap.clear();
+        _PathMap.insert(PathPair(NewPath.size(), NewPath));
+        _TmpMinDepth = NewPath.size();
       }
       return true;
     } else {
-      _typeMatch = true;
-      _direcMatch = true;
+      _TypeMatch = true;
+      _DirecMatch = true;
       return false;
     }
   }
 
-  virtual bool scheduleTree(VertexPointer first, EdgePointer edge, VertexPointer second){
+  virtual bool scheduleTree(VertexPointer First, EdgePointer Edge, VertexPointer Second){
 
-    if(_typeMatch && _direcMatch) {
-      VertexPath newPath = _prevPath;
-      newPath.push_back(second);
-      _pathStack.push_back(newPath);
+    if(_TypeMatch && _DirecMatch) {
+      VertexPath NewPath = _PrevPath;
+      NewPath.push_back(Second);
+      _pathStack.push_back(NewPath);
     }
     return false;
   }
 
 protected:
-  bool _turnFlag;
-  unsigned int  _tmpMinDepth;
-  unsigned int  _typeMatch;
-  unsigned int  _direcMatch;
-  unsigned int  _depthSetting;
-  VertexPointer _startVertex;
-  VertexDescriptor _endVertex;
-  std::vector<Filter> _filterList;
-  PathMap     _pathMap;
-  VertexPath   _prevPath;
+  bool _TurnFlag;
+  unsigned int  _TmpMinDepth;
+  unsigned int  _TypeMatch;
+  unsigned int  _DirecMatch;
+  unsigned int  _DepthSetting;
+  VertexPointer _StartVertex;
+  VertexDescriptor _EndVertex;
+  std::vector<Filter> _FilterList;
+  PathMap     _PathMap;
+  VertexPath   _PrevPath;
   PathStack _pathStack;
 };
 
 class DFSPathVisitor : public DFSShortestPathVisitor {
 public:
   virtual bool visitVertex(VertexPointer vertex) {
-    _prevPath = _pathStack.back();
+    _PrevPath = _pathStack.back();
     _pathStack.pop_back();
-    if(_prevPath.size() >=  _tmpMinDepth) {
-      _turnFlag = true; //prune not to go on with this branch
+    if(_PrevPath.size() >=  _TmpMinDepth) {
+      _TurnFlag = true; //prune not to go on with this branch
     } else 
-      _turnFlag = false;
+      _TurnFlag = false;
     return _TerminateFlag;
   }
 
-  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    _typeMatch = false;
-    _direcMatch = false;
+  virtual bool scheduleBranch(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
+    _TypeMatch = false;
+    _DirecMatch = false;
     /// if the depth of this branch already exceeds the shortest path, then prune
-    if(_turnFlag == true) {
+    if(_TurnFlag == true) {
       return true;
     }
 
-    VertexPath newPath = _prevPath;
-    newPath.push_back(second);
+    VertexPath NewPath = _PrevPath;
+    NewPath.push_back(Second);
     /// if find the endVertex, add to map and never visit this branch and following branches again
-    if(second->getId() == _endVertex) {
-//      if (newPath.size() <= _tmpMinDepth) {
-//        if(newPath.size() < _tmpMinDepth)
-//          _pathMap.clear();
-        _pathMap.insert(PathPair(newPath.size(), newPath));
-        _tmpMinDepth = newPath.size();
+    if(Second->getId() == _EndVertex) {
+//      if (NewPath.size() <= _TmpMinDepth) {
+//        if(NewPath.size() < _TmpMinDepth)
+//          _PathMap.clear();
+        _PathMap.insert(PathPair(NewPath.size(), NewPath));
+        _TmpMinDepth = NewPath.size();
         _TerminateFlag = true;
 //      }
       return true;
     } else {
-      _typeMatch = true;
-      _direcMatch = true;
+      _TypeMatch = true;
+      _DirecMatch = true;
       return false;
     }
   }
