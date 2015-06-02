@@ -29,56 +29,28 @@ public:
 
   virtual bool visitVertex(VertexPointer vertex) {
     auto ReturnValue = false;
-//    auto Attempt = 10;
     auto Lock = false; 
     while (!Lock) {
       Lock = _LockManager.getVertexSharedLock(vertex->getId());
-//      Attempt--;
-//      if (Attempt < 0) {
-//        break;
-//      }
     }
-    if( Lock ) {
-      if( _DepthList.find(vertex) != _DepthList.end() ) {
-        if( _DepthList[vertex] >= 1 ) {
-          ReturnValue = true;
-        }
-        else {
-          ReturnValue = false;
-        }
+    if( _DepthList.find(vertex) != _DepthList.end() ) {
+      if( _DepthList[vertex] >= 1 ) {
+        ReturnValue = true;
       }
-      else  {
-        ReturnValue = false;
-      }
-    } //end_if
-    else {
-      ///TODO:skip data now......
-      return false;
     }
-    _LockManager.releaseVertexSharedLock(vertex->getId());
+
+   _LockManager.releaseVertexSharedLock(vertex->getId());
     return ReturnValue;
   }
 
   virtual bool scheduleEdge(EdgePointer edge) {
     auto ReturnValue = false;
-//    auto Attempt = 10;
     auto Lock = false; 
     while(!Lock) {
       Lock = _LockManager.getEdgeSharedLock(edge->getId());
-//      Attempt--;
-//      if( Attempt < 0 ) {
-//        break;
-//      }
     }
 
-    if( Lock ) {
-      ReturnValue = checkType(edge, _Filter);
-    }
-    else {
-      ///skip current edge
-      cout << "skip data on edge" << edge->getId() << "\n";
-      return false;
-    }
+    ReturnValue = checkType(edge, _Filter);
     _LockManager.releaseEdgeSharedLock(edge->getId());
     return ReturnValue;
   }
@@ -89,55 +61,39 @@ public:
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
     _DirecMatch = false;
-//    auto AttemptFirst = 10;
-//    auto AttemptSecond = 10;
-//    auto AttemptEdge = 10;
     auto LockFirst = false; 
     auto LockSecond = false; 
     auto LockEdge = false; 
 
-    while( !LockEdge ) {
-      LockEdge = _LockManager.getEdgeSharedLock(edge->getId());
-//      AttemptEdge--;
-//      if( AttemptEdge < 0 ) {
-//        break;
-//      }
-    }
-
-    while( !LockFirst ) {
-      LockFirst = _LockManager.getVertexSharedLock(first->getId());
-//      AttemptFirst--;
-//      if( AttemptFirst < 0 ) {
-//        break;
-//      }
-    }
-
-    while( !LockSecond ) {
-      LockSecond = _LockManager.getVertexSharedLock(second->getId());
-//      AttemptSecond--;
-//      if( AttemptSecond < 0 ) {
-//        break;
-//      }
-    }
-
-    if( LockFirst && LockSecond && LockEdge ) {
-      bool TypeMatch = checkType(edge, _Filter);
-      _DirecMatch = checkDirection(second, edge, _Filter);
-      if( _DirecMatch && TypeMatch ) {
-        _VertexTargetList.push_back(second);
+    while(!LockEdge || !LockFirst || !LockSecond) {
+      if( LockEdge ) {
+        LockEdge = _LockManager.releaseEdgeSharedLock(edge->getId());
       }
-      computeDepth(first, edge, second, _DepthList);
-    } 
 
-    if( LockFirst ) {
-        _LockManager.releaseVertexSharedLock(first->getId());
+      if( LockFirst ) {
+        LockFirst = _LockManager.releaseVertexSharedLock(first->getId());
+      }
+
+      if( LockSecond ) {
+        LockSecond = _LockManager.releaseVertexSharedLock(second->getId());
+      }
+
+      LockEdge = _LockManager.getEdgeSharedLock(edge->getId());
+      LockFirst = _LockManager.getVertexSharedLock(first->getId());
+      LockSecond = _LockManager.getVertexSharedLock(second->getId());
     }
-    if( LockSecond ) {
-      _LockManager.releaseVertexSharedLock(second->getId());
-    } 
-    if( LockEdge ) {
-      _LockManager.releaseEdgeSharedLock(edge->getId());
-    } 
+
+    bool TypeMatch = checkType(edge, _Filter);
+    _DirecMatch = checkDirection(second, edge, _Filter);
+    if( _DirecMatch && TypeMatch ) {
+      _VertexTargetList.push_back(second);
+    }
+
+    computeDepth(first, edge, second, _DepthList);
+    _LockManager.releaseVertexSharedLock(first->getId());
+    _LockManager.releaseVertexSharedLock(second->getId());
+    _LockManager.releaseEdgeSharedLock(edge->getId());
+
     return false;
   }
 
@@ -156,79 +112,38 @@ public:
   UpdateVisitor (LockManagerType & lm) : _LockManager(lm) {}
   virtual bool visitVertex(VertexPointer vp) {
     bool VertexMatch = checkProperty<ReturnValueType>(vp, getFilter());
-    if( VertexMatch == true ) {
-      _VertexTargetList.push_back(vp);
-      std::shared_ptr<Mutex> mp(nullptr);
-      if( _LockManager.getVertexLockMap().find(vp->getId()) != 
-          _LockManager.getVertexLockMap().end() ) {
-        mp = ( _LockManager.getVertexLockMap()[vp->getId()] );
-//        unsigned int  chance = 20;
-        while( !mp ) {
-//          chance --;
-//          if( chance > 0 ) {
-//            cout << "Update: Pointer taken, try " << chance << " more times\n";
-            mp = (_LockManager.getVertexLockMap()[vp->getId()]);
-//          } else  {
-//            break;
-//          }
-        }
-        if( mp ) {
-          auto lock = mp->try_lock();
-//          unsigned int chances = 10;
-          while( !lock ) {
-//            chances --;
-//            if(chances > 0) {
-//              cout << "Update: Lock taken, try " << chances << " more times\n";
-              std::this_thread::sleep_for(std::chrono::seconds(1));
-              lock = mp->try_lock();
-//            } else  {
-//              break;
-//            }
-          }
-          if( lock == true ) {
-            _LogRecord->setOperationType(UPDATE);
-            ValueType oldV = vp->getPropertyValue("age").first;
-            PropertyListType oldProperty, newProperty; 
-            oldProperty.set("age", oldV.std_str());
-            newProperty.set("age", "20");
-            _LogRecord->setVertexPropertyPair(VertexPropPair(oldProperty, newProperty));
-            vp->updateProperty("age", "20");
-            std::this_thread::sleep_for(std::chrono::seconds(_SleepTime));
-            _LogRecord->setCommit();
-            mp->unlock();
-            cout << "Update: Success\n";
-          } else {
-            cout << "Update: Failed to get lock, exit\n";
-          }
-        } else {
-          cout << "Update: Failed to get mutex, exit\n";
-        }
-      }
- 
-      return true;
+    if( !VertexMatch ) 
+      return false;
+
+    _VertexTargetList.push_back(vp);
+    auto Lock = false;
+    while( !Lock ) {
+      Lock = _LockManager.getVertexExLock(vp->getId());
     }
-    return false;
+
+    _LogRecord->setOperationType(UPDATE);
+    ValueType oldV = vp->getPropertyValue("age").first;
+    PropertyListType oldProperty, newProperty; 
+    oldProperty.set("age", oldV.std_str());
+    newProperty.set("age", "20");
+    _LogRecord->setVertexPropertyPair(VertexPropPair(oldProperty, newProperty));
+    vp->updateProperty("age", "20");
+
+    _LogRecord->setCommit();
+    _LockManager.releaseVertexExLock(vp->getId());
+    cout << "Update: Success\n";
+    
+    return true;
   }
 
   virtual bool scheduleEdge( EdgePointer edge ) {
     auto ReturnValue = false;
-//    auto Attempt = 10;
     auto Lock = false; 
     while(!Lock) {
       Lock = _LockManager.getEdgeSharedLock(edge->getId());
-//      Attempt--;
-//      if( Attempt < 0 ) {
-//        break;
-//      }
     }
 
-    if( Lock ) {
-      ReturnValue = checkType(edge, _Filter);
-    }
-    else {
-      ///skip current edge
-      return false;
-    }
+    ReturnValue = checkType(edge, _Filter);
     _LockManager.releaseEdgeSharedLock(edge->getId());
     return ReturnValue;
   }
@@ -250,89 +165,49 @@ public:
 
   virtual bool visitVertex(VertexPointer vp) {
     bool VertexMatch = checkProperty<ReturnValueType>(vp, getFilter());
-    if( VertexMatch == true ) {
-      _VertexTargetList.push_back(vp);
-     
-      auto VertexId = Graph.addVertex();
-      _LockManager.addToVertexLockMap(VertexId);
+    if( !VertexMatch ) 
+      return false;
 
-      MutexPointer mpo(nullptr); //mutex for existed vertex
-      MutexPointer mpn(nullptr); //mutex for new-added vertex
-      if( (_LockManager.getVertexLockMap().find(vp->getId()) != 
-            _LockManager.getVertexLockMap().end() ) 
-          && ( _LockManager.getVertexLockMap().find(VertexId) != 
-            _LockManager.getVertexLockMap().end())) {
-        mpo = (_LockManager.getVertexLockMap()[vp->getId()]);
-        mpn = (_LockManager.getVertexLockMap()[VertexId]);
-//        unsigned int  chance = 20;
-        while( !(mpo && mpn) ) {
-//          chance --;
-//          if( chance > 0 ) {
-//            cout << "Insert: Pointer taken, try " << chance << " more times\n";
-            mpo = (_LockManager.getVertexLockMap()[vp->getId()]);
-            mpn = (_LockManager.getVertexLockMap()[VertexId]);
-//          } else  {
-//            break;
-//          }
-        }
-        if( mpo && mpn ) {
-          auto lo = mpo->try_lock(); auto ln = mpn->try_lock();
-//          unsigned int chances = 10;
-          while( !lo  || !ln) {
-//            chances --;
-//            if( chances > 0 ) {
-//              cout << "Insert: Lock taken, try " << chances << " more times\n";
-              if ( lo )
-                mpo->unlock(); 
-              if(ln)
-                mpn->unlock();
-              std::this_thread::sleep_for(std::chrono::seconds(1));
-              lo = mpo->try_lock(); ln = mpn->try_lock();
-//            } else  {
-//              break;
-//            }
-          }
-          if( lo && ln ) {
-            auto EdgeId = Graph.addEdge(vp->getId(), VertexId, "FRIENDS");
-            _LockManager.addToEdgeLockMap(EdgeId);
-//            std::this_thread::sleep_for(std::chrono::seconds(_SleepTime));
-            cout << "Insert: Success\n";
+    _VertexTargetList.push_back(vp);
+   
+    auto VertexId = Graph.addVertex();
+    _LockManager.addToVertexLockMap(VertexId);
 
-            mpo->unlock();
-            mpn->unlock();
-          } else {
-            cout << "Insert: Failed to get lock, exit\n";
-          }
-        } else {
-          cout << "Insert: Failed to get mutex, exit\n";
-        }
-      }
-      return true;
+    auto SourceId = vp->getId();
+    auto VLock = false;
+    auto SLock = false;
+
+    while( !VLock || !SLock ) {
+      if( VLock ) 
+        _LockManager.releaseVertexExLock(VertexId);
+      if( SLock )
+        _LockManager.releaseVertexExLock(SourceId);
+
+      VLock = _LockManager.getVertexExLock(VertexId);
+      SLock = _LockManager.getVertexExLock(SourceId);
     }
-    return false;
+
+    auto EdgeId = Graph.addEdge(vp->getId(), VertexId, "FRIENDS");
+    _LockManager.addToEdgeLockMap(EdgeId);
+    cout << "Insert: Success\n";
+
+    _LockManager.releaseVertexExLock(VertexId);
+    _LockManager.releaseVertexExLock(SourceId);
+
+    return true;
   }
 
   virtual bool scheduleEdge(EdgePointer edge) {
     auto ReturnValue = false;
-//    auto Attempt = 10;
     auto Lock = false; 
-    cout << "check locks number " <<  _LockManager.getVertexLockMap().size() << "\n";
+//    cout << "check locks number " <<  _LockManager.getVertexLockMap().size() << "\n";
     while( !Lock ) {
       Lock = _LockManager.getEdgeSharedLock(edge->getId());
-//      Attempt--;
-//      if( Attempt < 0 ) {
-//        break;
-//      }
     }
 
-    if( Lock ) {
-      ReturnValue = checkType(edge, _Filter);
-    }
-    else {
-      ///skip current edge
-      return false;
-    }
+    ReturnValue = checkType(edge, _Filter);
     _LockManager.releaseEdgeSharedLock( edge->getId() );
+
     return ReturnValue;
   }
 
@@ -359,45 +234,28 @@ public:
 
   virtual bool visitVertex(VertexPointer vertex) {
     VertexMatchFlag = false;
-//    auto Attempt = 10;
     auto Lock = false; 
     while(!Lock) {
       Lock = _LockManager.getVertexSharedLock(vertex->getId());
-//      Attempt--;
-//      if(Attempt < 0) {
-//        break;
-//      }
     }
-    if(Lock) {
-      bool VertexMatch = checkProperty<ReturnValueType>(vertex, getFilter());
-      if(VertexMatch == true) {
-        VertexMatchFlag = true;
-        _VertexTargetList.push_back(vertex);
-      }
+
+    bool VertexMatch = checkProperty<ReturnValueType>(vertex, getFilter());
+    if(VertexMatch == true) {
+      VertexMatchFlag = true;
+      _VertexTargetList.push_back(vertex);
+    }
     _LockManager.releaseVertexSharedLock(vertex->getId());
-    }
     return false;
   }
 
   virtual bool scheduleEdge(EdgePointer edge) {
     auto ReturnValue = false;
-//    auto Attempt = 10;
     auto Lock = false; 
     while(!Lock) {
       Lock = _LockManager.getEdgeSharedLock(edge->getId());
-//      Attempt--;
-//      if(Attempt < 0) {
-//        break;
-//      }
     }
 
-    if(Lock) {
-      ReturnValue = checkType(edge, _Filter);
-    }
-    else {
-      ///skip current edge
-      return false;
-    }
+    ReturnValue = checkType(edge, _Filter);
     _LockManager.releaseEdgeSharedLock(edge->getId());
     return ReturnValue;
   }
@@ -408,75 +266,36 @@ public:
     if (second->getId() != _EndVertex)
       return false;
 
-    MutexPointer mpo(nullptr); //mutex for existed vertex
-    MutexPointer mpn(nullptr); //mutex for new-added vertex
-    MutexPointer mpe(nullptr); //mutex for edge between two 
-      
-    if( (_LockManager.getVertexLockMap().find(first->getId()) 
-          != _LockManager.getVertexLockMap().end()) 
-        && ( _LockManager.getVertexLockMap().find(second->getId()) != _LockManager.getVertexLockMap().end())
-        && ( _LockManager.getEdgeLockMap().find(edge->getId()) != _LockManager.getEdgeLockMap().end())) {
-        mpo = (_LockManager.getVertexLockMap()[first->getId()]);
-        mpn = (_LockManager.getVertexLockMap()[_EndVertex]);
-        mpe = (_LockManager.getEdgeLockMap()[edge->getId()]);
-//        unsigned int  chance = 20;
-        while( !(mpo && mpn && mpe)) {
-//          chance --;
-//          if(chance > 0) {
-//            cout << "Delete: Pointer taken, try " << chance << " more times\n";
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-            if (!mpo) {
-              mpo = (_LockManager.getVertexLockMap()[first->getId()]);
-            }
-            if(!mpn) {
-              mpn = (_LockManager.getVertexLockMap()[_EndVertex]);
-            }
-            if (!mpe) {
-              mpe = (_LockManager.getEdgeLockMap()[edge->getId()]);
-            }
-//          } else  {
-//            break;
-//          }
-        }
-        if(mpo && mpn && mpe) {
-          auto lo = mpo->try_lock(); 
-          auto ln = mpn->try_lock(); 
-          auto le = mpe->try_lock();
-//          unsigned int chances = 10;
-          while( !lo  || !ln || !le) {
-//            chances --;
-//            if(chances > 0) {
-//              cout << "Delete: Lock taken, try " << chances << " more times\n";
-              if (lo)
-                mpo->unlock(); 
-              if(ln)
-                mpn->unlock();
-              if(le)
-                mpe->unlock();
-              std::this_thread::sleep_for(std::chrono::seconds(_SleepTime));
-              lo = mpo->try_lock(); ln = mpn->try_lock(); le = mpe->try_lock();
-//            } else  {
-//              break;
-//            }
-          }
-          if( lo && ln && le) {
-            Graph.removeEdgeChain(edge);
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-            mpo->unlock();
-            mpn->unlock();
-            mpe->unlock();
-            cout << "Delete: Success\n";
-          } else {
-            cout << "Delete: Failed to get lock, exit\n";
-          }
-        } else {
-          cout << "Delete: Failed to get mutex, exit\n";
-        }
-      } else {
-        cout << "Delete: Lock does not exist\n";
-      }
-      return true;
+    unsigned int FirstId = first->getId();
+    unsigned int SecondId = second->getId();
+    unsigned int EdgeId = edge->getId();
+
+    auto FLock = false;
+    auto ELock = false;
+    auto SLock = false;
+
+    while( !FLock || !ELock || !SLock ) {
+      if( FLock ) 
+        _LockManager.releaseVertexExLock(FirstId);
+
+      if( SLock ) 
+        _LockManager.releaseVertexExLock(SecondId);
+
+      if( ELock) 
+        _LockManager.releaseVertexExLock(EdgeId);
+
+      FLock = _LockManager.getVertexExLock(FirstId);
+      SLock = _LockManager.getVertexExLock(SecondId);
+      ELock = _LockManager.getVertexExLock(EdgeId);
     }
+
+    Graph.removeEdgeChain(edge);
+    _LockManager.releaseVertexExLock(FirstId);
+    _LockManager.releaseVertexExLock(SecondId);
+    _LockManager.releaseVertexExLock(EdgeId);
+
+    return true;
+  }
 
   virtual void dumpTarget() {
     dumpVertexTarget(_VertexTargetList);

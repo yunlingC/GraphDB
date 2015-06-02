@@ -29,10 +29,6 @@ typedef std::shared_ptr<Mutex> MutexPointer;
 typedef std::map<unsigned int, MutexPointer> LockMapType;
 typedef std::pair<unsigned int, MutexPointer> LockPair;
 
-struct NullDeleter {
- void operator() (void const *) const { }
-};
-
 class LockManager {
 public:
   typedef vector<unsigned int> LockIdListType;
@@ -50,7 +46,6 @@ public:
         if(mp) {
           if(mp->try_lock()) {
             cout << "get lock\n "; 
-            std::this_thread::sleep_for(std::chrono::seconds(1));
             mp->unlock();
           } else {
             cout <<"no lock\n";
@@ -68,18 +63,18 @@ public:
       if(VertexLockMap.find(id) == VertexLockMap.end())
         ///TODO: shoould be exception here, need to be fixed.
       {
-        cout << "vertex lock num " << VertexLockMap.size() << endl;
         cout << "Error : No such vertex " << id <<" in map \n";
-        return false;
+        exit(0);
+//        return false;
       }
       else {
         MutexPointer mp(nullptr);
         mp = VertexLockMap[id];
         if(mp) {
           if(mp->try_lock_shared()) {
-            cout << "get shared_lock: vertex " << id << "\n"; 
+//            cout << "get shared_lock: vertex " << id << "\n"; 
           } else {
-            cout <<"no shared_lock: vertex " << id << "\n";
+ //           cout <<"no shared_lock: vertex " << id << "\n";
             return false;
           }
         }
@@ -96,14 +91,67 @@ public:
       if(VertexLockMap.find(id) == VertexLockMap.end())
       { 
         cout << "Error : No such vertex " << id <<" in map \n";
-        return false;
+        exit(0);
+//        return false;
       }
       else {
         MutexPointer mp(nullptr);
         mp = VertexLockMap[id];
         if(mp) {
           mp->unlock_shared();
-          cout << "release shard_lock: vertex " << id << "\n"; 
+//          cout << "release shard_lock: vertex " << id << "\n"; 
+          return true;
+        }
+        else {
+          cout << "pointer taken\n";
+          return false;
+        }
+        return true;
+      }
+  }
+  
+  auto getVertexExLock(unsigned int id) 
+    -> bool {
+      if(VertexLockMap.find(id) == VertexLockMap.end())
+        ///TODO: shoould be exception here, need to be fixed.
+      {
+        cout << "Error : No such vertex " << id <<" in map \n";
+        exit(0);
+//        return false;
+      }
+      else {
+        MutexPointer mp(nullptr);
+        mp = VertexLockMap[id];
+        if(mp) {
+          if(mp->try_lock()) {
+//            cout << "get exclusive lock: vertex " << id << "\n"; 
+          } else {
+//            cout <<"no exclusive lock: vertex " << id << "\n";
+            return false;
+          }
+        }
+        else {
+          cout << "pointer taken: " << id << "\n";
+          return false;
+        }
+        return true;
+      }
+  }
+
+  auto releaseVertexExLock(unsigned int id) 
+    -> bool {
+      if(VertexLockMap.find(id) == VertexLockMap.end())
+      { 
+        cout << "Error : No such vertex " << id <<" in map \n";
+        exit(0);
+//        return false;
+      }
+      else {
+        MutexPointer mp(nullptr);
+        mp = VertexLockMap[id];
+        if(mp) {
+          mp->unlock();
+//          cout << "release exclusive_lock: vertex " << id << "\n"; 
           return true;
         }
         else {
@@ -118,18 +166,18 @@ public:
   auto getEdgeSharedLock(unsigned int id) 
     -> bool {
       if(EdgeLockMap.find(id) == EdgeLockMap.end()) {
-        cout << "edge lock num " << EdgeLockMap.size() << endl;
         cout << "Error : No such edge " << id <<" in map \n";
-        return false;
+        exit(0);
+//        return false;
       }
       else {
         MutexPointer mp(nullptr);
         mp = EdgeLockMap[id];
         if(mp) {
           if(mp->try_lock_shared()) {
-            cout << "get shared_lock: edge " << id << "\n"; 
+//            cout << "get shared_lock: edge " << id << "\n"; 
           } else {
-            cout <<"no shared_lock: edge " << id << "\n";
+//            cout <<"no shared_lock: edge " << id << "\n";
             return false;
           }
         }
@@ -145,14 +193,15 @@ public:
     -> bool {
       if(EdgeLockMap.find(id) == EdgeLockMap.end()) {
         cout << "Error : No such edge" << id <<" in map \n";
-        return false;
+        exit(0);
+//        return false;
       }
       else {
         MutexPointer mp(nullptr);
         mp = EdgeLockMap[id];
         if(mp) {
           mp->unlock_shared();
-          cout << "release shared_lock: edge " << id << "\n"; 
+//          cout << "release shared_lock: edge " << id << "\n"; 
           return true;
         }
         else {
@@ -162,6 +211,56 @@ public:
         return true;
       }
   }
+
+  auto getEdgeExLock(unsigned int id) 
+    -> bool {
+      if(EdgeLockMap.find(id) == EdgeLockMap.end()) {
+        cout << "Error : No such edge " << id <<" in map \n";
+        exit(0);
+//        return false;
+      }
+      else {
+        MutexPointer mp(nullptr);
+        mp = EdgeLockMap[id];
+        if(mp) {
+          if(mp->try_lock()) {
+//            cout << "get shared_lock: edge " << id << "\n"; 
+          } else {
+//            cout <<"no shared_lock: edge " << id << "\n";
+            return false;
+          }
+        }
+        else {
+          cout << "pointer taken\n";
+          return false;
+        }
+        return true;
+      }
+  }
+
+  auto releaseEdgeExLock(unsigned int id) 
+    -> bool {
+      if(EdgeLockMap.find(id) == EdgeLockMap.end()) {
+        cout << "Error : No such edge" << id <<" in map \n";
+        exit(0);
+//        return false;
+      }
+      else {
+        MutexPointer mp(nullptr);
+        mp = EdgeLockMap[id];
+        if(mp) {
+          mp->unlock();
+//          cout << "release shared_lock: edge " << id << "\n"; 
+          return true;
+        }
+        else {
+          cout << "pointer taken\n";
+          return false;
+        }
+        return true;
+      }
+  }
+
 
 
   auto getVertexSharedLocks(LockIdListType idList) 
@@ -195,24 +294,24 @@ public:
   /// TODO check map
   auto addToVertexLockMap(unsigned int id) 
     -> void  {
-      cout << "add to vertexlockmap " << id << endl;
+//      cout << "add to vertexlockmap " << id << endl;
 //      Mutex vertex;
 //      auto NewMP = std::make_shared<Mutex>(vertex);
       VertexLockMap.insert(LockPair(id, MutexPointer(new Mutex)));
 //      if(NewMP)
 //        cout << "added " << VertexLockMap[VertexLockMap.size()-1] << "\n";
-      cout << "vertex lock nums " << VertexLockMap.size() << endl;
-      cout << " First lock " << VertexLockMap[0] << "\n";
+//      cout << "vertex lock nums " << VertexLockMap.size() << endl;
+//      cout << " First lock " << VertexLockMap[0] << "\n";
   }
 
   auto addToEdgeLockMap(unsigned int id) 
     -> void  {
-      cout << "add to edgelockmap " << id << endl;
+//      cout << "add to edgelockmap " << id << endl;
 //      Mutex  Edge;
 //      auto NewMutex = std::make_shared<Mutex>(Edge);
 //      EdgeLockMap.insert(LockPair(id, MutexPointer(new Mutex)));
       EdgeLockMap.insert(LockPair(id, MutexPointer(new Mutex))); 
-      cout << "edge lock num " << EdgeLockMap.size() << endl;
+//      cout << "edge lock num " << EdgeLockMap.size() << endl;
   }
  
   auto buildLockMap(GraphType & graph) 
@@ -227,12 +326,12 @@ public:
     for(auto iter = VertexMap.begin();
         iter != VertexMap.end(); iter++) {
       VertexLockMap.insert(LockPair((*iter).first, MutexPointer(new Mutex)));
-      cout << "add lock for vertex: " << (*iter).first << endl;
+//      cout << "add lock for vertex: " << (*iter).first << endl;
     }
     for(auto it = EdgeMap.begin();
         it != EdgeMap.end(); it++) {
       EdgeLockMap.insert(LockPair((*it).first, MutexPointer(new Mutex)));
-      cout << "add lock for edge: " << (*it).first << endl;
+//      cout << "add lock for edge: " << (*it).first << endl;
     }
 
     cout << "after build maps, vertex lock num " << VertexLockMap.size() << " edge lock num " << EdgeLockMap.size() << endl;
