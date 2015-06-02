@@ -27,13 +27,13 @@
 
 class Query18: public Query {
 public:
- virtual void runQuery(Graph & graph, TransactionManager & TransM,  TMSwitch c ) {
+
+  virtual void runQuery(Graph & graph, TransactionManager & TransM, LockManager & _LockManager,  TMSwitch c ) {
     vector<VertexPointer>  target;
     switch(c) {
       case 1: {
         SimMarker(1, 23);
-        AdjacencyExplorer v12b; 
-        v12b.requestLockManager(_LockManager);
+        AdjacencyExplorer v12b(_LockManager); 
         traverseThroughTypeAndDirection("FRIENDS", "out", v12b.getFilter());
         breadthFirstSearch(graph, _PersonId, v12b);
         SimMarker(2, 23);
@@ -42,8 +42,7 @@ public:
               }
       case 2: {
         SimMarker(1, 24);
-        AdjacencyExplorer v12d; 
-        v12d.requestLockManager(_LockManager);
+        AdjacencyExplorer v12d(_LockManager); 
         traverseThroughTypeAndDirection("FRIENDS", "out",  v12d.getFilter());
         depthFirstSearch(graph, _PersonId, v12d);
         SimMarker(2, 24);
@@ -68,9 +67,8 @@ public:
 class Query15 : public Query {
 public:
 
-  virtual void runQuery(Graph & graph, TransactionManager & TransM, TMSwitch c) {
-    UpdateVisitor v1;
-    v1.requestLockManager(_LockManager);
+  virtual void runQuery(Graph & graph, TransactionManager & TransM, LockManager & _LockManager, TMSwitch c) {
+    UpdateVisitor v1(_LockManager);
     v1.requestLogRecord(TransM.addTransaction());
     v1.setSleepTime(_SleepTime);
     switch(c) {
@@ -106,19 +104,19 @@ public:
 
 class Query16 : public Query { 
 public:
-  virtual void runQuery(Graph & graph, TransactionManager & TransM, TMSwitch c) {
+
+  virtual void runQuery(Graph & graph, TransactionManager & TransM, LockManager & _LockManager, TMSwitch c) {
     MyFile << "===============================\n";
     MyFile << "Query 16\n";
     //a new vertex vs
-    InsertVisitor v1(graph);
-    v1.requestLockManager(_LockManager);
+    InsertVisitor v1(graph, _LockManager);
     v1.setSleepTime(_SleepTime);
     switch(c) {
       case 1:
         SimMarker(1, 1);
         filtProperty(_Key, _Value, v1.getFilter());
         traverseThroughType("FRIENDS", v1.getFilter());
-        breadthFirstSearch(_graph, 0, v1 );
+        breadthFirstSearch(graph, 0, v1 );
         SimMarker(2, 1);
         break;
       case 2:
@@ -135,13 +133,13 @@ public:
 
 class Query17 : public Query { 
 public:
-  virtual void runQuery(Graph & graph, TransactionManager & TransM, TMSwitch c) {
+
+  virtual void runQuery(Graph & graph, TransactionManager & TransM, LockManager & _LockManager, TMSwitch c) {
     MyFile << "===============================\n";
     MyFile << "Query 17\n";
     //a new vertex vs
-    DeleteVisitor v1(graph);
+    DeleteVisitor v1(graph, _LockManager);
     v1.setSleepTime(_SleepTime);
-    v1.requestLockManager(_LockManager);
     v1.setEndVertex(9);
     switch(c) {
       case 1:

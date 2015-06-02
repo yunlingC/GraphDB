@@ -35,9 +35,6 @@ public:
   typedef LockManager &  LockManagerType;
 public:
 
-  void requestLockManager(LockManager & lm) {
-    _LockManager = lm;
-  }
   void requestLogRecord(LogRecordPointer log) {
     _LogRecord = log;
   }
@@ -104,7 +101,6 @@ protected:
   Filter _Filter;
   ///TODO need another variable to record 
   // whether lockManager is requested
-  LockManager _LockManager;
   LogRecordPointer _LogRecord;
 };
 

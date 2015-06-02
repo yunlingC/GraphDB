@@ -42,13 +42,12 @@ public:
 
   virtual void runQuery(Graph & graph, TransactionManager & transM, TMSwitch c) { }
 
+  virtual void runQuery(Graph & graph, TransactionManager & transM, LockManager & lockM, TMSwitch c) { }
+
   void setSleepTime(unsigned int time) {
     _SleepTime = time;
   }
 
-  void setLockManager(LockManager & lm) {
-    _LockManager = lm;
-  }
   void setPersonProperty(const KeyType & key, const ValueType & value) {
     _Key = key;
     _Value = value;
@@ -74,7 +73,6 @@ protected:
   VertexDescriptor _PersonId;
   VertexDescriptor _PersonId1;
   VertexDescriptor _PersonId2;
-  LockManager _LockManager;
   unsigned int _SleepTime;
 };
 

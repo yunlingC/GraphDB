@@ -18,25 +18,14 @@
 ///TODO c++14
 #include <shared_mutex>
 #include <iostream>
-//#include <boost/thread/shared_mutex.hpp>
 #include <thread>
 #include <chrono>
 #include <map>
 
 #include "GraphType.h"
 
-//typedef boost::shared_mutex Mutex;
-//typedef boost::shared_lock<Mutex> ReadLock;
-//typedef boost::upgrade_lock<Mutex> UpgradeLock;
-//typedef boost::upgrade_to_unique_lock<Mutex> WriteLock;
-
-//typedef std::mutex Mutex;
 typedef std::shared_timed_mutex Mutex;
-//typedef boost::shared_mutex Mutex;
-//typedef std::unique_lock< Mutex > Lock;
 typedef std::shared_ptr<Mutex> MutexPointer;
-//TODO delete mutexPointer or uniqueMutexPointer
-//typedef std::unique_ptr<Mutex> UniqueMutexPointer;
 typedef std::map<unsigned int, MutexPointer> LockMapType;
 typedef std::pair<unsigned int, MutexPointer> LockPair;
 
@@ -48,6 +37,7 @@ class LockManager {
 public:
   typedef vector<unsigned int> LockIdListType;
 public:
+  LockManager() {}
   /// needs a mutex to guard LockMap in order not to 
   //allow multiple change concurrently
   auto testVertexMutex(unsigned int id) 
@@ -104,7 +94,6 @@ public:
   auto releaseVertexSharedLock(unsigned int id) 
     -> bool {
       if(VertexLockMap.find(id) == VertexLockMap.end())
-        ///TODO: shoould be exception here, need to be fixed.
       { 
         cout << "Error : No such vertex " << id <<" in map \n";
         return false;
@@ -155,7 +144,6 @@ public:
   auto releaseEdgeSharedLock(unsigned int id) 
     -> bool {
       if(EdgeLockMap.find(id) == EdgeLockMap.end()) {
-        ///TODO: shoould be exception here, need to be fixed.
         cout << "Error : No such edge" << id <<" in map \n";
         return false;
       }
@@ -184,7 +172,6 @@ public:
         if(VertexLockMap.find(id) == VertexLockMap.end())
           return false;
         else {
-          ///TODO wrong logic here, need to be fixed
           MutexPointer mp(nullptr);
           mp = VertexLockMap[id];
           if(mp) {
@@ -209,17 +196,22 @@ public:
   auto addToVertexLockMap(unsigned int id) 
     -> void  {
       cout << "add to vertexlockmap " << id << endl;
-      std::shared_ptr<Mutex> NewMP (new Mutex, NullDeleter());
-      //NewMP = std::make_shared<Mutex>;
-      //VertexLockMap.insert(LockPair(id, MutexPointer(new Mutex)));
-      VertexLockMap.insert(LockPair(id, NewMP));
+//      Mutex vertex;
+//      auto NewMP = std::make_shared<Mutex>(vertex);
+      VertexLockMap.insert(LockPair(id, MutexPointer(new Mutex)));
+//      if(NewMP)
+//        cout << "added " << VertexLockMap[VertexLockMap.size()-1] << "\n";
       cout << "vertex lock nums " << VertexLockMap.size() << endl;
+      cout << " First lock " << VertexLockMap[0] << "\n";
   }
 
   auto addToEdgeLockMap(unsigned int id) 
     -> void  {
       cout << "add to edgelockmap " << id << endl;
-      EdgeLockMap.insert(LockPair(id, MutexPointer(new Mutex)));
+//      Mutex  Edge;
+//      auto NewMutex = std::make_shared<Mutex>(Edge);
+//      EdgeLockMap.insert(LockPair(id, MutexPointer(new Mutex)));
+      EdgeLockMap.insert(LockPair(id, MutexPointer(new Mutex))); 
       cout << "edge lock num " << EdgeLockMap.size() << endl;
   }
  
