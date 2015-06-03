@@ -179,8 +179,8 @@ private:
     _nameList.push_back(attributes[1]);
     _graph.addVertex(peopleProp);
     _people++;
-    if ( _people % INTERVAL == 0)
-      cout << "# people " <<_people << "\n";
+//    if ( _people % INTERVAL == 0)
+//      cout << "# people " <<_people << "\n";
   }
   
   void readWebpages(string line){
@@ -207,8 +207,8 @@ private:
 
     _graph.addVertex(webpagesProp);
     _webpages++;
-    if( _webpages % INTERVAL == 0)
-      cout << "# webpages " << _webpages << "\n";
+//    if( _webpages % INTERVAL == 0)
+//      cout << "# webpages " << _webpages << "\n";
   }
 
   void readFriends(string line){
@@ -227,8 +227,8 @@ private:
 
     _graph.addEdge(stoi(attributes[1])-1, stoi(attributes[2])-1, "FRIENDS", friendsProp);
     _friends++;
-    if(_friends % INTERVAL == 0) 
-      cout << "# friend " << _friends << "\n";
+//    if(_friends % INTERVAL == 0) 
+//      cout << "# friend " << _friends << "\n";
   }
 
   void readLikes(string line) {
@@ -249,8 +249,8 @@ private:
     _graph.addEdge(stoi(attributes[1])-1, stoi(attributes[2])-1, "LIKES", likesProp);
     // _graph.addEdge(vs, vd, "LIKES");
     _likes++;
-     if(_likes % INTERVAL == 0) 
-      cout <<"# likes " << _likes  << "\n";
+//     if(_likes % INTERVAL == 0) 
+ //     cout <<"# likes " << _likes  << "\n";
   }
 
 };
