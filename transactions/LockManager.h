@@ -19,7 +19,6 @@
 #include <shared_mutex>
 #include <iostream>
 #include <thread>
-#include <chrono>
 #include <map>
 
 #include "GraphType.h"

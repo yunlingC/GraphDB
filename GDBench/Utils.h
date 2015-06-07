@@ -1,4 +1,4 @@
-//===-- traversals/Utils.h - functions to custom visitors---*- C++ -*-===//
+//===-- traversals/Utilities.h - functions to custom visitors---*- C++ -*-===//
 //
 //                     CAESR Graph Database 
 //
@@ -11,8 +11,8 @@
 /// \brief This is the function utilities for Graph visitors.
 ///
 //===----------------------------------------------------------------------===//
-#ifndef _UTILS_H_
-#define _UTILS_H_
+#ifndef _UTILITIES_H_
+#define _UTILITIES_H_
 
 #include <stack>
 #include <time.h>
@@ -38,9 +38,9 @@ typedef std::stack<unsigned int > LayerStack;
 typedef std::map<unsigned int, VertexTargetSet> LayerMap;
 
 
-void filtProperty(KeyType Key, ValueType Value, Filter & TraversalFilter){
-  TraversalFilter.setKey(Key);
-  TraversalFilter.setValue(Value);
+void filtProperty(KeyType key, ValueType value, Filter & TraversalFilter){
+  TraversalFilter.setKey(key);
+  TraversalFilter.setValue(value);
 }
 
 void filtVertexId(IdType vid , Filter & TraversalFilter) {
@@ -51,8 +51,10 @@ void filtEdgeId (IdType eid, Filter & TraversalFilter) {
   TraversalFilter.setEdgeId(eid);
 }
 
+//TODO set flag 
 void filtType (Type type, Filter & TraversalFilter) {
   TraversalFilter.setType(type);
+//  filtTypeFlag = true;
 }
 
 void traverseThroughDirection(Direction direction, Filter & TraversalFilter) {
@@ -67,7 +69,7 @@ void traverseThroughMultiRelType(RelType types, Filter & TypeFilter ) {
   AttributesType attributes;
   boost::split(attributes, types, boost::is_any_of("+"));
   for (auto it = attributes.begin(); it != attributes.end(); it++)
-//    cout << "types " << *it ;
+    cout << "types " << *it ;
   cout << endl;
   TypeFilter.setTypeList(attributes);
 }
@@ -77,7 +79,7 @@ void traverseThroughTypeAndDirection(Type type, Direction direction, Filter & Tr
   TraversalFilter.setType(type);
 }
 
-bool terminateAtVertex(unsigned int targetNum, VertexTargetSet vertexSet) {
+bool TerminateAtVertex(unsigned int targetNum, VertexTargetSet vertexSet) {
 
     if(vertexSet.size() >= targetNum) 
     {
@@ -92,7 +94,7 @@ bool terminateAtVertex(unsigned int targetNum, VertexTargetSet vertexSet) {
 unsigned int computeDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthList &dl) {
   typedef pair<VertexPointer, unsigned int> DepthPair;
 
-  unsigned int Depth = 1;
+  unsigned int depth = 1;
   if (dl.find(first) == dl.end()) {
     dl.insert(DepthPair(first, 0));
     if(dl.find(second) == dl.end())
@@ -101,39 +103,39 @@ unsigned int computeDepth(VertexPointer first, EdgePointer ep, VertexPointer sec
       dl[second] = 1;
   }
   else {
-    Depth = dl[first] + 1;
+    depth = dl[first] + 1;
     if(dl.find(second) == dl.end()) {
-      dl.insert(DepthPair(second, Depth));
+      dl.insert(DepthPair(second, depth));
     }
     else {
-      if(Depth < dl[second])
-        dl[second] = Depth;
+      if(depth < dl[second])
+        dl[second] = depth;
     }
   }
-  return Depth;
+  return  depth;
 }
 
 void recordDepth(VertexPointer first, EdgePointer ep, VertexPointer second, MultiDepthList &dl) {
   typedef pair<VertexPointer, unsigned int> DepthPair;
 
-  unsigned int Depth = 1;
+  unsigned int depth = 1;
   if (dl.find(first) == dl.end()) {
     dl.insert(DepthPair(first, 0));
     dl.insert(DepthPair(second, 1));
   }
   else {
     for( auto it = dl.equal_range(first).first; it != dl.equal_range(first).second; ++it ) {
-        Depth = (*it).second + 1;
+        depth = (*it).second + 1;
         unsigned int unique = true;
         if(dl.count(second) != 0)
         for(auto iter = dl.equal_range(second).first; iter != dl.equal_range(second).second; ++iter) {
-          if((*iter).second == Depth) {
+          if((*iter).second == depth) {
             unique = false;
             break;
           }
         }
           if(unique == true) {
-            dl.insert(DepthPair(second, Depth));
+            dl.insert(DepthPair(second, depth));
           }
     }
   }
@@ -143,7 +145,7 @@ void recordDepth(VertexPointer first, EdgePointer ep, VertexPointer second, Mult
 void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthList &dl) {
   typedef pair<VertexPointer, unsigned int> DepthPair;
 
-  unsigned int Depth = 1;
+  unsigned int depth = 1;
   if (dl.find(first) == dl.end()) {
     dl.insert(DepthPair(first, 0));
     if(dl.find(second) == dl.end())
@@ -153,19 +155,21 @@ void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, Dept
    
   }
   else {
-    Depth = dl[first] + 1;
+    depth = dl[first] + 1;
     if(dl.find(second) == dl.end()) {
-      dl.insert(DepthPair(second, Depth));
+      dl.insert(DepthPair(second, depth));
     }
     else 
-      dl[second] = Depth;
+      dl[second] = depth;
   }
   return  ;
 
 }
 
 /// check if the vertex's depth == given depth
-bool checkDepth(unsigned int depth, VertexPointer vertex, DepthList & depthList) { if (depthList.find(vertex) != depthList.end()) if(depthList[vertex]  == depth)
+bool checkDepth(unsigned int depth, VertexPointer vertex, DepthList & depthList) {
+  if (depthList.find(vertex) != depthList.end())
+    if(depthList[vertex]  == depth)
       return true;
   return false;
 }
@@ -275,7 +279,7 @@ bool checkYearRange(GraphElemType elem, Filter & filter, bool & EqualFlag) {
   }
   if(elem->getPropertyValue(filter.getKey()).second == false)
     return false;
-  auto YearProp = stoi(elem->getPropertyValue(filter.getKey()).first.std_str());
+  unsigned int YearProp = stoi(elem->getPropertyValue(filter.getKey()).first.std_str());
   if(cmpResult[0] == false)
     if( YearProp >= Year[0]) {
       if (YearProp == Year[0])
@@ -322,7 +326,7 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
     auto d = mktime(&DateToCheck);
     if(cmpResult[0] != true) {
       auto d1 = mktime(&date[0]);
-      auto cmp = compareTime(d, d1);
+      unsigned int cmp = compareTime(d, d1);
       if (cmp >= 0) {
         if(cmp == 0) 
           EqualFlag = true;
@@ -331,7 +335,7 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
     }
     if(cmpResult[1] != true) {
       auto d2 = mktime(&date[1]);
-      auto cmp2 = compareTime(d2, d);
+      unsigned int cmp2 = compareTime(d2, d);
       if(cmp2 >= true) {
         if(cmp2 == true)
           EqualFlag = true;
@@ -466,4 +470,4 @@ void computeInDegree(VertexPointer vertex, EdgePointer edge, DegreeList &list) {
   }
 }
 
-#endif /**_UTILS_H_*/
+#endif /**_UTILITIES_H_*/

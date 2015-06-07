@@ -19,8 +19,7 @@
 #include <stdlib.h>
 #include <algorithm>
 
-
-
+#include "util.h"
 #include "Vertex.h"
 #include "Edge.h"
 #include "PropertyList.h"
