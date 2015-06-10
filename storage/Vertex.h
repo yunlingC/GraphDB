@@ -46,12 +46,14 @@ public:
 
   unsigned int getId();
   EdgePtr getNextEdge();
+  EdgePtr getLastEdge();
   LabelType getType();
   ReturnPropertyValueType getPropertyValue(KeyType k);
   ReturnPropertyValueType getPropertyValue(std::string k);
   void setId(unsigned int id);
   void setType(string t);
   void setNextEdge(EdgePtr e);
+  void setLastEdge(EdgePtr e);
   bool updateProperty(KeyType k, ValueType v);
   bool updateProperty(std::string k, std::string v);
   void setProperty(KeyType k, ValueType v);
@@ -64,6 +66,8 @@ protected:
   unsigned int VertexId;
   // Pointer to next relationship
   EdgePtr NextEdge;
+
+  EdgePtr LastEdge;
 
   LabelType VertexLabel;
 

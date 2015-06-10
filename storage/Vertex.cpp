@@ -55,6 +55,7 @@ auto Vertex::getPropertyList()
 Vertex::Vertex(): 
   VertexId(-1) {
   NextEdge = nullptr;
+  LastEdge = nullptr;
 }
 
 auto Vertex::setId(unsigned int Id) 
@@ -85,6 +86,16 @@ auto Vertex::setNextEdge(EdgePtr NewEdge)
 auto Vertex::getNextEdge() -> EdgePtr {
   return NextEdge;
 }
+
+auto Vertex::setLastEdge(EdgePtr NewEdge) 
+  -> void {
+   LastEdge = NewEdge;
+}
+
+auto Vertex::getLastEdge() -> EdgePtr {
+  return LastEdge;
+}
+
 
 
 auto Vertex::dump() 

@@ -43,7 +43,6 @@ private:
   GraphType & _Graph;
   ifstream _LDBCFile;
   map<string, map<string, VertexDescriptor>> _VertexLabelMap;
-  vector<VertexDescriptor> _PersonList;
 public:
   LDBCReader(GraphType & graph) : _Graph( graph ) { }
 
@@ -91,11 +90,6 @@ public:
 
     closedir(_DirPointer);
     return 0;
-  }
-
-  auto getPersonList() 
-    -> ListTypeReference {
-    return _PersonList;
   }
 
 private:

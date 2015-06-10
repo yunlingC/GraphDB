@@ -69,8 +69,8 @@ void traverseThroughMultiRelType(RelType types, Filter & TypeFilter ) {
   AttributesType attributes;
   boost::split(attributes, types, boost::is_any_of("+"));
   for (auto it = attributes.begin(); it != attributes.end(); it++)
-    cout << "types " << *it ;
-  cout << endl;
+//    cout << "types " << *it ;
+//  cout << endl;
   TypeFilter.setTypeList(attributes);
 }
 
@@ -79,7 +79,7 @@ void traverseThroughTypeAndDirection(Type type, Direction direction, Filter & Tr
   TraversalFilter.setType(type);
 }
 
-bool TerminateAtVertex(unsigned int targetNum, VertexTargetSet vertexSet) {
+bool terminateAtVertex(unsigned int targetNum, VertexTargetSet vertexSet) {
 
     if(vertexSet.size() >= targetNum) 
     {
