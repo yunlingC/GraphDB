@@ -65,8 +65,8 @@ protected:
   VertexDescriptor _PersonId;
   VertexDescriptor _PersonId1;
   VertexDescriptor _PersonId2;
-
 };
+
 class Query14 : public Query {
 public:
  virtual void runQuery(Graph & graph, TMSwitch c) {
