@@ -7,7 +7,7 @@
 #include <string>
 #include <time.h>
 
-#include "GDBench/util.h"
+//#include "GDBench/util.h"
 //#include "GDReader.h"
 #include "LinkedList.h"
 #include "QueryDescription.h"
@@ -61,11 +61,12 @@ int main(int argc, char *argv[]) {
     Query13 Q13;
     Query14 Q14;
 
-    g.handleAddr();
+//    g.handleAddr();
 
     int InputId[19] = {46, 92, 42, 28, 59, 3, 98, 44, 54, 12, 95, 14, 42, 12, 60, 51, 99, 50, 11};
     int i = 0;
     id = InputId[i++];
+
     name = rander.getName(id);
     Q1.setPersonProperty("name", name);
 
@@ -79,7 +80,6 @@ int main(int argc, char *argv[]) {
 
     id = InputId[i++];
     pid  = rander.getPid(id);
-    std::cout << "pid " << pid << std::endl;
     Q4.setPersonProperty("pid", pid);
 
     id = InputId[i++];
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
     Q14.setPersonProperty("name", name);
 
 
-    SimRoiStart();
+//    SimRoiStart();
     Q1.runQuery(g, 1);
     Q2.runQuery(g, 1);
     Q3.runQuery(g, 1);
@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
     Q12.runQuery(g, 1);
     Q13.runQuery(g, 1);
     Q14.runQuery(g, 1);
-    SimRoiEnd();
+//    SimRoiEnd();
 
   cout << "finish testing\n";
   myfile.close();
