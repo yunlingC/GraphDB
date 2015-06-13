@@ -16,6 +16,7 @@ int main() {
 
   typedef GraphType Graph;
   typedef std::thread thread;
+  typedef LocksManager LockManager;
 
   Graph g;
   cout << "Begin testing\n";
@@ -24,8 +25,9 @@ int main() {
 //  reader.readFile("../tests/gd/sndata.gd");
 //
   LDBCReader reader(g);
-  reader.readDirectory("../tests/ldbc/social_network_10/");
+  reader.readDirectory("../tests/ldbc/social_network_10/New");
  
+  std::cout << "Finish reading\n";
   LockManager lockManager;
   lockManager.buildLockMap(g);
   cout << "LockMap built\n";
@@ -34,23 +36,23 @@ int main() {
 
   ///Q16 is for insert: insert a new people make is MOHAMMED 's new friend
   Query16 Q16;
-  Q16.setPersonProperty("firstName","Luis Filipe "); 
+  Q16.setPersonProperty("firstName", "Luis Filipe"); 
 
-  //Q18 is for reading people MOHAMMED 's friends number: 7 orginally
+//  Q18 is for reading people MOHAMMED 's friends number: 7 orginally
   Query18 Q18;
   Q18.setPersonId(0);
 
-  ///without concurrency: results is in gd_excution.log (not logfile for rollback!)
+//  ///without concurrency: results is in gd_excution.log (not logfile for rollback!)
   Q18.runQuery(g, transManager, lockManager, 1);
   Q16.runQuery(g, transManager, lockManager, 1);
   Q18.runQuery(g, transManager, lockManager, 1);
 
   ///In order for observe how locks is working, run every thread twice;
   // sleep time could be changed in order to see how data are locked and released
-  MyFile << "\n\n++++++++++++++Multithread+++++++++++++++\n\n";
+ // MyFile << "\n\n++++++++++++++Multithread+++++++++++++++\n\n";
   vector<thread> threads;
 //  threads.push_back(thread([&] {Q15.runQuery(g, transManager, lockManager, 1);}));
-  threads.push_back(thread([&] {Q18.runQuery(g, transManager, lockManager, 1);}));
+//  threads.push_back(thread([&] {Q18.runQuery(g, transManager, lockManager, 1);}));
   threads.push_back(thread([&] {Q16.runQuery(g, transManager, lockManager, 1);}));
   threads.push_back(thread([&] {Q16.runQuery(g, transManager, lockManager, 1);}));
 //  threads.push_back(thread([&] {Q17.runQuery(g, transManager, lockManager, 1);}));

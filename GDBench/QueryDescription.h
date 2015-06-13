@@ -25,6 +25,7 @@
 #include "BreadthFirstSearch.h"
 #include "DepthFirstSearch.h"
 #include "CustomVisitor.h"
+#include "LocksManager.h"
 
 ofstream MyFile("gd_execution.log", ios_base::out | ios_base::app);
 
@@ -35,6 +36,7 @@ public:
   typedef GraphType Graph;
   typedef unsigned int  TMSwitch; //traversalMethodSwitch: 1: bfs 2: dfs
   typedef GraphType::VertexDescriptor VertexDescriptor;
+  typedef LocksManager LockManagerType;
 public:
   Query() { }
   
@@ -43,6 +45,8 @@ public:
   virtual void runQuery(Graph & graph, TransactionManager & transM, TMSwitch c) { }
 
   virtual void runQuery(Graph & graph, TransactionManager & transM, LockManager & lockM, TMSwitch c) { }
+
+  virtual void runQuery(Graph & graph, TransactionManager & transM, LockManagerType & lockM, TMSwitch c) { }
 
   void setSleepTime(unsigned int time) {
     _SleepTime = time;

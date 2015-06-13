@@ -31,17 +31,17 @@ public:
   typedef GraphType::VertexDescriptor VertexDescriptor;
   typedef std::vector<VertexPointer> VertexTarget;
   typedef std::vector<VertexPointer> VertexPath;
-  typedef LogRecord * LogRecordPointer;
-  typedef LockManager &  LockManagerType;
+//  typedef LogRecord * LogRecordPointer;
+//  typedef LockManager &  LockManagerType;
 public:
 
-  void requestLogRecord(LogRecordPointer log) {
-    _LogRecord = log;
-  }
-
-  void setSleepTime(unsigned int time) {
-    _SleepTime = time;
-  }
+//  void requestLogRecord(LogRecordPointer log) {
+//    _LogRecord = log;
+//  }
+//
+//  void setSleepTime(unsigned int time) {
+//    _SleepTime = time;
+//  }
 
   virtual void setFilter(Filter & filter) {
     _Filter = filter;
@@ -55,7 +55,7 @@ public:
     return _VertexTargetList;
   }
 
-  virtual void  visitStartVertex(VertexPointer vertex) { }
+  virtual void visitStartVertex(VertexPointer vertex) { }
 
   virtual bool discoverVertex(VertexPointer vertex) {
     return false;
@@ -101,7 +101,7 @@ protected:
   Filter _Filter;
   ///TODO need another variable to record 
   // whether lockManager is requested
-  LogRecordPointer _LogRecord;
+//  LogRecordPointer _LogRecord;
 };
 
 #endif /*_VISITORS_H_ */

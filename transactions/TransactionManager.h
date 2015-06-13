@@ -19,105 +19,39 @@
 #include <map>
 
 #include "GraphType.h"
-
-enum OperationType { NOOP, UPDATE, INSERT, DELETE };
-
-class LogRecord {
-public:
-  typedef GraphType::VertexPointer Vertex;
-  typedef GraphType::EdgePointer   Edge;
-  typedef GraphType::VertexPropertyList VProp;
-  typedef GraphType::EdgePropertyList EProp;
-  typedef std::pair<Vertex, Vertex> VertexPair;
-  typedef std::pair<Edge,   Edge> EdgePair;
-  typedef std::pair<VProp,  VProp> VPropPair;
-  typedef std::pair<EProp,  EProp> EPropPair;
-  typedef std::vector<VertexPair> VertexPairListType;
-  typedef std::vector<EdgePair>   EdgePairListType;
-  typedef std::vector<VPropPair> VertexPropPairListType;
-  typedef std::vector<EPropPair> EdgePropPairListType;
-  
-public:
-  LogRecord () : Commit(false), Abort(false), OpType(NOOP) { }
-
-  auto setOperationType (OperationType opT)
-    -> void {
-      OpType = opT; 
-  }
-
-  auto setVertexPropertyPair(const VPropPair & vp) 
-    -> void {
-      VertexPropList.push_back(vp);
-
-    }
-  auto setCommit() 
-    -> void {
-      Commit = true;
-  }
-
-  auto setAbort() 
-    -> void {
-      Abort = true;
-  }
-
-  auto checkStatus() 
-    -> bool {
-    /// no need to rollback
-    if(Commit)  
-      return true;
-    /// must rollback
-    if(Abort)
-      return false;
-    /// could be not finished, no rollback
-    return true;
-  }
-
-  auto checkOperationType()
-    -> OperationType {
-    return OpType;
-  }
-  ~LogRecord() { }
-
-protected:
-  bool Commit ;
-  bool Abort ;
-  OperationType  OpType;
-  VertexPairListType VertexList;
-  EdgePairListType   EdgeList;
-  VertexPropPairListType VertexPropList;
-  EdgePropPairListType EdgePropList;
-
-};
+#include "Transaction.h"
 
 class TransactionManager {
 public:
-  typedef LogRecord *  LogRecordPointer;
-  typedef std::map<unsigned int, LogRecordPointer> TransactionTableType;
+  typedef Transaction *  TransactionPointer;
+  typedef std::map<unsigned int, TransactionPointer> TransactionTableType;
 public:
   TransactionManager() : TransNumber(0) {}
 
-  auto initLogRecord() 
-    -> LogRecordPointer {
-      LogRecordPointer log = new LogRecord;
+  ///TODO not used yet
+  auto initTransaction() 
+    -> TransactionPointer {
+      TransactionPointer log = new Transaction;
       return log;
   }
 
-  auto addLogRecord(unsigned int tid, LogRecordPointer log) 
+  auto addTransaction(unsigned int tid, TransactionPointer log) 
     -> bool  {
       if(TransTable.find(tid) != TransTable.end())
         return false;
-      TransTable.insert(std::pair<unsigned int, LogRecordPointer>(tid, log));
+      TransTable.insert(std::pair<unsigned int, TransactionPointer>(tid, log));
       return true;
   }
 
   auto addTransaction()
-    -> LogRecordPointer {
-      LogRecordPointer log = new LogRecord;
-      TransTable.insert(std::pair<unsigned int, LogRecordPointer>(TransNumber, log));
+    -> TransactionPointer {
+      TransactionPointer log = new Transaction;
+      log->setTxId(TransNumber);
+      TransTable.insert(std::pair<unsigned int, TransactionPointer>(TransNumber, log));
       TransNumber++;
       return log;
   }
-  
+
   auto rollBack(GraphType & graph) 
     -> bool {
     for (auto it = TransTable.begin(); 
@@ -152,16 +86,16 @@ public:
   }
 
 private:
-  auto undoUpdate(GraphType & graph, LogRecordPointer log) 
+  auto undoUpdate(GraphType & graph, TransactionPointer log) 
     -> void {
   }
 
-  auto undoInsert(GraphType & graph, LogRecordPointer log) 
+  auto undoInsert(GraphType & graph, TransactionPointer log) 
     -> void {
     
   }
 
-  auto undoDelete(GraphType & graph, LogRecordPointer log) 
+  auto undoDelete(GraphType & graph, TransactionPointer log) 
     -> void {
     
   }

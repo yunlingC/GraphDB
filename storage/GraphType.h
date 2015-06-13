@@ -286,7 +286,8 @@ public:
     return NewEdge->getId();
   }
 
-  EdgeDescriptor addEdge(VertexDescriptor StartVertex, VertexDescriptor EndVertex, 
+  EdgeDescriptor addEdge(VertexDescriptor StartVertex, 
+                         VertexDescriptor EndVertex, 
                          const string & Label, 
                          PropertyListType & InitialPropertyList) {
 

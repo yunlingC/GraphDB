@@ -142,7 +142,7 @@ private:
 
       if(getline(_LDBCFile, line) != NULL) {
         boost::split(keys, line, boost::is_any_of("|"));
-      }
+       }
 
       while(getline(_LDBCFile, line) != NULL){ 
         PropertyListType PropertyList; 
