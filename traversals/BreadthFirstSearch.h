@@ -19,7 +19,7 @@
 #include <map>
 
 /// Local includes.
-#include "../GDBench/util.h"
+//#include "../GDBench/util.h"
 #include "GraphType.h"
 #include "Visitor.h"
 
@@ -28,7 +28,7 @@ void breadthFirstSearch(GraphType & Graph, const GraphType::VertexDescriptor & S
   typedef pair<GraphType::VertexPointer, bool> VisitPair;
   auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
   //pass hint
-  passNodeHint(ScheduledVertex);
+//  passNodeHint(ScheduledVertex);
 
   // Start traversing the graph from here. 
   std::queue<GraphType::VertexPointer> VertexQueue;

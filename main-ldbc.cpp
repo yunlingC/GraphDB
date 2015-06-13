@@ -2,7 +2,7 @@
 #include <iostream>
 #include <thread>
 
-#include "GDBench/util.h"
+//#include "GDBench/util.h"
 #include "LDBCReader.h"
 #include "LinkedList.h"
 #include "LdbcQueryDescription.h"
@@ -19,7 +19,7 @@ int main() {
   reader.readDirectory("../tests/ldbc/social_network_part/New");
   cout << "Finish reading \n";
 
-  SimRoiStart();
+//  SimRoiStart();
 //  g.handleAddr();
 
 //  LdbcQuery1 q1;
@@ -28,7 +28,7 @@ int main() {
 
 //  q1.runQuery(g, persons[1]);
 
-  SimRoiEnd();
+//  SimRoiEnd();
 //  LdbcFile.close();
 //
 //  auto persons = reader.getPersonList();

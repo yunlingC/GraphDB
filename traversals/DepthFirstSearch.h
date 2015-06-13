@@ -25,7 +25,7 @@ void depthFirstSearch(GraphType & Graph,
   typedef std::pair<GraphType::VertexPointer, bool> VisitPair;
   GraphType::VertexPointer ScheduledVertex = Graph.getVertexPointer(StartVertex);
   //pass hint
-  passNodeHint(ScheduledVertex);
+//  passNodeHint(ScheduledVertex);
 
   std::vector<GraphType::VertexPointer> VertexStack;
   std::map<GraphType::VertexPointer, bool> ColorMap;
