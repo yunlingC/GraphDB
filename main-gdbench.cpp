@@ -5,6 +5,7 @@
 #include <queue>
 #include <thread>
 #include <string>
+#include <time.h>
 
 #include "GDBench/util.h"
 //#include "GDReader.h"
@@ -23,7 +24,12 @@ int main(int argc, char *argv[]) {
 
   GDReader reader(g);
   reader.setPrintInterval(10000);
-  reader.readFile("../tests/gd/sndata80000.gd");
+  reader.readFile("../tests/gd/sndata1000.gd");
+
+//  auto PeopleConnter = reader.getPeopleCounter();
+//  auto WebCounter = reader.getWebpagesCounter();
+//  auto FriendsCounter = getFriendsCounter();
+//  auto LikesCounter = getLikesCounter();
 
   cout << "Finish reading\n";
 
@@ -56,20 +62,72 @@ int main(int argc, char *argv[]) {
     Query14 Q14;
 
     g.handleAddr();
- 
+
+    int InputId[19] = {46, 92, 42, 28, 59, 3, 98, 44, 54, 12, 95, 14, 42, 12, 60, 51, 99, 50, 11};
+    int i = 0;
+    id = InputId[i++];
+    name = rander.getName(id);
     Q1.setPersonProperty("name", name);
+
+    id = InputId[i++];
+    webId = rander.getAWebpageIndex(id);
     Q2.setWebId(webId);
+
+    id = InputId[i++];
+    personId1 = rander.getAPersonIndex(id);
     Q3.setPersonId(personId1);
+
+    id = InputId[i++];
+    pid  = rander.getPid(id);
+    std::cout << "pid " << pid << std::endl;
     Q4.setPersonProperty("pid", pid);
+
+    id = InputId[i++];
+    personId1 = rander.getAPersonIndex(id);
     Q5.setPersonId(personId1);
+
+    id = InputId[i++];
+    personId1 = rander.getAPersonIndex(id);
     Q6.setPersonId(personId1);
+
+    id = InputId[i++];
+    personId1 = rander.getAPersonIndex(id);
     Q7.setPersonId(personId1);
+
+    id = InputId[i++];
+    personId3 = rander.getAPersonIndex(id);
+    id = InputId[i++];
+    personId2 = rander.getAPersonIndex(id);
     Q8.setEndPoints(personId2, personId3);
+
+    id = InputId[i++];
+    personId2 = rander.getAPersonIndex(id);
+    id = InputId[i++];
+    personId3 = rander.getAPersonIndex(id);
     Q9.setEndPoints(personId2, personId3);
+
+    id = InputId[i++];
+    personId2 = rander.getAPersonIndex(id);
+    id = InputId[i++];
+    personId3 = rander.getAPersonIndex(id);
     Q10.setEndPoints(personId2, personId3);
+
+    id = InputId[i++];
+    personId2 = rander.getAPersonIndex(id);
+    id = InputId[i++];
+    personId3 = rander.getAPersonIndex(id);
     Q11.setEndPoints(personId2, personId3);
+
+    id = InputId[i++];
+    personId1 = rander.getAPersonIndex(id);
     Q12.setPersonId(personId1);
+
+    id = InputId[i++];
+    personId1 = rander.getAPersonIndex(id);
     Q13.setPersonId(personId1);
+
+    id = InputId[i++];
+    name = rander.getName(id);
     Q14.setPersonProperty("name", name);
 
 

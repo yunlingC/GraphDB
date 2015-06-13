@@ -65,7 +65,7 @@ public:
 //    unsigned int pidId = rand() % (pidCounter/3);
 //    pid = _gdReader.getPidList().at(pidId);
 //    pid = _gdReader.getPidList().at(i);
-    pid = i + 1;
+    pid = std::to_string(i + 1);
     //std::cout << "Random pid is " << pid << std::endl;
   }
 
