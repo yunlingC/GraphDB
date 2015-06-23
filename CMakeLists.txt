@@ -54,6 +54,7 @@ set(TESTS
         main-gdbench.cpp
         main-ldbc.cpp
         main-translator.cpp
+        main-multithread.cpp
         )
 
 # This will generate all the executables listed in the TESTS variable
