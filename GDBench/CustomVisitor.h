@@ -6,8 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 /// / \file / \brief This is the customed class for Graph visitors.  /
-//===----------------------------------------------------------------------===//
-
+//===----------------------------------------------------------------------===// 
 #ifndef _CUSTOMVISITOR_H_
 #define _CUSTOMVISITOR_H_
 
@@ -27,6 +26,7 @@ public:
   SelectionVisitor() { }
 
   virtual bool visitVertex(VertexPointer Vertex) {
+    cout << "--Vertex " << Vertex->getId() << endl;
     bool VertexMatch = checkProperty<ReturnValueType>(Vertex, getFilter());
     if(VertexMatch == true) 
       _VertexTargetList.push_back(Vertex);
@@ -34,6 +34,7 @@ public:
   }
 
   virtual bool  scheduleEdge(EdgePointer Edge ) {
+    cout << "--Edge " << Edge->getId() << endl;
     return checkType(Edge, getFilter() );
   }
 

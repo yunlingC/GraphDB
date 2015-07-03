@@ -112,6 +112,104 @@ public:
   }
 };
 
+class AddVisitor : public ConcurrentVisitor {
+public:
+  typedef pair<FixedString, bool> ReturnValueType;
+//  typedef LocksManager & LockManagerType;
+protected:
+  unsigned int VertexId;
+  LockManagerType & LockManager;
+  GraphType & graph;
+public:
+
+  AddVisitor (LockManagerType & lm, GraphType & graph) :
+                LockManager(lm), graph (graph) {}
+
+  virtual bool visitStartVertex() {
+    VertexId = graph.addVertex();
+    LockManager.addToVertexLockMap(VertexId);
+    std::cout << "add one vertex " << VertexId << "\n";
+  }
+
+  virtual bool visitVertex( )
+  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
+    //LOCK 1
+    auto EdgeIdLock = false;
+    auto VertexIdLock = false;
+    while ( !EdgeIdLock ) {
+      EdgeIdLock = LockManager.getEdgeLock(edge->getId(), ID, SH):
+    }
+
+    bool TypeMatch = checkTypes(edge, _Filter);
+    if( !TypeMatch )  {
+      LockManager.releaseEdgeLock(edge->getId(), ID, SH);
+      return false;
+    }
+
+    auto SourceId = first->getId();
+    auto VertexIdLock = false;
+    while ( !VertexIdLock ) {
+      VertexIdLock = LockManager.getVertexLock(SourceId, ID, SH);
+    }
+
+    bool VertexMatch = checkProperty<ReturnValueType>(first, getFilter());
+    if( !VertexMatch )  {
+      LockManager.releaseVertexLock(SourceId, ID, SH);
+      LockManager.releaseEdgeLock(edge->getId(), ID, SH);
+      return false;
+    }
+
+    ///TODO should be moved to graphType.h
+    auto VLELock = false;
+    auto VNELock = false;
+    auto SLELock = false;
+    auto SNELock = false;
+
+    while( !VLELock || !VNELock || !SLELock || !SNELock) {
+      if( VLELock ) 
+        LockManager.releaseVertexLock(VertexId, LE, EX);
+      if( VNELock )
+        LockManager.releaseVertexLock(VertexId, NE, EX);
+      if( SLELock ) 
+        LockManager.releaseVertexLock(SourceId, LE, EX);
+      if( SNELock )
+        LockManager.releaseVertexLock(SourceId, NE, EX);
+
+      ///TODO should there be sleep or wait time here?
+      VLELock = LockManager.getVertexLock(VertexId, LE, EX);
+      VNELock = LockManager.getVertexLock(VertexId, NE, EX);
+      SLELock = LockManager.getVertexLock(SourceId, LE, EX);
+      SNELock = LockManager.getVertexLock(SourceId, NE, EX);
+    }
+
+    auto EdgePtr = first->getLastEdge();
+    auto EdgeId = EdgePtr->getId();
+    auto EdgeLock = false;
+    
+    ///change FirstNextEdge
+    while( !EdgeLock ) { 
+      if ( EdgePtr->getFirstVertexPtr()->getId() == first->getId() )
+        LockManager.getEdgeLock(EdgeId, FNE, SH); 
+      else
+        LockManager.getEdgeLock(EdgeId, SNE, SH); 
+    }
+    auto EdgeId = graph.addEdge(SourceId, VertexId, "KNOWS");
+    LockManager.addToEdgeLockMap(EdgeId);
+    cout << "Insert: Success\n";
+
+    LockManager.releaseVertexLock(VertexId, LE, EX);
+    LockManager.releaseVertexLock(VertexId, NE, EX);
+    LockManager.releaseVertexLock(SourceId, LE, EX);
+    LockManager.releaseVertexLock(SourceId, NE, EX);
+    LockManager.releaseVertexLock(SourceId, ID, SH);
+    LockManager.releaseEdgeLock(EdgeId, SNE, SH);
+    LockManager.releaseEdgeLock(edge->getId(), ID, SH);
+    return true;
+  }
+
+};
+
+
 class AdjacencyExplorer: public ConcurrentVisitor {
 public:
   AdjacencyExplorer(LockManagerType & lm) : LockManager(lm) { }

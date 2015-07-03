@@ -36,11 +36,17 @@ typedef std::map<VertexPointer, unsigned int> DegreeList;
 typedef std::vector<VertexPointer> VertexTargetSet;
 typedef std::stack<unsigned int > LayerStack;
 typedef std::map<unsigned int, VertexTargetSet> LayerMap;
-
+typedef std::vector<ValueType> ValueListType;
+typedef std::vector<ValueType> &  ValueListTypeReference;
 
 void filtProperty(KeyType key, ValueType value, Filter & TraversalFilter){
   TraversalFilter.setKey(key);
   TraversalFilter.setValue(value);
+}
+
+void filtPropertyList(KeyType key, ValueListTypeReference ValueList, Filter & TraversalFilter) {
+  TraversalFilter.setKey(key);
+  TraversalFilter.setValueList(ValueList);
 }
 
 void filtVertexId(IdType vid , Filter & TraversalFilter) {
@@ -198,7 +204,42 @@ bool checkProperty(VertexPointer vertex, Filter &filter) {
   return true;
 }
 
+template<typename ReturnValueType>
+bool checkPropertyList(VertexPointer vertex, Filter & filter) {
+  auto itend = filter.getValueList().end();
+  if ( filter.getKey() == "") 
+    return true;
+  for ( auto it = filter.getValueList.begin(); it != itend; it++) {
+    if ((*it == ""))
+      ///TODO should be an exception here?
+      return true; 
+    FixedString value(*it);
+    FixedString key(filter.getKey());
+    ReturnValueType rv = vertex->getPropertyValue(key); 
+    if(rv.first == value) {
+      ///erase this pair so we don't have to check it later
+      filter.getValueList().erase(it);
+      return true;
+    }
+  }
+    return false;
+}
 
+template<typename ReturnValueType>
+bool checkPropertyValue(VertexPointer vertex, Filter & filter) {
+  auto itend = filter.getPropertyMap().end();
+  for ( auto it = filter.getPropertyMap().begin(); it != itend; it++) {
+    FixedString value(*it);
+    FixedString key(filter.getKey());
+    ReturnValueType rv = vertex->getPropertyValue(key); 
+    if(rv.first == value) {
+      ///erase this pair so we don't have to check it later
+      filter.getValueList().erase(it);
+      return true;
+    }
+  }
+    return false;
+}
 int compareTime(time_t time1, time_t time2) {
   auto second = difftime(time1, time2);
   if (second >= 0.0000001) 
@@ -378,19 +419,32 @@ bool TerminateAtDepth(unsigned int depth, DepthList & depthlist) {
     return false;
 }
 
-bool checkType(EdgePointer edge, Filter &filter) {
-    if (filter.getType() == "")
+bool checkType(EdgePointer edge, Type type) {
+    if (type == "")
       return true;
-    FixedString type(filter.getType());
-    if (edge->getType() == type)
-    {
+    FixedString FixType(type);
+    if (edge->getType() == FixType)
       return true;
-    }
-    else  {
+    else  
       return false;
-    }
 }
 
+bool checkType(EdgePointer edge, Filter &filter) {
+  checkType(edge, filter.getType());
+}
+
+bool checkTypes(EdgePointer edge, Filter & filter) {
+  auto itend = filter.getPropertyMap().end();
+  auto IsMatch = false;
+  for ( auto it = filter.getPropertyMap().begin(); it != itend; it++ ) {
+    IsMatch = checkType(edge, (*it).first);
+    if( IsMatch ) 
+      break;
+  }
+  return IsMatch;
+}
+
+///TODO could be changed
 bool checkMultiRelType(EdgePointer edge, Filter & filter) {
   auto typeMatch = false;   
   if(filter.getTypeList().empty())

@@ -17,6 +17,8 @@ public:
   typedef std::vector<Type> TypeList;
   typedef std::vector<ValueType> ValueListType;
   typedef std::vector<ValueType> &  ValueListTypeReference;
+  typedef std::unordered_map<keyType, ValueType> PropertyMapType;
+  typedef PropertyMapType &  PropertyMapTypeReference;
 public:
   Filter() : _key(""), 
              _value(""), 
@@ -70,7 +72,12 @@ public:
   auto setValueList(KeyType key, ValueListType & ValueList) 
     -> void {
     _key = key;
-    _valueRange = ValueList;
+    _ValueList = ValueList;
+  }
+
+  auto setPropertyMap(PropertyMapType & pm)
+    -> {
+    PropertyMap = pm;
   }
 
   void setDefault() {
@@ -116,6 +123,16 @@ public:
     return _valueRange;
   }
 
+  auto getValueList()
+    -> ValueListTypeReference {
+    return _ValueList;
+  }
+
+  auto getPropertyMap() 
+    -> PropertyMapTypeReference {
+    return PropertyMap;
+  }
+
 private:
   KeyType   _key;
   ValueType _value;
@@ -125,8 +142,8 @@ private:
   IdType    _edgeId;
   TypeList  _typeList;
   ValueListType _valueRange;
-
-
+  ValueListType _ValueList;
+  PropertyMapType PropertyMap;
 };
 
 #endif /*_FILTER_H_*/

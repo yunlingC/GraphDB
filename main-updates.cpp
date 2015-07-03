@@ -21,9 +21,6 @@ int main() {
   Graph g;
   cout << "Begin testing\n";
 
-//  GDReader reader(g);
-//  reader.readFile("../tests/gd/sndata.gd");
-//
   LDBCReader reader(g);
   reader.readDirectory("../tests/ldbc/social_network_10/New");
  
@@ -42,13 +39,10 @@ int main() {
   Query18 Q18;
   Q18.setPersonId(0);
 
-//  ///without concurrency: results is in gd_excution.log (not logfile for rollback!)
   Q18.runQuery(g, transManager, lockManager, 1);
   Q16.runQuery(g, transManager, lockManager, 1);
   Q18.runQuery(g, transManager, lockManager, 1);
 
-  ///In order for observe how locks is working, run every thread twice;
-  // sleep time could be changed in order to see how data are locked and released
  // MyFile << "\n\n++++++++++++++Multithread+++++++++++++++\n\n";
   vector<thread> threads;
 //  threads.push_back(thread([&] {Q15.runQuery(g, transManager, lockManager, 1);}));

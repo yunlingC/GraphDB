@@ -9,7 +9,6 @@
 ///
 /// \file
 /// \brief This is the main class for managing transactions
-//.
 ///
 //===----------------------------------------------------------------------===//
 
