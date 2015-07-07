@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
 
   cout << "Begin reading\n";
   string DirName = "../tests/ldbc/";
-  string FileName = "social_network_10";
+  string FileName = "social_network_50";
 
   if( argc > 1)
     FileName  = argv[1];

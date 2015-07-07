@@ -28,16 +28,18 @@ ofstream CCFile("ldbc_concurrent.log", ios_base::out | ios_base::app);
 ///insert a new vertex
 class LDBCQuery : public Query {
 public:
+  typedef FixedString KeyType;
+  typedef FixedString ValueType;
   typedef PropertyList< KeyType, ValueType > PropertyListType;
-  typedef PropertyListType& PropertyListTypeReference;
+  typedef PropertyListType & PropertyListTypeReference;
 
-  auto setPropertyList(PropertyListTypeReference Pl) 
+  auto setPropertyList(PropertyListTypeReference pl) 
     -> void {
-    PropertyList = pl; 
+    VertexPropertyList = pl; 
   }
 protected:
-  PropertyListType PropertyList;
-}
+  PropertyListType VertexPropertyList;
+};
 
 class Query16 : public LDBCQuery { 
 public:
@@ -46,7 +48,6 @@ public:
     CCFile << "Query 16\n";
     //a new vertex vs 
     InsertVisitor v1(LockManager, graph);
-    //v1.setSleepTime(_SleepTime);
     filtProperty(_Key, _Value, v1.getFilter());
     traverseThroughType("KNOWS", v1.getFilter());
     breadthFirstSearch(graph, 0, v1 );
@@ -54,29 +55,37 @@ public:
  }
 };
 
+///Add one vertex to current graph
 class Query17 : public LDBCQuery { 
 public:
+  typedef std::string KeyType;
   typedef std::string ValueType;
   typedef std::vector<ValueType> ValueListType;
+  typedef std::unordered_map<std::string, std::pair<KeyType, ValueType>> BranchMapType;
 public:
   void setValueList(ValueListType & vl) {
     ValueList = vl;
+  }
+
+  void setBranchMap(BranchMapType & bm) {
+    BranchMap = bm;
   }
 
   virtual void runQuery(Graph & graph, TransactionManager & TransM, LockManagerType & LockManager, TMSwitch c) {
     CCFile << "===============================\n";
     CCFile << "Query 17\n";
     //a new vertex vs 
+    //need new propertylist for vertex and branchmap (criteria) for searching neighbor 
     AddVisitor v1(LockManager, graph);
-//    v1.getFilter().setPropertyMap;
-    traverseThroughType("KNOWS", v1.getFilter());
-    breadthFirstSearch(graph, 0, v1 );
-    CCFile << "Add one more friends to existing person with " << _Key << " = " << _Value << "\n";
+    v1.setVertexProperty(VertexPropertyList);
+    v1.getFilter().setBranchMap(BranchMap);
+    breadthFirstSearch(graph, 0, v1);
+    CCFile << "Add one more person into network \n";
  }
 protected:
+  BranchMapType BranchMap;
   ValueListType ValueList;
 };
-
 
 class Query18: public Query {
 public:

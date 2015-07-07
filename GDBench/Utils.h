@@ -46,7 +46,7 @@ void filtProperty(KeyType key, ValueType value, Filter & TraversalFilter){
 
 void filtPropertyList(KeyType key, ValueListTypeReference ValueList, Filter & TraversalFilter) {
   TraversalFilter.setKey(key);
-  TraversalFilter.setValueList(ValueList);
+  TraversalFilter.setValueList(key, ValueList);
 }
 
 void filtVertexId(IdType vid , Filter & TraversalFilter) {
@@ -209,7 +209,7 @@ bool checkPropertyList(VertexPointer vertex, Filter & filter) {
   auto itend = filter.getValueList().end();
   if ( filter.getKey() == "") 
     return true;
-  for ( auto it = filter.getValueList.begin(); it != itend; it++) {
+  for ( auto it = filter.getValueList().begin(); it != itend; it++) {
     if ((*it == ""))
       ///TODO should be an exception here?
       return true; 
@@ -233,13 +233,34 @@ bool checkPropertyValue(VertexPointer vertex, Filter & filter) {
     FixedString key(filter.getKey());
     ReturnValueType rv = vertex->getPropertyValue(key); 
     if(rv.first == value) {
-      ///erase this pair so we don't have to check it later
-      filter.getValueList().erase(it);
+//      filter.getValueList().erase(it);
       return true;
     }
   }
     return false;
 }
+
+template<typename ReturnValueType>
+bool checkBranch(VertexPointer vertex, EdgePointer edge, Filter & filter) {
+  /// std::<string, std::pair<string, string>> BranchMapType;
+  std::string EdgeType = edge->getType().std_str();
+  if ( filter.getBranchMap().find(EdgeType) == filter.getBranchMap().end() ) { 
+    return false; 
+  }
+  std::pair<KeyType, ValueType> VertexPropertyPair = 
+    filter.getBranchMap()[EdgeType];
+ 
+  FixedString Key(VertexPropertyPair.first);
+  FixedString Value(VertexPropertyPair.second);
+  ReturnValueType rv = vertex->getPropertyValue(Key); 
+  if(rv.first == Value) {
+      ///erase this pair so we don't have to check it later
+    filter.getBranchMap().erase(EdgeType);
+    return true;
+  }
+  return false;
+}
+
 int compareTime(time_t time1, time_t time2) {
   auto second = difftime(time1, time2);
   if (second >= 0.0000001) 
@@ -430,15 +451,15 @@ bool checkType(EdgePointer edge, Type type) {
 }
 
 bool checkType(EdgePointer edge, Filter &filter) {
-  checkType(edge, filter.getType());
+  return checkType(edge, filter.getType());
 }
 
 bool checkTypes(EdgePointer edge, Filter & filter) {
-  auto itend = filter.getPropertyMap().end();
+  auto itend = filter.getBranchMap().end();
   auto IsMatch = false;
-  for ( auto it = filter.getPropertyMap().begin(); it != itend; it++ ) {
+  for ( auto it = filter.getBranchMap().begin(); it != itend; it++ ) {
     IsMatch = checkType(edge, (*it).first);
-    if( IsMatch ) 
+    if ( IsMatch ) 
       break;
   }
   return IsMatch;
@@ -450,9 +471,9 @@ bool checkMultiRelType(EdgePointer edge, Filter & filter) {
   if(filter.getTypeList().empty())
     return true;
   for (auto it = filter.getTypeList().begin(); it != filter.getTypeList().end(); ++it) {
-   if (*it == "") {
+    if (*it == "") {
       return true;
-   }
+    }
     FixedString type(*it);
     if (edge->getType() == type)
     {

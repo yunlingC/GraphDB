@@ -1,8 +1,7 @@
 #ifndef _FILTER_H_
 #define _FILTER_H_
 
-//#include "PropertyList.h"
-//#include "LinkedList.h"
+#include <unordered_map>
 #include "FixedString.h"
 
 struct Filter {
@@ -17,8 +16,10 @@ public:
   typedef std::vector<Type> TypeList;
   typedef std::vector<ValueType> ValueListType;
   typedef std::vector<ValueType> &  ValueListTypeReference;
-  typedef std::unordered_map<keyType, ValueType> PropertyMapType;
+  typedef std::unordered_map<KeyType, ValueType> PropertyMapType;
   typedef PropertyMapType &  PropertyMapTypeReference;
+  typedef std::unordered_map<Type, std::pair<KeyType, ValueType> > BranchMapType;
+  typedef BranchMapType & BranchMapTypeReference;
 public:
   Filter() : _key(""), 
              _value(""), 
@@ -76,8 +77,13 @@ public:
   }
 
   auto setPropertyMap(PropertyMapType & pm)
-    -> {
-    PropertyMap = pm;
+    -> void {
+    _PropertyMap = pm;
+  }
+
+  auto setBranchMap(BranchMapType & bm) 
+    -> void {
+   _BranchMap = bm;
   }
 
   void setDefault() {
@@ -130,7 +136,12 @@ public:
 
   auto getPropertyMap() 
     -> PropertyMapTypeReference {
-    return PropertyMap;
+    return _PropertyMap;
+  }
+
+  auto getBranchMap() 
+    -> BranchMapTypeReference {
+    return _BranchMap;
   }
 
 private:
@@ -143,7 +154,8 @@ private:
   TypeList  _typeList;
   ValueListType _valueRange;
   ValueListType _ValueList;
-  PropertyMapType PropertyMap;
+  PropertyMapType _PropertyMap;
+  BranchMapType _BranchMap;
 };
 
 #endif /*_FILTER_H_*/

@@ -17,13 +17,10 @@ public:
   }
 
   FixedString(const string & s): _size(32) { 
-//    cout << "==> s: " << s <<endl;
     strncpy(_string, const_cast<char*>(s.c_str()), _size);
-//    cout << "==> s: " << _string <<endl;
   }
 
   FixedString & operator=(const FixedString & from) {
-//    cout << "FixedString:: assignment operator\n";
     if (this != &from) {
       strncpy(this->_string, from._string, _size);
     }
