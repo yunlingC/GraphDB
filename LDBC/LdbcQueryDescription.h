@@ -46,7 +46,7 @@ public:
         v1.setNameFilter(NameFilter);
         v1.setDepth(3);
         breadthFirstSearch(graph, startVertex, v1);
-    SimMarker(2, 1);
+        SimMarker(2, 1);
         auto target = v1.getVertexTargetList();
         LdbcFile << startVertex << " is connected with " << target.size() << " people with firstName : " << name << endl;
         for(auto it = target.begin(); it != target.end(); ++it) {

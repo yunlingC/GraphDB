@@ -116,6 +116,7 @@ class AddVisitor : public ConcurrentVisitor {
 public:
   typedef pair<FixedString, bool> ReturnValueType;
   typedef PropertyList<FixedString, FixedString> PropertyListType;
+  typedef std::pair<bool, std::pair<std::string, GraphType::PropertyListType> > ReturnBranchType;
 //  typedef LocksManager & LockManagerType;
 protected:
   LockManagerType & LockManager;
@@ -135,35 +136,40 @@ public:
   virtual void visitStartVertex(VertexPointer Vertex) {
     VertexId = graph.addVertex(VertexProperty);
     LockManager.addToVertexLockMap(VertexId);
+
+    auto NewVertex = graph.getVertexPointer(VertexId);
     std::cout << "add one vertex " << VertexId << "\n";
+    if ( NewVertex ) {
+      std::cout << "New Vertex info:\n";
+    }
   }
 
 //  virtual bool visitVertex( )
-  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    //LOCK 1
-    auto EdgeIdLock = false;
-    while ( !EdgeIdLock ) {
-      EdgeIdLock = LockManager.getEdgeLock(edge->getId(), ID, SH);
-    }
-
-    bool TypeMatch = checkTypes(edge, _Filter);
-    if( !TypeMatch )  {
-      LockManager.releaseEdgeLock(edge->getId(), ID, SH);
-      return false;
-    }
-
+  virtual bool visitVertex(VertexPointer first) {
+//    //LOCK 1
+//    auto EdgeIdLock = false;
+//    while ( !EdgeIdLock ) {
+//      EdgeIdLock = LockManager.getEdgeLock(edge->getId(), ID, SH);
+//    }
+//
+//    bool TypeMatch = checkTypes(edge, _Filter);
+//    if( !TypeMatch )  {
+//      LockManager.releaseEdgeLock(edge->getId(), ID, SH);
+//      return false;
+//    }
+//
 //    auto SourceId = first->getId();
-    auto SourceId = second->getId();
-
+    auto SourceId = first->getId();
     auto VertexIdLock = false;
+
     while ( !VertexIdLock ) {
       VertexIdLock = LockManager.getVertexLock(SourceId, ID, SH);
     }
 
-    bool VertexMatch = checkBranch<ReturnValueType>(first, edge, getFilter());
-    if( !VertexMatch )  {
+    ReturnBranchType VertexMatch = checkBranch<ReturnValueType>(first, getFilter());
+    if( !VertexMatch.first )  {
       LockManager.releaseVertexLock(SourceId, ID, SH);
-      LockManager.releaseEdgeLock(edge->getId(), ID, SH);
+//      LockManager.releaseEdgeLock(edge->getId(), ID, SH);
       return false;
     }
 
@@ -174,13 +180,13 @@ public:
     auto SNELock = false;
 
     while( !VLELock || !VNELock || !SLELock || !SNELock) {
-      if( VLELock ) 
+      if ( VLELock ) 
         LockManager.releaseVertexLock(VertexId, LE, EX);
-      if( VNELock )
+      if ( VNELock )
         LockManager.releaseVertexLock(VertexId, NE, EX);
-      if( SLELock ) 
+      if ( SLELock ) 
         LockManager.releaseVertexLock(SourceId, LE, EX);
-      if( SNELock )
+      if ( SNELock )
         LockManager.releaseVertexLock(SourceId, NE, EX);
 
       ///TODO should there be sleep or wait time here?
@@ -193,7 +199,7 @@ public:
       SNELock = LockManager.getVertexLock(SourceId, NE, EX);
     }
 
-    auto EdgePtr = second->getLastEdge();
+    auto EdgePtr = first->getLastEdge();
     auto EdgeId = EdgePtr->getId();
     auto EdgeLock = false;
     
@@ -205,9 +211,23 @@ public:
         EdgeLock = LockManager.getEdgeLock(EdgeId, SNE, SH); 
     }
 
-    auto NewEdgeId = graph.addEdge(SourceId, VertexId, "KNOWS");
+    unsigned int NewEdgeId = 0;
+    ///if PropertyList is null for this edge, don't add; otherwise, add propertylist
+    if(VertexMatch.second.second.get("null").second != true) {
+      NewEdgeId = graph.addEdge(VertexId, SourceId,
+        VertexMatch.second.first, VertexMatch.second.second);  
+    } else {
+      NewEdgeId = graph.addEdge(VertexId, SourceId, 
+        VertexMatch.second.first);  
+    }
+
     LockManager.addToEdgeLockMap(NewEdgeId);
     cout << "Insert: Success\n";
+
+    auto NewEdge = graph.getEdgePointer(NewEdgeId);
+    if ( NewEdge ) {
+      std::cout << "New edge info:\n";
+    }
 
     LockManager.releaseVertexLock(VertexId, LE, EX);
     LockManager.releaseVertexLock(VertexId, NE, EX);
@@ -215,8 +235,7 @@ public:
     LockManager.releaseVertexLock(SourceId, NE, EX);
     LockManager.releaseVertexLock(SourceId, ID, SH);
     LockManager.releaseEdgeLock(EdgeId, SNE, SH);
-    LockManager.releaseEdgeLock(edge->getId(), ID, SH);
-    return true;
+    return false;
   }
 };
 
@@ -230,7 +249,7 @@ public:
     while (!Lock) {
       Lock = LockManager.getVertexLock(vertex->getId(), ID, SH);
     }
-
+    
     if( _DepthList.find(vertex) != _DepthList.end() ) {
       if( _DepthList[vertex] >= 1 ) {
         ReturnValue = true;
@@ -282,11 +301,13 @@ public:
       LockSecond = LockManager.getVertexLock(second->getId(), ID, SH);
     }
 
-    std::cout << "first " << first->getId() << " second " << second->getId() << " edge " << edge->getId() << "\n";
+//    std::cout << "first " << first->getId() << " second " << second->getId() << " edge " << edge->getId() << "\n";
 
     bool TypeMatch = checkType(edge, _Filter);
     _DirecMatch = checkDirection(second, edge, _Filter);
+    std::cout << "direction " << _DirecMatch << " Type " << TypeMatch << "\n";
     if( _DirecMatch && TypeMatch ) {
+      std::cout << "Found! vertex id " << second->getId() << "\n";
       _VertexTargetList.push_back(second);
     }
 

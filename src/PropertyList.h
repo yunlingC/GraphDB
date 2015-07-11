@@ -1,10 +1,10 @@
 #ifndef _PROPERTY_LIST_H_
 #define _PROPERTY_LIST_H_
 
-#include <map>
-
-// TODO: This should be replaced with debug function.
+#if DEBUG
 #include <iostream>
+#endif 
+
 #include "LinkedList.h"
 
 using namespace std;
@@ -12,7 +12,6 @@ using namespace std;
 template <typename KeyType, typename ValueType>
 class PropertyList {
 public:  
-  //  typedef typename map<KeyType, ValueType>::iterator mapIteratorType;
   typedef LinkedList::iterator mapIteratorType;
   typedef pair<ValueType, bool> ReturnValueType;
 
@@ -34,7 +33,6 @@ public:
 
   void deletePropertyList() {
     // Must manually delete the linked list.
-//    cout << "-- property list: " << _pl.size() << "\n";
     if (_pl.size() > 0) 
       _pl.deleteList();
 
@@ -56,7 +54,6 @@ public:
 
     KeyType   kt(k);
     ValueType vt(v);
-    //    pair<KeyType, ValueType> p(kt,vt);
     _pl.insert(kt, vt);
     return true;
   }
@@ -68,9 +65,13 @@ public:
     if (returnValue.second == false) {
       return false;
     } else {
-//      cout << "PropertyList update: " << returnValue.first << "\t" << value << endl;
       return _pl.update(key, value);
     }
+  }
+
+  ReturnValueType get(const string & k) {
+    KeyType Key(k);
+    return get(Key);
   }
 
   ReturnValueType get(const KeyType & k) {
@@ -79,7 +80,6 @@ public:
     ValueType str("null");
     ReturnValueType rv(str, true);
 
-    //    KeyType kt(k);
     mapIteratorType mi = _pl.find(k);
     // Check if it's not found.
     if (mi == nullptr) {
@@ -87,7 +87,6 @@ public:
       rv.second = false;
       return rv;
     }
-    //    cout << "copy value: " << mi->first << ", " << mi->second << endl;
     // Copy the value.
     rv.first = mi->getValue();
     return rv;
@@ -108,13 +107,9 @@ public:
 
   void print() {
     _pl.print();
-    //    mapIteratorType mbeg, mend;
-    //    for (mbeg = _pl.begin(), mend = _pl.end(); mbeg != mend; mbeg++) {
-    //      cout << "[" << mbeg->getKey() << ", " << mbeg->getValue() << "]" << endl;
-    //    }
   }
+
 private:
-  //map<KeyType, ValueType> _pl;
   LinkedList _pl;
   unsigned int _maxSize;
 };

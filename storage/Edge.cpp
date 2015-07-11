@@ -22,6 +22,7 @@ auto Edge::dump()
   -> void {
   std::cout << "\nEdge id: " << EdgeId << " (" << FirstVertex->getId() 
             << ", " << SecondVertex->getId() << ") \n";
+  std::cout << "\nEdge type: " << "( " << EdgeLabel << " )\n";
 
   std::cout << "\nEdge PropertyList\n";
   EdgePropertyList.print();

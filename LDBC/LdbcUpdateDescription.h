@@ -61,7 +61,8 @@ public:
   typedef std::string KeyType;
   typedef std::string ValueType;
   typedef std::vector<ValueType> ValueListType;
-  typedef std::unordered_map<std::string, std::pair<KeyType, ValueType>> BranchMapType;
+  typedef std::pair<std::string, GraphType::PropertyListType> EdgePairType;
+  typedef std::map<std::pair<std::string, std::string>, EdgePairType> BranchMapType;
 public:
   void setValueList(ValueListType & vl) {
     ValueList = vl;

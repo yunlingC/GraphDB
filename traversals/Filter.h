@@ -1,13 +1,12 @@
 #ifndef _FILTER_H_
 #define _FILTER_H_
 
-#include <unordered_map>
+#include <map>
 #include "FixedString.h"
 
 struct Filter {
 public:
   ///TODO: enum every type
-
   typedef std::string KeyType;
   typedef std::string ValueType;
   typedef std::string Type;
@@ -16,9 +15,12 @@ public:
   typedef std::vector<Type> TypeList;
   typedef std::vector<ValueType> ValueListType;
   typedef std::vector<ValueType> &  ValueListTypeReference;
-  typedef std::unordered_map<KeyType, ValueType> PropertyMapType;
+  typedef std::map<KeyType, ValueType> PropertyMapType;
   typedef PropertyMapType &  PropertyMapTypeReference;
-  typedef std::unordered_map<Type, std::pair<KeyType, ValueType> > BranchMapType;
+  typedef std::pair<std::string, GraphType::PropertyListType> EdgePairType;
+  typedef std::map<Type, std::pair<KeyType, ValueType> > BranchPropertyType;
+  typedef std::map<std::pair<std::string, std::string>, EdgePairType> BranchMapType;
+  typedef BranchPropertyType & BranchPropertyTypeReference;
   typedef BranchMapType & BranchMapTypeReference;
 public:
   Filter() : _key(""), 
@@ -81,10 +83,16 @@ public:
     _PropertyMap = pm;
   }
 
+  auto setBranchPropertyMap(BranchPropertyType & bm) 
+    -> void {
+   _BranchPropertyMap = bm;
+  }
+
   auto setBranchMap(BranchMapType & bm) 
     -> void {
    _BranchMap = bm;
   }
+
 
   void setDefault() {
     _key = "";
@@ -139,6 +147,11 @@ public:
     return _PropertyMap;
   }
 
+  auto getBranchPropertyMap() 
+    -> BranchPropertyTypeReference {
+    return _BranchPropertyMap;
+  }
+
   auto getBranchMap() 
     -> BranchMapTypeReference {
     return _BranchMap;
@@ -156,6 +169,7 @@ private:
   ValueListType _ValueList;
   PropertyMapType _PropertyMap;
   BranchMapType _BranchMap;
+  BranchPropertyType _BranchPropertyMap;
 };
 
 #endif /*_FILTER_H_*/

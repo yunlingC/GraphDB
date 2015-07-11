@@ -380,15 +380,19 @@ public:
     /// However, only one place is necessary since everywhere else, I am storing pointers.
     /// Thus, Vertices and _edges contain all newly created objects.
 
+    std::cout << "GraphType: clean " << Vertices.size() << " vertices and " << Edges.size() << " edges\n";
     for ( size_t i=0; i < Vertices.size(); i++ ) {
       Vertices[i]->deleteVertex();
       delete Vertices[i];
     }
+    std::cout << "vertex clean is done\n";
 
     for ( size_t i=0; i < Edges.size(); i++ ) {
       Edges[i]->deleteEdge();
       delete Edges[i];
     }
+
+    std::cout << "edge clean is done\n";
   }
 
   vector<VertexPointer> getAllVertices(){

@@ -190,8 +190,6 @@ public:
     }
   }
 
-  
-
 private:
   ListNode * _head;
   ListNode * _tail;

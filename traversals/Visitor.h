@@ -93,7 +93,7 @@ public:
     return false;
   }
 
-  virtual void finishVisit()  { }
+  virtual void finishVisit()  { std::cout << "finish traversal\n";}
 
 protected:
   unsigned int _SleepTime = 1;

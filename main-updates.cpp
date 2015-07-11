@@ -18,7 +18,9 @@ int main() {
   typedef std::thread thread;
   typedef LocksManager LockManager;
   typedef PropertyList<FixedString, FixedString> PropertyListType;
-  typedef std::unordered_map<std::string, std::pair<std::string, std::string>> BranchMapType;
+  typedef std::pair<std::string, std::string> VertexPairType;
+  typedef std::pair<std::string, PropertyListType> EdgePairType;
+  typedef std::map<VertexPairType, EdgePairType> BranchMapType;
 
   Graph g;
   cout << "Begin testing\n";
@@ -37,14 +39,25 @@ int main() {
   VertexProp.set("firstName", "Senator");
   VertexProp.set("id", "1234567");
 
-  BranchMapType BranchMap = {
-    {"KNOWS", make_pair("firstName", "Andrew")}, 
-    {"HAS_INTEREST", make_pair("id", "10")}
+
+  PropertyListType EdgeProp1, EdgeProp2; 
+  EdgeProp1.set("null", "null");
+  EdgeProp2.set("null", "null");
+
+  EdgePairType NewEdge1, NewEdge2;
+  NewEdge1 = make_pair("KNOWS", EdgeProp1);
+  NewEdge2 = make_pair("HAS_INTEREST", EdgeProp2);
+
+  BranchMapType NewBranch= {
+    {make_pair("PERSON", "5497558144580"),  NewEdge1},
+//     make_pair("KNOWS", nullptr)}:, 
+    {make_pair("TAG", "10"), NewEdge2} 
+//     make_pair("HAS_INTEREST", nullptr)}
   };
 
   Query17 Q17;
   Q17.setPropertyList(VertexProp);
-  Q17.setBranchMap(BranchMap);
+  Q17.setBranchMap(NewBranch);
 
   cout << "setup\n";
   Q17.runQuery(g, transManager, lockManager, 1);
@@ -53,14 +66,18 @@ int main() {
   Q18.setPersonId(31409);   
   Q18.runQuery(g, transManager, lockManager, 1);
 
-  vector<thread> threads;
-  threads.push_back(thread([&] {Q18.runQuery(g, transManager, lockManager, 1);}));
-  threads.push_back(thread([&] {Q17.runQuery(g, transManager, lockManager, 1);}));
+//  Query17 q17;
+//  Query18 q18;
+ 
+//  Q17.runQuery(g, transManager, lockManager, 1);
+//  Q18.runQuery(g, transManager, lockManager, 1);
 
-  for_each(threads.begin(), threads.end(),
-           std::mem_fn(&thread::join));
-
-  Q18.runQuery(g, transManager, lockManager, 1);
+//  vector<thread> threads;
+//  threads.push_back(thread([&] {Q18.runQuery(g, transManager, lockManager, 1);}));
+//  threads.push_back(thread([&] {Q17.runQuery(g, transManager, lockManager, 1);}));
+//
+//  for_each(threads.begin(), threads.end(),
+//           std::mem_fn(&thread::join));
 
 //  Query16 Q16;
 //  Q16.setPersonProperty("firstName", "Luis Filipe"); 
@@ -94,6 +111,5 @@ int main() {
 //  Q18.runQuery(g, transManager,lockManager,  1);
 //
   cout << "finish testing\n";
-  CCFile.close();
   return 0;
 }

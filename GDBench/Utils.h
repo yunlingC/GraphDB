@@ -38,6 +38,7 @@ typedef std::stack<unsigned int > LayerStack;
 typedef std::map<unsigned int, VertexTargetSet> LayerMap;
 typedef std::vector<ValueType> ValueListType;
 typedef std::vector<ValueType> &  ValueListTypeReference;
+typedef std::pair<bool, std::pair<std::string, GraphType::PropertyListType> > ReturnBranchType;
 
 void filtProperty(KeyType key, ValueType value, Filter & TraversalFilter){
   TraversalFilter.setKey(key);
@@ -229,36 +230,78 @@ template<typename ReturnValueType>
 bool checkPropertyValue(VertexPointer vertex, Filter & filter) {
   auto itend = filter.getPropertyMap().end();
   for ( auto it = filter.getPropertyMap().begin(); it != itend; it++) {
-    FixedString value(*it);
-    FixedString key(filter.getKey());
-    ReturnValueType rv = vertex->getPropertyValue(key); 
-    if(rv.first == value) {
-//      filter.getValueList().erase(it);
-      return true;
+    FixedString Label((*it).first);
+    FixedString key("id");
+    FixedString value((*it).second);
+
+    if ( Label == vertex->getType() ) {
+      ReturnValueType rv = vertex->getPropertyValue(key); 
+      if(rv.first == value) {
+        return true;
+      }
     }
   }
     return false;
 }
 
 template<typename ReturnValueType>
-bool checkBranch(VertexPointer vertex, EdgePointer edge, Filter & filter) {
-  /// std::<string, std::pair<string, string>> BranchMapType;
+bool checkBranchProperty(VertexPointer vertex, EdgePointer edge, Filter & filter) {
   std::string EdgeType = edge->getType().std_str();
-  if ( filter.getBranchMap().find(EdgeType) == filter.getBranchMap().end() ) { 
+  if ( filter.getBranchPropertyMap().find(EdgeType) 
+      == filter.getBranchPropertyMap().end() ) { 
     return false; 
   }
   std::pair<KeyType, ValueType> VertexPropertyPair = 
-    filter.getBranchMap()[EdgeType];
+    filter.getBranchPropertyMap()[EdgeType];
  
   FixedString Key(VertexPropertyPair.first);
   FixedString Value(VertexPropertyPair.second);
   ReturnValueType rv = vertex->getPropertyValue(Key); 
   if(rv.first == Value) {
       ///erase this pair so we don't have to check it later
-    filter.getBranchMap().erase(EdgeType);
+    filter.getBranchPropertyMap().erase(EdgeType);
     return true;
   }
   return false;
+}
+
+///checking vertex property to see if a new branch could grow here
+///Vertex property format pair<Vertex->getType(), Vertex->getId()>
+//template<typename ReturnValueType>
+//bool checkBranch(VertexPointer vertex, Filter & filter) {
+//  auto rv = vertex->getPropertyValue("id");
+//  if(rv.second == false) {
+//    ///TODO exception here
+//    return false;
+//  }
+//  std::cout << "find vertex type " << vertex->getType() << " id " << rv.first << "\n";
+//  auto Identity = std::pair<std::string, std::string>(vertex->getType().std_str(), rv.first);
+//  if ( filter.getBranchMap().find(Identity) != filter.getBranchMap().end()) {
+//    return true; 
+//  }
+//
+//  return false;
+//}
+
+template<typename ReturnValueType>
+ReturnBranchType checkBranch(VertexPointer vertex, Filter & filter) {
+  GraphType::PropertyListType EdgeProp;
+  EdgeProp.set("null", "null");
+  ReturnBranchType rb = std::make_pair(false, std::make_pair("", EdgeProp));
+  auto rv = vertex->getPropertyValue("id");
+  if(rv.second == false) {
+    ///TODO exception here
+    return rb;
+  }
+  std::cout << "find vertex type " << vertex->getType() << " id " << rv.first << "\n";
+  auto Identity = std::pair<std::string, std::string>(vertex->getType().std_str(), rv.first.std_str());
+  if ( filter.getBranchMap().find(Identity) != filter.getBranchMap().end()) {
+    rb.first = true;
+    rb.second = filter.getBranchMap()[Identity];
+    return rb;
+  }
+
+  return rb;
 }
 
 int compareTime(time_t time1, time_t time2) {
@@ -440,7 +483,7 @@ bool TerminateAtDepth(unsigned int depth, DepthList & depthlist) {
     return false;
 }
 
-bool checkType(EdgePointer edge, Type type) {
+bool checkEdgeType(EdgePointer edge, Type type) {
     if (type == "")
       return true;
     FixedString FixType(type);
@@ -451,19 +494,20 @@ bool checkType(EdgePointer edge, Type type) {
 }
 
 bool checkType(EdgePointer edge, Filter &filter) {
-  return checkType(edge, filter.getType());
+  return checkEdgeType(edge, filter.getType());
 }
 
-bool checkTypes(EdgePointer edge, Filter & filter) {
-  auto itend = filter.getBranchMap().end();
-  auto IsMatch = false;
-  for ( auto it = filter.getBranchMap().begin(); it != itend; it++ ) {
-    IsMatch = checkType(edge, (*it).first);
-    if ( IsMatch ) 
-      break;
-  }
-  return IsMatch;
-}
+//bool checkTypes(EdgePointer edge, Filter & filter) {
+//  auto itend = filter.getBranchMap().end();
+//  auto IsMatch = false;
+//  for ( auto it = filter.getBranchMap().begin(); it != itend; it++ ) {
+////    std::cout  << "Utils: Type : " << (*it).first << "\n";
+//    IsMatch = checkType(edge, (*it).first);
+//    if ( IsMatch ) 
+//      break;
+//  }
+//  return IsMatch;
+//}
 
 ///TODO could be changed
 bool checkMultiRelType(EdgePointer edge, Filter & filter) {
