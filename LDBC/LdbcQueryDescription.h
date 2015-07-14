@@ -18,8 +18,10 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <unordered_map>
 
 #include "LdbcCustomVisitor.h"
+#include "CustomVisitor.h"
 #include "BreadthFirstSearch.h"
 #include "QueryDescription.h"
 
@@ -410,35 +412,79 @@ public:
 };
 
 //TODO unfinished 
-/**
 class LdbcQuery10 : public Query {
 public:
+  typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  
+public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    LdbcFile << "===============Query 11================\n";
-    Filter tmpFilter[7];
-    traverseThroughMultiRelType("KNOWS",  tmpFilter[0]);
-    traverseThroughMultiRelType("KNOWS",  tmpFilter[1]);
-    traverseThroughMultiRelType("POST_HAS_CREATOR", tmpFilter[2]); 
-    traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[3]); 
-    traverseThroughMultiRelType("HAS_INTEREST", tmpFilter[4]); 
-    tmpFilter[5].setValueRange("birthday", "",""); //functions to support this
-    tmpFilter[6].setProperty("id", startVertex);
+    LdbcFile << "===============Query 10================\n";
+    ///first find start person's friends
+    AdjacencyVisitor av1; 
+    traverseThroughTypeAndDirection("KNOWS", "out", av1.getFilter());
+    breadthFirstSearch(graph, startVertex, av1);
+    auto startId = graph.getVertexPointer(startVertex)->getPropertyValue("id").first.std_str();
+//    std::cout << "start person id and name " << graph.getVertexPointer(startVertex)->getId() << graph.getVertexPointer(startVertex)->getPropertyValue("firstName").first << "\n";
+//    std::cout << "start person has " << av1.getVertexTargetList().size() << " friends\n";
 
-    SimilarityVisitor v10;
-    v10.setDepth(5);
-    v10.setDepthToCheckRange(2);
-    v10.setDepthToCheckVertexProperty(5);
-    v10.setFilter(tmpFilter[0]);
-    v10.setFilter(tmpFilter[1]);
-    v10.setFilter(tmpFilter[2]);
-    v10.setFilter(tmpFilter[3]);
-    v10.setFilter(tmpFilter[4]);
-    v10.setRangeFilter(tmpFilter[5]);
-//    v10.setVertexFilter(tmpFilter[6]);
+    ///find friends of friends of start person
+    std::vector<VertexPointer> targets;
+    Filter BDFilter;
+    BDFilter.setValueRange("birthday", "0000-04-21", "0000-05-22");
+    for (VertexPointer StartVertex : av1.getVertexTargetList()) {
+      auto EqualFlag = false; 
+//      std::cout << "frined " << StartVertex->getId() << "\n";
+      if ( checkRange<VertexPointer>(4, StartVertex, BDFilter, EqualFlag) == true ) {
+        SimMap[StartVertex] = 0;
+        AdjacencyVisitor av2; 
+        traverseThroughTypeAndDirection("KNOWS", "out", av2.getFilter());
+        breadthFirstSearch(graph, StartVertex->getId(), av2);
+        ///concatenate two lists
+        targets.insert(targets.end(), av2.getVertexTargetList().begin(), 
+          av2.getVertexTargetList().end());
+//      std::cout << "friends " << StartVertex->getId() << " has friend " << av2.getVertexTargetList().size() << "\n";
+      }
 
+    }
+
+    for ( VertexPointer Vertex : targets) {
+      auto EqualFlag = false; 
+      if ( checkRange<VertexPointer>(4, Vertex, BDFilter, EqualFlag) == true ) {
+        SimMap[Vertex] = 0;
+      }
+    }
+
+    ///iterate over the friends who satisfy the condition
+    auto itend  = SimMap.end();
+    for ( auto it = SimMap.begin(); it != itend; it++ ) {
+      Filter tmpFilter[4];
+      traverseThroughMultiRelType("POST_HAS_CREATOR", tmpFilter[0]); 
+      traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[1]); 
+      traverseThroughMultiRelType("HAS_INTEREST", tmpFilter[2]); 
+      tmpFilter[3].setProperty("id", startId);
+
+      SimilarityVisitor v10;
+      v10.setDepth(3);
+      v10.setDepthToCheckVertexProp(3);
+      v10.setVertexFilter(tmpFilter[3]);
+      for ( unsigned int i = 0; i < 3; i++ ) {
+        v10.setFilter(tmpFilter[i]);
+      }
+      breadthFirstSearch(graph, (*it).first->getId(), v10);
+      auto iterend = v10.getPostMap().end();
+      unsigned int PostItrd = 0;
+      for ( auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
+        if ((*iter).second ) { PostItrd++; }
+//        std::cout << "post " << (*iter).first << "\t" << (*iter).second << "\n";
+      }
+      SimMap[(*it).first] = 2*PostItrd - v10.getPostMap().size(); 
+      LdbcFile << "person: " << (*it).first->getId() << " score " << (*it).second << "\n";
+    
+    }
   }
+protected:
+  SimMapType SimMap;
 };
-*/
+
 class LdbcQuery11 : public Query {
 public:
   typedef pair<EdgePointer, VertexPointer> MapPair;
@@ -489,7 +535,77 @@ public:
   }
 };
 
+class LdbcQuery12 : public Query {
+public:
+  typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  
+public:
+  void runQuery(Graph & graph, VertexDescriptor startVertex ) {
+    LdbcFile << "===============Query 12================\n";
+    ///first find start person's friends
+    AdjacencyVisitor av1; 
+    traverseThroughTypeAndDirection("KNOWS", "out", av1.getFilter());
+    breadthFirstSearch(graph, startVertex, av1);
+
+    ///find friends of friends of start person
+    std::vector<VertexPointer> targets;
+      Filter tmpFilter[6];
+      traverseThroughMultiRelType("COMMENT_HAS_CREATOR", tmpFilter[0]); 
+      traverseThroughMultiRelType("REPLY_OF_POST", tmpFilter[1]); 
+      traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[2]); 
+      traverseThroughMultiRelType("HAS_TYPE", tmpFilter[3]); 
+      traverseThroughMultiRelType("IS_SUBCLASS_OF", tmpFilter[4]); 
+      tmpFilter[5].setProperty("name", "Person");
+
+
+    for (VertexPointer StartVertex : av1.getVertexTargetList()) {
+      std::cout << "friend " << StartVertex->getId() << "\n";
+      SimMap[StartVertex] = 0;
+
+      ExpertVisitor v10;
+      v10.setDepth(5);
+      v10.setDepthToCheckVertexProp(4);
+      v10.setVertexFilter(tmpFilter[5]);
+      for ( unsigned int i = 0; i < 5; i++ ) {
+        v10.setFilter(tmpFilter[i]);
+      }
+      breadthFirstSearch(graph, StartVertex->getId(), v10);
+      auto iterend = v10.getPostMap().end();
+      auto PostNum = 0;
+      for ( auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
+        if ((*iter).second ) { PostNum++; }
+          std::cout << "post " << (*iter).first << "\t" << (*iter).second << "\n";
+      }
+
+      SimMap[StartVertex] = PostNum; 
+      LdbcFile << "person: " << StartVertex->getId() << " expert post " << PostNum << "\n";
+  
+    }
+  }
+protected:
+  SimMapType SimMap;
+};
+
+
 class LdbcQuery13 : public Query {
+public:
+  void runQuery(Graph & graph, VertexDescriptor startVertex, VertexDescriptor endVertex ) {
+    PathVisitor v13;
+    v13.setEndVertex(endVertex);
+    breadthFirstSearch(graph, startVertex, v13);
+    auto target = v13.getVertexTargetList();
+    if(target.empty())
+      LdbcFile << startVertex << " and " <<  endVertex <<" are not connected" << endl;
+    else {
+      LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << startVertex << " to " << endVertex << endl;
+      for(auto it = target.begin(); it != target.end(); ++it) {
+        LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("firstName").first<< endl;
+      }
+    }
+  }
+
+};
+
+class LdbcQuery14 : public Query {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex, VertexDescriptor endVertex ) {
     PathVisitor v13;

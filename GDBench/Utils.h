@@ -196,8 +196,8 @@ bool checkProperty(VertexPointer vertex, Filter &filter) {
       return true; 
   FixedString value(filter.getValue());
   FixedString key(filter.getKey());
-
   ReturnValueType rv = vertex->getPropertyValue(key); 
+//  std::cout << rv.first.std_str() << "\t" << filter.getValue() << "\n";
   if((rv.second == false) || (rv.first != value))
   {
       return false;
@@ -293,7 +293,7 @@ ReturnBranchType checkBranch(VertexPointer vertex, Filter & filter) {
     ///TODO exception here
     return rb;
   }
-  std::cout << "find vertex type " << vertex->getType() << " id " << rv.first << "\n";
+//  std::cout << "find vertex type " << vertex->getType() << " id " << rv.first << "\n";
   auto Identity = std::pair<std::string, std::string>(vertex->getType().std_str(), rv.first.std_str());
   if ( filter.getBranchMap().find(Identity) != filter.getBranchMap().end()) {
     rb.first = true;
@@ -409,7 +409,7 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
   vector<string> attributes;
   for (auto i = 0; i < 2; i++) {
     times = filter.getValueRange().at(i);
-    if(times == "") 
+    if ( times == "" ) 
       cmpResult[i] = true;
     else {
       boost::split(attributes, times, boost::is_any_of("T"));
@@ -425,7 +425,7 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
     struct tm DateToCheck;
     auto dateString = timeProp.first.std_str();
     boost::split(attributes, dateString, boost::is_any_of("T"));
-     memset(&DateToCheck, 0, sizeof(struct tm));
+    memset(&DateToCheck, 0, sizeof(struct tm));
     strptime(attributes[0].c_str(), "%Y-%m-%d", &DateToCheck);
     strftime(buf, sizeof(buf), "%Y-%m-%d", &DateToCheck);
     auto d = mktime(&DateToCheck);
@@ -451,6 +451,55 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
   }
  }
 
+///apply to birthday within given ranges: xxxx-0m-0d : xxxx-0m'-0d'
+//DOES NOT apply to single range  xxxx-0m-0d : now
+template<typename ReturnValueType, typename GraphElemPointer>
+bool checkBirthdayRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag) {
+  char buf[32];
+  string times;  
+  struct tm date[2];
+  EqualFlag = false;
+  bool cmpResult[2] = {false, false};
+  vector<string> attributes;
+  for (auto i = 0; i < 2; i++) {
+    times = filter.getValueRange().at(i);
+    if ( times == "" ) 
+      cmpResult[i] = true;
+    else {
+      boost::split(attributes, times, boost::is_any_of("T"));
+      memset(&date[i], 0, sizeof(struct tm));
+      strptime(attributes[0].c_str(), "%Y-%m-%d", &date[i]);
+      strftime(buf, sizeof(buf), "%Y-%m-%d", &date[i]);
+    }
+  }
+  auto timeProp = GraphElem->getPropertyValue(filter.getKey());                          
+  if(timeProp.second == false)
+    return false;   /// cannot find time property ;
+  else  {
+    struct tm DateToCheck;
+    auto dateString = timeProp.first.std_str();
+    boost::split(attributes, dateString, boost::is_any_of("T"));
+    memset(&DateToCheck, 0, sizeof(struct tm));
+    strptime(attributes[0].c_str(), "%Y-%m-%d", &DateToCheck);
+    strftime(buf, sizeof(buf), "%Y-%m-%d", &DateToCheck);
+//    std::cout << "date " << DateToCheck.tm_mon << "\n";
+//    std::cout << "left date " << date[0].tm_mon << "\n";
+//    std::cout << "right date " << date[1].tm_mon << "\n";
+    if ( (date[0].tm_mon - DateToCheck.tm_mon <= 0)
+         && (date[1].tm_mon - DateToCheck.tm_mon >= 0) ) {
+      if ( ((date[0].tm_mday- DateToCheck.tm_mday <= 0) && 
+            (date[0].tm_mon - DateToCheck.tm_mon == 0))
+         || ((date[1].tm_mday- DateToCheck.tm_mday > 0) &&
+            (date[1].tm_mon - DateToCheck.tm_mon == 0)) ) {
+         cmpResult[0] = true;
+         cmpResult[1] = true;
+      }
+    }
+  }
+    return (cmpResult[0] && cmpResult[1]); 
+ }
+
+
 template<typename GraphElemType>
 bool checkRange(unsigned int opt, GraphElemType elem, Filter & RangeFilter, bool & EqualFlag) {
   typedef std::pair<FixedString, bool> ReturnValueType;
@@ -461,6 +510,10 @@ bool checkRange(unsigned int opt, GraphElemType elem, Filter & RangeFilter, bool
             return checkDateRange<ReturnValueType, GraphElemType>(elem, RangeFilter, EqualFlag);
           case 3:
             return checkYearRange<GraphElemType>(elem, RangeFilter, EqualFlag);
+
+          case 4: 
+            return checkBirthdayRange<ReturnValueType, GraphElemType>(elem, RangeFilter, EqualFlag);
+
           case 0:
             return true;
           default:

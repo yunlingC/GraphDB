@@ -385,14 +385,14 @@ public:
       Vertices[i]->deleteVertex();
       delete Vertices[i];
     }
-    std::cout << "vertex clean is done\n";
+    std::cout << "vertex cleaning is done\n";
 
     for ( size_t i=0; i < Edges.size(); i++ ) {
       Edges[i]->deleteEdge();
       delete Edges[i];
     }
 
-    std::cout << "edge clean is done\n";
+    std::cout << "edge cleaning is done\n";
   }
 
   vector<VertexPointer> getAllVertices(){

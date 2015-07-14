@@ -27,7 +27,7 @@ public:
   typedef pair<FixedString, bool> ReturnValueType;
   typedef std::queue<VertexPath>  PathQueue;
 public:
-  auto setNameFilter (Filter & filter) 
+  auto setNameFilter(Filter & filter) 
     -> void {
     _NameFilter = filter;
   }
@@ -39,7 +39,6 @@ public:
   virtual void setDepth(unsigned int depth) {
     _DepthSetting = depth;
   }
-
 
   virtual void visitStartVertex(VertexPointer startVertex ) {
     VertexPath newPath;
@@ -305,13 +304,13 @@ public:
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
     unsigned int DepthSecond = 0;
-    if(_PrevPath.back() == first) {
+    if (_PrevPath.back() == first) {
       DepthSecond = _PrevPath.size();
       _CurrentDepth = DepthSecond;
     }
 
     Filter filter;
-    if(DepthSecond > 0) {
+    if ( DepthSecond > 0 ) {
       filter = _FilterList[DepthSecond-1];
     }
     else 
@@ -731,30 +730,22 @@ public:
 protected:
   TargetsMapType _ResultMap;
 };
-//// till here!
-// TODO unfinished
-/*
+
 class SimilarityVisitor : public VertexMatchVisitor {
 public:
   typedef pair<VertexPointer, bool> VertexPair;
   typedef vector<string> VertexListType;
-  typedef map<VertexPointer, int> ReturnTargetMapType;
+  ///<post.id, post_interted_by_personx>
+  typedef std::unordered_map<unsigned int, bool> PostMapType;
 public:
-  virtual ReturnTargetMapType & getResultTargetsMap() {
-    return _TargetMap;
+  PostMapType & getPostMap() {
+    return PostMap;
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-    cout << "==>visit vertex " << vertex->getId() << "\t" << vertex->getPropertyValue("id").first << endl;
-    _PrevPath  = _PathQueue.front(); _pathQueue.pop();
+//    cout << "==>visit vertex " << vertex->getId() << "\t" << vertex->getPropertyValue("id").first << endl;
+    _PrevPath  = _PathQueue.front(); _PathQueue.pop();
     _CurrentDepth = _PrevPath.size();
-    if(_CurrentDepth == 3) {
-      _TargetMap.insert(pair<VertexPointer, int>(vertex, 0));
-      cout << vertex->getPropertyValue("firstName").first << " is recoreded\n";
-    }
-    if(_CurrentDepth == 4) {
-      _TagFlag = false;
-    }
     return  ((_PrevPath.size() > _DepthSetting) ? true : false);
   }
 
@@ -771,23 +762,93 @@ public:
       filter.setDefault();
     
     _TypeMatch = checkMultiRelType(edge, filter);
-    if(_CurrentDepth == 3) {
-      _TargetMap[first]++;
-      cout << second->getType() << "\t" << second->getPropertyValue("id").first << endl;
+    if ( (_CurrentDepth == 1) && _TypeMatch ) {
+//      std::cout << second->getId() << " post +1 \n";
+      PostMap.insert(std::pair<unsigned int, bool>(second->getId(), false));
     }
-    if((_CurrentDepth == 5) && _TypeMatch) {
-      cout << "person id " << second->getPropertyValue("id").first << endl; 
+
+    if((_CurrentDepth == 3) && _TypeMatch) {
       if(checkProperty<ReturnValueType>(second, _VertexFilter ) == true) {
+        PostMap[_PrevPath[1]->getId()] = true;
       }
     }
     return false;
   }
 
 protected:
-  TargetsMapType _ResultMap;
-  ReturnTargetMapType _TargetMap;
-  MemoryMapType  _MemoryMap;
+  PostMapType PostMap;
 };
 
-*/
+class ExpertVisitor : public SimilarityVisitor {
+public:
+  typedef pair<VertexPointer, bool> VertexPair;
+  typedef vector<string> VertexListType;
+  typedef std::unordered_map<unsigned int, bool> PostMapType;
+public:
+  PostMapType & getPostMap() {
+    return PostMap;
+  }
+
+  virtual bool visitVertex(VertexPointer vertex) {
+    _PrevPath  = _PathQueue.front(); _PathQueue.pop();
+    _CurrentDepth = _PrevPath.size();
+    return  ((_PrevPath.size() > _DepthSetting) ? true : false);
+  }
+
+  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
+
+//    std::cout << "--current depth " << _CurrentDepth << "\n"; 
+//    std::cout << "--first " << first->getType() << "\tsecond " << second->getType() << "\n";
+
+    unsigned int DepthSecond = 0 ;
+    if(_PrevPath.back() == first) {
+      DepthSecond = _PrevPath.size();
+    }
+    Filter filter;
+    if(DepthSecond > 0) {
+      filter = _FilterList[DepthSecond-1];
+    }
+    else 
+      filter.setDefault();
+    
+    _TypeMatch = checkMultiRelType(edge, filter);
+
+    if ( _TypeMatch ) {
+//      std::cout << first->getType() << first->getId() <<"\t" 
+//        << second->getType() << second->getId() << "\n";
+    }
+
+    if ( (_CurrentDepth == 1) && _TypeMatch ) {
+//      std::cout << second->getId() << " post +1 \n";
+      PostMap.insert(std::pair<unsigned int, bool>(second->getId(), false));
+    }
+
+    
+    if ( (_CurrentDepth == 4) && _TypeMatch ) {
+      if(checkProperty<ReturnValueType>(second, _VertexFilter ) == true) {
+//        std::cout << second->getPropertyValue("name").first.std_str() << "\n";
+        _TypeMatch = false;
+        PostMap[_PrevPath[1]->getId()] = true;
+      }
+    }
+
+    if ( (_CurrentDepth == 5) && _TypeMatch ) {
+      if ( checkProperty<ReturnValueType>(second, _VertexFilter ) == true) {
+//        std::cout << second->getPropertyValue("name").first.std_str() << "\n";
+        PostMap[_PrevPath[1]->getId()] = true;
+      }
+    }
+
+    return false;
+  }
+
+protected:
+  PostMapType PostMap;
+};
+
+class WeightedPathVisitor : public Visitor {
+public:
+
+};
+
 #endif /*_LDBCCUSTOMVISITOR_H_*/
