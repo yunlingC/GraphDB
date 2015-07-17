@@ -63,12 +63,12 @@ int main() {
 //    LdbcQuery12 q12;
 //    q12.runQuery(g, 31359);
 //
-  LdbcQuery13 q13;
-  q13.runQuery(g, 0, 4);
+//  LdbcQuery13 q13;
+//  q13.runQuery(g, 31359, 31366);
 
 
-//  LdbcQuery14 q14;
-//  q14.runQuery(g, 31359, 31399);
+    LdbcQuery14 q14;
+    q14.runQuery(g, 31359, 31408);
 
 
 

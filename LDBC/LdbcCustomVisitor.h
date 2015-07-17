@@ -846,9 +846,118 @@ protected:
   PostMapType PostMap;
 };
 
-class WeightedPathVisitor : public Visitor {
+class SubGraphVisitor : public PathVisitor {
+public:
+  typedef std::queue<VertexPath>  PathQueue;
+public:
+  SubGraphVisitor (): TypeMatch(false), DirecMatch(false)  { }
+
+  virtual void setEdgeFilter(Filter & filter) {
+    EdgeFilter = filter;
+  }
+
+  virtual bool visitDirection(VertexPointer target, EdgePointer Edge) {
+    return DirecMatch;
+  }
+
+  virtual bool scheduleEdge(EdgePointer Edge) {
+    return TypeMatch;
+  }
+
+  virtual bool scheduleBranch(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
+    TypeMatch = checkType(Edge, EdgeFilter);
+    DirecMatch = checkDirection(Second, Edge, EdgeFilter);
+    return false;
+  }
+
+  virtual bool scheduleTree(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
+    if ( TypeMatch && DirecMatch ) {
+      VertexPath NewPath = _PrevPath;
+      NewPath.push_back(Second);
+      _PathQueue.push(NewPath);
+      if(Second->getId() == _EndVertex) {
+        _VertexTargetList = NewPath;
+        return true;
+      }
+    }
+    return false;
+  }
+
+protected:
+  Filter EdgeFilter;
+  bool TypeMatch;
+  bool DirecMatch;
+};
+
+
+class WeightedPathVisitor : public SimilarityVisitor {
+public:
+  typedef pair<VertexPointer, bool> VertexPair;
+  typedef vector<string> VertexListType;
 public:
 
+  WeightedPathVisitor ():Score(0.0) {}
+  float getScore() {
+    return Score;
+  }
+
+  virtual bool visitVertex(VertexPointer vertex) {  
+    std::cout << "--visit " << vertex->getId() << "\n";
+    _PrevPath  = _PathQueue.front(); _PathQueue.pop();
+    _CurrentDepth = _PrevPath.size();
+    return  ((_PrevPath.size() > _DepthSetting) ? true : false);
+  }
+
+  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
+
+//    std::cout << "--current depth " << _CurrentDepth << "\n"; 
+//    std::cout << "--first " << first->getType() << "\tsecond " << second->getType() << "\n";
+
+    unsigned int DepthSecond = 0 ;
+    if(_PrevPath.back() == first) {
+      DepthSecond = _PrevPath.size();
+    }
+    Filter filter;
+    if(DepthSecond > 0) {
+      filter = _FilterList[DepthSecond-1];
+    }
+    else 
+      filter.setDefault();
+    
+    _TypeMatch = checkMultiRelType(edge, filter);
+
+    if ( _TypeMatch ) {
+      std::cout << first->getType() << first->getId() <<"\t" 
+        << second->getType() << second->getId() << "\n";
+    }
+
+//    if ( (_CurrentDepth ==  1) && _TypeMatch ) {
+//      std::cout << second->getId() << " post +1 \n";
+//      PostMap.insert(std::pair<unsigned int, bool>(second->getId(), false));
+//    }
+    
+    if ( (_CurrentDepth == 3) && _TypeMatch ) {
+      if ( checkProperty<ReturnValueType>(second, _VertexFilter ) == true) {
+      ///comment_replyOf_comment 0.5
+      ///comment_replyOf_post    1.0
+        auto Reply = _PrevPath[1]->getType().std_str();
+        auto ReplyOf = _PrevPath[2]->getType().std_str();
+        std::cout << "reply " << Reply << " ReplyOf " << ReplyOf << "\n";
+        if ( "COMMENT" == Reply && "POST" == ReplyOf) {
+          Score += 1; 
+          std::cout << "score+1\n";
+        } else if ( "COMMENT" == Reply && "COMMENT" == ReplyOf ) {
+          Score += 0.5;
+          std::cout << "score+.5\n";
+        }
+
+      }
+    }
+    return false;
+  }
+
+protected:
+  float Score;
 };
 
 #endif /*_LDBCCUSTOMVISITOR_H_*/

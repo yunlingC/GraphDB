@@ -197,7 +197,7 @@ bool checkProperty(VertexPointer vertex, Filter &filter) {
   FixedString value(filter.getValue());
   FixedString key(filter.getKey());
   ReturnValueType rv = vertex->getPropertyValue(key); 
-//  std::cout << rv.first.std_str() << "\t" << filter.getValue() << "\n";
+  std::cout << " checkProperty " << rv.first.std_str() << "\t" << filter.getValue() << "\n";
   if((rv.second == false) || (rv.first != value))
   {
       return false;

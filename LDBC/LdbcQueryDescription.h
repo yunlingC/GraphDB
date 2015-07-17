@@ -608,8 +608,11 @@ public:
 class LdbcQuery14 : public Query {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex, VertexDescriptor endVertex ) {
-    PathVisitor v13;
+    SubGraphVisitor v13;
     v13.setEndVertex(endVertex);
+    Filter EdgeFilter;
+    traverseThroughTypeAndDirection("KNOWS", "out",  EdgeFilter);
+    v13.setEdgeFilter(EdgeFilter);
     breadthFirstSearch(graph, startVertex, v13);
     auto target = v13.getVertexTargetList();
     if(target.empty())
@@ -617,11 +620,33 @@ public:
     else {
       LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << startVertex << " to " << endVertex << endl;
       for(auto it = target.begin(); it != target.end(); ++it) {
-        LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("firstName").first<< endl;
-      }
-    }
+        LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first <<"\t" << (*it)->getPropertyValue("firstName").first<< endl;
+      }//for
+    }//else
+///already found all the paths, calculate weights now  
+
+  auto itend = target.end();
+  for ( auto it = target.begin(); it != itend-1; it++ ) {  
+ 
+  Filter tmpFilter[4];
+  traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", tmpFilter[0]); 
+  traverseThroughMultiRelType("REPLY_OF_POST+REPLY_OF_COMMENT", tmpFilter[1]); 
+  traverseThroughMultiRelType("POST_HAS_CREATOR+COMMENT_HAS_CREATOR", tmpFilter[2]); 
+
+  WeightedPathVisitor v14;
+  for ( unsigned int i = 0; i < 3; i++ ) {
+    v14.setFilter(tmpFilter[i]);
   }
 
+    auto it2 = it+1;
+    tmpFilter[3].setProperty("id",(*it2)->getPropertyValue("id").first.std_str());
+    v14.setVertexFilter(tmpFilter[3]);
+    v14.setDepth(3);
+    std::cout << "calculating weights\n";
+    breadthFirstSearch(graph, (*it)->getId(), v14);
+    std::cout << "weight: " << v14.getScore() << "\n";
+  } 
+  }//run
 };
 
 
