@@ -23,9 +23,12 @@
 #include <errno.h>
 
 #include "GraphType.h"
+#include "PropertyList.h"
 
 using namespace boost;
 using namespace std;
+
+//#define INTERVAL 100000
 
 enum readTypes  { people, webpages, friends, likes, defaultValue};
 
@@ -34,8 +37,7 @@ int  str2int(string str){
 
   if (str == "<PEOPLE>")
     retType = people;
-
-  else if (str == "<WEBPAGES>")
+else if (str == "<WEBPAGES>")
     retType = webpages;
 
   else if (str == "<FRIENDS>")
@@ -43,7 +45,7 @@ int  str2int(string str){
 
   else if (str == "<LIKES>")
     retType = likes;
- 
+
   return retType;
 }
 
@@ -59,16 +61,23 @@ private:
     unsigned int  _webpages;
     unsigned int  _friends;
     unsigned int  _likes;
-    
+    unsigned int  ReadState;
+    unsigned int INTERVAL;
+
     vector<string> _nameList;
-    vector<string> _pidList;
- 
-    map<string, VertexDescriptor> _vertexMap;
     ifstream _GDfile;
 
 public:
     string line;
-    GDReader(Graph &graph):_graph(graph){};
+    GDReader(Graph &graph):_graph(graph),
+                           _people(0),
+                           _webpages(0),
+                           _friends(0),
+                           _likes(0)  {};
+
+    void setPrintInterval(unsigned int interv) {
+      INTERVAL = interv;
+    }
 
     void readFile(string filename) {
       try{
@@ -77,35 +86,46 @@ public:
           throw 1;
        
         while(getline(_GDfile, line) != NULL){
-          switch(str2int(line)) {
-          
-            case people:
-              readPeople();
-              break;
-          
-            case webpages:
-              readWebpages();
-              break;
-         
-            case friends:
-              readFriends();
-              break;
-          
-            case likes:
-              readLikes();
-              break;
 
-            default:
-              cout << "Error: " << "2" <<"\t Failed to recognize type" << endl;
+          int State = str2int(line);
+          if(State != defaultValue) {
+            ReadState = State;
+          }
+
+          switch(ReadState) {
+
+          case people:
+            readPeople(line);
+            break;
+          
+          case webpages:
+            readWebpages(line);
+            break;
+         
+          case friends:
+            readFriends(line);
+            break;
+          
+          case likes:
+            readLikes(line);
+            break;
+
+          case defaultValue:
+            break;
+
           }//END_SWITCH
        } //END_WHILE
+
+      _GDfile.close();
+      cout << " people " << _people << "\n";
+      cout << " webpages" << _webpages << "\n";
+      cout << " friends " << _friends << "\n";
+      cout << " likes " << _likes << "\n";
      }//END_TRY
     catch (int i){
       cout << "Error:"<< i <<"\tFailed to open file" <<endl;
       cerr << strerror(errno) << endl;
    }
-      _GDfile.close();
-
   }//END_READFILE
 
   unsigned int  getPeopleCounter(){
@@ -128,158 +148,111 @@ public:
     return _nameList;
   }
 
-  vector<string> & getPidList() {
-    return _pidList;
-  }
-
 private:
 
-  void readPeople(){
+  void readPeople(string & line){
 
-    _people = 0;
-    string pid = "";
-    string name = "";
     string age = "";
     string location = "";
     vector<string> attributes;
 
-    while(getline(_GDfile,line) != NULL){
+    VertexPropertyList peopleProp;
 
-      VertexPropertyList peopleProp;
-
-      if(line == "</PEOPLE>") {
-        return;
-      }
-
-      split(attributes, line, is_any_of("-"));
-
-      pid = (attributes[0]);
-      name = (attributes[1]);
-
-      if(attributes[2] != "?" ){
-        age = (attributes[2]);
-      }
-      if(attributes[3] != "?" ){
-        location = (attributes[3]);
-      }
-       //insert vertex in Graph
-      peopleProp.set("pid", pid);
-      peopleProp.set("name",name);
-      peopleProp.set("age", age);
-      peopleProp.set("location",location);
-      
-      _nameList.push_back(name);
-      _pidList.push_back(pid);
-      VertexDescriptor vp = _graph.addVertex(peopleProp);
-      _vertexMap.insert(pair<string, VertexDescriptor>(pid, vp));
-      _people++;
+    if((line == "</PEOPLE>") || (line == "<PEOPLE>")) {
+      return;
     }
+
+    split(attributes, line, is_any_of("-"));
+
+    if(attributes[2] != "?" ){
+      age = (attributes[2]);
+    }
+    if(attributes[3] != "?" ){
+      location = (attributes[3]);
+    }
+    //insert vertex in Graph
+    peopleProp.set("pid", attributes[0]);
+    peopleProp.set("name",attributes[1]);
+    peopleProp.set("age", age);
+    peopleProp.set("location",location);
+      
+    _nameList.push_back(attributes[1]);
+    _graph.addVertex(peopleProp);
+    _people++;
+//    if ( _people % INTERVAL == 0)
+//      cout << "# people " <<_people << "\n";
   }
   
-  void readWebpages(){
-    _webpages = 0;
+  void readWebpages(string line){
+
     VertexPropertyList webpagesProp;
-    string wpid = "";
     string wpurl = "";
     string wpdate = "";
     vector<string> attributes;
 
-    while(getline(_GDfile, line) != NULL){
-      VertexPropertyList webpagesProp;
-      if(line == "</WEBPAGES>"){
-        return;
-      }
-      split(attributes, line, is_any_of("-"));
-      
-      wpid = (attributes[0]);
-      
-      if(attributes[1] != "?" ){
-        wpdate = (attributes[1]);
-      }
-       //insert vertex in Graph
-      
-     wpurl = "http://www.uwaterloo.ca/webpage" + wpid + ".html";
-
-     webpagesProp.set("wpid",wpid);
-     webpagesProp.set("wpurl",wpurl);
-     webpagesProp.set("wpdate",wpdate);
-
-     VertexDescriptor vw = _graph.addVertex(webpagesProp);
-     _vertexMap.insert(pair<string, VertexDescriptor>(wpid, vw));
-     _webpages++;
+    if((line == "</WEBPAGES>") || (line == "<WEBPAGES>")){
+      return;
     }
+    split(attributes, line, is_any_of("-"));
+    
+    if(attributes[1] != "?" ){
+      wpdate = (attributes[1]);
+    }
+      
+    wpurl = "http://www.uwaterloo.ca/webpage" + attributes[0] + ".html";
+
+    webpagesProp.set("wpid",attributes[0]);
+    webpagesProp.set("wpurl",wpurl);
+    webpagesProp.set("wpdate",wpdate);
+
+    _graph.addVertex(webpagesProp);
+    _webpages++;
+//    if( _webpages % INTERVAL == 0)
+//      cout << "# webpages " << _webpages << "\n";
   }
 
-  void readFriends(){
+  void readFriends(string line){
 
-    VertexDescriptor vs, vd;
-    string eid  = "";
-    string from = "";
-    string to   = "";
     vector<string> attributes;
 
-    while(getline(_GDfile, line) != NULL){
-      EdgePropertyList friendsProp;
-      if(line == "</FRIENDS>"){
-        return;
-      }
-      split(attributes, line, is_any_of("-"));
-      
-      eid = (attributes[0]);
-      from = (attributes[1]);
-      to = (attributes[2]);
+    EdgePropertyList friendsProp;
+    if((line == "</FRIENDS>") || (line == "<FRIENDS>")){
+      return;
+    }
+    split(attributes, line, is_any_of("-"));
+    
        //insert vertex in Graph
-      friendsProp.set("eid", eid);
-      friendsProp.set("endpts", from + "-" + to);
+    friendsProp.set("eid", attributes[0]);
+    friendsProp.set("endpts", attributes[1] + "-" + attributes[2]);
 
-      if((_vertexMap.find(from) == _vertexMap.end()) || 
-          (_vertexMap.find(to) == _vertexMap.end()) ) {
-        cout << "Error: Failed to recognize " << from << "\t" << to << endl;
-        exit(0);
-      }
-      vs = _vertexMap.at(from);
-      vd = _vertexMap.at(to) ;
-      
-      _graph.addEdge(vs, vd, "FRIENDS", friendsProp);
-      // _graph.addEdge(vs, vd, "FRIENDS");
-      _friends++;
-      }
+    _graph.addEdge(stoi(attributes[1])-1, stoi(attributes[2])-1, "FRIENDS", friendsProp);
+    _friends++;
+//    if(_friends % INTERVAL == 0) 
+//      cout << "# friend " << _friends << "\n";
   }
 
-  void readLikes() {
-    VertexDescriptor vs, vd;
-    string eid  = "";
-    string from = "";
-    string to   = "";
+  void readLikes(string line) {
+
     vector<string> attributes;
     
-    while(getline(_GDfile, line) != NULL){
-      EdgePropertyList likesProp;
-      if(line == "</LIKES>"){
-        return;
-      }
-      split(attributes, line, is_any_of("-"));
+    EdgePropertyList likesProp;
+    if(( line == "</LIKES>") || ( line == "<LIKES>")){
+      return;
+    }
+    split(attributes, line, is_any_of("-"));
       
-      eid = (attributes[0]);
-      from = (attributes[1]);
-      to = (attributes[2]);
 
-      likesProp.set("eid", eid);
-      likesProp.set("endpts", from + "-" + to);
+    likesProp.set("eid", attributes[0]);
+    likesProp.set("endpts", attributes[1]+ "-" + attributes[2]);
 
-      if((_vertexMap.find(from) == _vertexMap.end()) || 
-          (_vertexMap.find(to) == _vertexMap.end()) ) {
-        cout << "Error: Failed to recognize " << from << "\t" << to << endl;
-        exit(0);
-      }
-      vs = _vertexMap.at(from);
-      vd = _vertexMap.at(to);
 
-      _graph.addEdge(vs, vd, "LIKES", likesProp);
-      // _graph.addEdge(vs, vd, "LIKES");
-      _likes++;
-      }
+    _graph.addEdge(stoi(attributes[1])-1, stoi(attributes[2])-1, "LIKES", likesProp);
+    // _graph.addEdge(vs, vd, "LIKES");
+    _likes++;
+//     if(_likes % INTERVAL == 0) 
+ //     cout <<"# likes " << _likes  << "\n";
   }
+
 };
 
 

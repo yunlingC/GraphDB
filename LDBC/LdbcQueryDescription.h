@@ -31,6 +31,7 @@ ofstream LdbcFile("ldbc_execution.log", ios_base::out| ios_base::app);
 class LdbcQuery : public Query{
 public:
   typedef std::pair<string, string> ParamPairType;
+  typedef pair<string, pair<string, string> > RangePairType;
 public:
   virtual void runQuery(Graph & graph, VertexDescriptor startVertex ) { }
 
@@ -43,82 +44,91 @@ public:
     ParamPair = param;
   }
 
+  void setRange(string Key, string Min, string Max) {
+    ValueRange.first = Key;
+    ValueRange.second.first = Min;
+    ValueRange.second.second = Max;
+  }
+
+  void setPropertyRange(string Key, string A, string B) {
+    PropRange.first = Key;
+    PropRange.second.first = A;
+    PropRange.second.second = B;
+  }
+
 protected:
   ParamPairType ParamPair;
+  RangePairType ValueRange;
+  RangePairType PropRange;
 };
 
 class LdbcQuery1 : public LdbcQuery {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    LdbcFile << "===============Query 1================\n\n";
-    startVertex = 1;
-    Filter tmpFilter[3];
+    LdbcFile << "===============Query 1================\n";
+    Filter tmpFilter;
     Filter NameFilter;
-//    string name = "Benedejcic";
-//    string name = ParamPair.second; 
     filtProperty(ParamPair.first, ParamPair.second, NameFilter); 
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[2]);
+    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter);
     LimitedDepthVisitor  v1;
-    v1.setFilter(tmpFilter[0]);
-    v1.setFilter(tmpFilter[1]);
-    v1.setFilter(tmpFilter[2]);
+    for (auto i = 0; i < 3; i++) {
+      v1.setFilter(tmpFilter);
+    }
     v1.setNameFilter(NameFilter);
     v1.setDepth(3);
     breadthFirstSearch(graph, startVertex, v1);
-    auto target = v1.getVertexTargetList(); LdbcFile << startVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< endl;
+    auto target = v1.getVertexTargetList(); 
+    LdbcFile << startVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< endl;
       for(auto it = target.begin(); it != target.end(); ++it) {
-        LdbcFile << "Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("lastName").first;
+        LdbcFile << "Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("firstName").first <<"\t" << (*it)->getPropertyValue("lastName").first;
         LdbcFile << endl;
     }
   }
 };
 
-class LdbcQuery2 : public Query {
+class LdbcQuery2 : public LdbcQuery {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    LdbcFile << "===============Query 2================\n\n";
+    LdbcFile << "===============Query 2================\n";
     Filter tmpFilter[3];
     traverseThroughMultiRelType("KNOWS", tmpFilter[0]); 
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", tmpFilter[1]); 
-    tmpFilter[2].setValueRange("creationDate", "", "2012-07-16T10:00:00.255"); 
+//  tmpFilter[2].setValueRange("creationDate", "", "2012-07-16T10:00:00.255"); 
+    tmpFilter[2].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
    
-        MultiRelTypeVisitor v2;
-        startVertex = 1;
-        v2.setFilter(tmpFilter[0]);
-        v2.setFilter(tmpFilter[1]);
-        v2.setRangeFilter(tmpFilter[2]);
-        v2.setDepth(2);
-        v2.setDepthToCheckRange(2);
-        v2.setPropToCheck(2); //check date
-        breadthFirstSearch(graph, startVertex, v2);
-        auto target = v2.getVertexTargetList();
-        auto targets = v2.getTargetsMap();
-        LdbcFile << startVertex << " has friends made " << target.size() << " comments and posts \n";
-        for(auto it = targets.begin(); it != targets.end(); ++it) {
-          LdbcFile <<"person " << (*it).second->getPropertyValue("id").first << "\t" <<"comments/posts " << (*it).first->getPropertyValue("id").first << "\t" << (*it).first->getPropertyValue("creationDate").first ;
-          LdbcFile << endl;
+    MultiRelTypeVisitor v2;
+    v2.setFilter(tmpFilter[0]);
+    v2.setFilter(tmpFilter[1]);
+    v2.setRangeFilter(tmpFilter[2]);
+    v2.setDepth(2);
+    v2.setDepthToCheckRange(2);
+    v2.setPropToCheck(2); //check date
+    breadthFirstSearch(graph, startVertex, v2);
+    auto target = v2.getVertexTargetList();
+    auto targets = v2.getTargetsMap();
+//    LdbcFile << startVertex << " has friends made " << target.size() << " comments and posts \n";
+    for(auto it = targets.begin(); it != targets.end(); ++it) {
+      LdbcFile <<"person " << (*it).second->getPropertyValue("id").first << "\t" <<"comments/posts " << (*it).first->getPropertyValue("id").first << "\t" << (*it).first->getPropertyValue("creationDate").first ;
+      LdbcFile << endl;
         }
   }
-
 };
 
 
-class LdbcQuery3 : public Query {
+class LdbcQuery3 : public LdbcQuery {
 public:
   typedef map<VertexPointer, vector<VertexPointer>> PersonListMapType;
   typedef pair<VertexPointer, vector<VertexPointer>> PersonListPair;
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    LdbcFile << "===============Query 3================\n\n";
-    Filter tmpFilter[2];
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
+    LdbcFile << "===============Query 3================\n";
+    Filter tmpFilter;
+    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter);
 
     SingleRelTypeVisitor v3;
-    v3.setFilter(tmpFilter[0]);
-    v3.setFilter(tmpFilter[1]);
+    v3.setFilter(tmpFilter);
+    ///cannot be deleted
+    v3.setFilter(tmpFilter);
     v3.setDepth(2);
     breadthFirstSearch(graph, startVertex, v3);
     auto target = v3.getVertexTargetList();
@@ -126,8 +136,8 @@ public:
     Filter FilterSet[4];
     traverseThroughMultiRelType("PERSON_IS_LOCATED_IN", FilterSet[0]); 
     traverseThroughMultiRelType("IS_PART_OF", FilterSet[1]); 
-    auto country1 = "Austria";
-    auto country2 = "Angola";
+    auto country1 = PropRange.second.first;
+    auto country2 = PropRange.second.second;
     FilterSet[2].setProperty("name", country1);
     FilterSet[3].setProperty("name", country2);
     
@@ -153,7 +163,7 @@ public:
     Filter Filters[5];
     PersonListMapType PersonListMap;
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR",Filters[0]); 
-    Filters[1].setValueRange("creationDate", "2010-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
+    Filters[1].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
     traverseThroughMultiRelType("POST_IS_LOCATED_IN+COMMENT_IS_LOCATED_IN",Filters[2]); 
     Filters[3].setProperty("name", country1); 
     Filters[4].setProperty("name", country2); 
@@ -181,15 +191,15 @@ public:
   }
 };
 
-class LdbcQuery4 : public Query {
+class LdbcQuery4 : public LdbcQuery {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    LdbcFile << "===============Query 4================\n\n";
+    LdbcFile << "===============Query 4================\n";
     Filter tmpFilter[4];
     traverseThroughMultiRelType("KNOWS", tmpFilter[0]); 
     traverseThroughMultiRelType("POST_HAS_CREATOR", tmpFilter[1]); 
     traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[2]); 
-    tmpFilter[3].setValueRange("creationDate", "2010-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
+    tmpFilter[3].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
    
     MultiResultVisitor v4;
     v4.setFilter(tmpFilter[0]);
@@ -208,13 +218,13 @@ public:
   }
 };
 
-class LdbcQuery5 : public Query {
+class LdbcQuery5 : public LdbcQuery {
 public:
   typedef map<VertexPointer, vector<VertexPointer>> PersonListMapType;
   typedef pair<VertexPointer, vector<VertexPointer>> PersonListPair;
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    LdbcFile << "===============Query 5================\n\n";
+    LdbcFile << "===============Query 5================\n";
     Filter tmpFilter[2];
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
@@ -228,7 +238,7 @@ public:
     LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
     Filter Filters[4];
     traverseThroughMultiRelType("HAS_MEMBER", Filters[0]); 
-    Filters[1].setValueRange("joinDate", "2012-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
+    Filters[1].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
     traverseThroughMultiRelType("CONTAINER_OF",Filters[2]); 
     traverseThroughMultiRelType("POST_HAS_CREATOR",Filters[3]); 
     vector<Filter> VertexFilter;
@@ -261,13 +271,13 @@ public:
   }
 };
 
-class LdbcQuery6 : public Query {
+class LdbcQuery6 : public LdbcQuery {
 public:
   typedef map<VertexPointer, vector<VertexPointer>> PersonListMapType;
   typedef pair<VertexPointer, vector<VertexPointer>> PersonListPair;
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    LdbcFile << "===============Query 5================\n\n";
+    LdbcFile << "===============Query 6================\n";
     Filter tmpFilter[2];
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
@@ -283,8 +293,7 @@ public:
     Filter Filters[3];
     traverseThroughMultiRelType("POST_HAS_CREATOR", Filters[0]); 
     traverseThroughMultiRelType("POST_HAS_TAG", Filters[1]); 
-    string id = "62";
-    Filters[2].setProperty("id", id);
+    Filters[2].setProperty(ParamPair.first, ParamPair.second);
     
     map<string, unsigned int> TagMap; 
     for(auto it = target.begin(); it != target.end(); it++) {
@@ -306,7 +315,7 @@ public:
               TagMap.insert(pair<string, unsigned int>((*iter), 1));
             } else {
               TagMap[*iter]++;
-              LdbcFile << (*iter) << " with " << TagMap[*iter] << " posts \n";
+//              LdbcFile << (*iter) << " with " << TagMap[*iter] << " posts \n";
             }
           }
         }
@@ -317,13 +326,13 @@ public:
   }
 };
 
-class LdbcQuery7 : public Query {
+class LdbcQuery7 : public LdbcQuery {
 public:
   typedef map<VertexPointer, vector<VertexPointer>> PersonListMapType;
   typedef pair<VertexPointer, vector<VertexPointer>> PersonListPair;
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    LdbcFile << "===============Query 5================\n\n";
+    LdbcFile << "===============Query 7================\n";
     Filter tmpFilter[2];
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
 
@@ -363,10 +372,10 @@ public:
   }
 };
 
-class LdbcQuery8 : public Query {
+class LdbcQuery8 : public LdbcQuery {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex) {
-    LdbcFile << "===============Query 8================\n\n";
+    LdbcFile << "===============Query 8================\n";
     Filter Filters[3];
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]); 
     traverseThroughMultiRelType("REPLY_OF_COMMENT+REPLY_OF_POST", Filters[1]); 
@@ -386,13 +395,13 @@ public:
   }
 };
 
-class LdbcQuery9 : public Query {
+class LdbcQuery9 : public LdbcQuery {
 public:
   typedef map<VertexPointer, VertexPointer> ReturnMapType;
   typedef pair<VertexPointer, VertexPointer> ReturnMapPair;
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    LdbcFile << "===============Query 9================\n\n";
+    LdbcFile << "===============Query 9================\n";
     Filter tmpFilter[2];
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
@@ -428,8 +437,7 @@ public:
   }
 };
 
-//TODO unfinished 
-class LdbcQuery10 : public Query {
+class LdbcQuery10 : public LdbcQuery {
 public:
   typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  
 public:
@@ -446,7 +454,7 @@ public:
     ///find friends of friends of start person
     std::vector<VertexPointer> targets;
     Filter BDFilter;
-    BDFilter.setValueRange("birthday", "0000-04-21", "0000-05-22");
+    BDFilter.setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
     for (VertexPointer StartVertex : av1.getVertexTargetList()) {
       auto EqualFlag = false; 
 //      std::cout << "frined " << StartVertex->getId() << "\n";
@@ -493,8 +501,9 @@ public:
         if ((*iter).second ) { PostItrd++; }
 //        std::cout << "post " << (*iter).first << "\t" << (*iter).second << "\n";
       }
+
       SimMap[(*it).first] = 2*PostItrd - v10.getPostMap().size(); 
-      LdbcFile << "person: " << (*it).first->getId() << " score " << (*it).second << "\n";
+      LdbcFile << "person: " << (*it).first->getId() << " similarity score " << (*it).second << "\n";
     
     }
   }
@@ -502,7 +511,7 @@ protected:
   SimMapType SimMap;
 };
 
-class LdbcQuery11 : public Query {
+class LdbcQuery11 : public LdbcQuery {
 public:
   typedef pair<EdgePointer, VertexPointer> MapPair;
   typedef multimap<VertexPointer, MapPair> MatchMapType; 
@@ -511,13 +520,12 @@ public:
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
     LdbcFile << "===============Query 11================\n";
-    Filter tmpFilter[2];
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
+    Filter tmpFilter;
+    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter);
 
     SingleRelTypeVisitor v11;
-    v11.setFilter(tmpFilter[0]);
-    v11.setFilter(tmpFilter[1]);
+    v11.setFilter(tmpFilter);
+    v11.setFilter(tmpFilter);
     v11.setDepth(2);
     breadthFirstSearch(graph, startVertex, v11);
     auto target = v11.getVertexTargetList();
@@ -525,34 +533,34 @@ public:
     Filter Filters[4];
     traverseThroughMultiRelType("WORKS_AT",Filters[0]); 
     traverseThroughMultiRelType("ORGANISATION_IS_LOCATED_IN",Filters[1]); 
-    Filters[2].setValueRange("workFrom", "", "2018"); 
-    Filters[3].setProperty("name", "Angola");  
+    Filters[2].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
+    Filters[3].setProperty(ParamPair.first, ParamPair.second);  
 
     MatchMapType TargetsMap;
     for(auto it = target.begin(); it != target.end(); ++it) {
       LdbcFile <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << endl; 
    
-      VertexPropertyVisitor sv11;
-      sv11.setFilter(Filters[0]);
-      sv11.setFilter(Filters[1]);
-      sv11.setRangeFilter(Filters[2]);
-      sv11.setVertexFilter(Filters[3]);
-      sv11.setDepth(2);
-      sv11.setDepthToCheckRange(1);
-      sv11.setDepthToCheckVertexProp(2);
-      unsigned int startVertex = (*it)->getId();
-      breadthFirstSearch(graph, startVertex, sv11);
-      auto targets = sv11.getMatchMap();
-      TargetsMap.insert(targets.begin(), targets.end());
-    }
-      FixedString key("workFrom");
-      for(auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
-        LdbcFile << (*iter).first->getPropertyValue("firstName").first << " works at "  << (*iter).second.second->getPropertyValue("id").first << " from " << (*iter).second.first->getPropertyValue(key).first << endl;
+    VertexPropertyVisitor sv11;
+    sv11.setFilter(Filters[0]);
+    sv11.setFilter(Filters[1]);
+    sv11.setRangeFilter(Filters[2]);
+    sv11.setVertexFilter(Filters[3]);
+    sv11.setDepth(2);
+    sv11.setDepthToCheckRange(1);
+    sv11.setDepthToCheckVertexProp(2);
+    unsigned int startVertex = (*it)->getId();
+    breadthFirstSearch(graph, startVertex, sv11);
+    auto targets = sv11.getMatchMap();
+    TargetsMap.insert(targets.begin(), targets.end());
+  }
+    FixedString key("workFrom");
+    for(auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
+      LdbcFile << (*iter).first->getPropertyValue("firstName").first << " works at "  << (*iter).second.second->getPropertyValue("id").first << " from " << (*iter).second.first->getPropertyValue(key).first << endl;
       }
   }
 };
 
-class LdbcQuery12 : public Query {
+class LdbcQuery12 : public LdbcQuery {
 public:
   typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  
 public:
@@ -571,7 +579,7 @@ public:
       traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[2]); 
       traverseThroughMultiRelType("HAS_TYPE", tmpFilter[3]); 
       traverseThroughMultiRelType("IS_SUBCLASS_OF", tmpFilter[4]); 
-      tmpFilter[5].setProperty("name", "Person");
+      tmpFilter[5].setProperty(ParamPair.first, ParamPair.second);
 
 
     for (VertexPointer StartVertex : av1.getVertexTargetList()) {
@@ -603,9 +611,10 @@ protected:
 };
 
 
-class LdbcQuery13 : public Query {
+class LdbcQuery13 : public LdbcQuery {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex, VertexDescriptor endVertex ) {
+    LdbcFile << "===============Query 13================\n";
     PathVisitor v13;
     v13.setEndVertex(endVertex);
     breadthFirstSearch(graph, startVertex, v13);
@@ -625,6 +634,7 @@ public:
 class LdbcQuery14 : public Query {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex, VertexDescriptor endVertex ) {
+    LdbcFile << "===============Query 14================\n";
     SubGraphVisitor v13;
     v13.setEndVertex(endVertex);
     Filter EdgeFilter;

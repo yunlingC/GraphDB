@@ -306,9 +306,9 @@ ReturnBranchType checkBranch(VertexPointer vertex, Filter & filter) {
 
 int compareTime(time_t time1, time_t time2) {
   auto second = difftime(time1, time2);
-  if (second >= 0.0000001) 
+  if (second >= 0.0000000) 
     return 1; 
-  else  if(second < -0.0000001)
+  else  if(second < -0.0000000)
     return -1;
   else 
     return 0;
@@ -344,7 +344,7 @@ bool checkTimeRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
     auto timeString = timeProp.first.std_str();
     boost::split(attributes, timeString, boost::is_any_of("T"));
     boost::split(attributes, attributes[1], boost::is_any_of("."));
-      memset(&TimeToCheck, 0, sizeof(struct tm));
+    memset(&TimeToCheck, 0, sizeof(struct tm));
     strptime(attributes[0].c_str(), "%H:%M:%S", &TimeToCheck);
     strftime(buf, sizeof(buf), "%H:%M:%S", &TimeToCheck);
     auto t = mktime(&TimeToCheck); 
@@ -431,7 +431,7 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
     auto d = mktime(&DateToCheck);
     if(cmpResult[0] != true) {
       auto d1 = mktime(&date[0]);
-      unsigned int cmp = compareTime(d, d1);
+      int cmp = compareTime(d, d1);
       if (cmp >= 0) {
         if(cmp == 0) 
           EqualFlag = true;
@@ -440,13 +440,15 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
     }
     if(cmpResult[1] != true) {
       auto d2 = mktime(&date[1]);
-      unsigned int cmp2 = compareTime(d2, d);
-      if(cmp2 >= true) {
-        if(cmp2 == true)
+      int cmp2 = compareTime(d2, d);
+      if(cmp2 >= 0) {
+        if(cmp2 == 0)
           EqualFlag = true;
         cmpResult[1] = true; 
       }
+
     }
+
     return (cmpResult[0] && cmpResult[1]); 
   }
  }
@@ -510,7 +512,6 @@ bool checkRange(unsigned int opt, GraphElemType elem, Filter & RangeFilter, bool
             return checkDateRange<ReturnValueType, GraphElemType>(elem, RangeFilter, EqualFlag);
           case 3:
             return checkYearRange<GraphElemType>(elem, RangeFilter, EqualFlag);
-
           case 4: 
             return checkBirthdayRange<ReturnValueType, GraphElemType>(elem, RangeFilter, EqualFlag);
 
@@ -540,6 +541,7 @@ bool checkEdgeType(EdgePointer edge, Type type) {
     if (type == "")
       return true;
     FixedString FixType(type);
+//    std::cout << "edge type " << edge->getType() << " ?= " << type <<"\n";
     if (edge->getType() == FixType)
       return true;
     else  

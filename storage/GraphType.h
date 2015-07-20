@@ -128,8 +128,8 @@ public:
       exit(1);
     }
 
-    char* PlacePtr = _NodeMemory + _numVertices*sizeof(Vertex);
-    cout << "Place node at: " << reinterpret_cast<int*>(PlacePtr) << endl;
+    char* PlacePtr = NodeMemory + NumberOfVertices*sizeof(Vertex);
+//    cout << "Place node at: " << reinterpret_cast<int*>(PlacePtr) << endl;
        VertexPointer NewVertex = new(PlacePtr) Vertex();
   #else 
        VertexPointer NewVertex = new Vertex();
@@ -152,8 +152,8 @@ public:
       exit(1);
     }
 
-    char* PlacePtr = _NodeMemory + _numVertices*sizeof(Vertex);
-    cout << "Place node at: " << reinterpret_cast<int*>(PlacePtr) << endl;
+    char* PlacePtr = NodeMemory + NumberOfVertices*sizeof(Vertex);
+//    cout << "Place node at: " << reinterpret_cast<int*>(PlacePtr) << endl;
        VertexPointer NewVertex = new(PlacePtr) Vertex();
   #else 
        VertexPointer NewVertex = new Vertex();
@@ -177,8 +177,8 @@ public:
       exit(1);
     }
 
-    char* PlacePtr = _NodeMemory + _numVertices*sizeof(Vertex);
-    cout << "Place node at: " << reinterpret_cast<int*>(PlacePtr) << endl;
+    char* PlacePtr = NodeMemory + NumberOfVertices*sizeof(Vertex);
+//    cout << "Place node at: " << reinterpret_cast<int*>(PlacePtr) << endl;
        VertexPointer NewVertex = new(PlacePtr) Vertex();
   #else 
        VertexPointer NewVertex = new Vertex();
@@ -305,10 +305,10 @@ public:
     }
     //    Create new edge by retrieving VertexPtr from vertices.
        char * PlacePtr = EdgeMemory + NumberOfEdges*sizeof(Edge);
-       cout << "Place edge at: " << reinterpret_cast<int*>(PlacePtr) << endl;
-       EdgePtr NewEdge = new(PlacePtr) Edge(Vertices[vs], Vertices[vd]);
+//       cout << "Place edge at: " << reinterpret_cast<int*>(PlacePtr) << endl;
+       EdgePointer NewEdge = new(PlacePtr) Edge(Vertices[StartVertex], Vertices[EndVertex]);
   #else
-    EdgePtr NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
+    EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
   #endif /* _FIXALLOC_ */
 
 //    EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
@@ -331,8 +331,8 @@ public:
       exit(1);
     }
     //    Create new edge by retrieving VertexPtr from vertices.
-       char * PlacePtr = EdgeMemory + _NumberOfEdges*sizeof(Edge);
-       cout << "Place edge at: " << reinterpret_cast<int*>(PlacePtr) << endl;
+       char * PlacePtr = EdgeMemory + NumberOfEdges*sizeof(Edge);
+//       cout << "Place edge at: " << reinterpret_cast<int*>(PlacePtr) << endl;
        EdgePointer NewEdge = new(PlacePtr) Edge(Vertices[StartVertex], Vertices[EndVertex]);
   #else
     EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
@@ -360,8 +360,8 @@ public:
       exit(1);
     }
     //    Create new edge by retrieving VertexPtr from vertices.
-       char * PlacePtr = EdgeMemory + _NumberOfEdges*sizeof(Edge);
-       cout << "Place edge at: " << reinterpret_cast<int*>(PlacePtr) << endl;
+       char * PlacePtr = EdgeMemory + NumberOfEdges*sizeof(Edge);
+//       cout << "Place edge at: " << reinterpret_cast<int*>(PlacePtr) << endl;
        EdgePointer NewEdge = new(PlacePtr) Edge(Vertices[StartVertex], Vertices[EndVertex]);
   #else
     EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
@@ -456,19 +456,26 @@ public:
     /// However, only one place is necessary since everywhere else, I am storing pointers.
     /// Thus, Vertices and _edges contain all newly created objects.
 
-    std::cout << "GraphType: clean " << Vertices.size() << " vertices and " << Edges.size() << " edges\n";
-    for ( size_t i=0; i < Vertices.size(); i++ ) {
-      Vertices[i]->deleteVertex();
-      delete Vertices[i];
-    }
-    std::cout << "vertex cleaning is done\n";
+//    std::cout << "GraphType: clean " << Vertices.size() << " vertices and " << Edges.size() << " edges\n";
+//    for ( size_t i=0; i < Vertices.size(); i++ ) {
+//      Vertices[i]->deleteVertex();
+//      delete Vertices[i];
+//    }
+//    std::cout << "vertex cleaning is done\n";
+//
+//    for ( size_t i=0; i < Edges.size(); i++ ) {
+//      Edges[i]->deleteEdge();
+//      delete Edges[i];
+//    }
+//
+//    std::cout << "edge cleaning is done\n";
 
-    for ( size_t i=0; i < Edges.size(); i++ ) {
-      Edges[i]->deleteEdge();
-      delete Edges[i];
-    }
+#ifdef _FIXALLOC_
+    //    Delete the memory spaces.
+    delete NodeMemory;
+    delete EdgeMemory;
+#endif /* _FIXALLOC_ */
 
-    std::cout << "edge cleaning is done\n";
   }
 
 #ifdef _FIXALLOC_
@@ -483,9 +490,9 @@ public:
   void allocEdgeMemory(unsigned int sz) {
     // Allocation sz number of Vertex objects.
     cout << "Edge space: " << sizeof(Edge)*sz << "\n";
-    edgeMemory = new char[sizeof(Edge)*sz];
+    EdgeMemory = new char[sizeof(Edge)*sz];
     cout << "Edge Memory\n + Starting address: " << reinterpret_cast<int*>(EdgeMemory) 
-    	 << ", ending address: " << reinterpret_cast<int*>(edgeMemory + sizeof(Edge)*sz) << "\n" << endl;
+    	 << ", ending address: " << reinterpret_cast<int*>(EdgeMemory + sizeof(Edge)*sz) << "\n" << endl;
   }
 #endif /* _FIXALLOC_ */
 
