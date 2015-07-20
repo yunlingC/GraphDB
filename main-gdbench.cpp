@@ -22,6 +22,13 @@ int main(int argc, char *argv[]) {
   Graph g;
   cout << "Begin testing\n";
 
+#ifdef _FIXALLOC_
+  g.allocVertexMemory(1200);
+  g.allocEdgeMemory(20000);
+#endif /* _FIXALLOC */
+  cout << "Begin testing\n";
+
+
   GDReader reader(g);
   reader.setPrintInterval(10000);
   reader.readFile("../tests/gd/sndata1000.gd");
