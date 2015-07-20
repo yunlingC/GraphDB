@@ -902,7 +902,7 @@ public:
   }
 
   virtual bool visitVertex(VertexPointer vertex) {  
-    std::cout << "--visit " << vertex->getId() << "\n";
+//    std::cout << "--visit " << vertex->getId() << "\n";
     _PrevPath  = _PathQueue.front(); _PathQueue.pop();
     _CurrentDepth = _PrevPath.size();
     return  ((_PrevPath.size() > _DepthSetting) ? true : false);
@@ -927,8 +927,8 @@ public:
     _TypeMatch = checkMultiRelType(edge, filter);
 
     if ( _TypeMatch ) {
-      std::cout << first->getType() << first->getId() <<"\t" 
-        << second->getType() << second->getId() << "\n";
+//      std::cout << first->getType() << first->getId() <<"\t" 
+//        << second->getType() << second->getId() << "\n";
     }
 
 //    if ( (_CurrentDepth ==  1) && _TypeMatch ) {
@@ -942,13 +942,13 @@ public:
       ///comment_replyOf_post    1.0
         auto Reply = _PrevPath[1]->getType().std_str();
         auto ReplyOf = _PrevPath[2]->getType().std_str();
-        std::cout << "reply " << Reply << " ReplyOf " << ReplyOf << "\n";
+//        std::cout << "reply " << Reply << " ReplyOf " << ReplyOf << "\n";
         if ( "COMMENT" == Reply && "POST" == ReplyOf) {
           Score += 1; 
-          std::cout << "score+1\n";
+//          std::cout << "score+1\n";
         } else if ( "COMMENT" == Reply && "COMMENT" == ReplyOf ) {
           Score += 0.5;
-          std::cout << "score+.5\n";
+//          std::cout << "score+.5\n";
         }
 
       }

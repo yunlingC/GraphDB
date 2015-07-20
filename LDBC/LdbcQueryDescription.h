@@ -28,31 +28,48 @@
 
 ofstream LdbcFile("ldbc_execution.log", ios_base::out| ios_base::app);
 
-class LdbcQuery1 : public Query {
+class LdbcQuery : public Query{
+public:
+  typedef std::pair<string, string> ParamPairType;
+public:
+  virtual void runQuery(Graph & graph, VertexDescriptor startVertex ) { }
+
+  void setParam(const string & Key, const string & Value) {
+    ParamPair.first = Key;
+    ParamPair.second = Value;
+  }
+  
+  void setParam(ParamPairType & param) {
+    ParamPair = param;
+  }
+
+protected:
+  ParamPairType ParamPair;
+};
+
+class LdbcQuery1 : public LdbcQuery {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
     LdbcFile << "===============Query 1================\n\n";
     startVertex = 1;
-    SimMarker(1, 1);
     Filter tmpFilter[3];
     Filter NameFilter;
-    string name = "Benedejcic";
-    filtProperty("lastName", name, NameFilter); 
+//    string name = "Benedejcic";
+//    string name = ParamPair.second; 
+    filtProperty(ParamPair.first, ParamPair.second, NameFilter); 
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[2]);
-        LimitedDepthVisitor  v1;
-        v1.setFilter(tmpFilter[0]);
-        v1.setFilter(tmpFilter[1]);
-        v1.setFilter(tmpFilter[2]);
-        v1.setNameFilter(NameFilter);
-        v1.setDepth(3);
-        breadthFirstSearch(graph, startVertex, v1);
-        SimMarker(2, 1);
-        auto target = v1.getVertexTargetList();
-        LdbcFile << startVertex << " is connected with " << target.size() << " people with firstName : " << name << endl;
-        for(auto it = target.begin(); it != target.end(); ++it) {
-          LdbcFile << "Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("lastName").first;
+    LimitedDepthVisitor  v1;
+    v1.setFilter(tmpFilter[0]);
+    v1.setFilter(tmpFilter[1]);
+    v1.setFilter(tmpFilter[2]);
+    v1.setNameFilter(NameFilter);
+    v1.setDepth(3);
+    breadthFirstSearch(graph, startVertex, v1);
+    auto target = v1.getVertexTargetList(); LdbcFile << startVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< endl;
+      for(auto it = target.begin(); it != target.end(); ++it) {
+        LdbcFile << "Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("lastName").first;
         LdbcFile << endl;
     }
   }
@@ -558,7 +575,7 @@ public:
 
 
     for (VertexPointer StartVertex : av1.getVertexTargetList()) {
-      std::cout << "friend " << StartVertex->getId() << "\n";
+//      std::cout << "friend " << StartVertex->getId() << "\n";
       SimMap[StartVertex] = 0;
 
       ExpertVisitor v10;
@@ -573,7 +590,7 @@ public:
       auto PostNum = 0;
       for ( auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
         if ((*iter).second ) { PostNum++; }
-          std::cout << "post " << (*iter).first << "\t" << (*iter).second << "\n";
+//          std::cout << "post " << (*iter).first << "\t" << (*iter).second << "\n";
       }
 
       SimMap[StartVertex] = PostNum; 
@@ -626,6 +643,7 @@ public:
 ///already found all the paths, calculate weights now  
 
   auto itend = target.end();
+  float Weight = 0.0;
   for ( auto it = target.begin(); it != itend-1; it++ ) {  
  
   Filter tmpFilter[4];
@@ -642,11 +660,13 @@ public:
     tmpFilter[3].setProperty("id",(*it2)->getPropertyValue("id").first.std_str());
     v14.setVertexFilter(tmpFilter[3]);
     v14.setDepth(3);
-    std::cout << "calculating weights\n";
+//    std::cout << "calculating weights\n";
     breadthFirstSearch(graph, (*it)->getId(), v14);
-    std::cout << "weight: " << v14.getScore() << "\n";
-  } 
-  }//run
+//    std::cout << "weight: " << v14.getScore() << "\n";
+    Weight += v14.getScore();
+ } 
+  LdbcFile << "weight " << Weight <<"\n";
+ }//run
 };
 
 

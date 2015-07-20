@@ -122,7 +122,20 @@ public:
   }
 
   VertexDescriptor addVertex() {
-    VertexPointer NewVertex = new Vertex();
+  #ifdef _FIXALLOC_
+    if (NodeMemory == NULL) {
+      cerr << "ERROR: Edge space not allocated\n";
+      exit(1);
+    }
+
+    char* PlacePtr = _NodeMemory + _numVertices*sizeof(Vertex);
+    cout << "Place node at: " << reinterpret_cast<int*>(PlacePtr) << endl;
+       VertexPointer NewVertex = new(PlacePtr) Vertex();
+  #else 
+       VertexPointer NewVertex = new Vertex();
+  #endif /* _FIXALLOC_ */
+
+//    VertexPointer NewVertex = new Vertex();
     NewVertex->setId(NumberOfVertices); 
     //support for map
     VertexMap.insert(std::pair<unsigned int, VertexPointer>(NumberOfVertices, NewVertex));
@@ -133,7 +146,20 @@ public:
   }
 
   VertexDescriptor addVertex(string Label, PropertyListType & InitialPropertyList) {
-    VertexPointer NewVertex = new Vertex();
+  #ifdef _FIXALLOC_
+    if (NodeMemory == NULL) {
+      cerr << "ERROR: Edge space not allocated\n";
+      exit(1);
+    }
+
+    char* PlacePtr = _NodeMemory + _numVertices*sizeof(Vertex);
+    cout << "Place node at: " << reinterpret_cast<int*>(PlacePtr) << endl;
+       VertexPointer NewVertex = new(PlacePtr) Vertex();
+  #else 
+       VertexPointer NewVertex = new Vertex();
+  #endif /* _FIXALLOC_ */
+
+//    VertexPointer NewVertex = new Vertex();
     NewVertex->setPropertyList(InitialPropertyList);
     NewVertex->setId(NumberOfVertices); 
     NewVertex->setType(Label);
@@ -145,7 +171,20 @@ public:
   }
 
   VertexDescriptor addVertex(PropertyListType & InitialPropertyList) {
-    VertexPointer NewVertex = new Vertex();
+  #ifdef _FIXALLOC_
+    if (NodeMemory == NULL) {
+      cerr << "ERROR: Edge space not allocated\n";
+      exit(1);
+    }
+
+    char* PlacePtr = _NodeMemory + _numVertices*sizeof(Vertex);
+    cout << "Place node at: " << reinterpret_cast<int*>(PlacePtr) << endl;
+       VertexPointer NewVertex = new(PlacePtr) Vertex();
+  #else 
+       VertexPointer NewVertex = new Vertex();
+  #endif /* _FIXALLOC_ */
+
+//    VertexPointer NewVertex = new Vertex();
     NewVertex->setPropertyList(InitialPropertyList);
     NewVertex->setId(NumberOfVertices); 
     VertexMap.insert(std::pair<unsigned int, VertexPointer>(NumberOfVertices, NewVertex));
@@ -259,7 +298,20 @@ public:
 
   EdgeDescriptor addEdge(VertexDescriptor StartVertex, 
                          VertexDescriptor EndVertex, const string & Label) {
-    EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
+  #ifdef _FIXALLOC_
+    if (EdgeMemory == NULL) {
+      cerr << "ERROR: Edge space not allocated\n";
+      exit(1);
+    }
+    //    Create new edge by retrieving VertexPtr from vertices.
+       char * PlacePtr = EdgeMemory + NumberOfEdges*sizeof(Edge);
+       cout << "Place edge at: " << reinterpret_cast<int*>(PlacePtr) << endl;
+       EdgePtr NewEdge = new(PlacePtr) Edge(Vertices[vs], Vertices[vd]);
+  #else
+    EdgePtr NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
+  #endif /* _FIXALLOC_ */
+
+//    EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
     NewEdge->setId(NumberOfEdges);
     NewEdge->setType(Label);
     assignPointers(StartVertex, EndVertex, NewEdge);
@@ -273,8 +325,20 @@ public:
   EdgeDescriptor addEdge(VertexDescriptor StartVertex, 
                          VertexDescriptor EndVertex, 
                          PropertyListType & InitialPropertyList) {
-
+  #ifdef _FIXALLOC_
+    if (EdgeMemory == NULL) {
+      cerr << "ERROR: Edge space not allocated\n";
+      exit(1);
+    }
+    //    Create new edge by retrieving VertexPtr from vertices.
+       char * PlacePtr = EdgeMemory + _NumberOfEdges*sizeof(Edge);
+       cout << "Place edge at: " << reinterpret_cast<int*>(PlacePtr) << endl;
+       EdgePointer NewEdge = new(PlacePtr) Edge(Vertices[StartVertex], Vertices[EndVertex]);
+  #else
     EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
+  #endif /* _FIXALLOC_ */
+
+//    EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
 
     NewEdge->setPropertyList(InitialPropertyList);
     NewEdge->setId(NumberOfEdges);    
@@ -290,8 +354,20 @@ public:
                          VertexDescriptor EndVertex, 
                          const string & Label, 
                          PropertyListType & InitialPropertyList) {
-
+  #ifdef _FIXALLOC_
+    if (EdgeMemory == NULL) {
+      cerr << "ERROR: Edge space not allocated\n";
+      exit(1);
+    }
+    //    Create new edge by retrieving VertexPtr from vertices.
+       char * PlacePtr = EdgeMemory + _NumberOfEdges*sizeof(Edge);
+       cout << "Place edge at: " << reinterpret_cast<int*>(PlacePtr) << endl;
+       EdgePointer NewEdge = new(PlacePtr) Edge(Vertices[StartVertex], Vertices[EndVertex]);
+  #else
     EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
+  #endif /* _FIXALLOC_ */
+
+//    EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
 
     NewEdge->setType(Label);
     NewEdge->setPropertyList(InitialPropertyList);
@@ -395,6 +471,24 @@ public:
     std::cout << "edge cleaning is done\n";
   }
 
+#ifdef _FIXALLOC_
+  void allocVertexMemory(unsigned int sz) {
+
+    // Allocation sz number of Vertex objects.
+    NodeMemory = new char[sizeof(Vertex)*sz];
+    cout << "Vertex Memory\n + Starting address: " << reinterpret_cast<int*>(NodeMemory)
+    	 << ", ending address: " << reinterpret_cast<int*>(NodeMemory + sizeof(Vertex)*sz) << "\n";
+  }
+
+  void allocEdgeMemory(unsigned int sz) {
+    // Allocation sz number of Vertex objects.
+    cout << "Edge space: " << sizeof(Edge)*sz << "\n";
+    edgeMemory = new char[sizeof(Edge)*sz];
+    cout << "Edge Memory\n + Starting address: " << reinterpret_cast<int*>(EdgeMemory) 
+    	 << ", ending address: " << reinterpret_cast<int*>(edgeMemory + sizeof(Edge)*sz) << "\n" << endl;
+  }
+#endif /* _FIXALLOC_ */
+
   vector<VertexPointer> getAllVertices(){
     return Vertices;
   }
@@ -402,7 +496,6 @@ public:
   vector<EdgePointer> getAllEdges(){
     return Edges;
   }
-
 
   void handleAddr(){
     VerticesSort = Vertices;
@@ -425,6 +518,11 @@ protected:
   /// Keep a count of vertices and edges.
   unsigned int NumberOfVertices;
   unsigned int NumberOfEdges;
+
+#ifdef _FIXALLOC_
+  char* NodeMemory;
+  char* EdgeMemory;
+#endif /* _FIXALLOC_ */
 };
 
 #endif /* _GRAPH_TYPE_H */

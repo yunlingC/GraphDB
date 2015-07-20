@@ -6,30 +6,24 @@
 #include "LinkedList.h"
 #include "LdbcQueryDescription.h"
 
-
 int main() {
 
   typedef GraphType Graph;
+//  typedef std::pair<string, string> ParamPairType;
   //typedef Graph::VertexDescriptor VertexDescriptor;
   //typedef Graph::VertexPointer VertexPointer;
 
   Graph g;
-  cout << "Begin testing\n";
-
   LDBCReader reader(g);
   reader.readDirectory("../tests/ldbc/social_network_50/New");
 
   cout << "Finish reading \n";
-
-//  passPtr(0,0,0,0,0,0);
-  //start prefetching trigger
   
-//  SimRoiStart();
-//  SimRoiEnd();
 
-//  LdbcQuery1 q1;
-//  q1.runQuery(g, 0);
-//
+  LdbcQuery1 q1;
+  q1.setParam("firstName", "Peng");
+  q1.runQuery(g, 31359);
+
 //  LdbcQuery2 q2;
 //  q2.runQuery(g, 0);
 //
@@ -67,8 +61,8 @@ int main() {
 //  q13.runQuery(g, 31359, 31366);
 
 
-    LdbcQuery14 q14;
-    q14.runQuery(g, 31359, 31408);
+//    LdbcQuery14 q14;
+//    q14.runQuery(g, 31359, 31408);
 
 
 
