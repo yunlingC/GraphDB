@@ -49,7 +49,8 @@ set(GDB_LD_FLAGS storage)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++14 -D_FIXALLOC_ -Wall")
 
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_FIXALLOC_ -Wall")
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_FIXALLOC_ -Wall")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -Wall")
 
 
 # Storage sub directory
@@ -59,7 +60,7 @@ set(TESTS
   #        main-linkedlist.cpp
         #      main-dfs.cpp
         #        main-gdbench.cpp
-        main-updates.cpp
+        #main-updates.cpp
         #        main-translator.cpp
         main-ldbc.cpp
         )

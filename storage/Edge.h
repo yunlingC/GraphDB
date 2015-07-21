@@ -50,6 +50,7 @@ public:
   EdgePointer getPreviousEdge(VertexPointer from);
   PropertyListReference getPropertyList();
   ReturnValueType getPropertyValue(KeyType k);
+  ReturnValueType getPropertyValue(std::string k);
   EdgePointer getSecondNextEdge();
   EdgePointer getSecondPreviousEdge();
 

@@ -96,6 +96,12 @@ auto Edge::getPropertyValue(KeyType Key)
   return EdgePropertyList.get(Key);
 }
 
+auto Edge::getPropertyValue(std::string Key) 
+  -> ReturnValueType {
+  FixedString key(Key);
+  return Edge::getPropertyValue(key);
+}
+
 auto Edge::setProperty(KeyType Key, ValueType Value) 
   -> void {
   EdgePropertyList.set(Key,Value);
