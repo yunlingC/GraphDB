@@ -62,7 +62,9 @@ set(TESTS
         #        main-gdbench.cpp
         #main-updates.cpp
         #        main-translator.cpp
-        main-ldbc.cpp
+        #main-ldbc.cpp
+        #        main-all.cpp
+        main-mt-ldbc.cpp
         )
 
 # This will generate all the executables listed in the TESTS variable

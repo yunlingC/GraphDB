@@ -36,12 +36,7 @@ public:
                 LockManager(lm), graph (graph) {}
 
   virtual bool visitVertex(VertexPointer vp) {
-//    bool GetLock = false;
-//    while ( !GetLock ) {
-//      GetLock = getVertexLock(vp->getId(), Pp, SH);
-//    }
     bool VertexMatch = checkProperty<ReturnValueType>(vp, getFilter());
-//    releaseVertexLock(vp->getId(), Pp, SH);
     ///TODO bug here. not consistent
     //there is nothing like upgrade lock from sh to ex directly without deadlock from C++
     //what should we do? Getting the ex at the beginning? too slow...
@@ -84,7 +79,7 @@ public:
 
     auto EdgeId = graph.addEdge(SourceId, VertexId, "KNOWS");
     LockManager.addToEdgeLockMap(EdgeId);
-    cout << "Insert: Success\n";
+//    cout << "Insert: Success\n";
 
     LockManager.releaseVertexLock(VertexId, LE, EX);
     LockManager.releaseVertexLock(VertexId, NE, EX);
@@ -137,11 +132,12 @@ public:
     VertexId = graph.addVertex(VertexProperty);
     LockManager.addToVertexLockMap(VertexId);
 
-    auto NewVertex = graph.getVertexPointer(VertexId);
-    std::cout << "add one vertex " << VertexId << "\n";
-    if ( NewVertex ) {
-      std::cout << "New Vertex info:\n";
-    }
+    graph.getVertexPointer(VertexId);
+//    std::cout << "add one vertex " << VertexId << "\n";
+//    if ( NewVertex ) {
+//      std::cout << "New Vertex info:\n";
+//      NewVertex->dump();
+//    }
   }
 
 //  virtual bool visitVertex( )
@@ -191,7 +187,7 @@ public:
 
       ///TODO should there be sleep or wait time here?
       std::this_thread::sleep_for(std::chrono::seconds(1));
-      cout << "sleep one sec\n" ;
+//      cout << "sleep one sec\n" ;
 
       VLELock = LockManager.getVertexLock(VertexId, LE, EX);
       VNELock = LockManager.getVertexLock(VertexId, NE, EX);
@@ -204,11 +200,16 @@ public:
     auto EdgeLock = false;
     
     ///change FirstNextEdge
+    unsigned int WhoseLock = 0;
     while( !EdgeLock ) { 
-      if ( EdgePtr->getFirstVertexPtr()->getId() == first->getId() )
+      if ( EdgePtr->getFirstVertexPtr()->getId() == first->getId() ) {
         EdgeLock = LockManager.getEdgeLock(EdgeId, FNE, SH); 
-      else
+        WhoseLock = 1;
+      }
+      else {
         EdgeLock = LockManager.getEdgeLock(EdgeId, SNE, SH); 
+        WhoseLock = 2;
+      }
     }
 
     unsigned int NewEdgeId = 0;
@@ -222,19 +223,24 @@ public:
     }
 
     LockManager.addToEdgeLockMap(NewEdgeId);
-    cout << "Insert: Success\n";
+//    cout << "Insert: Success\n";
 
-    auto NewEdge = graph.getEdgePointer(NewEdgeId);
-    if ( NewEdge ) {
-      std::cout << "New edge info:\n";
-    }
+    graph.getEdgePointer(NewEdgeId);
+//    if ( NewEdge ) {
+//      std::cout << "New edge info:\n";
+//      NewEdge->dump();
+//    }
 
     LockManager.releaseVertexLock(VertexId, LE, EX);
     LockManager.releaseVertexLock(VertexId, NE, EX);
     LockManager.releaseVertexLock(SourceId, LE, EX);
     LockManager.releaseVertexLock(SourceId, NE, EX);
     LockManager.releaseVertexLock(SourceId, ID, SH);
-    LockManager.releaseEdgeLock(EdgeId, SNE, SH);
+    if ( WhoseLock == 2 ) {
+      LockManager.releaseEdgeLock(EdgeId, SNE, SH);
+    } else if ( WhoseLock == 1 ){
+      LockManager.releaseEdgeLock(EdgeId, FNE, SH);
+    }
     return false;
   }
 };
@@ -305,9 +311,9 @@ public:
 
     bool TypeMatch = checkType(edge, _Filter);
     _DirecMatch = checkDirection(second, edge, _Filter);
-    std::cout << "direction " << _DirecMatch << " Type " << TypeMatch << "\n";
+//    std::cout << "direction " << _DirecMatch << " Type " << TypeMatch << "\n";
     if( _DirecMatch && TypeMatch ) {
-      std::cout << "Found! vertex id " << second->getId() << "\n";
+//      std::cout << "Found! vertex id " << second->getId() << "\n";
       _VertexTargetList.push_back(second);
     }
 

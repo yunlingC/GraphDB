@@ -112,7 +112,7 @@ public:
 
 
 protected:
-///No mutex for label or id
+///No mutex for label
 /// won't be changed anyway;
   MutexPointer IdMutex;
   MutexPointer PpMutex;

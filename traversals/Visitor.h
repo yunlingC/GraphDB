@@ -17,8 +17,6 @@
 #include "GraphType.h"
 #include "Filter.h"
 #include "FixedString.h"
-#include "LockManager.h"
-#include "TransactionManager.h"
 
 class Visitor {
 public:
@@ -31,18 +29,7 @@ public:
   typedef GraphType::VertexDescriptor VertexDescriptor;
   typedef std::vector<VertexPointer> VertexTarget;
   typedef std::vector<VertexPointer> VertexPath;
-//  typedef LogRecord * LogRecordPointer;
-//  typedef LockManager &  LockManagerType;
 public:
-
-//  void requestLogRecord(LogRecordPointer log) {
-//    _LogRecord = log;
-//  }
-//
-//  void setSleepTime(unsigned int time) {
-//    _SleepTime = time;
-//  }
-
   virtual void setFilter(Filter & filter) {
     _Filter = filter;
   }
@@ -74,11 +61,13 @@ public:
   }
 
   virtual bool scheduleEdge(EdgePointer edge) {
-    return true; /// default value = true so that the vertex will be pushed into queue 
+    /// default value = true so that the vertex will be pushed into queue 
+    return true; 
   }
 
   virtual bool visitDirection(VertexPointer target, EdgePointer edge){
-    return true; /// the same above
+    /// the same above
+    return true;
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second){
@@ -96,12 +85,8 @@ public:
   virtual void finishVisit()  { }
 
 protected:
-  unsigned int _SleepTime = 1;
   VertexTarget _VertexTargetList; 
   Filter _Filter;
-  ///TODO need another variable to record 
-  // whether lockManager is requested
-//  LogRecordPointer _LogRecord;
 };
 
 #endif /*_VISITORS_H_ */

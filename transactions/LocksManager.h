@@ -36,13 +36,14 @@ public:
   typedef std::pair<unsigned int, VertexLock> VLockPair;
   typedef std::pair<unsigned int, EdgeLock>   ELockPair;
   typedef vector<unsigned int> LockIdListType;
+  typedef vector<pair<unsigned int, pair<MutexType, LockType> > > LockListType; 
 public:
   LocksManager() {}
 
   auto getVertexLock(unsigned int id, MutexType mt, LockType lt) 
     -> bool {
     if(VertexLockMap.find(id) == VertexLockMap.end()) {
-      std::cout << "Error : No such vertex " << id <<" in map \n";
+      std::cerr  << "Error : No such vertex " << id <<" in map \n";
       ///TODO: shoould be exception here, need to be fixed.
       /**
       *exiting process would give out ownership of this mutex automatically,
@@ -53,6 +54,7 @@ public:
       exit(0);
     }
     else {
+//      std::cout << "get Vertex lock on " << id << "\n";
       MutexPointer mp(nullptr);
       switch(mt) {
         case Pp:
@@ -69,10 +71,9 @@ public:
           break;
         default:
           ///TODO should be exception here
-          std::cout << "ERROR: No such Mutex in VertexLock\n";
+          std::cerr << "ERROR: No such Mutex in VertexLock\n";
           exit(0);
       }//END_SWITCH
-
       switch (lt) {   
         ///Shared lock
         case SH:
@@ -81,16 +82,16 @@ public:
           return mp->try_lock(); 
         default:
           ///TODO Should be exception here
-          std::cout << "ERROR: No such Mutex in VertexLock\n";
+          std::cerr << "ERROR: No such Mutex in VertexLock\n";
           exit(0);
       }
-    }
+    } 
   }
 
   auto releaseVertexLock(unsigned int id, MutexType mt, LockType lt) 
     -> bool {
     if(VertexLockMap.find(id) == VertexLockMap.end()) {
-      std::cout << "Error : No such vertex " << id <<" in map \n";
+      std::cerr << "Error : No such vertex " << id <<" in map \n";
       exit(0);
     }
     else {
@@ -110,7 +111,7 @@ public:
           break;
         default:
           ///TODO should be exception here
-          std::cout << "ERROR: No such Mutex in VertexLock\n";
+          std::cerr << "ERROR: No such Mutex in VertexLock\n";
           exit(0);
       }//END_SWITCH
 
@@ -124,7 +125,7 @@ public:
           break;
         default:
           ///TODO Should be exception here
-          std::cout << "ERROR: No such Mutex in VertexLock\n";
+          std::cerr << "ERROR: No such Mutex in VertexLock\n";
           exit(0);
       }
       return true;
@@ -133,15 +134,13 @@ public:
 
   auto getEdgeLock(unsigned int id, MutexType mt, LockType lt) 
     -> bool {
-//    std::cout <<"getEdgeLock " << id << "\n";
     if (EdgeLockMap.find(id) == EdgeLockMap.end()) {
-      std::cout << "Error : No such edge" << id <<" in map \n";
+      std::cerr << "Error : No such edge" << id <<" in map \n";
       exit(0);
     }
 
     else {
       MutexPointer mp(nullptr);
-//      std::cout << "Mutex Type " << mt << std::endl;
       switch(mt) {
         case ID:
           mp = EdgeLockMap[id].getIdMutex();
@@ -168,27 +167,52 @@ public:
           mp = EdgeLockMap[id].getSPEMutex();
           break;
         default:
-          std::cout << "ERROR: No such Mutex in EdgeLock\n";
+          std::cerr << "ERROR: No such Mutex in EdgeLock\n";
           exit(0);
       }//END_SWITCH
 
-//      std::cout << "Lock Type " << lt << std::endl;
       switch (lt) {   
         case SH:
           return mp->try_lock_shared();
         case EX:
           return mp->try_lock(); 
         default:
-          std::cout << "ERROR: No such Mutex in EdgeLock\n";
+          std::cerr  << "ERROR: No such Mutex in EdgeLock\n";
           exit(0);
       }
     }
   }
 
+  auto releaseEdgeAll(LockListType & EdgeLocks) 
+    -> void {
+    auto itend = EdgeLocks.end();
+    for ( auto it = EdgeLocks.begin(); it != itend; ++it) {
+      releaseEdgeLock((*it).first, 
+          (*it).second.first, (*it).second.second);
+    }
+//    std::cout <<"Release Edge Locks num" << EdgeLocks.size() <<"\n";
+  }
+
+  auto releaseVertexAll(LockListType & VertexLocks) 
+    -> void {
+    auto itend = VertexLocks.end();
+    for ( auto it = VertexLocks.begin(); it != itend; ++it) {
+      releaseVertexLock((*it).first, 
+          (*it).second.first, (*it).second.second);
+    }
+//    std::cout <<"Release Vertex Locks num" << VertexLocks.size() <<"\n";
+  }
+
+  auto releaseAll(LockListType & VertexLocks, LockListType & EdgeLocks) 
+    -> void {
+      releaseVertexAll(VertexLocks);
+      releaseEdgeAll(EdgeLocks);
+  }
+
   auto releaseEdgeLock(unsigned int id, MutexType mt, LockType lt) 
     -> bool {
     if (EdgeLockMap.find(id) == EdgeLockMap.end()) {
-      std::cout << "Error : No such edge" << id <<" in map \n";
+//      std::cout << "Error : No such edge" << id <<" in map \n";
       exit(0);
     }
     else {
@@ -220,7 +244,7 @@ public:
           mp = EdgeLockMap[id].getSPEMutex();
           break;
         default:
-          std::cout << "ERROR: No such Mutex in EdgeLock\n";
+          std::cerr << "ERROR: No such Mutex in EdgeLock\n";
           exit(0);
       }//END_SWITCH
 
@@ -233,7 +257,7 @@ public:
           mp->unlock(); 
           break;
         default:
-          std::cout << "ERROR: No such Mutex in EdgeLock\n";
+          std::cerr << "ERROR: No such Mutex in EdgeLock\n";
           exit(0);
       }
       return true;
@@ -245,16 +269,16 @@ public:
     -> void  {
       VertexLock NewVertex;
       VertexLockMap.insert(VLockPair(id, NewVertex));
-      std::cout << "add " << id << " to VertexLock map\n";
-      std::cout << VertexLockMap.size() << " locks in total\n";
+//      std::cout << "add " << id << " to VertexLock map\n";
+//      std::cout << VertexLockMap.size() << " locks in total\n";
   }
 
   auto addToEdgeLockMap(unsigned int id) 
     -> void  {
       EdgeLock NewEdge;
       EdgeLockMap.insert(ELockPair(id, NewEdge)); 
-      std::cout << "add " << id << " to EdgeLock map\n";
-      std::cout << EdgeLockMap.size() << " locks in total\n";
+//      std::cout << "add " << id << " to EdgeLock map\n";
+//      std::cout << EdgeLockMap.size() << " locks in total\n";
   }
  
   auto buildLockMap(GraphType & graph) 
@@ -270,16 +294,12 @@ public:
         iter != VertexMap.end(); iter++) {
       VertexLock NewVertex;
       VertexLockMap.insert(VLockPair((*iter).first, NewVertex));
-//      VertexLockMap.insert(LockPair((*iter).first, MutexPointer(new Mutex)));
-//      cout << "add lock for vertex: " << (*iter).first << endl;
     }
 
     for(auto it = EdgeMap.begin();
         it != EdgeMap.end(); it++) {
       EdgeLock NewEdge;
       EdgeLockMap.insert(ELockPair((*it).first, NewEdge));
-//      EdgeLockMap.insert(LockPair((*it).first, MutexPointer(new Mutex)));
-//      cout << "add lock for edge: " << (*it).first << endl;
     }
 
     cout << "after build maps, vertex lock num " << VertexLockMap.size() << " edge lock num " << EdgeLockMap.size() << endl;
@@ -312,6 +332,7 @@ public:
 protected:
   VLockMapType VertexLockMap;
   ELockMapType EdgeLockMap;
+  
 };
 
 #endif /*_LOCKSMANAGER_H_*/

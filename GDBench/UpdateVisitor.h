@@ -18,7 +18,6 @@
 #include <queue>
 #include <set>
 
-#include "CVisitor.h"
 #include "Utils.h"
 
 using namespace std;

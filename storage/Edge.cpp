@@ -22,9 +22,9 @@ auto Edge::dump()
   -> void {
   std::cout << "\nEdge id: " << EdgeId << " (" << FirstVertex->getId() 
             << ", " << SecondVertex->getId() << ") \n";
-  std::cout << "\nEdge type: " << "( " << EdgeLabel << " )\n";
+  std::cout << "Edge type: " << "( " << EdgeLabel << " )\n";
 
-  std::cout << "\nEdge PropertyList\n";
+  std::cout << "Edge PropertyList\n";
   EdgePropertyList.print();
 
   EdgePointer fne = getFirstNextEdge();
@@ -74,6 +74,7 @@ auto Edge::dump()
     std::cout << "=> " << fne->getId();
     fne = fne->getSecondPreviousEdge();
   }
+  std::cout <<"\n";
 }
 
 auto Edge::getFirstVertexPtr() 

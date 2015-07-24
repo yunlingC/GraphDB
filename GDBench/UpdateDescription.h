@@ -70,7 +70,6 @@ public:
   virtual void runQuery(Graph & graph, TransactionManager & TransM, LockManager & _LockManager, TMSwitch c) {
     UpdateVisitor v1(_LockManager);
     v1.requestLogRecord(TransM.addTransaction());
-    v1.setSleepTime(_SleepTime);
     switch(c) {
       case 1:
         SimMarker(1, 1);
@@ -110,7 +109,6 @@ public:
     MyFile << "Query 16\n";
     //a new vertex vs
     InsertVisitor v1(graph, _LockManager);
-    v1.setSleepTime(_SleepTime);
     switch(c) {
       case 1:
         SimMarker(1, 1);
@@ -139,7 +137,6 @@ public:
     MyFile << "Query 17\n";
     //a new vertex vs
     DeleteVisitor v1(graph, _LockManager);
-    v1.setSleepTime(_SleepTime);
     v1.setEndVertex(9);
     switch(c) {
       case 1:
