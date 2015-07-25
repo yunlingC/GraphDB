@@ -51,10 +51,11 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_F
 # Storage sub directory
 add_subdirectory(storage)
 set(TESTS 
-        main-gdbench.cpp
-        main-ldbc.cpp
-        main-translator.cpp
+  #        main-gdbench.cpp
+        #        main-ldbc.cpp
+        #        main-translator.cpp
         main-multithread.cpp
+        main-multigraphs.cpp
         )
 
 # This will generate all the executables listed in the TESTS variable

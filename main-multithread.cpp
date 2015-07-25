@@ -1,4 +1,3 @@
-//#include "macros.h"
 #include <stdlib.h>
 #include <algorithm>
 #include <iostream>
@@ -7,14 +6,11 @@
 #include <string>
 #include <time.h>
 
-//#include "GDBench/util.h"
-//#include "GDReader.h"
 #include "LinkedList.h"
 #include "QueryDescription.h"
 #include "QueryRandomizer.h"
 
 int main(int argc, char *argv[]) {
-
   
   typedef GraphType Graph;
   typedef Graph::VertexDescriptor VertexDescriptor;
@@ -22,14 +18,27 @@ int main(int argc, char *argv[]) {
   Graph g;
   cout << "Begin testing\n";
 
+  unsigned int InputSize;
+  if ( argc < 2) {
+    std::cout <<"Need one more arg: 1000 or 5000\n";
+    exit(1);
+  } else {
+    InputSize = std::stoi(argv[1]);
+    if ( (InputSize != 1000) && (InputSize != 5000) ) {
+      std::cout <<"Arg error : should be: 1000 or 5000\n";
+      exit(1);
+    }
+  }
+  
+#ifdef _FIXALLOC_
+  g.allocVertexMemory(InputSize*1.1);
+  g.allocEdgeMemory(InputSize*20);
+#endif /* _FIXALLOC */
+ 
   GDReader reader(g);
-  reader.setPrintInterval(10000);
-  reader.readFile("../tests/gd/sndata1000.gd");
-
-//  auto PeopleConnter = reader.getPeopleCounter();
-//  auto WebCounter = reader.getWebpagesCounter();
-//  auto FriendsCounter = getFriendsCounter();
-//  auto LikesCounter = getLikesCounter();
+  std::string FileName = "../tests/gd/sndata" +std::to_string(InputSize)+".gd";
+  std::cout <<"Read file name " << FileName <<"\n";
+  reader.readFile(FileName);
 
   cout << "Finish reading\n";
 
@@ -61,72 +70,73 @@ int main(int argc, char *argv[]) {
     Query13 Q13;
     Query14 Q14;
 
-//    g.handleAddr();
+    int InputId[19] = {46, 0, 0, 28, 0, 
+                        0, 0, 0, 54, 0, 
+                        95, 0, 42, 0, 60, 
+                        0, 0, 50, 11          //15-18
+                      };
 
-    int InputId[19] = {46, 92, 42, 28, 59, 3, 98, 44, 54, 12, 95, 14, 42, 12, 60, 51, 99, 50, 11};
-    int i = 0;
-    id = InputId[i++];
-
+    id = InputId[0];
     name = rander.getName(id);
     Q1.setPersonProperty("name", name);
 
-    id = InputId[i++];
+    id = InputId[1];
     webId = rander.getAWebpageIndex(id);
     Q2.setWebId(webId);
 
-    id = InputId[i++];
+    id = InputId[2];
     personId1 = rander.getAPersonIndex(id);
     Q3.setPersonId(personId1);
 
-    id = InputId[i++];
+    id = InputId[3];
     pid  = rander.getPid(id);
     Q4.setPersonProperty("pid", pid);
 
-    id = InputId[i++];
+    id = InputId[4];
     personId1 = rander.getAPersonIndex(id);
     Q5.setPersonId(personId1);
 
-    id = InputId[i++];
+    id = InputId[5];
     personId1 = rander.getAPersonIndex(id);
     Q6.setPersonId(personId1);
 
-    id = InputId[i++];
+    id = InputId[6];
     personId1 = rander.getAPersonIndex(id);
     Q7.setPersonId(personId1);
 
-    id = InputId[i++];
+    id = InputId[7];
     personId3 = rander.getAPersonIndex(id);
-    id = InputId[i++];
+    id = InputId[8];
     personId2 = rander.getAPersonIndex(id);
     Q8.setEndPoints(personId2, personId3);
 
-    id = InputId[i++];
+    id = InputId[9];
     personId2 = rander.getAPersonIndex(id);
-    id = InputId[i++];
+    id = InputId[10];
     personId3 = rander.getAPersonIndex(id);
     Q9.setEndPoints(personId2, personId3);
 
-    id = InputId[i++];
+    id = InputId[11];
     personId2 = rander.getAPersonIndex(id);
-    id = InputId[i++];
+    id = InputId[12];
     personId3 = rander.getAPersonIndex(id);
     Q10.setEndPoints(personId2, personId3);
 
-    id = InputId[i++];
+    id = InputId[13];
     personId2 = rander.getAPersonIndex(id);
-    id = InputId[i++];
+    id = InputId[14];
     personId3 = rander.getAPersonIndex(id);
     Q11.setEndPoints(personId2, personId3);
 
-    id = InputId[i++];
+    id = InputId[15];
     personId1 = rander.getAPersonIndex(id);
     Q12.setPersonId(personId1);
 
-    id = InputId[i++];
+    id = InputId[16];
     personId1 = rander.getAPersonIndex(id);
     Q13.setPersonId(personId1);
 
-    id = InputId[i++];
+    id = InputId[17];
     name = rander.getName(id);
     Q14.setPersonProperty("name", name);
 
