@@ -769,7 +769,7 @@ public:
     v1.setVertexProperty(VertexPropertyList);
     v1.getFilter().setBranchMap(BranchMap);
     breadthFirstSearch(graph, 0, v1);
-    LdbcFile << "Add one more person into network \n";
+//    LdbcFile << "Add one more person into network \n";
   }
 protected:
   BranchMapType BranchMap;

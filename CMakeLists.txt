@@ -61,7 +61,7 @@ set(TESTS
         #      main-dfs.cpp
         #        main-gdbench.cpp
         #main-updates.cpp
-        #        main-translator.cpp
+        main-translator.cpp
         #main-ldbc.cpp
         #        main-all.cpp
         main-mt-ldbc.cpp
