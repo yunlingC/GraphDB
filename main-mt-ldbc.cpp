@@ -9,7 +9,7 @@
 //#include "LdbcUpdateDescription.h"
 #include "LdbcConcurrentQuery.h"
 
-int main() {
+int main( int argc, char * argv[]) {
 
   typedef GraphType Graph;
   typedef LocksManager LockManagerType;
@@ -20,6 +20,17 @@ int main() {
   typedef std::pair<std::string, PropertyListType> EdgePairType;
   typedef std::map<VertexPairType, EdgePairType> BranchMapType;
 
+  unsigned int opt = 0;
+  if ( (argc < 2) || (argc > 2)) {
+    std::cout <<"Need one more args \n 1: single-thread\t 2: multithread \n";
+    exit(0);
+  } else {
+    opt = std::stoi(argv[1]);
+    if ( (opt != 1) && (opt!=2)) {
+      std::cout <<"wrong arg. \n 1: single-thread\t 2: multithread \n";
+      exit(0);
+    }
+  }
 
   Graph g;
   LDBCReader reader(g);
@@ -152,26 +163,57 @@ int main() {
   Q16.setBranchMap(NewBranch);
   }
 
-  vector<thread> threads;
-  threads.push_back( thread([&]{q1.runQuery(g, 157337, LockManager);}));
-  threads.push_back( thread([&]{q2.runQuery(g, 157387, LockManager);}));
-  threads.push_back( thread([&]{q3.runQuery(g, 157437, LockManager);}));
-  threads.push_back( thread([&]{q4.runQuery(g, 157487, LockManager);}));
-  threads.push_back( thread([&]{q5.runQuery(g, 157537, LockManager);}));
-  threads.push_back( thread([&]{q6.runQuery(g, 157587, LockManager);}));
-  threads.push_back( thread([&]{q7.runQuery(g, 157637, LockManager);}));
-  threads.push_back( thread([&]{q8.runQuery(g, 157687, LockManager);}));
-  threads.push_back( thread([&]{q9.runQuery(g, 157737, LockManager);}));
-  threads.push_back( thread([&]{q10.runQuery(g, 157787, LockManager);}));
-  threads.push_back( thread([&]{q11.runQuery(g, 157837, LockManager);}));
-  threads.push_back( thread([&]{q12.runQuery(g, 157887, LockManager);}));
-  threads.push_back( thread([&]{q13.runQuery(g, 157937, 157366, LockManager);}));
-  threads.push_back( thread([&]{q14.runQuery(g, 157987, 157663, LockManager);}));
-  threads.push_back( thread([&]{Q15.runQuery(g, transManager, LockManager, 1);}));
-  threads.push_back( thread([&]{Q16.runQuery(g, transManager, LockManager, 1);}));
+  switch (opt){ 
+    case 1:  
+    {
+      q1.runQuery(g, 157337, LockManager);
+      q2.runQuery(g, 157387, LockManager);
+      q3.runQuery(g, 157437, LockManager);
+      q4.runQuery(g, 157487, LockManager);
+      q5.runQuery(g, 157537, LockManager);
+      q6.runQuery(g, 157587, LockManager);
+      q7.runQuery(g, 157637, LockManager);
+      q8.runQuery(g, 157687, LockManager);
+      q9.runQuery(g, 157737, LockManager);
+      q10.runQuery(g, 157787, LockManager);
+      q11.runQuery(g, 157837, LockManager);
+      q12.runQuery(g, 157887, LockManager);
+      q13.runQuery(g, 157937, 157366, LockManager);
+      q14.runQuery(g, 157987, 157663, LockManager);
+      Q15.runQuery(g, transManager, LockManager, 1);
+      Q16.runQuery(g, transManager, LockManager, 1);
+      break;
+    }
+    case 2:
+    {
+      vector<thread> threads;
+      threads.push_back( thread([&]{q1.runQuery(g, 157337, LockManager);}));
+      threads.push_back( thread([&]{q2.runQuery(g, 157387, LockManager);}));
+      threads.push_back( thread([&]{q3.runQuery(g, 157437, LockManager);}));
+      threads.push_back( thread([&]{q4.runQuery(g, 157487, LockManager);}));
+      threads.push_back( thread([&]{q5.runQuery(g, 157537, LockManager);}));
+      threads.push_back( thread([&]{q6.runQuery(g, 157587, LockManager);}));
+      threads.push_back( thread([&]{q7.runQuery(g, 157637, LockManager);}));
+      threads.push_back( thread([&]{q8.runQuery(g, 157687, LockManager);}));
+      threads.push_back( thread([&]{q9.runQuery(g, 157737, LockManager);}));
+      threads.push_back( thread([&]{q10.runQuery(g, 157787, LockManager);}));
+      threads.push_back( thread([&]{q11.runQuery(g, 157837, LockManager);}));
+      threads.push_back( thread([&]{q12.runQuery(g, 157887, LockManager);}));
+      threads.push_back( thread([&]{q13.runQuery(g, 157937, 157366, LockManager);}));
+      threads.push_back( thread([&]{q14.runQuery(g, 157987, 157663, LockManager);}));
+      threads.push_back( thread([&]{Q15.runQuery(g, transManager, LockManager, 1);}));
+      threads.push_back( thread([&]{Q16.runQuery(g, transManager, LockManager, 1);}));
+    
+      for_each(threads.begin(), threads.end(),
+               std::mem_fn(&thread::join));
+      break;
+    }
 
-  for_each(threads.begin(), threads.end(),
-           std::mem_fn(&thread::join));
+    default:
+      std::cout << "wrong arg\n";
+      exit(0);
+  }
+
 
   LdbcFile.close();
 
