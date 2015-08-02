@@ -33,12 +33,12 @@ int main(int argc, char *argv[]) {
 #ifdef _FIXALLOC_
   for ( auto i = 0; i < 10; ++i ) {
     std::cout <<"Allocate space for graph " << i << "\n";
-    g[i].allocVertexMemory(InputSize*0.11);
-    g[i].allocEdgeMemory(InputSize);
+    g[i].allocVertexMemory(InputSize*1.1);
+    g[i].allocEdgeMemory(InputSize*20);
   }
 #endif /* _FIXALLOC */
  
-  unsigned int size = InputSize/10;
+  unsigned int size = InputSize;
   std::string FileName = "";
   for ( auto i = 0; i < 9; ++i ) {
     FileName = "../tests/gd/sndata" + std::to_string(size) + "_" + std::to_string(i+1) + ".gd";
