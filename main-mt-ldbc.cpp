@@ -34,6 +34,12 @@ int main( int argc, char * argv[]) {
 
   Graph g;
   LDBCReader reader(g);
+
+#ifdef _FIXALLOC_
+  g.allocVertexMemory(180000);
+  g.allocEdgeMemory(700000);
+#endif /* _FIXALLOC */
+
   reader.readDirectory("../tests/ldbc/social_network_700/New");
   cout << "Finish reading \n";
 
