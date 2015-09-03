@@ -14,6 +14,12 @@
 #ifndef _GRAPH_TYPE_H_ 
 #define _GRAPH_TYPE_H_ 
 
+#define NODE 0
+#define EDGE 1
+
+#define START 0
+#define END   1
+
 #include <vector>
 #include <map>
 #include <stdlib.h>
@@ -456,24 +462,23 @@ public:
     /// However, only one place is necessary since everywhere else, I am storing pointers.
     /// Thus, Vertices and _edges contain all newly created objects.
 
-//    std::cout << "GraphType: clean " << Vertices.size() << " vertices and " << Edges.size() << " edges\n";
-//    for ( size_t i=0; i < Vertices.size(); i++ ) {
-//      Vertices[i]->deleteVertex();
-//      delete Vertices[i];
-//    }
-//    std::cout << "vertex cleaning is done\n";
-//
-//    for ( size_t i=0; i < Edges.size(); i++ ) {
-//      Edges[i]->deleteEdge();
-//      delete Edges[i];
-//    }
-//
-//    std::cout << "edge cleaning is done\n";
-
 #ifdef _FIXALLOC_
     //    Delete the memory spaces.
     delete NodeMemory;
     delete EdgeMemory;
+#else 
+   std::cout << "GraphType: clean " << Vertices.size() << " vertices and " << Edges.size() << " edges\n";
+    for ( size_t i=0; i < Vertices.size(); i++ ) {
+      Vertices[i]->deleteVertex();
+      delete Vertices[i];
+    }
+//    std::cout << "vertex cleaning is done\n";
+
+
+    for ( size_t i=0; i < Edges.size(); i++ ) {
+      Edges[i]->deleteEdge();
+      delete Edges[i];
+    }
 #endif /* _FIXALLOC_ */
 
   }
@@ -485,6 +490,9 @@ public:
     NodeMemory = new char[sizeof(Vertex)*sz];
     cout << "Vertex Memory\n + Starting address: " << reinterpret_cast<int*>(NodeMemory)
     	 << ", ending address: " << reinterpret_cast<int*>(NodeMemory + sizeof(Vertex)*sz) << "\n";
+
+//    passAddr(NODE, NodeMemory, (NodeMemory + sizeof(Vertex)*sz));
+
   }
 
   void allocEdgeMemory(unsigned int sz) {
@@ -493,6 +501,7 @@ public:
     EdgeMemory = new char[sizeof(Edge)*sz];
     cout << "Edge Memory\n + Starting address: " << reinterpret_cast<int*>(EdgeMemory) 
     	 << ", ending address: " << reinterpret_cast<int*>(EdgeMemory + sizeof(Edge)*sz) << "\n" << endl;
+//    passAddr(EDGE, EdgeMemory, (EdgeMemory + sizeof(Edge)*sz));
   }
 #endif /* _FIXALLOC_ */
 
@@ -504,14 +513,13 @@ public:
     return Edges;
   }
 
-  void handleAddr(){
-    VerticesSort = Vertices;
-    EdgesSort = Edges;
-    sort(VerticesSort.begin(),VerticesSort.end());
-    sort(EdgesSort.begin(),EdgesSort.end());
-  //start prefetching trigger
-    passPtr(&VerticesSort,0,&EdgesSort,0,0,0);
-  }
+//  void handleAddr(){
+//    VerticesSort = Vertices;
+//    EdgesSort = Edges;
+//    sort(VerticesSort.begin(),VerticesSort.end());
+//  //start prefetching trigger
+//    passPtr(&VerticesSort,0,&EdgesSort,0,0,0);
+//  }
 
 protected:
   /// Hold pointers to all vertices.
