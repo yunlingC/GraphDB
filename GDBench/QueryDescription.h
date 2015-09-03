@@ -606,11 +606,11 @@ public:
     vector<VertexPointer>  target;
     switch(c) {
       case 1: {
-//        SimMarker(1, 23);
+        SimMarker(1, 23);
         AdjacencyVisitor v12b; 
         traverseThroughTypeAndDirection("FRIENDS", "out", v12b.getFilter());
         breadthFirstSearch(graph, _PersonId, v12b);
-//        SimMarker(2, 23);
+        SimMarker(2, 23);
         target = v12b.getVertexTargetList();
         break;
               }
