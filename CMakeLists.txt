@@ -14,8 +14,7 @@ set(LDBC_DIR "LDBC")
 set(TRANSACTIONS_DIR "transactions")
 
 include_directories( 
-        ${INCLUDE_DIRECTORIES} 
-        ${Boost_INCLUDE_DIRS} 
+        ${INCLUDE_DIRECTORIES} ${Boost_INCLUDE_DIRS} 
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${READERS_INCLUDE_DIR}
         ${SRC_DIR} 
@@ -45,26 +44,19 @@ set(GDB_LD_FLAGS storage)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
 
 # Debug flags
-#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++14 -D_FIXALLOC_ -Wall")
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++14 -D_FIXALLOC_ -D_SKIP_ -Wall")
 
-#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_FIXALLOC_ -Wall")
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_FIXALLOC_  -D_SKIP_ -Wall")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -Wall")
 
 
 # Storage sub directory
 add_subdirectory(storage)
 set(TESTS 
-  # main-storage.cpp 
-  #        main-linkedlist.cpp
-        #      main-dfs.cpp
-        #        main-gdbench.cpp
-        #main-updates.cpp
-        main-translator.cpp
-        #main-ldbc.cpp
-        #        main-all.cpp
         main-mt-ldbc.cpp
+        main-mt-ldbc-15.cpp
         )
 
 # This will generate all the executables listed in the TESTS variable
