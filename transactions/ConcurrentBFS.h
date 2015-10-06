@@ -64,10 +64,19 @@ public:
     while ( !VertexQueue.empty() ) {
       ScheduledVertex = VertexQueue.front();  VertexQueue.pop();
 
+#ifdef _SKIP_
+      auto VPpLock = LockManager.getVertexLock(ScheduledVertex->getId(), Pp, SH);
+      if (!VPpLock) {
+//        std::cout << "Skip read lock on Pp vertex\t" << ScheduledVertex->getId() << std::endl;
+//        releaseAll(LockManager);
+        break;
+      }
+#else 
       auto VPpLock = false; 
       while ( !VPpLock ) {
         VPpLock = LockManager.getVertexLock(ScheduledVertex->getId(), Pp, SH);
       }
+#endif
       auto VPpPair = make_pair(ScheduledVertex->getId(), make_pair(Pp, SH));
       VertexLocks.push_back(VPpPair);
  
@@ -78,11 +87,19 @@ public:
         
       /// Set to visited.    
       ColorMap[ScheduledVertex] = true;
-
+#ifdef _SKIP_
+      auto VNELock = LockManager.getVertexLock(ScheduledVertex->getId(), NE, SH);
+      if ( !VNELock ) {
+//        std::cout << "Skip read lock on NE vertex\t" << ScheduledVertex->getId() << std::endl;
+//        releaseAll(LockManager);
+        break;
+      }
+#else
       auto VNELock = false;
       while ( !VNELock ) {
         VNELock = LockManager.getVertexLock(ScheduledVertex->getId(), NE, SH);
       }
+#endif
       auto VNEPair = make_pair(ScheduledVertex->getId(), make_pair(NE, SH));
       VertexLocks.push_back(VNEPair);
   
@@ -91,14 +108,31 @@ public:
         /// Get the target node.
         auto EFVLock = false;
         auto ESVLock = false;
+#ifdef _SKIP_
+        EFVLock = LockManager.getEdgeLock(NextEdge->getId(), FV, SH);
+        if ( !EFVLock ) {
+//          Fstd::cout << "Skip read lock on FV edge\t" << NextEdge->getId() << std::endl;
+          break;
+        }
+#else
         while ( !EFVLock ) {
           EFVLock = LockManager.getEdgeLock(NextEdge->getId(), FV, SH);
         }
-       
+#endif
+
+#ifdef _SKIP_
+        ESVLock = LockManager.getEdgeLock(NextEdge->getId(), SV, SH);
+        if ( !ESVLock ) {
+//          std::cout << "Skip read lock on SV edge\t" << NextEdge->getId() << std::endl;
+          LockManager.releaseEdgeLock(NextEdge->getId(), FV, SH);
+          break;
+        }
+#else
         while ( !ESVLock ) {
           ESVLock = LockManager.getEdgeLock(NextEdge->getId(), SV, SH);
         }
 
+#endif
         auto EFVPair = make_pair(NextEdge->getId(), make_pair(FV, SH));
         auto ESVPair = make_pair(NextEdge->getId(), make_pair(SV, SH));
         EdgeLocks.push_back(EFVPair);
@@ -120,7 +154,7 @@ public:
           if( TypeMatch && DirectionMatch )   {
            ///control the vertex to be visited filtered by type
   	        VertexQueue.push(TargetVertex);
-  
+
   	        ColorMap.insert(VisitPair(TargetVertex,false));
           }
         } else {
@@ -129,12 +163,34 @@ public:
         
         auto EFNELock = false;
         auto ESNELock = false;
+#ifdef _SKIP_
+        EFNELock = LockManager.getEdgeLock(NextEdge->getId(), FNE, SH);
+        if ( !EFNELock ) {
+//          std::cout << "Skip read lock on FNE edge\t" << NextEdge->getId() << std::endl;
+          LockManager.releaseEdgeLock(NextEdge->getId(), FV, SH);
+          LockManager.releaseEdgeLock(NextEdge->getId(), SV, SH);
+          break;
+        }
+#else
         while ( !EFNELock ) {
           EFNELock = LockManager.getEdgeLock(NextEdge->getId(), FNE, SH);
         }
+#endif
+
+#ifdef _SKIP_
+        ESNELock = LockManager.getEdgeLock(NextEdge->getId(), SNE, SH);
+        if ( !ESNELock ) {
+//          std::cout << "Skip read lock on SNE edge\t" << NextEdge->getId() << std::endl;
+          LockManager.releaseEdgeLock(NextEdge->getId(), FV, SH);
+          LockManager.releaseEdgeLock(NextEdge->getId(), SV, SH);
+          LockManager.releaseEdgeLock(NextEdge->getId(), FNE, SH);
+          break;
+        }
+#else
         while ( !ESNELock ) {
           ESNELock = LockManager.getEdgeLock(NextEdge->getId(), SNE, SH);
         }
+#endif
         auto EFNEPair = make_pair(NextEdge->getId(), make_pair(FNE, SH));
         auto ESNEPair = make_pair(NextEdge->getId(), make_pair(SNE, SH));
         EdgeLocks.push_back(EFNEPair);

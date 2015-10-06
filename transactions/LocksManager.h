@@ -54,7 +54,8 @@ public:
       exit(0);
     }
     else {
-//      std::cout << "get Vertex lock on " << id << "\n";
+//      if ( (id == 36820) && (mt == 3) )
+//        std::cout << "get Vertex lock on " << id << " type " << mt << " locktype " << lt << "\n";
       MutexPointer mp(nullptr);
       switch(mt) {
         case Pp:
@@ -95,6 +96,8 @@ public:
       exit(0);
     }
     else {
+//      if ( (id == 36820) && (mt == 3) )
+//        std::cout << "release Vertex lock on " << id << " type " << mt << " locktype " << lt << "\n";
       MutexPointer mp(nullptr);
       switch(mt) {
         case Pp:
@@ -302,7 +305,7 @@ public:
       EdgeLockMap.insert(ELockPair((*it).first, NewEdge));
     }
 
-    cout << "after build maps, vertex lock num " << VertexLockMap.size() << " edge lock num " << EdgeLockMap.size() << endl;
+//    cout << "after build maps, vertex lock num " << VertexLockMap.size() << " edge lock num " << EdgeLockMap.size() << endl;
   }
  
   auto getVertexLockMap() 
