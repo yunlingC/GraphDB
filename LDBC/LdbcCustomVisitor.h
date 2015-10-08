@@ -40,7 +40,7 @@ public:
     _DepthSetting = depth;
   }
 
-  virtual void visitStartVertex( VertexPointer startVertex ) {
+  virtual void visitStartVertex(VertexPointer startVertex ) {
     VertexPath newPath;
     newPath.push_back(startVertex);
     _PathQueue.push(newPath);
