@@ -76,7 +76,7 @@ public:
     std::cout << "Query 17\n";
     //a new vertex vs 
     //need new propertylist for vertex and branchmap (criteria) for searching neighbor 
-    AddVisitor v1(LockManager, graph);
+    AddNodeVisitor v1(LockManager, graph);
     v1.setVertexProperty(VertexPropertyList);
     v1.getFilter().setBranchMap(BranchMap);
     breadthFirstSearch(graph, 0, v1);

@@ -15,7 +15,9 @@
 #include <string>
 #include <time.h>
 #include <unordered_map>
-#include <iostream>
+#ifdef _PRINTLOG_
+  #include <iostream>
+#endif
 
 #include "LdbcConcurrentQuery.h"
 
@@ -44,8 +46,6 @@ public:
     LdbcFile << startVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< endl;
     for(auto it = target.begin(); it != target.end(); ++it) {
       LdbcFile << endl;
-    }
-#endif
 
     Cbfs.releaseAll(LockManager);
     getExecTime();
@@ -834,7 +834,7 @@ public:
     getStartTime();  
     //a new vertex vs 
     //need new propertylist for vertex and branchmap (criteria) for searching neighbor 
-    AddVisitor v1(LockManager, graph);
+    AddNodeVisitor v1(LockManager, graph);
     v1.setVertexProperty(VertexPropertyList);
     v1.getFilter().setBranchMap(BranchMap);
     breadthFirstSearch(graph, 0, v1);
