@@ -38,11 +38,15 @@ public:
     v1.setDepth(3);
     ConcurrentBFS Cbfs; 
     Cbfs.breadthFirstSearch(graph, startVertex, v1, LockManager);
+
+#ifdef _PRINTLOG_
     auto target = v1.getVertexTargetList(); 
     LdbcFile << startVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< endl;
     for(auto it = target.begin(); it != target.end(); ++it) {
       LdbcFile << endl;
     }
+#endif
+
     Cbfs.releaseAll(LockManager);
     getExecTime();
     LdbcFile.close();
@@ -71,6 +75,8 @@ public:
     v2.setPropToCheck(2); //check date
     ConcurrentBFS Cbfs;
     Cbfs.breadthFirstSearch(graph, startVertex, v2, LockManager);
+
+#ifdef _PRINTLOG_
     auto target = v2.getVertexTargetList();
     auto targets = v2.getTargetsMap();
 //    LdbcFile << startVertex, LockManagerType startVertex  LockManager<< " has friends made " << target.size() << " comments and posts \n";
@@ -78,6 +84,8 @@ public:
       LdbcFile <<"person " << (*it).second->getPropertyValue("id").first << "\t" <<"comments/posts " << (*it).first->getPropertyValue("id").first << "\t" << (*it).first->getPropertyValue("creationDate").first ;
       LdbcFile << endl;
         }
+#endif
+
     Cbfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
@@ -106,7 +114,10 @@ public:
     ConcurrentBFS Cbfs;
     Cbfs.breadthFirstSearch(graph, startVertex, v3, LockManager);
     auto target = v3.getVertexTargetList();
+#ifdef _PRINTLOG_
     LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+#endif
+
     Filter FilterSet[4];
     traverseThroughMultiRelType("PERSON_IS_LOCATED_IN", FilterSet[0]); 
     traverseThroughMultiRelType("IS_PART_OF", FilterSet[1]); 
@@ -159,9 +170,12 @@ public:
       PersonListMap.insert(PersonListPair((*it), targetList));
     }
 
+#ifdef _PRINTLOG_
     for(auto it = PersonListMap.begin(); it != PersonListMap.end(); ++it) {
       LdbcFile <<"friend " << (*it).first->getPropertyValue("firstName").first  << " has " <<(*it).second.size() << " commmets/posts made in " << country1 << " or " << country2 << endl; 
     }
+#endif
+
     Cbfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
@@ -191,11 +205,15 @@ public:
     v4.setPropToCheck(1); //check time
     ConcurrentBFS Cbfs;
     Cbfs.breadthFirstSearch(graph, startVertex, v4, LockManager);
+
+#ifdef _PRINTLOG_
     auto targets = v4.getReturnResultMap();
     LdbcFile << startVertex << " has friends made posts of " << targets.size() << " tags\n";
     for(auto it = targets.begin(); it != targets.end(); ++it) {
       LdbcFile <<"tags " << (*it).first->getPropertyValue("id").first << "\t" <<"num of posts " << (*it).second <<  endl;
     }
+#endif
+
     Cbfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
@@ -222,8 +240,18 @@ public:
     v5.setDepth(2);
     ConcurrentBFS Cbfs;
     Cbfs.breadthFirstSearch(graph, startVertex, v5, LockManager);
+
     auto target = v5.getVertexTargetList();
+#ifdef _PRINTLOG_
     LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+    for(auto it = targetMap.begin(); it != targetMap.end(); ++it) {
+      if((*it).second != 0)
+        LdbcFile <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< endl; 
+    }
+#endif
+
+//    auto target = v5.getVertexTargetList();
+//    LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
     Filter Filters[4];
     traverseThroughMultiRelType("HAS_MEMBER", Filters[0]); 
     Filters[1].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
@@ -252,10 +280,7 @@ public:
       Cbfs.breadthFirstSearch(graph, startVertex, mpv5, LockManager);
       targetMap.insert(mpv5.getResultMap().begin(), mpv5.getResultMap().end());
     }
-    for(auto it = targetMap.begin(); it != targetMap.end(); ++it) {
-      if((*it).second != 0)
-        LdbcFile <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< endl; 
-    }
+ 
     Cbfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
@@ -282,8 +307,14 @@ public:
     v6.setDepth(2);
     ConcurrentBFS Cbfs;
     Cbfs.breadthFirstSearch(graph, startVertex, v6, LockManager);
+
     auto target = v6.getVertexTargetList();
+#ifdef _PRINTLOG_
     LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+#endif
+
+//    auto target = v6.getVertexTargetList();
+//    LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
 
     Filter Filters[3];
     traverseThroughMultiRelType("POST_HAS_CREATOR", Filters[0]); 
@@ -316,9 +347,13 @@ public:
         }
       }
     }
+ 
+#ifdef _PRINTLOG_
     for (auto it = TagMap.begin(); it != TagMap.end(); it++) {
       LdbcFile << "Tag " << (*it).first << " has " << (*it).second << " posts\n";
     }
+#endif
+
     Cbfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
@@ -350,8 +385,9 @@ public:
       newFilter.setProperty("id", (*iter)->getPropertyValue("id").first.std_str());
       VertexFilter.push_back(newFilter);
     }
-
+#ifdef _PRINTLOG_
     LdbcFile << startVertex << " is connected with " << target.size() << " friends" << endl;
+#endif
     Filter Filters[2];
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]); 
     traverseThroughMultiRelType("LIKES_COMMENT+LIKES_POST", Filters[1]); 
@@ -363,6 +399,8 @@ public:
     vmv7.setDepthToCheckVertexProp(2);
     vmv7.setDepthToCompareTime(2);
     Cbfs.breadthFirstSearch(graph, startVertex, vmv7, LockManager);
+ 
+#ifdef _PRINTLOG_
     auto targetsMap = vmv7.getTimeMap();
     for(auto it = targetsMap.begin(); it != targetsMap.end(); it++) {
       LdbcFile << (*it).first->getPropertyValue("firstName").first << "\t" << (*it).first->getPropertyValue("id").first<< " likes comment/posts at " << (*it).second << endl; 
@@ -372,6 +410,8 @@ public:
       if((*it).second == true) 
         LdbcFile << "comment/post " << (*it).first->getPropertyValue("id").first << " are made by friend\n" ;
     }
+#endif
+
     Cbfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
@@ -398,10 +438,14 @@ public:
     v8.setDepthToCompareTime(2);
     ConcurrentBFS Cbfs;
     Cbfs.breadthFirstSearch(graph, startVertex, v8, LockManager);
+ 
+#ifdef _PRINTLOG_
     auto vertexMap = v8.getVertexMap();
     for(auto it = vertexMap.begin(); it != vertexMap.end(); it++) {
       LdbcFile << "Person " << (*it).second->getPropertyValue("firstName").first << " made replies " << (*it).first->getPropertyValue("id").first << " at " << (*it).first->getPropertyValue("creationDate").first << " to startperson's posts/comments\n";
     }
+#endif
+
     Cbfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
@@ -427,16 +471,21 @@ public:
     v9.setDepth(2);
     ConcurrentBFS Cbfs;
     Cbfs.breadthFirstSearch(graph, startVertex, v9, LockManager);
+
     auto target = v9.getVertexTargetList();
+#ifdef _PRINTLOG_
     LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+#endif
+
     Filter Filters[2];
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR",Filters[0]); 
     Filters[1].setValueRange("creationDate", "", "2011-07-16T23:59:00.255"); 
           
     ReturnMapType TargetsMap; 
     for(auto it = target.begin(); it != target.end(); ++it) {
+#ifdef _PRINTLOG_
       LdbcFile <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << endl; 
- 
+#endif
       MultiRelTypeVisitor sv9;
       sv9.setFilter(Filters[0]);
       sv9.setRangeFilter(Filters[1]);
@@ -448,9 +497,13 @@ public:
       auto targets = sv9.getTargetsMap();
       TargetsMap.insert(targets.begin(), targets.end());
    }
+ 
+#ifdef _PRINTLOG_
     for(auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
       LdbcFile << "posts/comments " << (*iter).first->getPropertyValue("id").first << "\t" << (*iter).first->getPropertyValue("creationDate").first << " made by person " << (*iter).second->getPropertyValue("id").first << "\t" <<  (*iter).second->getPropertyValue("firstName").first << endl;
     }
+#endif
+
     Cbfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
@@ -472,8 +525,10 @@ public:
     ConcurrentBFS Cbfs;
     Cbfs.breadthFirstSearch(graph, startVertex, av1, LockManager);
     auto startId = graph.getVertexPointer(startVertex)->getPropertyValue("id").first.std_str();
+#ifdef _PRINTLOG_
 //    std::cout << "start person id and name " << graph.getVertexPointer(startVertex)->getId() << graph.getVertexPointer(startVertex)->getPropertyValue("firstName").first << "\n";
 //    std::cout << "start person has " << av1.getVertexTargetList().size() << " friends\n";
+#endif
 
     ///find friends of friends of start person
     std::vector<VertexPointer> targets;
@@ -527,9 +582,11 @@ public:
       }
 
       SimMap[(*it).first] = 2*PostItrd - v10.getPostMap().size(); 
+#ifdef _PRINTLOG_
       LdbcFile << "person: " << (*it).first->getId() << " similarity score " << (*it).second << "\n";
-    
+#endif
     }
+
     Cbfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
@@ -559,8 +616,12 @@ public:
     v11.setDepth(2);
     ConcurrentBFS Cbfs;
     Cbfs.breadthFirstSearch(graph, startVertex, v11, LockManager);
+
     auto target = v11.getVertexTargetList();
+#ifdef _PRINTLOG_
     LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+#endif
+
     Filter Filters[4];
     traverseThroughMultiRelType("WORKS_AT",Filters[0]); 
     traverseThroughMultiRelType("ORGANISATION_IS_LOCATED_IN",Filters[1]); 
@@ -569,7 +630,9 @@ public:
 
     MatchMapType TargetsMap;
     for(auto it = target.begin(); it != target.end(); ++it) {
+#ifdef _PRINTLOG_
       LdbcFile <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << endl; 
+#endif
    
     VertexPropertyVisitor sv11;
     sv11.setFilter(Filters[0]);
@@ -584,10 +647,12 @@ public:
     auto targets = sv11.getMatchMap();
     TargetsMap.insert(targets.begin(), targets.end());
   }
+#ifdef _PRINTLOG_
     FixedString key("workFrom");
     for(auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
       LdbcFile << (*iter).first->getPropertyValue("firstName").first << " works at "  << (*iter).second.second->getPropertyValue("id").first << " from " << (*iter).second.first->getPropertyValue(key).first << endl;
       }
+#endif
     Cbfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
@@ -639,8 +704,10 @@ public:
 //          std::cout << "post " << (*iter).first << "\t" << (*iter).second << "\n";
       }
 
+#ifdef _PRINTLOG_
       SimMap[StartVertex] = PostNum; 
       LdbcFile << "person: " << StartVertex->getId() << " expert post " << PostNum << "\n";
+#endif
   
     }
     Cbfs.releaseAll(LockManager);
@@ -663,6 +730,8 @@ public:
     v13.setEndVertex(endVertex);
     ConcurrentBFS Cbfs;
     Cbfs.breadthFirstSearch(graph, startVertex, v13, LockManager);
+
+#ifdef _PRINTLOG_
     auto target = v13.getVertexTargetList();
     if(target.empty())
       LdbcFile << startVertex << " and " <<  endVertex <<" are not connected" << endl;
@@ -672,6 +741,8 @@ public:
         LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("firstName").first<< endl;
       }
     }
+#endif
+
     Cbfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
@@ -693,7 +764,9 @@ public:
     v13.setEdgeFilter(EdgeFilter);
     ConcurrentBFS Cbfs;
     Cbfs.breadthFirstSearch(graph, startVertex, v13, LockManager);
+
     auto target = v13.getVertexTargetList();
+#ifdef _PRINTLOG_
     if(target.empty())
       LdbcFile << startVertex << " and " <<  endVertex <<" are not connected" << endl;
     else {
@@ -702,6 +775,7 @@ public:
         LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first <<"\t" << (*it)->getPropertyValue("firstName").first<< endl;
       }//for
     }//else
+#endif
 
   ///already found all the paths, calculate weights now  
   
@@ -727,7 +801,9 @@ public:
     Weight += v14.getScore();
   } 
 
+#ifdef _PRINTLOG_
   LdbcFile << "weight " << Weight <<"\n";
+#endif
   Cbfs.releaseAll(LockManager);
   getExecTime();  
   LdbcFile.close();

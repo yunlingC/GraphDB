@@ -483,16 +483,16 @@ public:
 
     // Allocation sz number of Vertex objects.
     NodeMemory = new char[sizeof(Vertex)*sz];
-    cout << "Vertex Memory\n + Starting address: " << reinterpret_cast<int*>(NodeMemory)
-    	 << ", ending address: " << reinterpret_cast<int*>(NodeMemory + sizeof(Vertex)*sz) << "\n";
+//    cout << "Vertex Memory\n + Starting address: " << reinterpret_cast<int*>(NodeMemory)
+//    	 << ", ending address: " << reinterpret_cast<int*>(NodeMemory + sizeof(Vertex)*sz) << "\n";
   }
 
   void allocEdgeMemory(unsigned int sz) {
     // Allocation sz number of Vertex objects.
-    cout << "Edge space: " << sizeof(Edge)*sz << "\n";
+//    cout << "Edge space: " << sizeof(Edge)*sz << "\n";
     EdgeMemory = new char[sizeof(Edge)*sz];
-    cout << "Edge Memory\n + Starting address: " << reinterpret_cast<int*>(EdgeMemory) 
-    	 << ", ending address: " << reinterpret_cast<int*>(EdgeMemory + sizeof(Edge)*sz) << "\n" << endl;
+//    cout << "Edge Memory\n + Starting address: " << reinterpret_cast<int*>(EdgeMemory) 
+//    	 << ", ending address: " << reinterpret_cast<int*>(EdgeMemory + sizeof(Edge)*sz) << "\n" << endl;
   }
 #endif /* _FIXALLOC_ */
 
@@ -504,14 +504,14 @@ public:
     return Edges;
   }
 
-  void handleAddr(){
-    VerticesSort = Vertices;
-    EdgesSort = Edges;
-    sort(VerticesSort.begin(),VerticesSort.end());
-    sort(EdgesSort.begin(),EdgesSort.end());
-  //start prefetching trigger
-    passPtr(&VerticesSort,0,&EdgesSort,0,0,0);
-  }
+//  void handleAddr(){
+//    VerticesSort = Vertices;
+//    EdgesSort = Edges;
+//    sort(VerticesSort.begin(),VerticesSort.end());
+//    sort(EdgesSort.begin(),EdgesSort.end());
+//  //start prefetching trigger
+//    passPtr(&VerticesSort,0,&EdgesSort,0,0,0);
+//  }
 
 protected:
   /// Hold pointers to all vertices.
