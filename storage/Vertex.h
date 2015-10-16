@@ -23,6 +23,10 @@
 #include "FixedString.h"
 
 /// Forward declaration.
+#ifdef _LOCKING_
+class VertexLock;
+#endif
+
 class Edge;
 
 class Vertex { 
@@ -33,6 +37,9 @@ public:
   typedef FixedString KeyType;
   typedef FixedString ValueType;
   typedef FixedString LabelType;
+#ifdef _LOCKING_
+  typedef VertexLock* VertexLockPointer;
+#endif
 
   // PropertyList typedefs.
   typedef PropertyList< KeyType, ValueType > PropertyListType;
@@ -59,6 +66,10 @@ public:
   void setProperty(KeyType k, ValueType v);
   void setPropertyList(PropertyListType & l);
   PropertyListType &  getPropertyList();
+#ifdef _LOCKING_
+  void setVertexLock(VertexLockPointer NewLock);
+  VertexLockPointer getVertexLock();
+#endif
   void deleteVertex();
 
 protected:
@@ -72,6 +83,11 @@ protected:
   LabelType VertexLabel;
 
   PropertyListType VertexPropertyList;
+
+#ifdef _LOCKING_
+  VertexLockPointer  VLock; 
+#endif 
+
 };
 
 #endif /* _VERTEX_H_ */

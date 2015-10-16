@@ -15,6 +15,7 @@
 #include <string>
 #include <time.h>
 #include <unordered_map>
+
 #ifdef _PRINTLOG_
   #include <iostream>
 #endif
@@ -46,7 +47,7 @@ public:
     LdbcFile << startVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< endl;
     for(auto it = target.begin(); it != target.end(); ++it) {
       LdbcFile << endl;
-
+#endif
     Cbfs.releaseAll(LockManager);
     getExecTime();
     LdbcFile.close();

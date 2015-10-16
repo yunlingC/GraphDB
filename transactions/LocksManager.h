@@ -54,8 +54,6 @@ public:
       exit(0);
     }
     else {
-//      if ( (id == 36820) && (mt == 3) )
-//        std::cout << "get Vertex lock on " << id << " type " << mt << " locktype " << lt << "\n";
       MutexPointer mp(nullptr);
       switch(mt) {
         case Pp:
@@ -96,8 +94,6 @@ public:
       exit(0);
     }
     else {
-//      if ( (id == 36820) && (mt == 3) )
-//        std::cout << "release Vertex lock on " << id << " type " << mt << " locktype " << lt << "\n";
       MutexPointer mp(nullptr);
       switch(mt) {
         case Pp:
@@ -173,7 +169,6 @@ public:
           std::cerr << "ERROR: No such Mutex in EdgeLock\n";
           exit(0);
       }//END_SWITCH
-
       switch (lt) {   
         case SH:
           return mp->try_lock_shared();
@@ -215,11 +210,9 @@ public:
   auto releaseEdgeLock(unsigned int id, MutexType mt, LockType lt) 
     -> bool {
     if (EdgeLockMap.find(id) == EdgeLockMap.end()) {
-//      std::cout << "Error : No such edge" << id <<" in map \n";
       exit(0);
     }
     else {
-//      std::cout << "Mutex Type " << mt << std::endl;
       MutexPointer mp(nullptr);
       switch(mt) {
         case ID:
@@ -295,19 +288,28 @@ public:
 
     for(auto iter = VertexMap.begin();
         iter != VertexMap.end(); iter++) {
-      VertexLock NewVertex;
-      VertexLockMap.insert(VLockPair((*iter).first, NewVertex));
+//      VertexLock NewVertex;
+      VertexLock* NewVertexLock = new VertexLock();
+      VertexLockMap.insert(VLockPair((*iter).first, *NewVertexLock));
+#ifdef _LOCKING_
+      (*iter).second->setVertexLock(NewVertexLock); 
+#endif
     }
 
     for(auto it = EdgeMap.begin();
         it != EdgeMap.end(); it++) {
-      EdgeLock NewEdge;
-      EdgeLockMap.insert(ELockPair((*it).first, NewEdge));
+//      EdgeLock NewEdge;
+      EdgeLock* NewEdgeLock = new EdgeLock();
+      EdgeLockMap.insert(ELockPair((*it).first, *NewEdgeLock));
+#ifdef _LOCKING_
+      (*it).second->setEdgeLock(NewEdgeLock);
+#endif
     }
 
 //    cout << "after build maps, vertex lock num " << VertexLockMap.size() << " edge lock num " << EdgeLockMap.size() << endl;
   }
  
+
   auto getVertexLockMap() 
     -> VLockMapType {
       return VertexLockMap;

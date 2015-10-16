@@ -213,6 +213,16 @@ auto Edge::getId()
   return EdgeId;
 }
 
+#ifdef _LOCKING_
+auto Edge::getEdgeLock() -> EdgeLockPointer {
+  return ELock;
+}
+
+auto Edge::setEdgeLock(EdgeLockPointer NewLock) -> void {
+  ELock = NewLock;
+}
+#endif
+
 Edge::Edge(): EdgeId(-1) { 
   FirstVertex = nullptr;     
   SecondVertex = nullptr;

@@ -23,9 +23,10 @@ public:
   typedef std::shared_ptr<Mutex> MutexPointer;
 public:
   VertexLock() : IdMutex (MutexPointer(new Mutex)),
-                 PpMutex (MutexPointer(new Mutex)), 
                  NEMutex (MutexPointer(new Mutex)),
-                 LEMutex (MutexPointer(new Mutex)) {}
+                 LEMutex (MutexPointer(new Mutex)),
+                 LbMutex (MutexPointer(new Mutex)),
+                 PpMutex (MutexPointer(new Mutex)){} 
 
   auto getPpMutex()
     -> MutexPointer {
@@ -47,13 +48,20 @@ public:
     return IdMutex;
   }
 
+  auto getLbMutex() 
+    -> MutexPointer {
+    return LbMutex;
+  }
+
+
 protected:
 ///No mutex for label or id
 /// won't be changed anyway;
   MutexPointer IdMutex;
-  MutexPointer PpMutex;
   MutexPointer NEMutex;
   MutexPointer LEMutex;
+  MutexPointer LbMutex;
+  MutexPointer PpMutex;
 };
 
 class EdgeLock {
@@ -62,13 +70,14 @@ public:
   typedef std::shared_ptr<Mutex> MutexPointer;
 public:
   EdgeLock() : IdMutex (MutexPointer(new Mutex)),
-               PpMutex (MutexPointer(new Mutex)),
                FVMutex (MutexPointer(new Mutex)),
                SVMutex (MutexPointer(new Mutex)),
                FNEMutex (MutexPointer(new Mutex)),
                FPEMutex (MutexPointer(new Mutex)),
                SNEMutex (MutexPointer(new Mutex)),
-               SPEMutex (MutexPointer(new Mutex)) {}
+               SPEMutex (MutexPointer(new Mutex)),
+               LbMutex (MutexPointer(new Mutex)),
+               PpMutex (MutexPointer(new Mutex)){}
 
   auto getIdMutex() 
     -> MutexPointer {
@@ -112,16 +121,19 @@ public:
 
 
 protected:
-///No mutex for label
-/// won't be changed anyway;
+  ///No mutex for label
+  /// won't be changed anyway;
   MutexPointer IdMutex;
-  MutexPointer PpMutex;
   MutexPointer FVMutex;
   MutexPointer SVMutex;
   MutexPointer FNEMutex;
   MutexPointer FPEMutex;
   MutexPointer SNEMutex;
   MutexPointer SPEMutex;
+  /// Lb mutex for prefetching convenience(temporal)
+  MutexPointer LbMutex;
+  MutexPointer PpMutex;
+
 };
 
 #endif /**_LOCK_H_*/

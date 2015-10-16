@@ -19,6 +19,10 @@
 #include "PropertyList.h"
 #include "FixedString.h"
 
+#ifdef _LOCKING_
+class EdgeLock;
+#endif 
+
 class Vertex;
 
 class Edge {
@@ -28,7 +32,10 @@ public:
   typedef Edge* EdgePointer;
   typedef unsigned int EdgeDescriptor;
   typedef unsigned int VertexDescriptor;
-  
+#ifdef _LOCKING_
+  typedef EdgeLock* EdgeLockPointer;
+#endif
+
   typedef FixedString KeyType;
   typedef FixedString ValueType;
   typedef FixedString LabelType;
@@ -70,6 +77,11 @@ public:
   void setSecondPreviousEdge(EdgePointer e);
   void setType(string t);
 
+#ifdef _LOCKING_
+  void setEdgeLock(EdgeLockPointer el);
+  EdgeLockPointer getEdgeLock();
+#endif
+
   /// Constructors.
   Edge();
   Edge(VertexPointer vs, VertexPointer vd);
@@ -96,6 +108,11 @@ protected:
   LabelType EdgeLabel;
 
   PropertyListType EdgePropertyList;
+
+#ifdef _LOCKING_
+  EdgeLockPointer ELock;
+#endif 
+
 };
 
 #endif /* _EDGE_H_ */

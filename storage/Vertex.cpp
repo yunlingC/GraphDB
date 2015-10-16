@@ -96,7 +96,16 @@ auto Vertex::getLastEdge() -> EdgePtr {
   return LastEdge;
 }
 
+#ifdef _LOCKING_
+auto Vertex::getVertexLock() ->VertexLockPointer {
+  return VLock;
+}
 
+auto Vertex::setVertexLock(VertexLockPointer NewLock)
+  -> void {
+  VLock = NewLock;
+  }
+#endif
 
 auto Vertex::dump() 
   -> void {
