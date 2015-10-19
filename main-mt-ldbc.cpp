@@ -54,7 +54,7 @@ int main( int argc, char * argv[]) {
   rand.getFileName("../tests/ldbc/social_network_1000/New/person_0.csv");
   rand.getIntervalPersonInput(interval, Input);
 
-  LockManagerType LockManager;
+  LockManagerType LockManager(g);
   LockManager.buildLockMap(g);
 
   cout <<"Begin testing \n";
