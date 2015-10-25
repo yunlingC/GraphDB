@@ -47,6 +47,7 @@ public:
     LdbcFile << startVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< endl;
     for(auto it = target.begin(); it != target.end(); ++it) {
       LdbcFile << endl;
+    } 
 #endif
     Cbfs.releaseAll(LockManager);
     getExecTime();
@@ -229,7 +230,7 @@ public:
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex, 
       LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 5================\n";
+    LdbcFile << "===============Query 5================\n";
     getStartTime();  
     Filter tmpFilter[2];
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
@@ -245,14 +246,8 @@ public:
     auto target = v5.getVertexTargetList();
 #ifdef _PRINTLOG_
     LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
-    for(auto it = targetMap.begin(); it != targetMap.end(); ++it) {
-      if((*it).second != 0)
-        LdbcFile <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< endl; 
-    }
 #endif
 
-//    auto target = v5.getVertexTargetList();
-//    LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
     Filter Filters[4];
     traverseThroughMultiRelType("HAS_MEMBER", Filters[0]); 
     Filters[1].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
@@ -281,7 +276,13 @@ public:
       Cbfs.breadthFirstSearch(graph, startVertex, mpv5, LockManager);
       targetMap.insert(mpv5.getResultMap().begin(), mpv5.getResultMap().end());
     }
- 
+
+#ifdef _PRINTLOG_
+     for(auto it = targetMap.begin(); it != targetMap.end(); ++it) {
+      if((*it).second != 0)
+        LdbcFile <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< endl; 
+    }
+#endif
     Cbfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
