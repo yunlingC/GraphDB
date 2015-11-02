@@ -38,7 +38,7 @@ int main( int argc, char * argv[]) {
   g.allocEdgeMemory(2000000);
 #endif /* _FIXALLOC */
 
-  reader.readDirectory("../tests/ldbc/social_network_1000/New");
+  reader.readDirectory("../tests/ldbc/social_network_100/New");
   cout << "Finish reading \n";
 
   unsigned int interval = 14;
@@ -51,7 +51,7 @@ int main( int argc, char * argv[]) {
 
   LDBCRandomizer rand;
   std::vector<unsigned int> Input;
-  rand.getFileName("../tests/ldbc/social_network_1000/New/person_0.csv");
+  rand.getFileName("../tests/ldbc/social_network_100/New/person_0.csv");
   rand.getIntervalPersonInput(interval, Input);
 
   LockManagerType LockManager(g);
@@ -240,8 +240,8 @@ int main( int argc, char * argv[]) {
         q13.runQuery(g, Input[12], Input[0], LockManager);
         q14.runQuery(g, Input[13], Input[1], LockManager);
 
-        Q15.runQuery(g, transManager, LockManager, 1);
-        Q16.runQuery(g, transManager, LockManager, 1);
+        Q15.runQuery(g, LockManager);
+        Q16.runQuery(g, LockManager);
       break;
     }
     case 2:
@@ -262,8 +262,8 @@ int main( int argc, char * argv[]) {
         threads.push_back( thread([&]{q13.runQuery(g, Input[12], Input[0], LockManager);}));
         threads.push_back( thread([&]{q14.runQuery(g, Input[13], Input[1], LockManager);}));
 
-        threads.push_back( thread([&]{Q15.runQuery(g, transManager, LockManager, 1);}));
-        threads.push_back( thread([&]{Q16.runQuery(g, transManager, LockManager, 1);}));
+        threads.push_back( thread([&]{Q15.runQuery(g, LockManager);}));
+        threads.push_back( thread([&]{Q16.runQuery(g, LockManager);}));
    
       for_each(threads.begin(), threads.end(),
                std::mem_fn(&thread::join));
@@ -289,8 +289,8 @@ int main( int argc, char * argv[]) {
         threads.push_back( thread([&]{q13.runQuery(g, Input[12], Input[0], LockManager);}));
         threads.push_back( thread([&]{q14.runQuery(g, Input[13], Input[1], LockManager);}));
 
-        threads.push_back( thread([&]{Q17.runQuery(g, transManager, LockManager, 1);}));
-        threads.push_back( thread([&]{Q18.runQuery(g, transManager, LockManager, 1);}));
+        threads.push_back( thread([&]{Q17.runQuery(g, transManager, LockManager);}));
+        threads.push_back( thread([&]{Q18.runQuery(g, transManager, LockManager);}));
    
       for_each(threads.begin(), threads.end(),
                std::mem_fn(&thread::join));

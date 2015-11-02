@@ -25,18 +25,28 @@
 #include "Visitor.h"
 #include "LocksManager.h"
 
+//TODO
+/// back-off one by one /read or write - stack
+/// update graph->add/delete nodes/edges
+/// remove std
+/// Macros of spinning on locks
+/// add comments
+
 class ConcurrentBFS {
 public:
   typedef LocksManager LockManagerType;
   typedef pair<GraphType::VertexPointer, bool> VisitPair;
-  typedef pair<unsigned int, pair<MutexType, LockType> >  LockPair;
-  typedef vector<pair<unsigned int, pair<MutexType, LockType> > > LockListType; 
+  typedef pair<VertexPointer, pair<MutexType, LockType> >  VLockPair;
+  typedef pair<EdgePointer, pair<MutexType, LockType> >  ELockPair;
+  typedef vector<VLockPair> VLockListType; 
+  typedef vector<ELockPair> ELockListType; 
 public:
   void releaseAll(LockManagerType & LockManager) {
      LockManager.releaseAll(VertexLocks, EdgeLocks); 
   }
 
-  ///get read locks one by one and store in locklists, then release locks in reverse order one by one before return.
+  /// get read locks one by one and store in locklists, 
+  /// then release locks in reverse order one by one before return.
   void breadthFirstSearch(GraphType & Graph, 
                           const GraphType::VertexDescriptor & StartVertex,  
                           Visitor & GraphVisitor,
@@ -65,76 +75,55 @@ public:
       ScheduledVertex = VertexQueue.front();  VertexQueue.pop();
 
 #ifdef _SKIP_
-      auto VPpLock = LockManager.getVertexLock(ScheduledVertex->getId(), Pp, SH);
-      if (!VPpLock) {
-//        std::cout << "Skip read lock on Pp vertex\t" << ScheduledVertex->getId() << std::endl;
-//        releaseAll(LockManager);
+      /// couldn't get the lock, skip it and visit the next one from queue
+      if (!LockManager.getVertexLock(ScheduledVertex, Pp, SH))
         break;
-      }
 #else 
-      auto VPpLock = false; 
-      while ( !VPpLock ) {
-        VPpLock = LockManager.getVertexLock(ScheduledVertex->getId(), Pp, SH);
-      }
+      /// spin on it till it is available
+      while ( !LockManager.getVertexLock(ScheduledVertex, Pp, SH));
+
 #endif
-      auto VPpPair = make_pair(ScheduledVertex->getId(), make_pair(Pp, SH));
+
+      auto VPpPair = make_pair(ScheduledVertex, make_pair(Pp, SH));
       VertexLocks.push_back(VPpPair);
  
-      bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
-      if( VertexMatch == true ) {
+      if (GraphVisitor.visitVertex(ScheduledVertex))
         return;
-      }
         
       /// Set to visited.    
       ColorMap[ScheduledVertex] = true;
 #ifdef _SKIP_
-      auto VNELock = LockManager.getVertexLock(ScheduledVertex->getId(), NE, SH);
-      if ( !VNELock ) {
-//        std::cout << "Skip read lock on NE vertex\t" << ScheduledVertex->getId() << std::endl;
-//        releaseAll(LockManager);
+      if (!LockManager.getVertexLock(ScheduledVertex, NE, SH))
         break;
-      }
 #else
-      auto VNELock = false;
-      while ( !VNELock ) {
-        VNELock = LockManager.getVertexLock(ScheduledVertex->getId(), NE, SH);
-      }
+      while (!LockManager.getVertexLock(ScheduledVertex, NE, SH));
 #endif
-      auto VNEPair = make_pair(ScheduledVertex->getId(), make_pair(NE, SH));
+
+      auto VNEPair = make_pair(ScheduledVertex, make_pair(NE, SH));
       VertexLocks.push_back(VNEPair);
   
       auto NextEdge = ScheduledVertex->getNextEdge();
       while ( NextEdge != nullptr ) {                  
         /// Get the target node.
-        auto EFVLock = false;
-        auto ESVLock = false;
+
 #ifdef _SKIP_
-        EFVLock = LockManager.getEdgeLock(NextEdge->getId(), FV, SH);
-        if ( !EFVLock ) {
-//          Fstd::cout << "Skip read lock on FV edge\t" << NextEdge->getId() << std::endl;
+        if (!LockManager.getEdgeLock(NextEdge, FV, SH)) {
           break;
         }
 #else
-        while ( !EFVLock ) {
-          EFVLock = LockManager.getEdgeLock(NextEdge->getId(), FV, SH);
-        }
+        while (!LockManager.getEdgeLock(NextEdge, FV, SH));
 #endif
 
 #ifdef _SKIP_
-        ESVLock = LockManager.getEdgeLock(NextEdge->getId(), SV, SH);
-        if ( !ESVLock ) {
-//          std::cout << "Skip read lock on SV edge\t" << NextEdge->getId() << std::endl;
-          LockManager.releaseEdgeLock(NextEdge->getId(), FV, SH);
+        if (!LockManager.getEdgeLock(NextEdge, SV, SH)) {
+          LockManager.releaseEdgeLock(NextEdge, FV, SH);
           break;
         }
 #else
-        while ( !ESVLock ) {
-          ESVLock = LockManager.getEdgeLock(NextEdge->getId(), SV, SH);
-        }
-
+        while (!LockManager.getEdgeLock(NextEdge, SV, SH));
 #endif
-        auto EFVPair = make_pair(NextEdge->getId(), make_pair(FV, SH));
-        auto ESVPair = make_pair(NextEdge->getId(), make_pair(SV, SH));
+        auto EFVPair = make_pair(NextEdge, make_pair(FV, SH));
+        auto ESVPair = make_pair(NextEdge, make_pair(SV, SH));
         EdgeLocks.push_back(EFVPair);
         EdgeLocks.push_back(ESVPair);
 
@@ -161,38 +150,28 @@ public:
           GraphVisitor.revisitVertex( TargetVertex );
         }
         
-        auto EFNELock = false;
-        auto ESNELock = false;
 #ifdef _SKIP_
-        EFNELock = LockManager.getEdgeLock(NextEdge->getId(), FNE, SH);
-        if ( !EFNELock ) {
-//          std::cout << "Skip read lock on FNE edge\t" << NextEdge->getId() << std::endl;
-          LockManager.releaseEdgeLock(NextEdge->getId(), FV, SH);
-          LockManager.releaseEdgeLock(NextEdge->getId(), SV, SH);
+        if (!LockManager.getEdgeLock(NextEdge, FNE, SH)) {
+          LockManager.releaseEdgeLock(NextEdge, FV, SH);
+          LockManager.releaseEdgeLock(NextEdge, SV, SH);
           break;
         }
 #else
-        while ( !EFNELock ) {
-          EFNELock = LockManager.getEdgeLock(NextEdge->getId(), FNE, SH);
-        }
+        while (!LockManager.getEdgeLock(NextEdge, FNE, SH));
 #endif
 
 #ifdef _SKIP_
-        ESNELock = LockManager.getEdgeLock(NextEdge->getId(), SNE, SH);
-        if ( !ESNELock ) {
-//          std::cout << "Skip read lock on SNE edge\t" << NextEdge->getId() << std::endl;
-          LockManager.releaseEdgeLock(NextEdge->getId(), FV, SH);
-          LockManager.releaseEdgeLock(NextEdge->getId(), SV, SH);
-          LockManager.releaseEdgeLock(NextEdge->getId(), FNE, SH);
+        if ( !LockManager.getEdgeLock(NextEdge, SNE, SH)) {
+          LockManager.releaseEdgeLock(NextEdge, FV, SH);
+          LockManager.releaseEdgeLock(NextEdge, SV, SH);
+          LockManager.releaseEdgeLock(NextEdge, FNE, SH);
           break;
         }
 #else
-        while ( !ESNELock ) {
-          ESNELock = LockManager.getEdgeLock(NextEdge->getId(), SNE, SH);
-        }
+        while ( !LockManager.getEdgeLock(NextEdge, SNE, SH));
 #endif
-        auto EFNEPair = make_pair(NextEdge->getId(), make_pair(FNE, SH));
-        auto ESNEPair = make_pair(NextEdge->getId(), make_pair(SNE, SH));
+        auto EFNEPair = make_pair(NextEdge, make_pair(FNE, SH));
+        auto ESNEPair = make_pair(NextEdge, make_pair(SNE, SH));
         EdgeLocks.push_back(EFNEPair);
         EdgeLocks.push_back(ESNEPair);
 
@@ -203,8 +182,8 @@ public:
     GraphVisitor.finishVisit();
   }
 private:
-  LockListType VertexLocks;
-  LockListType EdgeLocks;
+  VLockListType VertexLocks;
+  ELockListType EdgeLocks;
 };
 
 #endif /* _BREATHFIRSTSEARCH_H_*/

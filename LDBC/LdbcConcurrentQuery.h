@@ -29,29 +29,34 @@
 #define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
 #define MILLION 100000
 
-/*This is the base class for LdbcQuery*/
+/// This is the base class for LdbcQuery
 class LdbcQuery : public Query{
 public:
   typedef std::pair<string, string> ParamPairType;
-  typedef pair<string, pair<string, string> > RangePairType;
+  typedef std::pair<string, pair<string, string> > RangePairType;
   typedef LocksManager LockManagerType;
 public:
-  LdbcQuery(unsigned int id) : _QueryId(id) {
-    LdbcFile.open("ldbc"+std::to_string(id)+".log", ios_base::out| ios_base::app);
+  LdbcQuery(unsigned int Id) : QueryId(Id) {
+    LdbcFile.open("ldbc"+std::to_string(Id)+".log", ios_base::out| ios_base::app);
   }
 
-  virtual void runQuery(Graph & graph, VertexDescriptor startVertex ) { }
+  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex ) { }
 
-  virtual void runQuery(Graph & graph, VertexDescriptor startVertex,
+  virtual void runQuery(Graph & graph, LockManagerType & LockManager) { }
+
+  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
       LockManagerType & LockManager) {}
+
+  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
+      VertexDescriptor EndVertex, LockManagerType & LockManager) {}
 
   void setParam(const string & Key, const string & Value) {
     ParamPair.first = Key;
     ParamPair.second = Value;
   }
   
-  void setParam(ParamPairType & param) {
-    ParamPair = param;
+  void setParam(ParamPairType & Param) {
+    ParamPair = Param;
   }
 
   void setRange(string Key, string Min, string Max) {
@@ -60,38 +65,37 @@ public:
     ValueRange.second.second = Max;
   }
 
-  void setPropertyRange(string Key, string A, string B) {
+  void setPropertyRange(string Key, string MinValue, string MaxValue) {
     PropRange.first = Key;
-    PropRange.second.first = A;
-    PropRange.second.second = B;
+    PropRange.second.first = MinValue;
+    PropRange.second.second = MaxValue;
   }
   
   void getExecTime() {
-    _End = (struct timespec){ 0 };
-    if ( clock_gettime( CLOCK_ID, &_End) == -1) {
+    End = (struct timespec){ 0 };
+    if ( clock_gettime( CLOCK_ID, &End) == -1) {
+      LdbcFile << "Query\t" << QueryId << "\tCould NOT get exec time\n"; 
       exit(0);
     }
 
-    double execTime = ( _End.tv_sec - _Start.tv_sec )*1000
-                  + ( _End.tv_nsec - _Start.tv_nsec)/MILLION;
+    double execTime = ( End.tv_sec - Start.tv_sec )*1000
+                  + ( End.tv_nsec - Start.tv_nsec)/MILLION;
 
-    LdbcFile << "Query\t" << _QueryId << "\t" << execTime << "\n"; 
+    LdbcFile << "Query\t" << QueryId << "\t" << execTime << "\n"; 
   }
 
-  //TODO: throw exception or exit
   void getStartTime() { 
-    _Start = (struct timespec){ 0 };
-    if ( clock_gettime( CLOCK_ID, &_Start ) == -1 ) {
+    Start = (struct timespec){ 0 };
+    if ( clock_gettime( CLOCK_ID, &Start ) == -1 ) {
       LdbcFile << "Fail to get start time\n";
       exit(0);
     } 
-//    LdbcFile << "Start time\t" << _Start.tv_sec << "\t" << _Start.tv_nsec <<"\n";
   }
 
 protected:
-  struct timespec _Start;
-  struct timespec _End;
-  unsigned int _QueryId;
+  struct timespec Start;
+  struct timespec End;
+  unsigned int QueryId;
   ParamPairType ParamPair;
   RangePairType ValueRange;
   RangePairType PropRange;
@@ -106,12 +110,13 @@ public:
   typedef PropertyList< KeyType, ValueType > PropertyListType;
   typedef PropertyListType & PropertyListTypeReference;
 public:
-  auto setPropertyList(PropertyListTypeReference pl) 
+  auto setPropertyList(PropertyListTypeReference PropertyList) 
     -> void {
-    VertexPropertyList = pl; 
+    VertexPropertyList = PropertyList; 
   }
 protected:
   PropertyListType VertexPropertyList;
 };
+
 
 #endif /*_LDBCQUERYDESCRIPTION_H_*/

@@ -15,36 +15,44 @@
 #ifndef _LOCKSMANAGER_H_
 #define _LOCKSMANAGER_H_
 
-///std=c++14
-#include <shared_mutex>
-#include <iostream>
+///std=c++14 
 #include <thread>
 #include <map>
 
 #include "GraphType.h"
 #include "Lock.h"
 
-enum MutexType { ID, Pp, LE, NE, FV, SV, FNE, FPE, SNE, SPE };
+/// TODO full name
+enum MutexType { ID, Pp, LE, NE, FV, SV, FNE, FPE, SNE, SPE, Lb};
 enum LockType { SH, EX };
+
+/// currently PLock is only supported in _LOCKING_
+/// i.e. in the LockMap we are still use shared_mutex from C++ lib
+/// TODO: support PLock with LockMap
 
 class LocksManager {
 public:
   typedef std::shared_timed_mutex Mutex;
-  typedef std::shared_ptr<Mutex> MutexPointer;
-  typedef std::map<unsigned int, VertexLock>  VLockMapType;
-  typedef std::map<unsigned int, EdgeLock>    ELockMapType;
+  typedef VertexLock::MutexPointer  MutexPointer;
+  typedef GraphType::VertexPointer VertexPtr;
+  typedef GraphType::EdgePointer EdgePtr;
+  typedef std::map<unsigned int, VertexLock>  VertexLockMapType;
+  typedef std::map<unsigned int, EdgeLock>    EdgeLockMapType;
   typedef std::pair<unsigned int, VertexLock> VLockPair;
   typedef std::pair<unsigned int, EdgeLock>   ELockPair;
-  typedef vector<unsigned int> LockIdListType;
-  typedef vector<pair<unsigned int, pair<MutexType, LockType> > > LockListType; 
+  typedef std::vector<pair<VertexPtr, pair<MutexType, LockType> > > VLockListType; 
+  typedef std::vector<pair<EdgePtr, pair<MutexType, LockType> > > ELockListType; 
 public:
+
 #ifndef _LOCKING_
+/// locks stored in a map
   LocksManager() {}
-  auto getVertexLock(unsigned int id, MutexType mt, LockType lt) 
+
+  auto getVertexLock(unsigned int VertexId, MutexType Mutex, LockType Lock) 
     -> bool {
-    if(VertexLockMap.find(id) == VertexLockMap.end()) {
-      std::cerr  << "Error : No such vertex " << id <<" in map \n";
-      ///TODO: shoould be exception here, need to be fixed.
+    if (VertexLockMap.find(VertexId) == VertexLockMap.end()) {
+      std::cerr  << "Error : No such vertex " << VertexId <<" in map \n";
+      ///TODO: shoould be exception here and roll back, need to be fixed.
       /**
       *exiting process would give out ownership of this mutex automatically,
       * no need to release it before exiting
@@ -54,126 +62,123 @@ public:
       exit(0);
     }
     else {
-      MutexPointer mp(nullptr);
-      switch(mt) {
+      MutexPointer MutexPtr = nullptr;
+      switch (Mutex) {
         case Pp:
-          mp = VertexLockMap[id].getPpMutex();
+          MutexPtr = VertexLockMap[VertexId].getPpMutex();
           break;
         case LE:
-          mp = VertexLockMap[id].getLEMutex();
+          MutexPtr = VertexLockMap[VertexId].getLEMutex();
           break;
         case NE:
-          mp = VertexLockMap[id].getNEMutex();
+          MutexPtr = VertexLockMap[VertexId].getNEMutex();
           break;
         case ID:
-          mp = VertexLockMap[id].getIdMutex();
+          MutexPtr = VertexLockMap[VertexId].getIdMutex();
           break;
         default:
-          ///TODO should be exception here
           std::cerr << "ERROR: No such Mutex in VertexLock\n";
           exit(0);
-      }//END_SWITCH
-      switch (lt) {   
+      }
+      switch (Lock) {   
         ///Shared lock
         case SH:
-          return mp->try_lock_shared();
+          return MutexPtr->try_lock_shared();
+        ///Exclusive lock
         case EX:
-          return mp->try_lock(); 
+          return MutexPtr->try_lock(); 
         default:
-          ///TODO Should be exception here
           std::cerr << "ERROR: No such Mutex in VertexLock\n";
           exit(0);
       }
     } 
   }
 
-  auto releaseVertexLock(unsigned int id, MutexType mt, LockType lt) 
+  auto releaseVertexLock(unsigned int VertexId, MutexType Mutex, LockType Lock) 
     -> bool {
-    if(VertexLockMap.find(id) == VertexLockMap.end()) {
-      std::cerr << "Error : No such vertex " << id <<" in map \n";
+    if(VertexLockMap.find(VertexId) == VertexLockMap.end()) {
+      std::cerr << "Error : No such vertex " << VertexId <<" in map \n";
       exit(0);
     }
     else {
-      MutexPointer mp(nullptr);
-      switch(mt) {
+      MutexPointer MutexPtr = nullptr;
+      switch (Mutex) {
         case Pp:
-          mp = VertexLockMap[id].getPpMutex();
+          MutexPtr = VertexLockMap[VertexId].getPpMutex();
           break;
         case LE:
-          mp = VertexLockMap[id].getLEMutex();
+          MutexPtr = VertexLockMap[VertexId].getLEMutex();
           break;
         case NE:
-          mp = VertexLockMap[id].getNEMutex();
+          MutexPtr = VertexLockMap[VertexId].getNEMutex();
           break;
         case ID:
-          mp = VertexLockMap[id].getIdMutex();
+          MutexPtr = VertexLockMap[VertexId].getIdMutex();
           break;
         default:
-          ///TODO should be exception here
-          std::cerr << "ERROR: No such Mutex in VertexLock\n";
-          exit(0);
-      }//END_SWITCH
-
-      switch (lt) {   
-        ///Shared lock
-        case SH:
-          mp->unlock_shared();
-          break;
-        case EX:
-          mp->unlock(); 
-          break;
-        default:
-          ///TODO Should be exception here
           std::cerr << "ERROR: No such Mutex in VertexLock\n";
           exit(0);
       }
-      return true;
+
+      switch (Lock) {   
+        case SH:
+          MutexPtr->unlock_shared();
+          break;
+        case EX:
+          MutexPtr->unlock(); 
+          break;
+        default:
+          std::cerr << "ERROR: No such Mutex in VertexLock\n";
+          exit(0);
+      }
     }
+    return true;
   }
 
-  auto getEdgeLock(unsigned int id, MutexType mt, LockType lt) 
+  auto getEdgeLock(unsigned int EdgeId, MutexType Mutex, LockType Lock) 
     -> bool {
-    if (EdgeLockMap.find(id) == EdgeLockMap.end()) {
-      std::cerr << "Error : No such edge" << id <<" in map \n";
+    if (EdgeLockMap.find(EdgeId) == EdgeLockMap.end()) {
+      std::cerr << "Error : No such edge" << EdgeId <<" in map \n";
       exit(0);
     }
 
     else {
-      MutexPointer mp(nullptr);
-      switch(mt) {
+      MutexPointer MutexPtr = nullptr;
+      switch (Mutex) {
         case ID:
-          mp = EdgeLockMap[id].getIdMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getIdMutex();
           break;
         case Pp:
-          mp = EdgeLockMap[id].getPpMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getPpMutex();
           break;
         case FV:
-          mp = EdgeLockMap[id].getFVMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getFVMutex();
           break;
         case SV:
-          mp = EdgeLockMap[id].getSVMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getSVMutex();
           break;
         case FNE:
-          mp = EdgeLockMap[id].getFNEMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getFNEMutex();
           break;
         case FPE:
-          mp = EdgeLockMap[id].getFPEMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getFPEMutex();
           break;
         case SNE:
-          mp = EdgeLockMap[id].getSNEMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getSNEMutex();
           break;
         case SPE:
-          mp = EdgeLockMap[id].getSPEMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getSPEMutex();
           break;
         default:
           std::cerr << "ERROR: No such Mutex in EdgeLock\n";
           exit(0);
-      }//END_SWITCH
-      switch (lt) {   
+      }
+
+      switch (Lock) {   
         case SH:
-          return mp->try_lock_shared();
+          return MutexPtr->try_lock_shared();
         case EX:
-          return mp->try_lock(); 
+          return MutexPtr->try_lock(); 
         default:
           std::cerr  << "ERROR: No such Mutex in EdgeLock\n";
           exit(0);
@@ -181,93 +186,92 @@ public:
     }
   }
 
-  auto releaseEdgeAll(LockListType & EdgeLocks) 
+  auto releaseEdgeAll(ELockListType & EdgeLocks) 
     -> void {
-    auto itend = EdgeLocks.end();
-    for ( auto it = EdgeLocks.begin(); it != itend; ++it) {
+    for (auto it = EdgeLocks.begin(), itend = EdgeLocks.end(); 
+        it != itend; ++it) {
       releaseEdgeLock((*it).first, 
           (*it).second.first, (*it).second.second);
     }
   }
 
-  auto releaseVertexAll(LockListType & VertexLocks) 
+  auto releaseVertexAll(VLockListType & VertexLocks) 
     -> void {
-    auto itend = VertexLocks.end();
-    for ( auto it = VertexLocks.begin(); it != itend; ++it) {
+    for (auto it = VertexLocks.begin(), itend = VertexLocks.end(); 
+        it != itend; ++it) {
       releaseVertexLock((*it).first, 
           (*it).second.first, (*it).second.second);
     }
   }
 
-  auto releaseAll(LockListType & VertexLocks, LockListType & EdgeLocks) 
+  auto releaseAll(VLockListType & VertexLocks, ELockListType & EdgeLocks) 
     -> void {
       releaseVertexAll(VertexLocks);
       releaseEdgeAll(EdgeLocks);
   }
 
-  auto releaseEdgeLock(unsigned int id, MutexType mt, LockType lt) 
+  auto releaseEdgeLock(unsigned int EdgeId, MutexType Mutex, LockType Lock) 
     -> bool {
-    if (EdgeLockMap.find(id) == EdgeLockMap.end()) {
+    if (EdgeLockMap.find(EdgeId) == EdgeLockMap.end()) {
       exit(0);
     }
     else {
-      MutexPointer mp(nullptr);
-      switch(mt) {
+      MutexPointer MutexPtr(nullptr);
+      switch (Mutex) {
         case ID:
-          mp = EdgeLockMap[id].getIdMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getIdMutex();
           break;
         case Pp:
-          mp = EdgeLockMap[id].getPpMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getPpMutex();
           break;
         case FV:
-          mp = EdgeLockMap[id].getFVMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getFVMutex();
           break;
         case SV:
-          mp = EdgeLockMap[id].getSVMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getSVMutex();
           break;
         case FNE:
-          mp = EdgeLockMap[id].getFNEMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getFNEMutex();
           break;
         case FPE:
-          mp = EdgeLockMap[id].getFPEMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getFPEMutex();
           break;
         case SNE:
-          mp = EdgeLockMap[id].getSNEMutex();
+          MutexPtr = EdgeLockMap[EdgeId].getSNEMutex();
           break;
         case SPE:
-          mp = EdgeLockMap[id].getSPEMutex();
-          break;
-        default:
-          std::cerr << "ERROR: No such Mutex in EdgeLock\n";
-          exit(0);
-      }//END_SWITCH
-
-      switch (lt) {   
-        case SH:
-          mp->unlock_shared();
-          break;
-        case EX:
-          mp->unlock(); 
+          MutexPtr = EdgeLockMap[EdgeId].getSPEMutex();
           break;
         default:
           std::cerr << "ERROR: No such Mutex in EdgeLock\n";
           exit(0);
       }
-      return true;
+
+      switch (Lock) {   
+        case SH:
+          MutexPtr->unlock_shared();
+          break;
+        case EX:
+          MutexPtr->unlock(); 
+          break;
+        default:
+          std::cerr << "ERROR: No such Mutex in EdgeLock\n";
+          exit(0);
+      }
     }
+    return true;
   }
 
-    /// TODO check map
-  auto addToVertexLockMap(unsigned int id) 
+  auto addToVertexLockMap(unsigned int VertexId) 
     -> void  {
       VertexLock NewVertex;
-      VertexLockMap.insert(VLockPair(id, NewVertex));
+      VertexLockMap.insert(VLockPair(VertexId, NewVertex));
   }
 
-  auto addToEdgeLockMap(unsigned int id) 
+  auto addToEdgeLockMap(unsigned int EdgeId) 
     -> void  {
       EdgeLock NewEdge;
-      EdgeLockMap.insert(ELockPair(id, NewEdge)); 
+      EdgeLockMap.insert(ELockPair(EdgeId, NewEdge)); 
   }
  
   auto buildLockMap(GraphType & graph) 
@@ -276,126 +280,117 @@ public:
     typedef GraphType::EdgePointer EdgePointer;
     std::map<unsigned int, VertexPointer> VertexMap;
     std::map<unsigned int, EdgePointer> EdgeMap;
-    VertexMap = graph.getVertexMap();
-    EdgeMap = graph.getEdgeMap();
+    VertexMap = Graph.getVertexMap();
+    EdgeMap = Graph.getEdgeMap();
 
-    for(auto iter = VertexMap.begin();
-        iter != VertexMap.end(); iter++) {
-//      VertexLock NewVertex;
+    for (auto iter = VertexMap.begin(), iter_end = VertexMap.end();
+        iter != iter_end; iter++) {
       VertexLock* NewVertexLock = new VertexLock();
       VertexLockMap.insert(VLockPair((*iter).first, *NewVertexLock));
       (*iter).second->setVertexLock(NewVertexLock); 
     }
 
-    for(auto it = EdgeMap.begin();
-        it != EdgeMap.end(); it++) {
-//      EdgeLock NewEdge;
+    for (auto it = EdgeMap.begin(), it_end = EdgeMap.end();
+        it != it_end; it++) {
       EdgeLock* NewEdgeLock = new EdgeLock();
       EdgeLockMap.insert(ELockPair((*it).first, *NewEdgeLock));
       (*it).second->setEdgeLock(NewEdgeLock);
     }
-
-//    cout << "after build maps, vertex lock num " << VertexLockMap.size() << " edge lock num " << EdgeLockMap.size() << endl;
   }
  
 
   auto getVertexLockMap() 
-    -> VLockMapType {
+    -> VertexLockMapType {
       return VertexLockMap;
   }
   auto getEdgeLockMap() 
-    -> ELockMapType {
+    -> EdgeLockMapType {
       return EdgeLockMap;
   }
 
 #else
   ///locks are encoded in Vertex and Edge
 public:
-  typedef GraphType::VertexPointer VertexPtr;
-  typedef GraphType::EdgePointer EdgePtr;
-public:
-  LocksManager(GraphType & g) : graph(g) {};
+  /// TODO const & g
+  LocksManager(GraphType & g) : Graph(g) {};
 
-  auto getVertexLock(unsigned int id, MutexType mt, LockType lt) 
+  auto getVertexLock(VertexPtr Vertex, MutexType Mutex, LockType Lock) 
     -> bool {
-    VertexPtr vp = graph.getVertexPointer(id);
-    if(vp == nullptr) {
-      std::cerr  << "Error : No such vertex " << id <<" in map \n";
+    if (Vertex == nullptr) {
+      std::cerr  << "Error : No such vertex  in map \n";
       ///TODO: shoould be exception here, need to be fixed.
       /**
       *exiting process would give out ownership of this mutex automatically,
       * no need to release it before exiting
       * but consistency state?
+      * need transaction rollback and redo
       * anyway, it won't happen if we don't delete any lock from manager
       */
       exit(0);
     }
-    MutexPointer mp(nullptr);
-    switch(mt) {
+    MutexPointer MutexPtr = nullptr;
+    switch (Mutex) {
       case Pp:
-        mp = vp->getVertexLock()->getPpMutex();
+        MutexPtr = Vertex->getVertexLock()->getPpMutex();
         break;
       case LE:
-        mp = vp->getVertexLock()->getLEMutex();
+        MutexPtr = Vertex->getVertexLock()->getLEMutex();
         break;
       case NE:
-        mp = vp->getVertexLock()->getNEMutex();
+        MutexPtr = Vertex->getVertexLock()->getNEMutex();
         break;
       case ID:
-        mp = vp->getVertexLock()->getIdMutex();
+        MutexPtr = Vertex->getVertexLock()->getIdMutex();
         break;
       default:
-        ///TODO should be exception here
         std::cerr << "ERROR: No such Mutex in VertexLock\n";
         exit(0);
-    }//END_SWITCH
-    switch (lt) {   
+    }
+    switch (Lock) {   
       ///Shared lock
       case SH:
-        return mp->try_lock_shared();
+        return MutexPtr->try_lock_shared();
       case EX:
-        return mp->try_lock(); 
+        return MutexPtr->try_lock(); 
       default:
-        ///TODO Should be exception here
         std::cerr << "ERROR: No such Mutex in VertexLock\n";
         exit(0);
     }
   }
 
-  auto releaseVertexLock(unsigned int id, MutexType mt, LockType lt) 
+  auto releaseVertexLock(VertexPtr Vertex, MutexType Mutex, LockType Lock) 
     -> bool {
-    VertexPtr vp = graph.getVertexPointer(id);
-    if(vp == nullptr) {
-      std::cerr << "Error : No such vertex " << id <<" in map \n";
+    if (Vertex == nullptr) {
+      std::cerr << "Error : No such vertex  in map \n";
       exit(0);
     }
-    MutexPointer mp(nullptr);
-    switch(mt) {
+
+    MutexPointer MutexPtr = nullptr;
+    switch (Mutex) {
       case Pp:
-        mp = vp->getVertexLock()->getPpMutex();
+        MutexPtr = Vertex->getVertexLock()->getPpMutex();
         break;
       case LE:
-        mp = vp->getVertexLock()->getLEMutex();
+        MutexPtr = Vertex->getVertexLock()->getLEMutex();
         break;
       case NE:
-        mp = vp->getVertexLock()->getNEMutex();
+        MutexPtr = Vertex->getVertexLock()->getNEMutex();
         break;
       case ID:
-        mp = vp->getVertexLock()->getIdMutex();
+        MutexPtr = Vertex->getVertexLock()->getIdMutex();
         break;
       default:
-        ///TODO should be exception here
         std::cerr << "ERROR: No such Mutex in VertexLock\n";
         exit(0);
-    }//END_SWITCH
+    }
 
-    switch (lt) {   
+    switch (Lock) {   
       ///Shared lock
       case SH:
-        mp->unlock_shared();
+        MutexPtr->unlock_shared();
         break;
       case EX:
-        mp->unlock(); 
+        MutexPtr->unlock(); 
         break;
       default:
         ///TODO Should be exception here
@@ -405,97 +400,95 @@ public:
     return true;
   }
 
-  auto getEdgeLock(unsigned int id, MutexType mt, LockType lt) 
+  auto getEdgeLock(EdgePtr Edge, MutexType Mutex, LockType Lock) 
     -> bool {
-    EdgePtr ep = graph.getEdgePointer(id);
-    if(ep == nullptr) {
-      std::cerr << "Error : No such edge" << id <<" in map \n";
+    if (Edge == nullptr) {
+      std::cerr << "Error : No such edge in map \n";
       exit(0);
     }
-    MutexPointer mp(nullptr);
-    switch(mt) {
+    MutexPointer MutexPtr = nullptr;
+    switch (Mutex) {
       case ID:
-        mp = ep->getEdgeLock()->getIdMutex();
+        MutexPtr = Edge->getEdgeLock()->getIdMutex();
         break;
       case Pp:
-        mp = ep->getEdgeLock()->getPpMutex();
+        MutexPtr = Edge->getEdgeLock()->getPpMutex();
         break;
       case FV:
-        mp = ep->getEdgeLock()->getFVMutex();
+        MutexPtr = Edge->getEdgeLock()->getFVMutex();
         break;
       case SV:
-        mp = ep->getEdgeLock()->getSVMutex();
+        MutexPtr = Edge->getEdgeLock()->getSVMutex();
         break;
       case FNE:
-        mp = ep->getEdgeLock()->getFNEMutex();
+        MutexPtr = Edge->getEdgeLock()->getFNEMutex();
         break;
       case FPE:
-        mp = ep->getEdgeLock()->getFPEMutex();
+        MutexPtr = Edge->getEdgeLock()->getFPEMutex();
         break;
       case SNE:
-        mp = ep->getEdgeLock()->getSNEMutex();
+        MutexPtr = Edge->getEdgeLock()->getSNEMutex();
         break;
       case SPE:
-        mp = ep->getEdgeLock()->getSPEMutex();
+        MutexPtr = Edge->getEdgeLock()->getSPEMutex();
         break;
       default:
         std::cerr << "ERROR: No such Mutex in EdgeLock\n";
         exit(0);
-    }//END_SWITCH
-    switch (lt) {   
+    }
+    switch (Lock) {   
       case SH:
-        return mp->try_lock_shared();
+        return MutexPtr->try_lock_shared();
       case EX:
-        return mp->try_lock(); 
+        return MutexPtr->try_lock(); 
       default:
         std::cerr  << "ERROR: No such Mutex in EdgeLock\n";
         exit(0);
     }
   }
 
-  auto releaseEdgeLock(unsigned int id, MutexType mt, LockType lt) 
+  auto releaseEdgeLock(EdgePtr Edge, MutexType Mutex, LockType Lock) 
     -> bool {
-    EdgePtr ep = graph.getEdgePointer(id);
-    if (ep == nullptr) {
+    if (Edge == nullptr) {
       exit(0);
     }
-    MutexPointer mp(nullptr);
-    switch(mt) {
+    MutexPointer MutexPtr = nullptr;
+    switch (Mutex) {
       case ID:
-        mp = ep->getEdgeLock()->getIdMutex();
+        MutexPtr = Edge->getEdgeLock()->getIdMutex();
         break;
       case Pp:
-        mp = ep->getEdgeLock()->getPpMutex();
+        MutexPtr = Edge->getEdgeLock()->getPpMutex();
         break;
       case FV:
-        mp = ep->getEdgeLock()->getFVMutex();
+        MutexPtr = Edge->getEdgeLock()->getFVMutex();
         break;
       case SV:
-        mp = ep->getEdgeLock()->getSVMutex();
+        MutexPtr = Edge->getEdgeLock()->getSVMutex();
         break;
       case FNE:
-        mp = ep->getEdgeLock()->getFNEMutex();
+        MutexPtr = Edge->getEdgeLock()->getFNEMutex();
         break;
       case FPE:
-        mp = ep->getEdgeLock()->getFPEMutex();
+        MutexPtr = Edge->getEdgeLock()->getFPEMutex();
         break;
       case SNE:
-        mp = ep->getEdgeLock()->getSNEMutex();
+        MutexPtr = Edge->getEdgeLock()->getSNEMutex();
         break;
       case SPE:
-        mp = ep->getEdgeLock()->getSPEMutex();
+        MutexPtr = Edge->getEdgeLock()->getSPEMutex();
         break;
       default:
         std::cerr << "ERROR: No such Mutex in EdgeLock\n";
         exit(0);
-    }//END_SWITCH
+    }
 
-    switch (lt) {   
+    switch (Lock) {   
       case SH:
-        mp->unlock_shared();
+        MutexPtr->unlock_shared();
         break;
       case EX:
-        mp->unlock(); 
+        MutexPtr->unlock(); 
         break;
       default:
         std::cerr << "ERROR: No such Mutex in EdgeLock\n";
@@ -504,72 +497,70 @@ public:
     return true;
   }
 
-  auto releaseEdgeAll(LockListType & EdgeLocks) 
+  auto releaseEdgeAll(ELockListType & EdgeLocks) 
     -> void {
-    auto itend = EdgeLocks.end();
-    for ( auto it = EdgeLocks.begin(); it != itend; ++it) {
-      releaseEdgeLock((*it).first, 
-          (*it).second.first, (*it).second.second);
+    for (auto it = EdgeLocks.begin(), it_end = EdgeLocks.end();
+        it != it_end; ++it) {
+      releaseEdgeLock((*it).first,(*it).second.first, (*it).second.second);
     }
   }
 
-  auto releaseVertexAll(LockListType & VertexLocks) 
+  auto releaseVertexAll(VLockListType & VertexLocks) 
     -> void {
-    auto itend = VertexLocks.end();
-    for ( auto it = VertexLocks.begin(); it != itend; ++it) {
+    for (auto it = VertexLocks.begin(), it_end = VertexLocks.end(); 
+        it != it_end; ++it) {
       releaseVertexLock((*it).first, 
           (*it).second.first, (*it).second.second);
     }
   }
 
-  auto releaseAll(LockListType & VertexLocks, LockListType & EdgeLocks) 
+  auto releaseAll(VLockListType & VertexLocks, ELockListType & EdgeLocks) 
     -> void {
       releaseVertexAll(VertexLocks);
       releaseEdgeAll(EdgeLocks);
   }
 
 
-  auto addToVertexLockMap(unsigned int id) 
+  auto addToVertexLockMap(unsigned int VertexId) 
     -> void  {
-      VertexPtr vp = graph.getVertexPointer(id);
-      if ( vp == nullptr) {
-        std::cerr  << "Error : No such vertex " << id <<" in map \n";
+      VertexPtr Vertex = Graph.getVertexPointer(VertexId);
+      if (Vertex == nullptr) {
+        std::cerr  << "Error : No such vertex " << VertexId <<" in map \n";
         exit(0);
       }
 
       VertexLock* NewVertexLock = new VertexLock();
-      vp->setVertexLock(NewVertexLock);
+      Vertex->setVertexLock(NewVertexLock);
     }
 
-  auto addToEdgeLockMap(unsigned int id) 
+  auto addToEdgeLockMap(unsigned int EdgeId) 
     -> void  {
-      EdgePtr ep = graph.getEdgePointer(id);
-      if ( ep == nullptr) {
-        std::cerr  << "Error : No such edge" << id <<" in map \n";
+      EdgePtr Edge = Graph.getEdgePointer(EdgeId);
+      if (Edge == nullptr) {
+        std::cerr  << "Error : No such edge" << EdgeId <<" in map \n";
         exit(0);
       }
-
       EdgeLock*  NewEdgeLock = new EdgeLock();
-      ep->setEdgeLock(NewEdgeLock);
+      Edge->setEdgeLock(NewEdgeLock);
   }
  
-  auto buildLockMap(GraphType & graph) 
+  auto buildLockMap(GraphType & Graph) 
   -> void {
     typedef GraphType::VertexPointer VertexPointer;
     typedef GraphType::EdgePointer EdgePointer;
     std::map<unsigned int, VertexPointer> VertexMap;
     std::map<unsigned int, EdgePointer> EdgeMap;
-    VertexMap = graph.getVertexMap();
-    EdgeMap = graph.getEdgeMap();
+    VertexMap = Graph.getVertexMap();
+    EdgeMap = Graph.getEdgeMap();
 
-    for(auto iter = VertexMap.begin();
-        iter != VertexMap.end(); iter++) {
+    for (auto iter = VertexMap.begin(), iter_end = VertexMap.end();
+        iter != iter_end; iter++) {
       VertexLock* NewVertexLock = new VertexLock();
       (*iter).second->setVertexLock(NewVertexLock); 
     }
 
-    for(auto it = EdgeMap.begin();
-        it != EdgeMap.end(); it++) {
+    for (auto it = EdgeMap.begin(), it_end = EdgeMap.end();
+        it != it_end; it++) {
       EdgeLock* NewEdgeLock = new EdgeLock();
       (*it).second->setEdgeLock(NewEdgeLock);
     }
@@ -578,10 +569,10 @@ public:
 
 protected:
 #ifndef _LOCKING_
-  VLockMapType VertexLockMap;
-  ELockMapType EdgeLockMap;
+  VertexLockMapType VertexLockMap;
+  EdgeLockMapType EdgeLockMap;
 #else 
-  GraphType & graph;
+  GraphType & Graph;
 #endif
     
 };

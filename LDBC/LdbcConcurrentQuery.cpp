@@ -11,6 +11,7 @@
 /// \brief This is the query class for LDBC derived from LDBCConcurrnetQuery.
 ///
 //===----------------------------------------------------------------------===//
+
 #include <vector>
 #include <string>
 #include <time.h>
@@ -25,31 +26,28 @@
 class LdbcQuery1 : public LdbcQuery {
   using LdbcQuery::LdbcQuery;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
+
+  void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
       LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 1================\n";
     getStartTime();  
-    Filter tmpFilter;
+    Filter TmpFilter;
     Filter NameFilter;
     filtProperty(ParamPair.first, ParamPair.second, NameFilter); 
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter);
-    LimitedDepthVisitor  v1;
+    traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
+    LimitedDepthVisitor  DepthVisitor;
     for (auto i = 0; i < 3; i++) {
-      v1.setFilter(tmpFilter);
+      DepthVisitor.setFilter(TmpFilter);
     }
-    v1.setNameFilter(NameFilter);
-    v1.setDepth(3);
-    ConcurrentBFS Cbfs; 
-    Cbfs.breadthFirstSearch(graph, startVertex, v1, LockManager);
+    DepthVisitor.setNameFilter(NameFilter);
+    DepthVisitor.setDepth(3);
+    ConcurrentBFS CcBfs; 
+    CcBfs.breadthFirstSearch(Graph, StartVertex, DepthVisitor, LockManager);
 
 #ifdef _PRINTLOG_
-    auto target = v1.getVertexTargetList(); 
-    LdbcFile << startVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< endl;
-    for(auto it = target.begin(); it != target.end(); ++it) {
-      LdbcFile << endl;
-    } 
+    auto target = DepthVisitor.getVertexTargetList(); 
+    LdbcFile << StartVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< endl;
 #endif
-    Cbfs.releaseAll(LockManager);
+    CcBfs.releaseAll(LockManager);
     getExecTime();
     LdbcFile.close();
   }
@@ -58,42 +56,41 @@ public:
 class LdbcQuery2 : public LdbcQuery {
   using LdbcQuery::LdbcQuery;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
+
+  void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
       LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 2================\n";
     getStartTime();  
-    Filter tmpFilter[3];
-    traverseThroughMultiRelType("KNOWS", tmpFilter[0]); 
-    traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", tmpFilter[1]); 
-//  tmpFilter[2].setValueRange("creationDate", "", "2012-07-16T10:00:00.255"); 
-    tmpFilter[2].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
+    Filter TmpFilter[3];
+    traverseThroughMultiRelType("KNOWS", TmpFilter[0]); 
+    traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", TmpFilter[1]); 
+    TmpFilter[2].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
    
-    MultiRelTypeVisitor v2;
-    v2.setFilter(tmpFilter[0]);
-    v2.setFilter(tmpFilter[1]);
-    v2.setRangeFilter(tmpFilter[2]);
-    v2.setDepth(2);
-    v2.setDepthToCheckRange(2);
-    v2.setPropToCheck(2); //check date
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, v2, LockManager);
+    MultiRelTypeVisitor TypeVisitor;
+    TypeVisitor.setFilter(TmpFilter[0]);
+    TypeVisitor.setFilter(TmpFilter[1]);
+    TypeVisitor.setRangeFilter(TmpFilter[2]);
+    TypeVisitor.setDepth(2);
+    TypeVisitor.setDepthToCheckRange(2);
+    //check date
+    TypeVisitor.setPropToCheck(2); 
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, TypeVisitor, LockManager);
 
 #ifdef _PRINTLOG_
-    auto target = v2.getVertexTargetList();
-    auto targets = v2.getTargetsMap();
-//    LdbcFile << startVertex, LockManagerType startVertex  LockManager<< " has friends made " << target.size() << " comments and posts \n";
+    auto target = TypeVisitor.getVertexTargetList();
+    auto targets = TypeVisitor.getTargetsMap();
+    LdbcFile << StartVertex << " has friends made " << target.size() << " comments and posts \n";
     for(auto it = targets.begin(); it != targets.end(); ++it) {
-      LdbcFile <<"person " << (*it).second->getPropertyValue("id").first << "\t" <<"comments/posts " << (*it).first->getPropertyValue("id").first << "\t" << (*it).first->getPropertyValue("creationDate").first ;
+      LdbcFile <<"person " << (*it).first->getId() << " " << (*it).second->getPropertyValue("id").first << "\t" <<"comments/posts " << (*it).first->getPropertyValue("id").first << "\t" << (*it).first->getPropertyValue("creationDate").first ;
       LdbcFile << endl;
-        }
+    }
 #endif
 
-    Cbfs.releaseAll(LockManager);
+    CcBfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
   }
 };
-
 
 class LdbcQuery3 : public LdbcQuery {
   using LdbcQuery::LdbcQuery;
@@ -101,23 +98,24 @@ public:
   typedef map<VertexPointer, vector<VertexPointer>> PersonListMapType;
   typedef pair<VertexPointer, vector<VertexPointer>> PersonListPair;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
-      LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 3================\n";
-    getStartTime();  
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter);
 
-    SingleRelTypeVisitor v3;
-    v3.setFilter(tmpFilter);
-    ///cannot be deleted
-    v3.setFilter(tmpFilter);
-    v3.setDepth(2);
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, v3, LockManager);
-    auto target = v3.getVertexTargetList();
+  void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
+      LockManagerType & LockManager) {
+    getStartTime();  
+    Filter TmpFilter;
+    traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
+
+    SingleRelTypeVisitor SingleVisitor;
+    SingleVisitor.setFilter(TmpFilter);
+    ///Do NOT delete
+    SingleVisitor.setFilter(TmpFilter);
+    SingleVisitor.setDepth(2);
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, SingleVisitor, LockManager);
+    auto target = SingleVisitor.getVertexTargetList();
+
 #ifdef _PRINTLOG_
-    LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+    LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
 #endif
 
     Filter FilterSet[4];
@@ -129,17 +127,17 @@ public:
     FilterSet[3].setProperty("name", country2);
     
     auto it = target.begin(); 
-    while(it != target.end()) {
-      VertexPropertyRangeVisitor vp3;
-      vp3.setFilter(FilterSet[0]);
-      vp3.setFilter(FilterSet[1]);
-      vp3.setVertexFilters(FilterSet[2]);
-      vp3.setVertexFilters(FilterSet[3]);
-      vp3.setDepth(2);
-      vp3.setDepthToCheckVertexProp(2);
-      auto startVertex = (*it)->getId();
-      Cbfs.breadthFirstSearch(graph, startVertex, vp3, LockManager);
-      if(vp3.getIncludeState() == false) {
+    while (it != target.end()) {
+      VertexPropertyRangeVisitor RangeVisitor;
+      RangeVisitor.setFilter(FilterSet[0]);
+      RangeVisitor.setFilter(FilterSet[1]);
+      RangeVisitor.setVertexFilters(FilterSet[2]);
+      RangeVisitor.setVertexFilters(FilterSet[3]);
+      RangeVisitor.setDepth(2);
+      RangeVisitor.setDepthToCheckVertexProp(2);
+      auto StartVertex = (*it)->getId();
+      CcBfs.breadthFirstSearch(Graph, StartVertex, RangeVisitor, LockManager);
+      if (RangeVisitor.getIncludeState() == false) {
         target.erase(it);
       }
       else {
@@ -155,30 +153,32 @@ public:
     Filters[3].setProperty("name", country1); 
     Filters[4].setProperty("name", country2); 
     
-    for (auto it = target.begin(); it != target.end(); it++) {
-      VertexPropertyRangeVisitor vpr3;
-      vpr3.setFilter(Filters[0]);
-      vpr3.setFilter(Filters[2]);
-      vpr3.setRangeFilter(Filters[1]);
-      vpr3.setVertexFilters(Filters[4]);
-      vpr3.setVertexFilters(Filters[3]);
-      vpr3.setDepth(2);
-      vpr3.setDepthToCheckRange(2);
-      vpr3.setPropToCheck(2);
-      vpr3.setDepthToCheckVertexProp(2);
-      auto startVertex = (*it)->getId();
-      Cbfs.breadthFirstSearch(graph, startVertex, vpr3, LockManager);
-      auto targetList = vpr3.getVertexTargetList();
+    for (auto it = target.begin(), it_end = target.end(); 
+        it != it_end; it++) {
+      VertexPropertyRangeVisitor RangeVisitor;
+      RangeVisitor.setFilter(Filters[0]);
+      RangeVisitor.setFilter(Filters[2]);
+      RangeVisitor.setRangeFilter(Filters[1]);
+      RangeVisitor.setVertexFilters(Filters[4]);
+      RangeVisitor.setVertexFilters(Filters[3]);
+      RangeVisitor.setDepth(2);
+      RangeVisitor.setDepthToCheckRange(2);
+      RangeVisitor.setPropToCheck(2);
+      RangeVisitor.setDepthToCheckVertexProp(2);
+      auto StartVertex = (*it)->getId();
+      CcBfs.breadthFirstSearch(Graph, StartVertex, RangeVisitor, LockManager);
+      auto targetList = RangeVisitor.getVertexTargetList();
       PersonListMap.insert(PersonListPair((*it), targetList));
     }
 
 #ifdef _PRINTLOG_
-    for(auto it = PersonListMap.begin(); it != PersonListMap.end(); ++it) {
-      LdbcFile <<"friend " << (*it).first->getPropertyValue("firstName").first  << " has " <<(*it).second.size() << " commmets/posts made in " << country1 << " or " << country2 << endl; 
+    for(auto it = PersonListMap.begin(), it_end = PersonListMap.begin(); 
+        it != it_end; ++it) {
+      LdbcFile << "friend " << (*it).first->getPropertyValue("firstName").first  << " has " <<(*it).second.size() << " commmets/posts made in " << country1 << " or " << country2 << endl; 
     }
 #endif
 
-    Cbfs.releaseAll(LockManager);
+    CcBfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
   }
@@ -187,36 +187,37 @@ public:
 class LdbcQuery4 : public LdbcQuery {
   using LdbcQuery::LdbcQuery;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
+
+  void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
       LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 4================\n";
     getStartTime();  
-    Filter tmpFilter[4];
-    traverseThroughMultiRelType("KNOWS", tmpFilter[0]); 
-    traverseThroughMultiRelType("POST_HAS_CREATOR", tmpFilter[1]); 
-    traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[2]); 
-    tmpFilter[3].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
+    Filter TmpFilter[4];
+    traverseThroughMultiRelType("KNOWS", TmpFilter[0]); 
+    traverseThroughMultiRelType("POST_HAS_CREATOR", TmpFilter[1]); 
+    traverseThroughMultiRelType("POST_HAS_TAG", TmpFilter[2]); 
+    TmpFilter[3].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
    
-    MultiResultVisitor v4;
-    v4.setFilter(tmpFilter[0]);
-    v4.setFilter(tmpFilter[1]);
-    v4.setFilter(tmpFilter[2]);
-    v4.setRangeFilter(tmpFilter[3]);
-    v4.setDepth(3);
-    v4.setDepthToCheckRange(2);
-    v4.setPropToCheck(1); //check time
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, v4, LockManager);
+    MultiResultVisitor ResultsVisitor;
+    ResultsVisitor.setFilter(TmpFilter[0]);
+    ResultsVisitor.setFilter(TmpFilter[1]);
+    ResultsVisitor.setFilter(TmpFilter[2]);
+    ResultsVisitor.setRangeFilter(TmpFilter[3]);
+    ResultsVisitor.setDepth(3);
+    ResultsVisitor.setDepthToCheckRange(2);
+    ResultsVisitor.setPropToCheck(1); //check time
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, ResultsVisitor, LockManager);
 
 #ifdef _PRINTLOG_
-    auto targets = v4.getReturnResultMap();
-    LdbcFile << startVertex << " has friends made posts of " << targets.size() << " tags\n";
-    for(auto it = targets.begin(); it != targets.end(); ++it) {
+    auto targets = ResultsVisitor.getReturnResultMap();
+    LdbcFile << StartVertex << " has friends made posts of " << targets.size() << " tags\n";
+    for(auto it = targets.begin(), it_end = targets.end(); 
+        it != it_end; ++it) {
       LdbcFile <<"tags " << (*it).first->getPropertyValue("id").first << "\t" <<"num of posts " << (*it).second <<  endl;
     }
 #endif
 
-    Cbfs.releaseAll(LockManager);
+    CcBfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
   }
@@ -228,24 +229,24 @@ public:
   typedef map<VertexPointer, vector<VertexPointer>> PersonListMapType;
   typedef pair<VertexPointer, vector<VertexPointer>> PersonListPair;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
+
+  void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
       LockManagerType & LockManager) {
-    LdbcFile << "===============Query 5================\n";
     getStartTime();  
-    Filter tmpFilter[2];
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
+    Filter TmpFilter[2];
+    traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
+    traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[1]);
 
-    SingleRelTypeVisitor v5;
-    v5.setFilter(tmpFilter[0]);
-    v5.setFilter(tmpFilter[1]);
-    v5.setDepth(2);
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, v5, LockManager);
+    SingleRelTypeVisitor SingleVisitor;
+    SingleVisitor.setFilter(TmpFilter[0]);
+    SingleVisitor.setFilter(TmpFilter[1]);
+    SingleVisitor.setDepth(2);
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, SingleVisitor, LockManager);
 
-    auto target = v5.getVertexTargetList();
+    auto target = SingleVisitor.getVertexTargetList();
 #ifdef _PRINTLOG_
-    LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+    LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
 #endif
 
     Filter Filters[4];
@@ -254,36 +255,40 @@ public:
     traverseThroughMultiRelType("CONTAINER_OF",Filters[2]); 
     traverseThroughMultiRelType("POST_HAS_CREATOR",Filters[3]); 
     vector<Filter> VertexFilter;
-    for(auto iter = target.begin(); iter != target.end(); iter++) {
+    for (auto iter = target.begin(), iter_end = target.end(); 
+        iter != iter_end; iter++) {
       Filter newFilter;
       newFilter.setProperty("id", (*iter)->getPropertyValue("id").first.std_str());
       VertexFilter.push_back(newFilter);
     }
 
     map<VertexPointer, unsigned int> targetMap;
-    for(auto it = target.begin(); it != target.end(); it++) {
-      MultiPropertyVisitor mpv5;
-      mpv5.setFilter(Filters[0]);
-      mpv5.setFilter(Filters[2]);
-      mpv5.setFilter(Filters[3]);
-      mpv5.setRangeFilter(Filters[1]);
-      mpv5.setVertexFilterList(VertexFilter);
-      mpv5.setDepth(3);
-      mpv5.setDepthToCheckVertexProp(3);
-      mpv5.setDepthToCheckRange(1);
-      mpv5.setPropToCheck(2); //check date 
-      auto startVertex = (*it)->getId();
-      Cbfs.breadthFirstSearch(graph, startVertex, mpv5, LockManager);
-      targetMap.insert(mpv5.getResultMap().begin(), mpv5.getResultMap().end());
+    for (auto it = target.begin(), it_end = target.end(); 
+        it != it_end; it++) {
+      MultiPropertyVisitor PropertiesVisitor;
+      PropertiesVisitor.setFilter(Filters[0]);
+      PropertiesVisitor.setFilter(Filters[2]);
+      PropertiesVisitor.setFilter(Filters[3]);
+      PropertiesVisitor.setRangeFilter(Filters[1]);
+      PropertiesVisitor.setVertexFilterList(VertexFilter);
+      PropertiesVisitor.setDepth(3);
+      PropertiesVisitor.setDepthToCheckVertexProp(3);
+      PropertiesVisitor.setDepthToCheckRange(1);
+      PropertiesVisitor.setPropToCheck(2); //check date 
+      auto StartVertex = (*it)->getId();
+      CcBfs.breadthFirstSearch(Graph, StartVertex, PropertiesVisitor, LockManager);
+      targetMap.insert(PropertiesVisitor.getResultMap().begin(), 
+          PropertiesVisitor.getResultMap().end());
     }
 
 #ifdef _PRINTLOG_
-     for(auto it = targetMap.begin(); it != targetMap.end(); ++it) {
-      if((*it).second != 0)
+     for (auto it = targetMap.begin(), it_end = targetMap.end(); 
+         it != it_end; ++it) {
+      if (!(*it).second)
         LdbcFile <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< endl; 
     }
 #endif
-    Cbfs.releaseAll(LockManager);
+    CcBfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
   }
@@ -295,28 +300,26 @@ public:
   typedef map<VertexPointer, vector<VertexPointer>> PersonListMapType;
   typedef pair<VertexPointer, vector<VertexPointer>> PersonListPair;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
+
+  void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
       LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 6================\n";
     getStartTime();  
-    Filter tmpFilter[2];
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
+    Filter TmpFilter[2];
+    traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
+    traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[1]);
 
-    SingleRelTypeVisitor v6;
-    v6.setFilter(tmpFilter[0]);
-    v6.setFilter(tmpFilter[1]);
-    v6.setDepth(2);
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, v6, LockManager);
+    SingleRelTypeVisitor SingleVisitor;
+    SingleVisitor.setFilter(TmpFilter[0]);
+    SingleVisitor.setFilter(TmpFilter[1]);
+    SingleVisitor.setDepth(2);
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, SingleVisitor, LockManager);
 
-    auto target = v6.getVertexTargetList();
+    auto target = SingleVisitor.getVertexTargetList();
+
 #ifdef _PRINTLOG_
-    LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+    LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
 #endif
-
-//    auto target = v6.getVertexTargetList();
-//    LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
 
     Filter Filters[3];
     traverseThroughMultiRelType("POST_HAS_CREATOR", Filters[0]); 
@@ -325,25 +328,26 @@ public:
     
     map<string, unsigned int> TagMap; 
     for(auto it = target.begin(); it != target.end(); it++) {
-      SinglePropertyVisitor  vpv6;
-      vpv6.setFilter(Filters[0]);
-      vpv6.setFilter(Filters[1]);
-      vpv6.setVertexFilter(Filters[2]);
-      vpv6.setDepthToCheckVertexProp(2);
-      vpv6.setDepth(2);
-      unsigned int startVertex = (*it)->getId();
-      Cbfs.breadthFirstSearch(graph, startVertex, vpv6, LockManager);
-      auto personMap = vpv6.getPersonMap(); 
-      for(auto it = personMap.begin(); it != personMap.end(); it++) {
-        if((*it).second ) {
-          for(auto iter = vpv6.getResultTargetsMap()[(*it).first].begin(); 
-              iter != vpv6.getResultTargetsMap()[(*it).first].end(); iter++) {
+      SinglePropertyVisitor  SPVisitor;
+      SPVisitor.setFilter(Filters[0]);
+      SPVisitor.setFilter(Filters[1]);
+      SPVisitor.setVertexFilter(Filters[2]);
+      SPVisitor.setDepthToCheckVertexProp(2);
+      SPVisitor.setDepth(2);
+      unsigned int StartVertex = (*it)->getId();
+      CcBfs.breadthFirstSearch(Graph, StartVertex, SPVisitor, LockManager);
+      auto personMap = SPVisitor.getPersonMap(); 
+
+      for (auto it = personMap.begin(), it_end = personMap.end(); 
+          it != it_end; it++) {
+        if ((*it).second ) {
+          for (auto iter = SPVisitor.getResultTargetsMap()[(*it).first].begin();  
+              iter != SPVisitor.getResultTargetsMap()[(*it).first].end(); iter++) {
             // (*iter) --> Tag id (string)
-            if(TagMap.find(*iter) == TagMap.end()) {
+            if (TagMap.find(*iter) == TagMap.end()) {
               TagMap.insert(pair<string, unsigned int>((*iter), 1));
             } else {
               TagMap[*iter]++;
-//              LdbcFile << (*iter) << " with " << TagMap[*iter] << " posts \n";
             }
           }
         }
@@ -351,12 +355,13 @@ public:
     }
  
 #ifdef _PRINTLOG_
-    for (auto it = TagMap.begin(); it != TagMap.end(); it++) {
+    for (auto it = TagMap.begin(), it_end = TagMap.end(); 
+        it != it_end; it++) {
       LdbcFile << "Tag " << (*it).first << " has " << (*it).second << " posts\n";
     }
 #endif
 
-    Cbfs.releaseAll(LockManager);
+    CcBfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
   }
@@ -368,53 +373,57 @@ public:
   typedef map<VertexPointer, vector<VertexPointer>> PersonListMapType;
   typedef pair<VertexPointer, vector<VertexPointer>> PersonListPair;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
-      LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 7================\n";
-    getStartTime();  
-    Filter tmpFilter[2];
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
 
-    SingleRelTypeVisitor v7;
-    v7.setFilter(tmpFilter[0]);
-    v7.setDepth(1);
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, v7, LockManager);
-    auto target = v7.getVertexTargetList();
+    void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
+      LockManagerType & LockManager) {
+    getStartTime();  
+    Filter TmpFilter[2];
+    traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
+
+    SingleRelTypeVisitor RelVisitor;
+    RelVisitor.setFilter(TmpFilter[0]);
+    RelVisitor.setDepth(1);
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, RelVisitor, LockManager);
+    auto target = RelVisitor.getVertexTargetList();
     vector<Filter> VertexFilter;
-    for(auto iter = target.begin(); iter != target.end(); iter++) {
+    for (auto iter = target.begin(); iter != target.end(); iter++) {
       Filter newFilter;
       newFilter.setProperty("id", (*iter)->getPropertyValue("id").first.std_str());
       VertexFilter.push_back(newFilter);
     }
+
 #ifdef _PRINTLOG_
-    LdbcFile << startVertex << " is connected with " << target.size() << " friends" << endl;
+    LdbcFile << StartVertex << " is connected with " << target.size() << " friends" << endl;
 #endif
+
     Filter Filters[2];
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]); 
     traverseThroughMultiRelType("LIKES_COMMENT+LIKES_POST", Filters[1]); 
-    VertexMatchVisitor vmv7;
-    vmv7.setFilter(Filters[0]);
-    vmv7.setFilter(Filters[1]);
-    vmv7.setDepth(2);
-    vmv7.setVertexFilterList(VertexFilter);
-    vmv7.setDepthToCheckVertexProp(2);
-    vmv7.setDepthToCompareTime(2);
-    Cbfs.breadthFirstSearch(graph, startVertex, vmv7, LockManager);
+    VertexMatchVisitor MatchVisitor;
+    MatchVisitor.setFilter(Filters[0]);
+    MatchVisitor.setFilter(Filters[1]);
+    MatchVisitor.setDepth(2);
+    MatchVisitor.setVertexFilterList(VertexFilter);
+    MatchVisitor.setDepthToCheckVertexProp(2);
+    MatchVisitor.setDepthToCompareTime(2);
+    CcBfs.breadthFirstSearch(Graph, StartVertex, MatchVisitor, LockManager);
  
 #ifdef _PRINTLOG_
-    auto targetsMap = vmv7.getTimeMap();
-    for(auto it = targetsMap.begin(); it != targetsMap.end(); it++) {
+    auto targetsMap = MatchVisitor.getTimeMap();
+    for (auto it = targetsMap.begin(), it_end = targetsMap.end(); 
+        it != it_end; it++) {
       LdbcFile << (*it).first->getPropertyValue("firstName").first << "\t" << (*it).first->getPropertyValue("id").first<< " likes comment/posts at " << (*it).second << endl; 
     }
-    auto personMap = vmv7.getPersonMap();
-    for(auto it = personMap.begin(); it != personMap.end(); it++)  {
-      if((*it).second == true) 
+    auto personMap = MatchVisitor.getPersonMap();
+    for (auto it = personMap.begin(), it_end = personMap.end(); 
+        it != it_end; it++)  {
+      if ((*it).second) 
         LdbcFile << "comment/post " << (*it).first->getPropertyValue("id").first << " are made by friend\n" ;
     }
 #endif
 
-    Cbfs.releaseAll(LockManager);
+    CcBfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
   }
@@ -423,32 +432,33 @@ public:
 class LdbcQuery8 : public LdbcQuery {
   using LdbcQuery::LdbcQuery;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
+  
+  void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
       LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 8================\n";
     getStartTime();  
     Filter Filters[3];
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]); 
     traverseThroughMultiRelType("REPLY_OF_COMMENT+REPLY_OF_POST", Filters[1]); 
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR", Filters[2]); 
 
-    TimeCompareVisitor v8;
-    v8.setFilter(Filters[0]);
-    v8.setFilter(Filters[1]);
-    v8.setFilter(Filters[2]);
-    v8.setDepth(3);
-    v8.setDepthToCompareTime(2);
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, v8, LockManager);
+    TimeCompareVisitor TimeVisitor;
+    TimeVisitor.setFilter(Filters[0]);
+    TimeVisitor.setFilter(Filters[1]);
+    TimeVisitor.setFilter(Filters[2]);
+    TimeVisitor.setDepth(3);
+    TimeVisitor.setDepthToCompareTime(2);
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, TimeVisitor, LockManager);
  
 #ifdef _PRINTLOG_
-    auto vertexMap = v8.getVertexMap();
-    for(auto it = vertexMap.begin(); it != vertexMap.end(); it++) {
+    auto vertexMap = TimeVisitor.getVertexMap();
+    for (auto it = vertexMap.begin(), it_end = vertexMap.end(); 
+        it != it_end; it++) {
       LdbcFile << "Person " << (*it).second->getPropertyValue("firstName").first << " made replies " << (*it).first->getPropertyValue("id").first << " at " << (*it).first->getPropertyValue("creationDate").first << " to startperson's posts/comments\n";
     }
 #endif
 
-    Cbfs.releaseAll(LockManager);
+    CcBfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
   }
@@ -460,23 +470,24 @@ public:
   typedef map<VertexPointer, VertexPointer> ReturnMapType;
   typedef pair<VertexPointer, VertexPointer> ReturnMapPair;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
-      LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 9================\n";
-    getStartTime();  
-    Filter tmpFilter[2];
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
-    SingleRelTypeVisitor v9;
-    v9.setFilter(tmpFilter[0]);
-    v9.setFilter(tmpFilter[1]);
-    v9.setDepth(2);
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, v9, LockManager);
 
-    auto target = v9.getVertexTargetList();
+  void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
+      LockManagerType & LockManager) {
+    getStartTime();  
+    Filter TmpFilter[2];
+    traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
+    traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[1]);
+    SingleRelTypeVisitor RelVisitor;
+    RelVisitor.setFilter(TmpFilter[0]);
+    RelVisitor.setFilter(TmpFilter[1]);
+    RelVisitor.setDepth(2);
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, RelVisitor, LockManager);
+
+    auto target = RelVisitor.getVertexTargetList();
+
 #ifdef _PRINTLOG_
-    LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+    LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
 #endif
 
     Filter Filters[2];
@@ -484,29 +495,33 @@ public:
     Filters[1].setValueRange("creationDate", "", "2011-07-16T23:59:00.255"); 
           
     ReturnMapType TargetsMap; 
-    for(auto it = target.begin(); it != target.end(); ++it) {
+    for (auto it = target.begin(), it_end = target.end(); 
+        it != it_end; ++it) {
+
 #ifdef _PRINTLOG_
       LdbcFile <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << endl; 
 #endif
-      MultiRelTypeVisitor sv9;
-      sv9.setFilter(Filters[0]);
-      sv9.setRangeFilter(Filters[1]);
-      sv9.setDepth(1);
-      sv9.setDepthToCheckRange(1);
-      sv9.setPropToCheck(2); //check date 
-      unsigned int startVertex = (*it)->getId();
-      Cbfs.breadthFirstSearch(graph, startVertex, sv9, LockManager);
-      auto targets = sv9.getTargetsMap();
+
+      MultiRelTypeVisitor RelVisitor;
+      RelVisitor.setFilter(Filters[0]);
+      RelVisitor.setRangeFilter(Filters[1]);
+      RelVisitor.setDepth(1);
+      RelVisitor.setDepthToCheckRange(1);
+      RelVisitor.setPropToCheck(2); //check date 
+      unsigned int StartVertex = (*it)->getId();
+      CcBfs.breadthFirstSearch(Graph, StartVertex, RelVisitor, LockManager);
+      auto targets = RelVisitor.getTargetsMap();
       TargetsMap.insert(targets.begin(), targets.end());
    }
  
 #ifdef _PRINTLOG_
-    for(auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
+    for (auto iter = TargetsMap.begin(), iter_end = TargetsMap.end(); 
+        iter != iter_end; ++iter) {
       LdbcFile << "posts/comments " << (*iter).first->getPropertyValue("id").first << "\t" << (*iter).first->getPropertyValue("creationDate").first << " made by person " << (*iter).second->getPropertyValue("id").first << "\t" <<  (*iter).second->getPropertyValue("firstName").first << endl;
     }
 #endif
 
-    Cbfs.releaseAll(LockManager);
+    CcBfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
   }
@@ -517,44 +532,37 @@ class LdbcQuery10 : public LdbcQuery {
 public:
   typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex,
+
+    void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
       LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 10================\n";
     getStartTime();  
     ///first find start person's friends
-    AdjacencyVisitor av1; 
-    traverseThroughTypeAndDirection("KNOWS", "out", av1.getFilter());
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, av1, LockManager);
-    auto startId = graph.getVertexPointer(startVertex)->getPropertyValue("id").first.std_str();
-#ifdef _PRINTLOG_
-//    std::cout << "start person id and name " << graph.getVertexPointer(startVertex)->getId() << graph.getVertexPointer(startVertex)->getPropertyValue("firstName").first << "\n";
-//    std::cout << "start person has " << av1.getVertexTargetList().size() << " friends\n";
-#endif
+    AdjacencyVisitor AdjVisitor; 
+    traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, AdjVisitor, LockManager);
+    auto startId = Graph.getVertexPointer(StartVertex)->getPropertyValue("id").first.std_str();
 
     ///find friends of friends of start person
     std::vector<VertexPointer> targets;
     Filter BDFilter;
     BDFilter.setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
-    for (VertexPointer StartVertex : av1.getVertexTargetList()) {
+    for (VertexPointer StartVertex : AdjVisitor.getVertexTargetList()) {
       auto EqualFlag = false; 
-//      std::cout << "frined " << StartVertex->getId() << "\n";
-      if ( checkRange<VertexPointer>(4, StartVertex, BDFilter, EqualFlag) == true ) {
+      if (checkRange<VertexPointer>(4, StartVertex, BDFilter, EqualFlag)){
         SimMap[StartVertex] = 0;
-        AdjacencyVisitor av2; 
-        traverseThroughTypeAndDirection("KNOWS", "out", av2.getFilter());
-        Cbfs.breadthFirstSearch(graph, StartVertex->getId(), av2, LockManager);
+        AdjacencyVisitor AdjVisitor; 
+        traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
+        CcBfs.breadthFirstSearch(Graph, StartVertex->getId(), AdjVisitor, LockManager);
         ///concatenate two lists
-        targets.insert(targets.end(), av2.getVertexTargetList().begin(), 
-          av2.getVertexTargetList().end());
-//      std::cout << "friends " << StartVertex->getId() << " has friend " << av2.getVertexTargetList().size() << "\n";
+        targets.insert(targets.end(),AdjVisitor.getVertexTargetList().begin(),          AdjVisitor.getVertexTargetList().end());
       }
 
     }
 
-    for ( VertexPointer Vertex : targets) {
+    for (VertexPointer Vertex : targets) {
       auto EqualFlag = false; 
-      if ( checkRange<VertexPointer>(4, Vertex, BDFilter, EqualFlag) == true ) {
+      if (checkRange<VertexPointer>(4, Vertex, BDFilter, EqualFlag)) {
         SimMap[Vertex] = 0;
       }
     }
@@ -562,34 +570,34 @@ public:
     ///iterate over the friends who satisfy the condition
     auto itend  = SimMap.end();
     for ( auto it = SimMap.begin(); it != itend; it++ ) {
-      Filter tmpFilter[4];
-      traverseThroughMultiRelType("POST_HAS_CREATOR", tmpFilter[0]); 
-      traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[1]); 
-      traverseThroughMultiRelType("HAS_INTEREST", tmpFilter[2]); 
-      tmpFilter[3].setProperty("id", startId);
+      Filter TmpFilter[4];
+      traverseThroughMultiRelType("POST_HAS_CREATOR", TmpFilter[0]); 
+      traverseThroughMultiRelType("POST_HAS_TAG", TmpFilter[1]); 
+      traverseThroughMultiRelType("HAS_INTEREST", TmpFilter[2]); 
+      TmpFilter[3].setProperty("id", startId);
 
-      SimilarityVisitor v10;
-      v10.setDepth(3);
-      v10.setDepthToCheckVertexProp(3);
-      v10.setVertexFilter(tmpFilter[3]);
+      SimilarityVisitor SimVisitor;
+      SimVisitor.setDepth(3);
+      SimVisitor.setDepthToCheckVertexProp(3);
+      SimVisitor.setVertexFilter(TmpFilter[3]);
       for ( unsigned int i = 0; i < 3; i++ ) {
-        v10.setFilter(tmpFilter[i]);
+        SimVisitor.setFilter(TmpFilter[i]);
       }
-      Cbfs.breadthFirstSearch(graph, (*it).first->getId(), v10, LockManager);
-      auto iterend = v10.getPostMap().end();
+      CcBfs.breadthFirstSearch(Graph, (*it).first->getId(), SimVisitor, LockManager);
+      auto iterend = SimVisitor.getPostMap().end();
       unsigned int PostItrd = 0;
-      for ( auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
+      for ( auto iter = SimVisitor.getPostMap().begin(); 
+          iter != iterend; iter++ ) {
         if ((*iter).second ) { PostItrd++; }
-//        std::cout << "post " << (*iter).first << "\t" << (*iter).second << "\n";
       }
+      SimMap[(*it).first] = 2*PostItrd - SimVisitor.getPostMap().size(); 
 
-      SimMap[(*it).first] = 2*PostItrd - v10.getPostMap().size(); 
 #ifdef _PRINTLOG_
       LdbcFile << "person: " << (*it).first->getId() << " similarity score " << (*it).second << "\n";
 #endif
     }
 
-    Cbfs.releaseAll(LockManager);
+    CcBfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
   }
@@ -605,23 +613,23 @@ public:
   typedef pair<VertexPointer, VertexPointer> ReturnMapPair;
   typedef vector<MatchMapType> ReturnTargetsType;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
+  
+  void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
       LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 11================\n";
     getStartTime();  
-    Filter tmpFilter;
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter);
+    Filter TmpFilter;
+    traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
 
-    SingleRelTypeVisitor v11;
-    v11.setFilter(tmpFilter);
-    v11.setFilter(tmpFilter);
-    v11.setDepth(2);
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, v11, LockManager);
+    SingleRelTypeVisitor RelVisitor;
+    RelVisitor.setFilter(TmpFilter);
+    RelVisitor.setFilter(TmpFilter);
+    RelVisitor.setDepth(2);
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, RelVisitor, LockManager);
 
-    auto target = v11.getVertexTargetList();
+    auto target = RelVisitor.getVertexTargetList();
 #ifdef _PRINTLOG_
-    LdbcFile << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+    LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
 #endif
 
     Filter Filters[4];
@@ -631,31 +639,36 @@ public:
     Filters[3].setProperty(ParamPair.first, ParamPair.second);  
 
     MatchMapType TargetsMap;
-    for(auto it = target.begin(); it != target.end(); ++it) {
+    for(auto it = target.begin(), it_end = target.end(); 
+        it != it_end; ++it) {
+
 #ifdef _PRINTLOG_
       LdbcFile <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << endl; 
 #endif
    
-    VertexPropertyVisitor sv11;
-    sv11.setFilter(Filters[0]);
-    sv11.setFilter(Filters[1]);
-    sv11.setRangeFilter(Filters[2]);
-    sv11.setVertexFilter(Filters[3]);
-    sv11.setDepth(2);
-    sv11.setDepthToCheckRange(1);
-    sv11.setDepthToCheckVertexProp(2);
-    unsigned int startVertex = (*it)->getId();
-    Cbfs.breadthFirstSearch(graph, startVertex, sv11, LockManager);
-    auto targets = sv11.getMatchMap();
+    VertexPropertyVisitor VPVisitor;
+    VPVisitor.setFilter(Filters[0]);
+    VPVisitor.setFilter(Filters[1]);
+    VPVisitor.setRangeFilter(Filters[2]);
+    VPVisitor.setVertexFilter(Filters[3]);
+    VPVisitor.setDepth(2);
+    VPVisitor.setDepthToCheckRange(1);
+    VPVisitor.setDepthToCheckVertexProp(2);
+    unsigned int StartVertex = (*it)->getId();
+    CcBfs.breadthFirstSearch(Graph, StartVertex, VPVisitor, LockManager);
+    auto targets = VPVisitor.getMatchMap();
     TargetsMap.insert(targets.begin(), targets.end());
   }
+
 #ifdef _PRINTLOG_
     FixedString key("workFrom");
-    for(auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
+    for (auto iter = TargetsMap.begin(), iter_end = TargetsMap.end(); 
+        iter != iter_end; ++iter) {
       LdbcFile << (*iter).first->getPropertyValue("firstName").first << " works at "  << (*iter).second.second->getPropertyValue("id").first << " from " << (*iter).second.first->getPropertyValue(key).first << endl;
       }
 #endif
-    Cbfs.releaseAll(LockManager);
+
+    CcBfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
   }
@@ -666,44 +679,44 @@ class LdbcQuery12 : public LdbcQuery {
 public:
   typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
+
+  void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
       LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 12================\n";
     getStartTime();  
     ///first find start person's friends
-    AdjacencyVisitor av1; 
-    traverseThroughTypeAndDirection("KNOWS", "out", av1.getFilter());
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, av1, LockManager);
+    AdjacencyVisitor AdjVisitor; 
+    traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, AdjVisitor, LockManager);
 
     ///find friends of friends of start person
     std::vector<VertexPointer> targets;
-      Filter tmpFilter[6];
-      traverseThroughMultiRelType("COMMENT_HAS_CREATOR", tmpFilter[0]); 
-      traverseThroughMultiRelType("REPLY_OF_POST", tmpFilter[1]); 
-      traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[2]); 
-      traverseThroughMultiRelType("HAS_TYPE", tmpFilter[3]); 
-      traverseThroughMultiRelType("IS_SUBCLASS_OF", tmpFilter[4]); 
-      tmpFilter[5].setProperty(ParamPair.first, ParamPair.second);
+      Filter TmpFilter[6];
+      traverseThroughMultiRelType("COMMENT_HAS_CREATOR", TmpFilter[0]); 
+      traverseThroughMultiRelType("REPLY_OF_POST", TmpFilter[1]); 
+      traverseThroughMultiRelType("POST_HAS_TAG", TmpFilter[2]); 
+      traverseThroughMultiRelType("HAS_TYPE", TmpFilter[3]); 
+      traverseThroughMultiRelType("IS_SUBCLASS_OF", TmpFilter[4]); 
+      TmpFilter[5].setProperty(ParamPair.first, ParamPair.second);
 
-
-    for (VertexPointer StartVertex : av1.getVertexTargetList()) {
-//      std::cout << "friend " << StartVertex->getId() << "\n";
+    for (VertexPointer StartVertex : AdjVisitor.getVertexTargetList()) {
       SimMap[StartVertex] = 0;
 
-      ExpertVisitor v10;
-      v10.setDepth(5);
-      v10.setDepthToCheckVertexProp(4);
-      v10.setVertexFilter(tmpFilter[5]);
+      ExpertVisitor ExpertVisitor;
+      ExpertVisitor.setDepth(5);
+      ExpertVisitor.setDepthToCheckVertexProp(4);
+      ExpertVisitor.setVertexFilter(TmpFilter[5]);
+
       for ( unsigned int i = 0; i < 5; i++ ) {
-        v10.setFilter(tmpFilter[i]);
+        ExpertVisitor.setFilter(TmpFilter[i]);
       }
-      Cbfs.breadthFirstSearch(graph, StartVertex->getId(), v10, LockManager);
-      auto iterend = v10.getPostMap().end();
+
+      CcBfs.breadthFirstSearch(Graph, StartVertex->getId(), 
+          ExpertVisitor, LockManager);
+      auto iterend = ExpertVisitor.getPostMap().end();
       auto PostNum = 0;
-      for ( auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
+      for ( auto iter = ExpertVisitor.getPostMap().begin(); iter != iterend; iter++ ) {
         if ((*iter).second ) { PostNum++; }
-//          std::cout << "post " << (*iter).first << "\t" << (*iter).second << "\n";
       }
 
 #ifdef _PRINTLOG_
@@ -712,7 +725,7 @@ public:
 #endif
   
     }
-    Cbfs.releaseAll(LockManager);
+    CcBfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
   }
@@ -720,32 +733,38 @@ protected:
   SimMapType SimMap;
 };
 
-
 class LdbcQuery13 : public LdbcQuery {
   using LdbcQuery::LdbcQuery;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
+
+  void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
       VertexDescriptor endVertex, LockManagerType & LockManager) {
-//    LdbcFile << "===============Query 13================\n";
+
     getStartTime();  
-    PathVisitor v13;
-    v13.setEndVertex(endVertex);
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, v13, LockManager);
+
+    if ( StartVertex == endVertex ) {
+      std::cerr << "StartVertex == endVertex \n";
+      exit(0);
+    }
+
+    PathVisitor PVisitor;
+    PVisitor.setEndVertex(endVertex);
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, PVisitor, LockManager);
 
 #ifdef _PRINTLOG_
-    auto target = v13.getVertexTargetList();
-    if(target.empty())
-      LdbcFile << startVertex << " and " <<  endVertex <<" are not connected" << endl;
+    auto target = PVisitor.getVertexTargetList();
+    if (target.empty())
+      LdbcFile << StartVertex << " and " <<  endVertex <<" are not connected" << endl;
     else {
-      LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << startVertex << " to " << endVertex << endl;
+      LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << StartVertex << " to " << endVertex << endl;
       for(auto it = target.begin(); it != target.end(); ++it) {
         LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("firstName").first<< endl;
       }
     }
 #endif
 
-    Cbfs.releaseAll(LockManager);
+    CcBfs.releaseAll(LockManager);
     getExecTime();  
     LdbcFile.close();
   }
@@ -755,24 +774,25 @@ public:
 class LdbcQuery14 : public LdbcQuery {
   using LdbcQuery::LdbcQuery;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, 
+  
+  void runQuery(GraphType & Graph, VertexDescriptor StartVertex, 
       VertexDescriptor endVertex, LockManagerType & LockManager ) {
-//    LdbcFile << "===============Query 14================\n";
     getStartTime();  
-    SubGraphVisitor v13;
-    v13.setEndVertex(endVertex);
+    SubGraphVisitor SubgVisitor;
+    SubgVisitor.setEndVertex(endVertex);
     Filter EdgeFilter;
     traverseThroughTypeAndDirection("KNOWS", "out",  EdgeFilter);
-    v13.setEdgeFilter(EdgeFilter);
-    ConcurrentBFS Cbfs;
-    Cbfs.breadthFirstSearch(graph, startVertex, v13, LockManager);
+    SubgVisitor.setEdgeFilter(EdgeFilter);
+    ConcurrentBFS CcBfs;
+    CcBfs.breadthFirstSearch(Graph, StartVertex, SubgVisitor, LockManager);
 
-    auto target = v13.getVertexTargetList();
+    auto target = SubgVisitor.getVertexTargetList();
+
 #ifdef _PRINTLOG_
-    if(target.empty())
-      LdbcFile << startVertex << " and " <<  endVertex <<" are not connected" << endl;
+    if (target.empty())
+      LdbcFile << StartVertex << " and " <<  endVertex <<" are not connected" << endl;
     else {
-      LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << startVertex << " to " << endVertex << endl;
+      LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << StartVertex << " to " << endVertex << endl;
       for(auto it = target.begin(); it != target.end(); ++it) {
         LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first <<"\t" << (*it)->getPropertyValue("firstName").first<< endl;
       }//for
@@ -780,38 +800,35 @@ public:
 #endif
 
   ///already found all the paths, calculate weights now  
-  
   auto itend = target.end();
   float Weight = 0.0;
   for ( auto it = target.begin(); it != itend-1; it++ ) {  
  
-    Filter tmpFilter[4];
-    traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", tmpFilter[0]); 
-    traverseThroughMultiRelType("REPLY_OF_POST+REPLY_OF_COMMENT", tmpFilter[1]); 
-    traverseThroughMultiRelType("POST_HAS_CREATOR+COMMENT_HAS_CREATOR", tmpFilter[2]); 
+    Filter TmpFilter[4];
+    traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", TmpFilter[0]); 
+    traverseThroughMultiRelType("REPLY_OF_POST+REPLY_OF_COMMENT", TmpFilter[1]); 
+    traverseThroughMultiRelType("POST_HAS_CREATOR+COMMENT_HAS_CREATOR", TmpFilter[2]); 
   
-    WeightedPathVisitor v14;
+    WeightedPathVisitor WPathVisitor;
     for ( unsigned int i = 0; i < 3; i++ ) {
-      v14.setFilter(tmpFilter[i]);
+      WPathVisitor.setFilter(TmpFilter[i]);
     }
   
     auto it2 = it+1;
-    tmpFilter[3].setProperty("id",(*it2)->getPropertyValue("id").first.std_str());
-    v14.setVertexFilter(tmpFilter[3]);
-    v14.setDepth(3);
-    Cbfs.breadthFirstSearch(graph, (*it)->getId(), v14, LockManager);
-    Weight += v14.getScore();
+    TmpFilter[3].setProperty("id",(*it2)->getPropertyValue("id").first.std_str());
+    WPathVisitor.setVertexFilter(TmpFilter[3]);
+    WPathVisitor.setDepth(3);
+    CcBfs.breadthFirstSearch(Graph, (*it)->getId(), WPathVisitor, LockManager);
+    Weight += WPathVisitor.getScore();
   } 
 
 #ifdef _PRINTLOG_
   LdbcFile << "weight " << Weight <<"\n";
 #endif
-  Cbfs.releaseAll(LockManager);
+  CcBfs.releaseAll(LockManager);
   getExecTime();  
   LdbcFile.close();
  }//run
-//private:
-//  unsigned int _QueryId;
 };
 
 class Query17 : public LDBCQuery { 
@@ -823,6 +840,7 @@ public:
   typedef std::pair<std::string, GraphType::PropertyListType> EdgePairType;
   typedef std::map<std::pair<std::string, std::string>, EdgePairType> BranchMapType;
 public:
+
   void setValueList(ValueListType & vl) {
     ValueList = vl;
   }
@@ -831,25 +849,25 @@ public:
     BranchMap = bm;
   }
 
-  virtual void runQuery(Graph & graph, TransactionManager & TransM, LockManagerType & LockManager, TMSwitch c) {
-//    LdbcFile << "===============Update Query================\n";
+  virtual void runQuery(GraphType & Graph, LockManagerType & LockManager) {
     getStartTime();  
     //a new vertex vs 
     //need new propertylist for vertex and branchmap (criteria) for searching neighbor 
-    AddNodeVisitor v1(LockManager, graph);
-    v1.setVertexProperty(VertexPropertyList);
-    v1.getFilter().setBranchMap(BranchMap);
-    breadthFirstSearch(graph, 0, v1);
+    AddVisitor AdVisitor(LockManager, Graph);
+    AdVisitor.setVertexProperty(VertexPropertyList);
+    AdVisitor.getFilter().setBranchMap(BranchMap);
+    breadthFirstSearch(Graph, 0, AdVisitor);
 
     getExecTime();  
+    LdbcFile << "Add one more node into network \n";
     LdbcFile.close();
-    //LdbcFile << "Add one more person into network \n";
   }
 protected:
   BranchMapType BranchMap;
   ValueListType ValueList;
 };
 
+/**
 #if _SKIP_
 class Query18 : public LDBCQuery { 
   using LDBCQuery::LDBCQuery;
@@ -868,15 +886,15 @@ public:
     BranchMap = bm;
   }
 
-  virtual void runQuery(Graph & graph, TransactionManager & TransM, LockManagerType & LockManager, TMSwitch c) {
+  virtual void runQuery(GraphType & Graph, TransactionManager & TransM, LockManagerType & LockManager, TMSwitch c) {
 //    LdbcFile << "===============Skip Data================\n";
     getStartTime();  
     //a new vertex vs 
     //need new propertylist for vertex and branchmap (criteria) for searching neighbor 
-    SkipVisitor v1(LockManager, graph);
+    SkipVisitor v1(LockManager, Graph);
     v1.setVertexProperty(VertexPropertyList);
     v1.getFilter().setBranchMap(BranchMap);
-    breadthFirstSearch(graph, 0, v1);
+    breadthFirstSearch(Graph, 0, v1);
 
     getExecTime();  
     LdbcFile.close();
@@ -887,4 +905,6 @@ protected:
   BranchMapType BranchMap;
   ValueListType ValueList;
 };
+
 #endif
+*/
