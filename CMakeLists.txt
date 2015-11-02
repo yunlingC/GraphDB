@@ -57,7 +57,6 @@ set(TESTS
         #        main-translator.cpp
         # main-multithread.cpp
         # main-multigraphs.cpp
-        main-gt.cpp
         )
 
 # This will generate all the executables listed in the TESTS variable
