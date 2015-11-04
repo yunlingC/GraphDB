@@ -23,7 +23,6 @@
 #include <vector>
 #include <map>
 #include <stdlib.h>
-#include <algorithm>
 
 #include "util.h"
 #include "Vertex.h"
@@ -449,7 +448,6 @@ public:
 
     for ( size_t i = 0; i <Edges.size() ; i++ ) {
       Edges[i]->dump();
-      std::cout << "\n";
     }
   }
 
@@ -467,13 +465,10 @@ public:
     delete NodeMemory;
     delete EdgeMemory;
 #else 
-   std::cout << "GraphType: clean " << Vertices.size() << " vertices and " << Edges.size() << " edges\n";
     for ( size_t i=0; i < Vertices.size(); i++ ) {
       Vertices[i]->deleteVertex();
       delete Vertices[i];
     }
-//    std::cout << "vertex cleaning is done\n";
-
 
     for ( size_t i=0; i < Edges.size(); i++ ) {
       Edges[i]->deleteEdge();
@@ -490,18 +485,15 @@ public:
     NodeMemory = new char[sizeof(Vertex)*sz];
     cout << "Vertex Memory\n + Starting address: " << reinterpret_cast<int*>(NodeMemory)
     	 << ", ending address: " << reinterpret_cast<int*>(NodeMemory + sizeof(Vertex)*sz) << "\n";
-
-//    passAddr(NODE, NodeMemory, (NodeMemory + sizeof(Vertex)*sz));
-
   }
 
   void allocEdgeMemory(unsigned int sz) {
+
     // Allocation sz number of Vertex objects.
     cout << "Edge space: " << sizeof(Edge)*sz << "\n";
     EdgeMemory = new char[sizeof(Edge)*sz];
     cout << "Edge Memory\n + Starting address: " << reinterpret_cast<int*>(EdgeMemory) 
     	 << ", ending address: " << reinterpret_cast<int*>(EdgeMemory + sizeof(Edge)*sz) << "\n" << endl;
-//    passAddr(EDGE, EdgeMemory, (EdgeMemory + sizeof(Edge)*sz));
   }
 #endif /* _FIXALLOC_ */
 
@@ -512,14 +504,6 @@ public:
   vector<EdgePointer> getAllEdges(){
     return Edges;
   }
-
-//  void handleAddr(){
-//    VerticesSort = Vertices;
-//    EdgesSort = Edges;
-//    sort(VerticesSort.begin(),VerticesSort.end());
-//  //start prefetching trigger
-//    passPtr(&VerticesSort,0,&EdgesSort,0,0,0);
-//  }
 
 protected:
   /// Hold pointers to all vertices.
@@ -533,6 +517,7 @@ protected:
   /// Keep a count of vertices and edges.
   unsigned int NumberOfVertices;
   unsigned int NumberOfEdges;
+
 
 #ifdef _FIXALLOC_
   char* NodeMemory;
