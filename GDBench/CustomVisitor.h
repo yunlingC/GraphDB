@@ -23,6 +23,45 @@
 
 using namespace std;
 
+/// just for address distribution analysis
+class AddressVisitor : public Visitor {
+public:
+  AddressVisitor() {}
+
+  bool visitVertex(VertexPointer Vertex) {
+    int  diff = reinterpret_cast<int *>(Vertex) - reinterpret_cast<int *>(PrevVertexAddr); 
+    VertexAddrDis.push_back(diff);
+
+    std::cout << "Vertex:  Prev " << reinterpret_cast<int *>(PrevVertexAddr) << "\t"
+              << "Curr " << reinterpret_cast<int *>(Vertex) 
+              << "\tdiff " << diff << std::endl;;
+
+
+    PrevVertexAddr = Vertex;
+    return false;
+  }
+
+  bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
+    int diff = reinterpret_cast<int *>(edge) - reinterpret_cast<int *>(PrevEdgeAddr);
+    EdgeAddrDis.push_back(diff);
+
+    std::cout << "Edge:    Prev " << reinterpret_cast<int *>(PrevEdgeAddr) << "\t"
+              << "Curr " << reinterpret_cast<int *>(edge) 
+              << "\tdiff " << diff << std::endl;;
+
+    PrevEdgeAddr = edge;
+
+    return false;
+  }
+
+protected:
+  VertexPointer PrevVertexAddr;
+  EdgePointer PrevEdgeAddr;
+public:
+  std::vector<int > VertexAddrDis;
+  std::vector<int > EdgeAddrDis;
+};
+
 /// visitor to deal with query of selection : query1 and query 4
 class SelectionVisitor: public Visitor {
 public:
