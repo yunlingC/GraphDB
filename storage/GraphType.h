@@ -386,60 +386,84 @@ public:
   }
 
   ///Support for update on graph
-//  EdgeDescriptor removeEdgeChain(EdgePointer Edge) {
-//    VertexPointer FirstVertex = Edge->getFirstVertexPtr();
-//    VertexPointer SecondVertex = Edge->getSecondVertexPtr();
-//    EdgePointer  FirstNextEdge = Edge->getFirstNextEdge();
-//    EdgePointer  FirstPrevEdge = Edge->getFirstPreviousEdge();
-//    EdgePointer  SecondNextEdge = Edge->getSecondNextEdge();
-//    EdgePointer  SecondPrevEdge = Edge->getSecondPreviousEdge();
-///**    
-//    if(FirstVertex->getNextEdge() != nullptr)
-//    std::cout << "FirstVertex->NextEdge " << FirstVertex->getNextEdge()->getId() << "\n";
-//    if(SecondVertex->getNextEdge() != nullptr)
-//    std::cout << "SecondVertex->NextEdge " << SecondVertex->getNextEdge()->getId() << "\n";
-//    if(FirstNextEdge != nullptr)
-//    std::cout << "FirstNextEdge " << FirstNextEdge->getId() << "\n";
-//    if(FirstPrevEdge != nullptr)
-//    std::cout << "FirstPreviousEdge " << FirstPrevEdge->getId() << "\n";
-//    if(SecondNextEdge != nullptr)
-//    std::cout << "SecondNextEdge " << SecondNextEdge->getId() << "\n";
-//    if(SecondPrevEdge != nullptr)
-//    std::cout << "SecondPrevEdge " << SecondPrevEdge->getId() << "\n";
-//*/
-//    if(Edge == FirstVertex->getNextEdge()) {
-//      FirstVertex->setNextEdge(Edge->getNextEdge(FirstVertex));
-//    }
-//    // Edge is not the first edge of FirstVertex
-//    if(FirstPrevEdge != nullptr) {
-//      FirstPrevEdge->setFirstNextEdge(FirstNextEdge);
-//    }
-//    // Edge is not the last edge of FirstVertex
-//    if(FirstNextEdge != nullptr) {
-//      FirstNextEdge->setFirstPreviousEdge(FirstPrevEdge);
-//    }
-//    // Edge is the only next edge of FirstVertex
-//    if((FirstPrevEdge == nullptr) && (FirstNextEdge == nullptr)) {
-//      FirstVertex->setNextEdge(nullptr); 
-//    }
-//    
-//    /// repeat for the second
-//    if(Edge == SecondVertex->getNextEdge()) {
-//      SecondVertex->setNextEdge(Edge->getNextEdge(SecondVertex));
-//    }
-//    if(SecondPrevEdge != nullptr) {
-//      SecondPrevEdge->setSecondNextEdge(SecondNextEdge);
-//    }
-//    if(SecondNextEdge != nullptr) {
-//      SecondNextEdge->setSecondPreviousEdge(SecondPrevEdge);
-//    }
-//    if((SecondPrevEdge == nullptr) && (SecondNextEdge == nullptr)) {
-//      SecondVertex->setNextEdge(nullptr); 
-//    }
-//
-//    return Edge->getId();
-//  }
-//
+
+  EdgeDescriptor removeEdgeChain(EdgePointer Edge) {
+    VertexPointer FirstVertex = Edge->getFirstVertexPtr();
+    VertexPointer SecondVertex = Edge->getSecondVertexPtr();
+    EdgePointer  FirstNextEdge = Edge->getFirstNextEdge();
+    EdgePointer  FirstPrevEdge = Edge->getFirstPreviousEdge();
+    EdgePointer  SecondNextEdge = Edge->getSecondNextEdge();
+    EdgePointer  SecondPrevEdge = Edge->getSecondPreviousEdge();
+/**    
+    if(FirstVertex->getNextEdge() != nullptr)
+    std::cout << "FirstVertex->NextEdge " << FirstVertex->getNextEdge()->getId() << "\n";
+    if(SecondVertex->getNextEdge() != nullptr)
+    std::cout << "SecondVertex->NextEdge " << SecondVertex->getNextEdge()->getId() << "\n";
+    if(FirstNextEdge != nullptr)
+    std::cout << "FirstNextEdge " << FirstNextEdge->getId() << "\n";
+    if(FirstPrevEdge != nullptr)
+    std::cout << "FirstPreviousEdge " << FirstPrevEdge->getId() << "\n";
+    if(SecondNextEdge != nullptr)
+    std::cout << "SecondNextEdge " << SecondNextEdge->getId() << "\n";
+    if(SecondPrevEdge != nullptr)
+    std::cout << "SecondPrevEdge " << SecondPrevEdge->getId() << "\n";
+*/
+    if(Edge == FirstVertex->getNextEdge()) {
+      FirstVertex->setNextEdge(Edge->getNextEdge(FirstVertex));
+    }
+    // Edge is the last edge of FirstVertex
+    if (Edge == FirstVertex->getLastEdge()) {
+      FirstVertex->setLastEdge(nullptr);
+    }
+    // Edge is not the first edge of FirstVertex
+    if(FirstPrevEdge != nullptr) {
+      FirstPrevEdge->setFirstNextEdge(FirstNextEdge);
+    }
+    // Edge is not the last edge of FirstVertex
+    if(FirstNextEdge != nullptr) {
+      FirstNextEdge->setFirstPreviousEdge(FirstPrevEdge);
+    }
+    // Edge is the only next edge of FirstVertex
+    if((FirstPrevEdge == nullptr) && (FirstNextEdge == nullptr)) {
+      FirstVertex->setNextEdge(nullptr); 
+    }
+    
+    /// repeat for the second
+    if(Edge == SecondVertex->getNextEdge()) {
+      SecondVertex->setNextEdge(Edge->getNextEdge(SecondVertex));
+    }
+    if (Edge == SecondVertex->getLastEdge()) {
+      SecondVertex->setLastEdge(nullptr);
+    }
+    if(SecondPrevEdge != nullptr) {
+      SecondPrevEdge->setSecondNextEdge(SecondNextEdge);
+    }
+    if(SecondNextEdge != nullptr) {
+      SecondNextEdge->setSecondPreviousEdge(SecondPrevEdge);
+    }
+    if((SecondPrevEdge == nullptr) && (SecondNextEdge == nullptr)) {
+      SecondVertex->setNextEdge(nullptr); 
+    }
+
+    Edge->deleteEdge();
+
+    /// patch the hole left by the deleted edge
+    /// look for the last edge in the graph and move it here
+
+    return Edge->getId();
+  }
+
+#ifdef _FIXALLOC_
+
+  void reLocateVertex(VertexPointer Vertex) {
+
+  }
+
+#endif
+
+  void patchMemory() {
+
+  }
 
   void dump() {
     for ( size_t  i = 0; i < Vertices.size(); i++ ) {
