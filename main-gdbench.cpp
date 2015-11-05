@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 
   GDReader reader(g);
   reader.setPrintInterval(10000);
-  reader.readFile("../tests/gd/sndata1000.gd");
+  reader.readFile("../tests/gd/sndata5000.gd");
 
   cout << "Finish reading\n";
 
