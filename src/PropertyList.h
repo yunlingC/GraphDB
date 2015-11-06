@@ -1,87 +1,103 @@
+//===-- src/PropertyList.h - Graph class type ------------------*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is the main class for the Property list.
+///
+//===----------------------------------------------------------------------===//
+
 #ifndef _PROPERTY_LIST_H_
 #define _PROPERTY_LIST_H_
 
-#include <map>
-
-// TODO: This should be replaced with debug function.
-#include <iostream>
 #include "LinkedList.h"
+
+#if DEBUG
+#include <iostream>
+#endif 
 
 using namespace std;
 
 template <typename KeyType, typename ValueType>
 class PropertyList {
-public:  
-  //  typedef typename map<KeyType, ValueType>::iterator mapIteratorType;
-  typedef LinkedList::iterator mapIteratorType;
-  typedef pair<ValueType, bool> ReturnValueType;
-
+private:
+  static const int MAXSIZE = 10;
 public:
-  PropertyList(): _maxSize(10) {
-  }
+  typedef LinkedList::iterator mapIteratorType;
+  typedef std::pair<ValueType, bool> ReturnValueType;
+public:
+  PropertyList(): _MaxSize(MAXSIZE) { }
 
-  PropertyList(unsigned int s): _maxSize(0) {
+  PropertyList(unsigned int size): _MaxSize(size) { }
 
-  }
-
-  PropertyList & operator=(const PropertyList & from) {
-    if (this != &from) {
-      _pl = from._pl;
-      _maxSize = from._maxSize;
+  PropertyList & operator=(const PropertyList & From) {
+    if (this != &From) {
+      _LinkedList = From._LinkedList;
+      _MaxSize = From._MaxSize;
     }
     return *this;
   }
 
   void deletePropertyList() {
     // Must manually delete the linked list.
-//    cout << "-- property list: " << _pl.size() << "\n";
-    if (_pl.size() > 0) 
-      _pl.deleteList();
-
+    if (_LinkedList.size() > 0) 
+      _LinkedList.deleteList();
   }    
 
   ~PropertyList() {
-    // Must explicitly call delete
+    // Must explicitly call delete    
   }
 
-  bool set(const std::string & k, const std::string & v) {
-    KeyType kk(k); ValueType vv(v);
-    return set(kk, vv);
+  bool set(const std::string & key, const std::string & value) {
+    KeyType Key(key); ValueType Value(value);
+    return set(Key, Value);
   }
  
-  bool set(const KeyType & k, const ValueType & v) {
-    if (_pl.size() >= _maxSize) {
+  bool set(const KeyType & key, const ValueType & value) {
+    if (_LinkedList.size() >= _MaxSize) {
       return false;
     }
 
-    KeyType   kt(k);
-    ValueType vt(v);
-    //    pair<KeyType, ValueType> p(kt,vt);
-    _pl.insert(kt, vt);
+    KeyType   Key(key);
+    ValueType Value(value);
+    _LinkedList.insert(Key, Value);
     return true;
   }
 
-  // void remove(const KeyType & k) {
-  //   KeyType kt(k);
-  //   _pl.erase(kt);
-  // }
+  /// in support for update propertylist -Yunling
+  /// update the value with key == key to value
+  bool update(const KeyType & key, const ValueType & value) {
+    ReturnValueType returnValue = get(key);
+    if (returnValue.second == false) {
+      return false;
+    } else {
+      return _LinkedList.update(key, value);
+    }
+  }
 
+  ReturnValueType get(const string & key) {
+    KeyType Key(key);
+    return get(Key);
+  }
 
-  ReturnValueType get(const KeyType & k) {
+  ReturnValueType get(const KeyType & key) {
     // Only initialize if known type parameters.
     // Assume <string, bool>
-    ValueType str("null");
-    ReturnValueType rv(str, true);
+    ValueType value("null");
+    ReturnValueType rv(value, true);
 
-    //    KeyType kt(k);
-    mapIteratorType mi = _pl.find(k);
+    mapIteratorType mi = _LinkedList.find(key);
     // Check if it's not found.
     if (mi == nullptr) {
       // Set the bool flag if not found.
       rv.second = false;
       return rv;
     }
-    //    cout << "copy value: " << mi->first << ", " << mi->second << endl;
     // Copy the value.
     rv.first = mi->getValue();
     return rv;
@@ -91,26 +107,17 @@ public:
   // - Copy constructor, assignment operator
   // This is only true if the key, value is assumed to be a simple type.
 
-  // Copy constructor.
-  // PropertyList(const PropertyList & from) {
-    
-  // }
-
   unsigned int size() {
-    return _pl.size();
+    return _LinkedList.size();
   }
 
   void print() {
-    _pl.print();
-    //    mapIteratorType mbeg, mend;
-    //    for (mbeg = _pl.begin(), mend = _pl.end(); mbeg != mend; mbeg++) {
-    //      cout << "[" << mbeg->getKey() << ", " << mbeg->getValue() << "]" << endl;
-    //    }
+    _LinkedList.print();
   }
+
 private:
-  //map<KeyType, ValueType> _pl;
-  LinkedList _pl;
-  unsigned int _maxSize;
+  LinkedList _LinkedList;
+  unsigned int _MaxSize;
 };
 
 #endif /* _PROPERTY_LIST_H_ */

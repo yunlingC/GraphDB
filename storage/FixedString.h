@@ -1,96 +1,95 @@
+//===-- storage/FixedString.h - FixedString class type ----------*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is the base class for key and value type in linked list.
+///
+//===----------------------------------------------------------------------===//
+
 #ifndef _FIXED_STRING_H_
 #define _FIXED_STRING_H_
 
 #include <stdio.h>
 #include <string.h>
+#if DEBUG
 #include <iostream>
-
-using namespace std;
+#endif
 
 class FixedString {
+private:
+  static const int FIXSIZE = 32;
 public:
   typedef char FixedStringType;
   typedef char* FixedStringPtrType;
 public:
-  FixedString(): _size(32) { 
+  FixedString(): Size(FIXSIZE) { }
 
+  FixedString(const std::string & string): Size(FIXSIZE) { 
+    strncpy(String, const_cast<char*>(string.c_str()), Size);
   }
 
-  FixedString(const string & s): _size(32) { 
-//    cout << "==> s: " << s <<endl;
-    strncpy(_string, const_cast<char*>(s.c_str()), _size);
-//    cout << "==> s: " << _string <<endl;
-  }
-
-  FixedString & operator=(const FixedString & from) {
-//    cout << "FixedString:: assignment operator\n";
-    if (this != &from) {
-      strncpy(this->_string, from._string, _size);
+  FixedString & operator=(const FixedString & From) {
+    if (this != &From) {
+      strncpy(this->String, From.String, Size);
     }
     return *this;
   }
   
-  FixedString & operator+=(const FixedString & appender){
-    strcat(_string, appender._string);
+  FixedString & operator+=(const FixedString & Appender){
+    strcat(String, Appender.String);
     return *this;
   }
 
-  friend std::ostream & operator<<(std::ostream & os, const FixedString & s)  {
-    os << s._string ;
-    return os;
+  friend std::ostream & operator<<(std::ostream & OutStream, const FixedString & string)  {
+    OutStream << string.String ;
+    return OutStream;
   }
 
-  friend FixedString & operator+(FixedString lhs, const FixedString &rhs) {
-    return lhs += rhs;
+  friend FixedString & operator+(FixedString Left, const FixedString & Right) {
+    return Left += Right;
  }
 
-  friend bool  operator<(const FixedString & lhs, const FixedString & rhs) {
-    if(strcmp(lhs._string, rhs._string) <= 0)
-      return true;
-    else 
-      return false;
+  friend bool  operator<(const FixedString & Left, const FixedString & Right) {
+    return strcmp(Left.String, Right.String) <= 0 ;
   }
 
-  friend bool  operator>(const FixedString & lhs, const FixedString & rhs) {
-    if(strcmp(lhs._string, rhs._string) > 0)
-      return true;
-    else 
-      return false;
+  friend bool  operator>(const FixedString & Left, const FixedString & Right) {
+    return strcmp(Left.String, Right.String) > 0;
   }
 
   bool operator==(const FixedString & right) const {
-    if(strcmp(_string, right._string) == 0)
-      return true;
-    else 
-      return false;
+    return strcmp(String, right.String) == 0;
   }
 
   bool operator!=(const FixedString & right) const {
-   if(strcmp(_string, right._string) != 0)
-     return true;
-   else 
-     return false;
+   return strcmp(String, right.String) != 0;
   }
 
-  void setString(const string& s) {
-    strncpy(_string, const_cast<char*>(s.c_str()), _size);
+  void setString(const std::string & str) {
+    strncpy(String, const_cast<char*>(str.c_str()), Size);
   }
 
   FixedStringPtrType getString() {
-    return &(_string[0]);
+    return &(String[0]);
   }
 
   std::string std_str() const {
-    return string(_string);
+    return std::string(String);
   }
 
   unsigned int size() {
-    return _size;
+    return Size;
   }
 
 protected:
-  FixedStringType _string[32];
-  unsigned int _size;
+  FixedStringType String[FIXSIZE];
+  unsigned int Size;
 };
 
 #endif /* _FIXED_STRING_H_ */
