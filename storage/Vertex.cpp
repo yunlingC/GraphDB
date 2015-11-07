@@ -80,40 +80,42 @@ auto Vertex::getNextEdge() -> EdgePtr {
 auto Vertex::dump() 
   -> void {
     std::cout << " ========================================= \n"; 
-    std::cout << " Vertex: " << VertexId << ", addr:" << this << ", node size: " << sizeof(Vertex) << "\n";
+    std::cout << " Vertex: " << VertexId 
+              << ", addr:" << this 
+              << ", node size: " << sizeof(Vertex) << "\n";
     std::cout << " Outedge ids: ";
     
     // For this node's next first edge
     if ( NextEdge != nullptr ) {
       std::cout << "\nPrint edge traversals:" << NextEdge << "\n";
       std::cout << "=> current edge id: " << NextEdge->getId() << ", previous edge ids: \n";
-      EdgePtr p = NextEdge;
+      EdgePtr TempEdgePtr = NextEdge;
       std::cout << "\n=> firstEdges\n";
       std::cout << "=> previous eids\n";
-      while ( p != nullptr ) {
-	std::cout << "=> " << p->getId() << " ";
-	p = p->getFirstPreviousEdge();
+      while ( TempEdgePtr != nullptr ) {
+	std::cout << "=> " << TempEdgePtr->getId() << " ";
+	TempEdgePtr = TempEdgePtr->getFirstPreviousEdge();
       }
 
       std::cout << "\n= next eids\n";
-      p = NextEdge;
-      while ( p != nullptr) {
-	std::cout << "=> " << p->getId() << " ";
-	p = p->getFirstNextEdge();
+      TempEdgePtr = NextEdge;
+      while ( TempEdgePtr != nullptr) {
+	std::cout << "=> " << TempEdgePtr->getId() << " ";
+	TempEdgePtr = TempEdgePtr->getFirstNextEdge();
       }
 
       std::cout << "\n\n=> secondEdges\n";
       std::cout << "=> previous eids\n";
-      while ( p != nullptr) {
-	std::cout << "=> " << p->getId() << " ";
-	p = p->getSecondPreviousEdge();
+      while ( TempEdgePtr != nullptr) {
+	std::cout << "=> " << TempEdgePtr->getId() << " ";
+	TempEdgePtr = TempEdgePtr->getSecondPreviousEdge();
       }
 
       std::cout << "\n= next eids\n";
-      p = NextEdge;
-      while ( p != nullptr) {
-	std::cout << "=> " << p->getId() << " ";
-	p = p->getSecondNextEdge();
+      TempEdgePtr = NextEdge;
+      while ( TempEdgePtr != nullptr) {
+	std::cout << "=> " << TempEdgePtr->getId() << " ";
+	TempEdgePtr = TempEdgePtr->getSecondNextEdge();
       }
     }
 

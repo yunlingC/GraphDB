@@ -23,7 +23,8 @@
 #if DEBUG
 auto Edge::dump() 
   -> void {
-  std::cout << "\nEdge id: " << EdgeId << " (" << FirstVertex->getId() 
+  std::cout << "\nEdge id: " << EdgeId 
+            << " (" << FirstVertex->getId() 
             << ", " << SecondVertex->getId() << ") \n";
 
   std::cout << "\nEdge PropertyList\n";
@@ -35,19 +36,23 @@ auto Edge::dump()
   EdgePointer SecdPrevEdge = getSecondPreviousEdge();
 
   if (FirstPrevEdge != nullptr) {
-    std::cout << "- firstPreviousEdge: " << FirstPrevEdge->getId() << "\n";
+    std::cout << "- firstPreviousEdge: " 
+              << FirstPrevEdge->getId() << "\n";
   } else     std::cout << "- firstPreviousEdge: nullptr" << "\n";
 
   if (FirstNexEdge != nullptr) {
-    std::cout << "- firstNextEdge: " << FirstNexEdge->getId() << "\n";
+    std::cout << "- firstNextEdge: " 
+              << FirstNexEdge->getId() << "\n";
   } else     std::cout << "- firstNextEdge: nullptr" << "\n";
 
   if (SecdPrevEdge != nullptr) {
-    std::cout << "- secondPreviousEdge: " << SecdPrevEdge->getId() << "\n";
+    std::cout << "- secondPreviousEdge: " 
+              << SecdPrevEdge->getId() << "\n";
   } else     std::cout << "- secondPreviousEdge: nullptr" << "\n";
 
   if (SecdNextEdge != nullptr) {
-    std::cout << "- secondNextEdge: " << SecdNextEdge->getId() << "\n";
+    std::cout << "- secondNextEdge: " 
+              << SecdNextEdge->getId() << "\n";
   } else     std::cout << "- secondNextEdge: nullptr" << "\n";
   
   std::cout << "traverse firstNext: " ;
@@ -119,39 +124,42 @@ auto Edge::getType()
   return EdgeLabel;
 }
 
-auto Edge::getTarget(VertexPointer from) 
+/// get the other endpoint of this edge, without direction
+auto Edge::getTarget(VertexPointer Vertex) 
   -> VertexPointer {
-  if (from == FirstVertex) {
+  if (Vertex == FirstVertex) {
     return SecondVertex;
-  } else if (from == SecondVertex) {
+  } else if (Vertex == SecondVertex) {
     return FirstVertex;
   }
   return nullptr;
 }
 
-auto Edge::getNextEdge(VertexPointer from) 
+/// get the next edge that shares the same endpoint Vertex
+/// Ignoring the direction
+auto Edge::getNextEdge(VertexPointer Vertex) 
   -> EdgePointer  {
-  if ( from == FirstVertex ) {
+  if ( Vertex == FirstVertex ) {
     return FirstNextEdge;
-  } else if (from == SecondVertex) {
+  } else if (Vertex == SecondVertex) {
     return SecondNextEdge;
   }
   return nullptr;
 }
 
-auto Edge::getPreviousEdge(Edge::VertexPointer from) 
+auto Edge::getPreviousEdge(Edge::VertexPointer Vertex) 
   -> EdgePointer  {
-  if ( from == FirstVertex ) {
+  if ( Vertex == FirstVertex ) {
     return FirstPreviousEdge;
-  } else if (from == SecondVertex) {
+  } else if (Vertex == SecondVertex) {
     return SecondPreviousEdge;
   }
   return nullptr;
 }
 
-auto Edge::setFirstNextEdge(EdgePointer e) 
+auto Edge::setFirstNextEdge(EdgePointer Edge) 
   -> void {
-  FirstNextEdge = e;
+  FirstNextEdge = Edge;
 }
 
 auto Edge::getFirstNextEdge() 
@@ -159,9 +167,9 @@ auto Edge::getFirstNextEdge()
   return FirstNextEdge;
 }
 
-auto Edge::setFirstPreviousEdge(EdgePointer e) 
+auto Edge::setFirstPreviousEdge(EdgePointer Edge) 
   -> void {
-  FirstPreviousEdge = e;
+  FirstPreviousEdge = Edge;
 }
 
 auto Edge::getFirstPreviousEdge() 
@@ -169,9 +177,9 @@ auto Edge::getFirstPreviousEdge()
   return FirstPreviousEdge;
 }
 
-auto Edge::setSecondNextEdge(EdgePointer e) 
+auto Edge::setSecondNextEdge(EdgePointer Edge) 
   -> void {
-  SecondNextEdge = e;
+  SecondNextEdge = Edge;
 }
 
 auto Edge::getSecondNextEdge() 
@@ -179,9 +187,9 @@ auto Edge::getSecondNextEdge()
   return SecondNextEdge;
 }
 
-auto Edge::setSecondPreviousEdge(EdgePointer e) 
+auto Edge::setSecondPreviousEdge(EdgePointer Edge) 
 -> void {
-  SecondPreviousEdge = e;
+  SecondPreviousEdge = Edge;
 }
 
 auto Edge::getSecondPreviousEdge() 
@@ -199,9 +207,9 @@ auto Edge::getSecondId()
   return SecondVertex->getId();
 }
 
-auto Edge::setId(unsigned int id)
+auto Edge::setId(unsigned int Id)
   -> void {
-    EdgeId = id;
+    EdgeId = Id;
 }
 
 auto Edge::getId() 
