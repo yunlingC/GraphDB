@@ -21,8 +21,6 @@
 #include <iostream>
 #endif 
 
-using namespace std;
-
 template <typename KeyType, typename ValueType>
 class PropertyList {
 private:
@@ -80,7 +78,7 @@ public:
     }
   }
 
-  ReturnValueType get(const string & key) {
+  ReturnValueType get(const std::string & key) {
     KeyType Key(key);
     return get(Key);
   }
@@ -111,9 +109,11 @@ public:
     return _LinkedList.size();
   }
 
+#if DEBUG
   void print() {
     _LinkedList.print();
   }
+#endif
 
 private:
   LinkedList _LinkedList;

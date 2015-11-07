@@ -18,6 +18,7 @@
 
 using namespace std;
 
+#if DEBUG
 auto Edge::dump() 
   -> void {
   std::cout << "\nEdge id: " << EdgeId << " (" << FirstVertex->getId() 
@@ -74,6 +75,7 @@ auto Edge::dump()
     fne = fne->getSecondPreviousEdge();
   }
 }
+#endif
 
 auto Edge::getFirstVertexPtr() 
   -> VertexPointer {
@@ -105,7 +107,7 @@ auto Edge::setPropertyList(PropertyListType InitialList)
   EdgePropertyList = InitialList;
 }
 
-auto Edge::setType(string Label) 
+auto Edge::setType(std::string Label) 
   -> void {
   EdgeLabel = Label;
 }

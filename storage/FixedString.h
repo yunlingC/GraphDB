@@ -16,10 +16,9 @@
 #define _FIXED_STRING_H_
 
 #include <stdio.h>
+#include <string>
 #include <string.h>
-#if DEBUG
-#include <iostream>
-#endif
+#include <ostream>
 
 class FixedString {
 private:
@@ -63,12 +62,12 @@ public:
     return strcmp(Left.String, Right.String) > 0;
   }
 
-  bool operator==(const FixedString & right) const {
-    return strcmp(String, right.String) == 0;
+  bool operator==(const FixedString & Right) const {
+    return strcmp(String, Right.String) == 0;
   }
 
-  bool operator!=(const FixedString & right) const {
-   return strcmp(String, right.String) != 0;
+  bool operator!=(const FixedString & Right) const {
+   return strcmp(String, Right.String) != 0;
   }
 
   void setString(const std::string & str) {

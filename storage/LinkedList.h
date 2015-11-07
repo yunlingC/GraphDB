@@ -14,11 +14,12 @@
 #ifndef _LINKED_LIST_H_
 #define _LINKED_LIST_H_
 
+#include "FixedString.h"
+
 #if DEBUG
 #include <iostream>
 #endif
 
-#include "FixedString.h"
 // This class is necessary to have fixed size linked lists.
 // These will serve as PropertyLists.
 
@@ -69,12 +70,12 @@ public:
     return _Previous;
   }
 
-  void setNext(ListNode * n) {
-    _Next = n;
+  void setNext(ListNode * next) {
+    _Next = next;
   }
 
-  void setPrevious(ListNode * p) {
-    _Previous = p;
+  void setPrevious(ListNode * prev) {
+    _Previous = prev;
   }
 
 private:
@@ -159,6 +160,7 @@ public:
     }
   }
 
+#if DEBUG
   void print() {
     // Iterate over the linked list and delete it.
     ListNode * it = _Head;
@@ -170,6 +172,7 @@ public:
       it = it->getNext();
     }
   }
+#endif
 
   unsigned int size() {
     return _Size;
