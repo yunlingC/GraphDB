@@ -16,11 +16,9 @@
 #define _VERTEX_H_
 
 #include "PropertyList.h"
-#include "FixedString.h"
 
 #include <vector>
 #include <string>
-#include <iostream>
 
 /// Forward declaration.
 class Edge;

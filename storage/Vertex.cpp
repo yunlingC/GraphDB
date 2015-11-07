@@ -79,17 +79,13 @@ auto Vertex::getNextEdge() -> EdgePtr {
 #if DEBUG
 auto Vertex::dump() 
   -> void {
-    std::cout << " ========================================= " << std::endl;
-    std::cout << " Vertex: " << VertexId << ", addr:" << this << ", node size: " << sizeof(Vertex) << std::endl;
+    std::cout << " ========================================= \n"; 
+    std::cout << " Vertex: " << VertexId << ", addr:" << this << ", node size: " << sizeof(Vertex) << "\n";
     std::cout << " Outedge ids: ";
-    // for ( auto i = 0; i < AllEdges.size(); i++ ) {
-    //   EdgePtr ep = AllEdges[i];
-    //   std::cout << ep->getId() << ": (" << ep->getFirstId() << ", " << ep->getSecondId() << ") ";
-    // }
     
     // For this node's next first edge
     if ( NextEdge != nullptr ) {
-      std::cout << "\nPrint edge traversals:" << NextEdge << std::endl;
+      std::cout << "\nPrint edge traversals:" << NextEdge << "\n";
       std::cout << "=> current edge id: " << NextEdge->getId() << ", previous edge ids: \n";
       EdgePtr p = NextEdge;
       std::cout << "\n=> firstEdges\n";
@@ -121,7 +117,7 @@ auto Vertex::dump()
       }
     }
 
-    std::cout << "\n"; //std::endl;
+    std::cout << "\n"; 
 
     std::cout << "\nVertex Propertylist:\n";
     VertexPropertyList.print();
