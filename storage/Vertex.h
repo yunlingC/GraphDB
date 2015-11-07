@@ -10,24 +10,23 @@
 /// \file
 /// \brief This is the main class for the Vertex structure.
 ///
-//===----------------------------------------------------------------------===//
+//===---------------------------------------------------------------------===//
 
 #ifndef _VERTEX_H_
 #define _VERTEX_H_
 
-#include <vector>
-#include <iostream>
-#include <string>
-
 #include "PropertyList.h"
 #include "FixedString.h"
+
+#include <vector>
+#include <string>
+#include <iostream>
 
 /// Forward declaration.
 class Edge;
 
 class Vertex { 
 public:
-  //  typedef Vertex* VertexPtr;
   typedef Edge* EdgePtr;
   typedef unsigned int EdgeDescriptor;
   typedef FixedString KeyType;
@@ -47,13 +46,13 @@ public:
   unsigned int getId();
   EdgePtr getNextEdge();
   LabelType getType();
-  ReturnPropertyValueType getPropertyValue(KeyType k);
-  ReturnPropertyValueType getPropertyValue(std::string k);
-  void setId(unsigned int id);
-  void setType(string t);
-  void setNextEdge(EdgePtr e);
-  void setProperty(KeyType k, ValueType v);
-  void setPropertyList(PropertyListType & l);
+  ReturnPropertyValueType getPropertyValue(KeyType Key);
+  ReturnPropertyValueType getPropertyValue(std::string Key);
+  void setId(unsigned int Id);
+  void setType(std::string Type);
+  void setNextEdge(EdgePtr Edge);
+  void setProperty(KeyType Key, ValueType Value);
+  void setPropertyList(PropertyListType & List);
   PropertyListType &  getPropertyList();
   void deleteVertex();
 

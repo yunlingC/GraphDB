@@ -56,7 +56,7 @@ auto Vertex::getId()
   return VertexId;
 }
 
-auto Vertex::setType (string Label)
+auto Vertex::setType (std::string Label)
   -> void {
   VertexLabel = Label;
 }
@@ -76,9 +76,9 @@ auto Vertex::getNextEdge() -> EdgePtr {
 }
 
 
+#if DEBUG
 auto Vertex::dump() 
   -> void {
-
     std::cout << " ========================================= " << std::endl;
     std::cout << " Vertex: " << VertexId << ", addr:" << this << ", node size: " << sizeof(Vertex) << std::endl;
     std::cout << " Outedge ids: ";
@@ -90,7 +90,7 @@ auto Vertex::dump()
     // For this node's next first edge
     if ( NextEdge != nullptr ) {
       std::cout << "\nPrint edge traversals:" << NextEdge << std::endl;
-      cout << "=> current edge id: " << NextEdge->getId() << ", previous edge ids: \n";
+      std::cout << "=> current edge id: " << NextEdge->getId() << ", previous edge ids: \n";
       EdgePtr p = NextEdge;
       std::cout << "\n=> firstEdges\n";
       std::cout << "=> previous eids\n";
@@ -99,7 +99,7 @@ auto Vertex::dump()
 	p = p->getFirstPreviousEdge();
       }
 
-      cout << "\n= next eids\n";
+      std::cout << "\n= next eids\n";
       p = NextEdge;
       while ( p != nullptr) {
 	std::cout << "=> " << p->getId() << " ";
@@ -113,7 +113,7 @@ auto Vertex::dump()
 	p = p->getSecondPreviousEdge();
       }
 
-      cout << "\n= next eids\n";
+      std::cout << "\n= next eids\n";
       p = NextEdge;
       while ( p != nullptr) {
 	std::cout << "=> " << p->getId() << " ";
@@ -126,8 +126,8 @@ auto Vertex::dump()
     std::cout << "\nVertex Propertylist:\n";
     VertexPropertyList.print();
     std::cout << " ========================================= \n";
-
   }
+#endif
 
 auto Vertex::deleteVertex() 
   -> void {

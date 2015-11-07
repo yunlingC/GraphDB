@@ -67,7 +67,7 @@ public:
   void setPropertyList(PropertyListType l);
   void setSecondNextEdge(EdgePointer e);
   void setSecondPreviousEdge(EdgePointer e);
-  void setType(string t);
+  void setType(std::string t);
 
   /// Constructors.
   Edge();
