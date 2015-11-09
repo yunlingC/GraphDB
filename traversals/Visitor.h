@@ -16,7 +16,6 @@
 
 #include "GraphType.h"
 #include "Filter.h"
-#include "FixedString.h"
 
 class Visitor {
 public:
@@ -30,63 +29,59 @@ public:
   typedef std::vector<VertexPointer> VertexTarget;
   typedef std::vector<VertexPointer> VertexPath;
 public:
-  virtual void setFilter(Filter & f) {
-    _filter = f;
+  virtual void setFilter(Filter & filter) {
+    _Filter = filter;
   }
 
   virtual Filter & getFilter() { 
-    return _filter;
+    return _Filter;
   }
 
   virtual VertexTarget & getVertexTargetList() {
     return _VertexTargetList;
   }
 
-  virtual void  visitStartVertex(VertexPointer vp) {
-    //return false;
-  }
+  virtual void  visitStartVertex(VertexPointer VertexPtr) { }
 
-  virtual bool discoverVertex(VertexPointer vp) {
+  virtual bool discoverVertex(VertexPointer VertexPtr) {
     return false;
   }
 
-  virtual bool visitVertex(VertexPointer vp) {
-    FixedString key("id");
-    //std::cout << "==>vid " << vp->getId() << " ==>pid " << vp->getPropertyValue(key).first << endl;
+  virtual bool visitVertex(VertexPointer VertexPtr) {
     return false;
   }
 
-  virtual bool scheduleVertex(VertexPointer vp, EdgePointer ep) {
+  virtual bool scheduleVertex(VertexPointer VertexPtr, EdgePointer EdgePtr) {
     return false;
   }
 
-  virtual  bool visitEdge(EdgePointer ep) {
+  virtual  bool visitEdge(EdgePointer EdgePtr) {
     return false;
   }
-  virtual bool scheduleEdge(EdgePointer ep) {
-    return true; /// default vaue = true so that the vertex will be pushed into queue 
+  virtual bool scheduleEdge(EdgePointer EdgePtr) {
+    /// default value = true so that the vertex will be pushed into queue 
+    return true; 
   }
 
   /// for bfs only
-  virtual bool visitDirection(VertexPointer target, EdgePointer edge){
-    return true; /// the same above
+  virtual bool visitDirection(VertexPointer TargetVertex, EdgePointer EdgePtr){
+    /// the same above
+    return true; 
   }
 
-  /// TODO delete this 
-  /// for dfs only 0: all direction  1: outedges 2: incoming edges 
-  virtual unsigned int visitDirection(VertexPointer) {
-    return 0;
-  }
-  
-  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second){
+  virtual bool scheduleBranch(VertexPointer FirstVertex, 
+                              EdgePointer EdgePtr, 
+                              VertexPointer SecondVertex){
      return false;
   }
 
-  virtual bool scheduleTree(VertexPointer first, EdgePointer edge, VertexPointer second) {
+  virtual bool scheduleTree(VertexPointer FirstVertex, 
+                            EdgePointer EdgePtr, 
+                            VertexPointer SecondVertex) {
     return false;
   }
 
-  virtual bool revisitVertex(VertexPointer vertex) {
+  virtual bool revisitVertex(VertexPointer VertexPtr) {
     return false;
   }
 
@@ -98,7 +93,7 @@ public:
 
 protected:
   VertexTarget _VertexTargetList; 
-  Filter _filter;
+  Filter _Filter;
 
 };
 

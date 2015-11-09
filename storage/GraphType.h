@@ -25,6 +25,7 @@ public:
   typedef Vertex* VertexPointer;
   typedef Edge* EdgePointer;
   typedef std::vector<EdgePointer> EdgeList;
+  typedef std::vector<VertexPointer> VertexList;
   typedef PropertyList<FixedString, FixedString> PropertyListType;
   typedef PropertyListType VertexPropertyList;
   typedef PropertyListType EdgePropertyList;
@@ -103,7 +104,8 @@ public:
     return NewVertex->getId();
   }
 
-  VertexDescriptor addVertex(string Label, PropertyListType & InitialPropertyList) {
+  VertexDescriptor addVertex(std::string Label, 
+                            PropertyListType & InitialPropertyList) {
     VertexPointer NewVertex = new Vertex();
     NewVertex->setPropertyList(InitialPropertyList);
     NewVertex->setId(NumberOfVertices); 
@@ -211,7 +213,8 @@ public:
   }
 
   EdgeDescriptor addEdge(VertexDescriptor StartVertex, 
-                         VertexDescriptor EndVertex, const string & Label) {
+                         VertexDescriptor EndVertex, 
+                         const std::string & Label) {
     EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
     
     NewEdge->setId(NumberOfEdges);
@@ -236,8 +239,9 @@ public:
     return NewEdge->getId();
   }
 
-  EdgeDescriptor addEdge(VertexDescriptor StartVertex, VertexDescriptor EndVertex, 
-                         const string & Label, 
+  EdgeDescriptor addEdge(VertexDescriptor StartVertex, 
+                         VertexDescriptor EndVertex, 
+                         const std::string & Label, 
                          PropertyListType & InitialPropertyList) {
 
     EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
@@ -272,7 +276,7 @@ public:
     /// since I am storing pointers.
     /// Thus, Vertices and _edges contain all newly created objects.
 
-    for ( size_t i=0; i < Vertices.size(); i++ ) {
+    for ( size_t i= 0; i < Vertices.size(); i++ ) {
       Vertices[i]->deleteVertex();
       delete Vertices[i];
     }
@@ -283,20 +287,20 @@ public:
     }
   }
 
-  vector<VertexPointer> getAllVertices(){
+  VertexList getAllVertices(){
     return Vertices;
   }
 
-  vector<EdgePointer> getAllEdges(){
+  EdgeList getAllEdges(){
     return Edges;
   }
 
   
 protected:
   /// Hold pointers to all vertices.
-  vector<VertexPointer> Vertices;
+  std::vector<VertexPointer> Vertices;
   /// Hold pointers to all edges.
-  vector<EdgePointer> Edges;
+  std::vector<EdgePointer> Edges;
   /// Keep a count of vertices and edges.
   unsigned int NumberOfVertices;
   unsigned int NumberOfEdges;

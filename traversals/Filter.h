@@ -1,8 +1,19 @@
+//===-- traversals/Filter.h - Filter class ----------------------*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is the base class for Filter used in visitor.
+///
+//===----------------------------------------------------------------------===//
 #ifndef _FILTER_H_
 #define _FILTER_H_
 
-//#include "PropertyList.h"
-//#include "LinkedList.h"
 #include "FixedString.h"
 
 struct Filter {
@@ -18,19 +29,19 @@ public:
   typedef std::vector<ValueType> ValueListType;
   typedef std::vector<ValueType> &  ValueListTypeReference;
 public:
-  Filter() : _key(""), 
-             _value(""), 
-             _type(""), 
-             _direction(""),
-             _vertexId(0), 
-             _edgeId(0)  { }
+  Filter() : _Key(""), 
+             _Value(""), 
+             _Type(""), 
+             _Direction(""),
+             _VertexId(0), 
+             _EdgeId(0)  { }
 
-  void setKey(KeyType k) {
-    _key = k;
+  void setKey(KeyType key) {
+    _Key = key;
   }
   
-  void setValue(ValueType v)  {
-    _value = v;
+  void setValue(ValueType value)  {
+    _Value = value;
   }
 
   void setProperty(KeyType key, ValueType value) {
@@ -38,93 +49,93 @@ public:
     setValue(value);
    }
 
-  void setType(Type t)  {
-    _type = t;
+  void setType(Type type)  {
+    _Type = type;
   }
  
-  void setDirection(Direction d) {
-    _direction = d;
+  void setDirection(Direction direct) {
+    _Direction = direct;
   }
 
-  void setVertexId(IdType vid) {
-    _vertexId = vid;
+  void setVertexId(IdType VertexId) {
+    _VertexId = VertexId;
   }
   
-  void setEdgeId(IdType eid) {
-    _edgeId = eid;
+  void setEdgeId(IdType EdgeId) {
+    _EdgeId = EdgeId;
   }
 
   void setTypeList(TypeList & typeList) {
-    _typeList = typeList;
+    _TypeList = typeList;
   }
 
   auto setValueRange(KeyType key, ValueType valueMin, ValueType valueMax) 
     -> void {
-    _key = key;
+    _Key = key;
     ValueListType ValueList;
     ValueList.push_back(valueMin);
     ValueList.push_back(valueMax);
-    _valueRange = ValueList;
+    _ValueRange = ValueList;
   }
 
   auto setValueList(KeyType key, ValueListType & ValueList) 
     -> void {
-    _key = key;
-    _valueRange = ValueList;
+    _Key = key;
+    _ValueRange = ValueList;
   }
 
   void setDefault() {
-    _key = "";
-    _value = "";
-    _type = "";
-    _direction = "";
-    _vertexId = 0;
-    _edgeId = 0;
-    _typeList.push_back("");
+    _Key = "";
+    _Value = "";
+    _Type = "";
+    _Direction = "";
+    _VertexId = 0;
+    _EdgeId = 0;
+    _TypeList.push_back("");
   }
 
   KeyType & getKey() {
-    return _key;
+    return _Key;
   }
 
   ValueType & getValue() {
-    return _value;
+    return _Value;
   }
 
   Type & getType() { 
-    return _type; 
+    return _Type; 
   }
 
   Direction & getDirection() {
-    return _direction;
+    return _Direction;
   }
 
   IdType & getVertexId() {
-    return _vertexId;
+    return _VertexId;
   }
 
   IdType & getEdgeId() {
-    return _edgeId;
+    return _EdgeId;
   }
 
   TypeList & getTypeList() {
-    return _typeList;
+    return _TypeList;
   }
 
   auto getValueRange() 
     -> ValueListTypeReference {
-    return _valueRange;
+    return _ValueRange;
   }
 
 private:
-  KeyType   _key;
-  ValueType _value;
-  Type      _type;
-  Direction _direction;
-  IdType    _vertexId;
-  IdType    _edgeId;
-  TypeList  _typeList;
-  ValueListType _valueRange;
+  KeyType   _Key;
+  ValueType _Value;
+  Type      _Type;
+  Direction _Direction;
+  IdType    _VertexId;
+  IdType    _EdgeId;
+  TypeList  _TypeList;
+  ValueListType _ValueRange;
 
 
 };

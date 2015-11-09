@@ -24,11 +24,9 @@ void depthFirstSearch(GraphType & Graph,
 
   typedef std::pair<GraphType::VertexPointer, bool> VisitPair;
   GraphType::VertexPointer ScheduledVertex = Graph.getVertexPointer(StartVertex);
-  //pass hint
-  passNodeHint(ScheduledVertex);
 
   std::vector<GraphType::VertexPointer> VertexStack;
-  std::map<GraphType::VertexPointer, bool> ColorMap;
+  std::unordered_map<GraphType::VertexPointer, bool> ColorMap;
 
   VertexStack.push_back(ScheduledVertex);
   GraphVisitor.visitStartVertex(ScheduledVertex);
@@ -39,8 +37,7 @@ void depthFirstSearch(GraphType & Graph,
 
   while ( !VertexStack.empty() ) {
     ScheduledVertex = VertexStack.back();  VertexStack.pop_back();
-    //pass hint
-    //passNodeHint(ScheduledVertex);
+
     bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
     if(VertexMatch == true)
       return ;

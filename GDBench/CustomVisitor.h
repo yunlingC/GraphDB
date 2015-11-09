@@ -19,7 +19,7 @@
 #include <set>
 
 #include "Visitor.h"
-#include "Utilities.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -63,7 +63,7 @@ public:
   }
 
   virtual bool scheduleEdge(EdgePointer edge) {
-    return checkType(edge, _filter);
+    return checkType(edge, _Filter);
   }
 
 
@@ -73,8 +73,8 @@ public:
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    bool TypeMatch = checkType(edge, _filter);
-    _direcMatch = checkDirection(second, edge, _filter);
+    bool TypeMatch = checkType(edge, _Filter);
+    _direcMatch = checkDirection(second, edge, _Filter);
     if(_direcMatch && TypeMatch ) {
       _VertexTargetList.push_back(second);
     }
@@ -97,7 +97,7 @@ public:
   ReachabilityVisitor () { }
 
   virtual void setFilter(Filter & f) {
-    _filterList.push_back(f);
+    _FilterList.push_back(f);
   }
 
   virtual void setDepth(unsigned int depth) {
@@ -150,7 +150,7 @@ public:
 
     Filter filter;
     if(depthSecond > 0)
-      filter = _filterList[depthSecond-1];
+      filter = _FilterList[depthSecond-1];
     else
       filter.setDefault();
    
@@ -168,7 +168,7 @@ protected:
   unsigned int  _typeMatch;
   unsigned int  _direcMatch;
   unsigned int  _depthSetting;
-  std::vector<Filter> _filterList;
+  std::vector<Filter> _FilterList;
   VertexPath   _prevPath;
   PathQueue  _pathQueue;
   VertexSetType _TargetSet;
@@ -223,7 +223,7 @@ public:
   PatternVisitor () { }
 
   void setFilter(Filter & f) {
-    _filterList.push_back(f);
+    _FilterList.push_back(f);
   }
 
   void setDepth(unsigned int depth) {
@@ -286,7 +286,7 @@ public:
 
     Filter filter;
       if(depthSecond > 0)
-        filter = _filterList[depthSecond-1];
+        filter = _FilterList[depthSecond-1];
     else
       filter.setDefault();
    
@@ -310,7 +310,7 @@ protected:
   bool _direcMatch;
   unsigned int  _depthSetting;
   VertexDescriptor _endVertex;
-  std::vector<Filter> _filterList;
+  std::vector<Filter> _FilterList;
   VertexPath   _prevPath;
   PathQueue  _pathQueue;
 };
@@ -323,7 +323,7 @@ public:
 public:
 
   virtual void setFilter(Filter & f) {
-    _filterList.push_back(f);
+    _FilterList.push_back(f);
   }
 
   virtual void visitStartVertex(VertexPointer startVertex ) {
@@ -357,7 +357,7 @@ public:
     for(auto it = _depthList.equal_range(first).first; it != _depthList.equal_range(first).second; ++it) {
       if((*it).first == first) {
         if((*it).second < _depthSetting) {
-          Filter filter = _filterList[(*it).second];
+          Filter filter = _FilterList[(*it).second];
           if(_depthList.count(second) <= _depthSetting) {
           if(checkType(edge, filter) == true)
             _typeMatch = true;
@@ -381,14 +381,14 @@ public:
   }
 
 protected:
-  Filter _filter;
+  Filter _Filter;
   MultiDepthList   _depthList;
   VertexPointer    _startVertex;
   bool _typeMatch;
   bool _direcMatch;
   unsigned int     _depthSetting;
   VertexTarget     _VertexTargetList;
-  std::vector<Filter> _filterList;
+  std::vector<Filter> _FilterList;
 };
 
 class DFSPatternVisitor : public Visitor {
@@ -397,7 +397,7 @@ public:
 public:
 
   void setFilter(Filter & f) {
-    _filterList.push_back(f);
+    _FilterList.push_back(f);
   }
 
   void setDepth(unsigned int depth) {
@@ -461,7 +461,7 @@ public:
 
     Filter filter;
       if(firstDepth >= 0 && firstDepth < _depthSetting)
-        filter = _filterList[firstDepth];
+        filter = _FilterList[firstDepth];
     else
       filter.setDefault();
 
@@ -487,7 +487,7 @@ protected:
   unsigned int  _depthSetting;
   VertexPointer _startVertex;
   VertexDescriptor _endVertex;
-  std::vector<Filter> _filterList;
+  std::vector<Filter> _FilterList;
   VertexPath   _prevPath;
   PathStack _pathStack;
 };
@@ -501,7 +501,7 @@ public:
 public:
 
   void setFilter(Filter & f) {
-    _filterList.push_back(f);
+    _FilterList.push_back(f);
   }
 
   void setDepth(unsigned int depth) {
@@ -592,7 +592,7 @@ protected:
   unsigned int  _depthSetting;
   VertexPointer _startVertex;
   VertexDescriptor _endVertex;
-  std::vector<Filter> _filterList;
+  std::vector<Filter> _FilterList;
   PathMap     _pathMap;
   VertexPath   _prevPath;
   PathStack _pathStack;

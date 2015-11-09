@@ -20,7 +20,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "util.h"
 #include "FixedString.h"
 #include "BreadthFirstSearch.h"
 #include "DepthFirstSearch.h"
@@ -73,16 +72,12 @@ public:
     Visitor v1;
     switch(c) {
       case 1:
-        SimMarker(1, 27);
         filtProperty(_Key, _Value, v1.getFilter());
         breadthFirstSearch(graph, 0, v1 );
-        SimMarker(2, 27);
         break;
       case 2:
-        SimMarker(1, 28);
         filtProperty(_Key, _Value, v1.getFilter());
         depthFirstSearch(graph, 0, v1);
-        SimMarker(2, 28);
         break;
     }
 
@@ -105,18 +100,14 @@ public:
     SelectionVisitor v1;
     switch(c) {
       case 1:
-        SimMarker(1, 1);
         filtProperty(_Key, _Value, v1.getFilter());
         traverseThroughType("FRIENDS", v1.getFilter());
         breadthFirstSearch(graph, 0, v1 );
-        SimMarker(2, 1);
         break;
       case 2:
-        SimMarker(1, 2);
         filtProperty(_Key, _Value, v1.getFilter());
         traverseThroughType("FRIENDS", v1.getFilter());
         depthFirstSearch(graph, 0, v1);
-        SimMarker(2, 2);
         break;
     }
 
@@ -144,16 +135,12 @@ public:
     AdjacencyVisitor v2; 
     switch(c) {
       case 1:
-        SimMarker(1, 3);
         traverseThroughTypeAndDirection("LIKES","in", v2.getFilter());
         breadthFirstSearch(graph, _WebId, v2);
-        SimMarker(2, 3);
         break;
       case 2:
-        SimMarker(1, 4);
         traverseThroughTypeAndDirection("LIKES","in", v2.getFilter());
         depthFirstSearch(graph, _WebId, v2);
-        SimMarker(2, 4);
         break;
     }
 
@@ -181,16 +168,12 @@ public:
     AdjacencyVisitor v3; 
     switch(c) {
       case 1:
-        SimMarker(1, 5);
         traverseThroughType("LIKES", v3.getFilter());
         breadthFirstSearch(graph, _PersonId, v3);
-        SimMarker(2, 5);
         break;
       case 2:
-        SimMarker(1, 6);
         traverseThroughType("LIKES", v3.getFilter());
         depthFirstSearch(graph, _PersonId, v3);
-        SimMarker(2, 6);
         break;
     }
 
@@ -217,18 +200,14 @@ public:
     SelectionVisitor  v4;
     switch(c) {
       case 1:
-        SimMarker(1, 7);
         filtProperty(_Key, _Value, v4.getFilter());
         traverseThroughType("FRIENDS", v4.getFilter());
         breadthFirstSearch(graph, 0, v4);
-        SimMarker(2, 7);
         break;
       case 2:
-        SimMarker(1, 8);
         filtProperty(_Key, _Value, v4.getFilter());
         traverseThroughType("FRIENDS", v4.getFilter());
         depthFirstSearch(graph, 0, v4);
-        SimMarker(2, 8);
         break;
     }
 
@@ -263,7 +242,6 @@ public:
     std::vector<VertexPointer> target;
     switch(c) {
       case 1: {
-        SimMarker(1, 9);
         traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
         ReachabilityVisitor  v5b;
@@ -271,7 +249,6 @@ public:
         v5b.setFilter(tmpFilter[1]);
         v5b.setDepth(2);
         breadthFirstSearch(graph, _PersonId, v5b);
-        SimMarker(2, 9);
         auto TargetSet = v5b.getTargetSet(); 
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
           myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first << endl;
@@ -279,7 +256,6 @@ public:
         break;
               }
       case 2: {
-        SimMarker(1, 10);
         traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
         DFSReachabilityVisitor v5d;
@@ -287,7 +263,6 @@ public:
         v5d.setFilter(tmpFilter[1]);
         v5d.setDepth(2);
         depthFirstSearch(graph, _PersonId, v5d);
-        SimMarker(2, 10);
         auto target = v5d.getVertexTargetMap();
         myfile << "---------------------DFS---------------------\n";
         for(auto it = target.begin(); it != target.end(); ++it) {
@@ -314,7 +289,6 @@ public:
     Filter tmpFilter[2];
     switch(c) {
       case 1: {
-        SimMarker(1, 11);
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
         traverseThroughTypeAndDirection("LIKES", "out", tmpFilter[1]);
         ReachabilityVisitor  v6b;
@@ -322,7 +296,6 @@ public:
         v6b.setFilter(tmpFilter[1]);
         v6b.setDepth(2);
         breadthFirstSearch(graph, _PersonId, v6b);
-        SimMarker(2, 11);
         auto TargetSet = v6b.getTargetSet(); 
         myfile << "The friends of Person with vid = " << _PersonId<< " like " << TargetSet.size() << " webpages\n";
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
@@ -331,7 +304,6 @@ public:
         break;
               }
       case 2: {
-        SimMarker(1, 12);
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
         traverseThroughTypeAndDirection("LIKES", "out", tmpFilter[1]);
         DFSReachabilityVisitor v6d;
@@ -339,7 +311,6 @@ public:
         v6d.setFilter(tmpFilter[1]);
         v6d.setDepth(2);
         depthFirstSearch(graph, _PersonId, v6d);
-        SimMarker(2, 12);
         auto target = v6d.getVertexTargetMap();
         myfile << "The friends of Person with vid = " << _PersonId << " like " << target.size() << " webpages\n";
         for(auto it = target.begin(); it != target.end(); ++it) {
@@ -365,7 +336,6 @@ public:
     FixedString key("name");
     switch(c) {
       case 1: {
-        SimMarker(1, 13);
         traverseThroughType("LIKES", tmpFilter[0]);
         traverseThroughType("LIKES", tmpFilter[1]);
         ReachabilityVisitor  v7b;
@@ -373,7 +343,6 @@ public:
         v7b.setFilter(tmpFilter[1]);
         v7b.setDepth(2);
         breadthFirstSearch(graph, _PersonId, v7b);
-        SimMarker(2, 13);
         auto TargetSet = v7b.getTargetSet(); 
         myfile << "The webpages liked by person vid = " << _PersonId<< " are liked by " << TargetSet.size() << " people: \n";
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
@@ -383,7 +352,6 @@ public:
         break;
               }
       case 2: {
-        SimMarker(1, 14);
         traverseThroughType("LIKES", tmpFilter[0]);
         traverseThroughType("LIKES", tmpFilter[1]);
         DFSReachabilityVisitor v7d;
@@ -391,7 +359,6 @@ public:
         v7d.setFilter(tmpFilter[1]);
         v7d.setDepth(2);
         depthFirstSearch(graph, _PersonId, v7d);
-        SimMarker(2, 14);
         auto target = v7d.getVertexTargetMap();
         myfile << "The webpages liked by person vid = " << _PersonId << " are liked by  " << target.size() << " people\n";
         for(auto it = target.begin(); it != target.end(); ++it) {
@@ -416,11 +383,9 @@ public:
         myfile << "---------------------DFS---------------------\n";
     switch(c) {
       case 1: {
-        SimMarker(1, 15);
         PathVisitor v8b;
         v8b.setEndVertex(_PersonId2);
         breadthFirstSearch(graph, _PersonId1, v8b);
-        SimMarker(2, 15);
         auto target = v8b.getVertexTargetList();
         if(!target.empty())
           myfile << "There is path from " << _PersonId1 << " to " <<  _PersonId2 << endl;
@@ -429,11 +394,9 @@ public:
         break;
               }
       case 2: {
-        SimMarker(1, 16);
         DFSPathVisitor v8d;
         v8d.setEndVertex(_PersonId2);
         depthFirstSearch(graph, _PersonId1, v8d);
-        SimMarker(2, 16);
         auto target = v8d.getPathList();
         if(!target.empty())
           myfile << "There is path from " << _PersonId1 << " to " <<  _PersonId2 << endl;
@@ -458,11 +421,9 @@ public:
     //v9.setEndVertex(_PersonId2);
     switch(c) {
       case 1: {
-        SimMarker(1, 17);
         PathVisitor v9b;
         v9b.setEndVertex(_PersonId2);
         breadthFirstSearch(graph, _PersonId1, v9b);
-        SimMarker(2, 17);
         auto target = v9b.getVertexTargetList();
         if(target.empty())
           myfile << _PersonId1 << " and " <<  _PersonId2 <<" are not connected" << endl;
@@ -475,11 +436,9 @@ public:
         break;
               }
       case 2: {
-        SimMarker(1, 18);
         DFSShortestPathVisitor v9d;
         v9d.setEndVertex(_PersonId2);
         depthFirstSearch(graph, _PersonId1, v9d);
-        SimMarker(2, 18);
         auto target = v9d.getPathList();
         if(target.empty())
           myfile << _PersonId1 << " and " <<  _PersonId2 <<" are not connected" << endl;
@@ -505,7 +464,6 @@ public:
     vector<VertexPointer> target;
     switch(c) {
       case 1: {
-        SimMarker(1, 19);
         traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
         traverseThroughTypeAndDirection("FRIENDS", "in", tmpFilter[1]);
         PatternVisitor v10d;
@@ -514,12 +472,10 @@ public:
         v10d.setDepth(2);
         v10d.setEndVertex(_PersonId2);
         breadthFirstSearch(graph, _PersonId1, v10d);
-        SimMarker(2, 19);
         target = v10d.getVertexTargetList();
         break;
               }
       case 2: {
-        SimMarker(1, 20);
         traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
         traverseThroughTypeAndDirection("FRIENDS", "in", tmpFilter[1]);
         DFSPatternVisitor v10d;
@@ -528,7 +484,6 @@ public:
         v10d.setDepth(2);
         v10d.setEndVertex(_PersonId2);
         depthFirstSearch(graph, _PersonId1, v10d);
-        SimMarker(2, 20);
         target = v10d.getVertexTargetList();
         break;
               }
@@ -556,7 +511,6 @@ public:
     vector<VertexPointer> target;
     switch(c) {
       case 1: {
-        SimMarker(1, 21);
         traverseThroughTypeAndDirection("LIKES", "out",  tmpFilter[0]);
         traverseThroughTypeAndDirection("LIKES", "in",   tmpFilter[1]);
         PatternVisitor v11b;
@@ -565,12 +519,10 @@ public:
         v11b.setDepth(2);
         v11b.setEndVertex(_PersonId2);
         breadthFirstSearch(graph, _PersonId1, v11b);
-        SimMarker(2, 21);
         target = v11b.getVertexTargetList();
         break;
               }
       case 2: {
-        SimMarker(1, 22);
         traverseThroughTypeAndDirection("LIKES", "out",  tmpFilter[0]);
         traverseThroughTypeAndDirection("LIKES", "in",   tmpFilter[1]);
         DFSPatternVisitor v11d;
@@ -579,7 +531,6 @@ public:
         v11d.setDepth(2);
         v11d.setEndVertex(_PersonId2);
         depthFirstSearch(graph, _PersonId1, v11d);
-        SimMarker(2, 22);
         target = v11d.getVertexTargetList();
         break;
               }
@@ -606,20 +557,16 @@ public:
     vector<VertexPointer>  target;
     switch(c) {
       case 1: {
-        SimMarker(1, 23);
         AdjacencyVisitor v12b; 
         traverseThroughTypeAndDirection("FRIENDS", "out", v12b.getFilter());
         breadthFirstSearch(graph, _PersonId, v12b);
-        SimMarker(2, 23);
         target = v12b.getVertexTargetList();
         break;
               }
       case 2: {
-        SimMarker(1, 24);
         AdjacencyVisitor v12d; 
         traverseThroughTypeAndDirection("FRIENDS", "out",  v12d.getFilter());
         depthFirstSearch(graph, _PersonId, v12d);
-        SimMarker(2, 24);
         target = v12d.getVertexTargetList();
         break;
               }
@@ -650,7 +597,6 @@ public:
     FixedString key("name");
     switch(c) {
       case 1: {
-        SimMarker(1, 25);
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[2]);
@@ -660,7 +606,6 @@ public:
         v13b.setFilter(tmpFilter[2]);
         v13b.setDepth(3);
         breadthFirstSearch(graph, _PersonId, v13b);
-        SimMarker(2, 25);
         auto TargetSet = v13b.getTargetSet(); 
         myfile << "The friends of friends of person vid = " << _PersonId << " has " << TargetSet.size() << " friends: \n";
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
@@ -669,7 +614,6 @@ public:
         break;
               }
       case 2: {
-        SimMarker(1, 26);
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[2]);
@@ -679,7 +623,6 @@ public:
         v13d.setFilter(tmpFilter[2]);
         v13d.setDepth(3);
         depthFirstSearch(graph, _PersonId, v13d);
-        SimMarker(2, 26);
         auto target = v13d.getVertexTargetMap();
         myfile << "The friends of friends of person vid = " << _PersonId << " has " << target.size() << " friends: \n";
         for(auto it = target.begin(); it != target.end(); ++it) {
