@@ -14,13 +14,8 @@
 #ifndef _GRAPH_TYPE_H_ 
 #define _GRAPH_TYPE_H_ 
 
-#include <vector>
-#include <stdlib.h>
-#include <algorithm>
-
 #include "Vertex.h"
 #include "Edge.h"
-#include "PropertyList.h"
 
 class GraphType {
 public:
@@ -28,9 +23,7 @@ public:
   typedef unsigned int VertexDescriptor;
   typedef unsigned int EdgeDescriptor;
   typedef Vertex* VertexPointer;
-  typedef Vertex* VertexPtr;
   typedef Edge* EdgePointer;
-  typedef Edge* EdgePtr;
   typedef std::vector<EdgePointer> EdgeList;
   typedef PropertyList<FixedString, FixedString> PropertyListType;
   typedef PropertyListType VertexPropertyList;
@@ -48,22 +41,22 @@ public:
     EdgeList OutEdges;
 
     auto NextEdge = CurrentVertex->getNextEdge();
-    if( NextEdge != nullptr) {
-      if ( CurrentVertex == NextEdge->getFirstVertexPtr() ) {
+    if (NextEdge != nullptr) {
+      if (CurrentVertex == NextEdge->getFirstVertexPtr() ) {
         OutEdges.push_back(NextEdge);
       }
       auto EdgeIterator = NextEdge->getNextEdge(CurrentVertex);
 
-      while ( EdgeIterator != nullptr ) {
-        if ( CurrentVertex == EdgeIterator->getFirstVertexPtr() ) {
+      while (EdgeIterator != nullptr) {
+        if (CurrentVertex == EdgeIterator->getFirstVertexPtr()) {
           OutEdges.push_back(EdgeIterator);
         }
         EdgeIterator = EdgeIterator->getNextEdge(CurrentVertex);
       }
 
       EdgeIterator = NextEdge->getPreviousEdge(CurrentVertex);
-      while ( EdgeIterator != nullptr ) {
-        if ( CurrentVertex == EdgeIterator->getFirstVertexPtr() ) {
+      while (EdgeIterator != nullptr) {
+        if (CurrentVertex == EdgeIterator->getFirstVertexPtr()) {
           OutEdges.push_back(EdgeIterator);
         }
         EdgeIterator = EdgeIterator->getPreviousEdge(CurrentVertex);
@@ -72,28 +65,27 @@ public:
     return OutEdges;
   }
 
-  /// TODO: untested
   EdgeList getInEdges(VertexPointer CurrentVertex) {
     EdgeList InEdges;
 
     auto NextEdge = CurrentVertex->getNextEdge();
-    if( NextEdge != nullptr) {
+    if (NextEdge != nullptr) {
 
-      if ( CurrentVertex == NextEdge->getSecondVertexPtr() ) {
+      if (CurrentVertex == NextEdge->getSecondVertexPtr() ) {
         InEdges.push_back(NextEdge);
       }
       auto EdgeIterator = NextEdge->getNextEdge(CurrentVertex);
 
-      while ( EdgeIterator != nullptr ) {
-        if ( CurrentVertex == EdgeIterator->getSecondVertexPtr() ) {
+      while (EdgeIterator != nullptr) {
+        if (CurrentVertex == EdgeIterator->getSecondVertexPtr()) {
           InEdges.push_back(EdgeIterator);
         }
         EdgeIterator = EdgeIterator->getNextEdge(CurrentVertex);
       }
 
       EdgeIterator = NextEdge->getPreviousEdge(CurrentVertex);
-      while ( EdgeIterator != nullptr ) {
-        if ( CurrentVertex == EdgeIterator->getSecondVertexPtr() ) {
+      while (EdgeIterator != nullptr) {
+        if (CurrentVertex == EdgeIterator->getSecondVertexPtr()) {
           InEdges.push_back(EdgeIterator);
         }
         EdgeIterator = EdgeIterator->getPreviousEdge(CurrentVertex);
@@ -136,12 +128,12 @@ public:
     EdgePointer NextEdge = FirstNextEdge;
     EdgePointer PreviousEdge = nullptr;
 
-    while ( NextEdge != nullptr ) {
+    while (NextEdge != nullptr) {
       PreviousEdge = NextEdge;
-      if ( NextEdge->getFirstVertexPtr()->getId() == Vertex->getId() ) {
-	NextEdge = NextEdge->getFirstNextEdge();
-      } else if ( NextEdge->getSecondVertexPtr()->getId() == Vertex->getId() ) {
-	NextEdge = NextEdge->getSecondNextEdge();
+      if (NextEdge->getFirstVertexPtr()->getId() == Vertex->getId()) {
+	      NextEdge = NextEdge->getFirstNextEdge();
+      } else if (NextEdge->getSecondVertexPtr()->getId() == Vertex->getId()) {
+	      NextEdge = NextEdge->getSecondNextEdge();
       } else {
         std::cout << "+ \nERROR: no forward movement \n";
       }
@@ -149,7 +141,7 @@ public:
 
     /// The end of the chain is the new edge itself.
     /// Exit since it is already set.
-    if ( PreviousEdge == NewEdge )  {
+    if (PreviousEdge == NewEdge)  {
       return;
     }
     
@@ -157,13 +149,13 @@ public:
     /// Is the end of chain's first vertex the same as the Vertex.
     /// If it is then set the first edge pointers.
     /// Otherwise, use the second edge pointers.
-    if ( PreviousEdge->getFirstVertexPtr() == Vertex ) {
+    if (PreviousEdge->getFirstVertexPtr() == Vertex) {
 
       PreviousEdge->setFirstNextEdge(NewEdge);
 
       /// If new edge's first vertex is same as vertex then set its first
       /// previous and next edges.  Otherwise set second previous and next.
-      if ( NewEdge->getFirstVertexPtr() == Vertex ) {
+      if (NewEdge->getFirstVertexPtr() == Vertex) {
 	NewEdge->setFirstPreviousEdge(PreviousEdge);
 	NewEdge->setFirstNextEdge(nullptr); 
       } else if (NewEdge->getSecondVertexPtr() == Vertex ) {
@@ -171,13 +163,13 @@ public:
 	NewEdge->setSecondNextEdge(nullptr); 
       }
 
-    } else if ( PreviousEdge->getSecondVertexPtr() == Vertex ) {
+    } else if (PreviousEdge->getSecondVertexPtr() == Vertex) {
       PreviousEdge->setSecondNextEdge(NewEdge);
-      if ( NewEdge->getFirstVertexPtr() == Vertex ) {
+      if (NewEdge->getFirstVertexPtr() == Vertex) {
 	NewEdge->setFirstPreviousEdge(PreviousEdge);
 	NewEdge->setFirstNextEdge(nullptr);
 
-      } else if ( NewEdge->getSecondVertexPtr() == Vertex ) {
+      } else if (NewEdge->getSecondVertexPtr() == Vertex) {
 	NewEdge->setSecondPreviousEdge(PreviousEdge);
 	NewEdge->setSecondNextEdge(nullptr);
       }
@@ -192,10 +184,10 @@ public:
 
     /// 1. See if first's and second's nextEdge is set or not.
     /// If it is not set then set it. Doesn't matter who the next really is.
-    if ( FirstVertexPointer->getNextEdge() == nullptr ) {
+    if (FirstVertexPointer->getNextEdge() == nullptr) {
       FirstVertexPointer->setNextEdge(NewEdge);
     }
-    if ( SecondVertexPointer->getNextEdge() == nullptr ) {
+    if (SecondVertexPointer->getNextEdge() == nullptr) {
       SecondVertexPointer->setNextEdge(NewEdge);
     }
 
@@ -276,7 +268,8 @@ public:
   
   ~GraphType() {
     /// Must manually delete the objects.  
-    /// However, only one place is necessary since everywhere else, I am storing pointers.
+    /// However, only one place is necessary since everywhere else, 
+    /// since I am storing pointers.
     /// Thus, Vertices and _edges contain all newly created objects.
 
     for ( size_t i=0; i < Vertices.size(); i++ ) {
@@ -298,34 +291,12 @@ public:
     return Edges;
   }
 
-  void handleAddr(){
-    //g.dump();
-    //vector<VertexPointer> Vertices = getAllVertices();
-    //for(unsigned int i=0;i<Vertices.size();i++){
-    //for(unsigned int i=0;i<50;i++){
-    //  cout<<dec<<Vertices[i]->getId()<<" "<<hex<<Vertices[i]<<" ";
-    //}
-    //cout<<endl;
-
-    VerticesSort = Vertices;
-    EdgesSort = Edges;
-    sort(VerticesSort.begin(),VerticesSort.end());
-    sort(EdgesSort.begin(),EdgesSort.end());
-  //start prefetching trigger
-    passPtr(&VerticesSort,0,&EdgesSort,0,0,0);
-    //cout<<"sof:"<<&Vertices<<endl;
-    //cout<<"sof:"<<Vertices[1]<<endl;
-    //cout<<"sof:"<<Edges[1]<<endl;
-  }
-
   
 protected:
   /// Hold pointers to all vertices.
   vector<VertexPointer> Vertices;
-  vector<VertexPointer> VerticesSort;
   /// Hold pointers to all edges.
   vector<EdgePointer> Edges;
-  vector<EdgePointer> EdgesSort;
   /// Keep a count of vertices and edges.
   unsigned int NumberOfVertices;
   unsigned int NumberOfEdges;
