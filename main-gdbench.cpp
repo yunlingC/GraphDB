@@ -1,3 +1,8 @@
+#include "LinkedList.h"
+#include "QueryDescription.h"
+#include "QueryRandomizer.h"
+
+
 //#include "macros.h"
 #include <stdlib.h>
 #include <algorithm>
@@ -5,12 +10,6 @@
 #include <queue>
 #include <thread>
 #include <string>
-
-#include "GDBench/util.h"
-//#include "GDReader.h"
-#include "LinkedList.h"
-#include "QueryDescription.h"
-#include "QueryRandomizer.h"
 
 int main(int argc, char *argv[]) {
 
@@ -92,8 +91,6 @@ int main(int argc, char *argv[]) {
     Query13 Q13;
     Query14 Q14;
 
-    g.handleAddr();
- 
 //  auto id = 0; //only one set of input right now
     Q1.setPersonProperty("name", name);
     Q2.setWebId(webId);
@@ -142,9 +139,7 @@ int main(int argc, char *argv[]) {
     cout <<"query number is " << qid << endl;
     auto query = QueryList[qid-1];
 
-    SimRoiStart();
     query->runQuery(g, 1);
-    SimRoiEnd();
 
   }
 
