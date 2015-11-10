@@ -100,7 +100,6 @@ protected:
 class SingleRelTypeVisitor : public LimitedDepthVisitor {
 public:
   virtual bool visitVertex(VertexPointer vertex) {
-//    cout << "==>visit vertex " << vertex->getId() << endl;
     _PrevPath  = _PathQueue.front();
     _PathQueue.pop();
     if (_PrevPath.size() > _DepthSetting)
@@ -115,7 +114,6 @@ public:
       newPath.push_back(second);
       _PathQueue.push(newPath);
       _VertexTargetList.push_back(second); //unique
-//      cout << "==>vid\t" << second->getPropertyValue("id").first << "\t" << second->getPropertyValue("firstName").first  << endl;
     }
     return false;
   }
@@ -718,10 +716,9 @@ public:
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-//    cout << "==>visit vertex " << vertex->getId() << "\t" << vertex->getPropertyValue("id").first << endl;
     _PrevPath  = _PathQueue.front(); _PathQueue.pop();
     _CurrentDepth = _PrevPath.size();
-    return  ((_PrevPath.size() > _DepthSetting) ? true : false);
+    return  ((_PrevPath.size() > _DepthSetting ) ? true : false);
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
@@ -738,12 +735,11 @@ public:
     
     _TypeMatch = checkMultiRelType(edge, filter);
     if ( (_CurrentDepth == 1) && _TypeMatch ) {
-//      std::cout << second->getId() << " post +1 \n";
       PostMap.insert(std::pair<unsigned int, bool>(second->getId(), false));
     }
 
     if((_CurrentDepth == 3) && _TypeMatch) {
-      if(checkProperty<ReturnValueType>(second, _VertexFilter ) == true) {
+      if(checkProperty<ReturnValueType>(second, _VertexFilter)) {
         PostMap[_PrevPath[1]->getId()] = true;
       }
     }

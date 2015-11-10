@@ -447,9 +447,7 @@ public:
     }
   }
 
-  GraphType(): NumberOfVertices(0), NumberOfEdges(0) {
-
-  }
+  GraphType(): NumberOfVertices(0), NumberOfEdges(0) {}
   
   ~GraphType() {
     /// Must manually delete the objects.  

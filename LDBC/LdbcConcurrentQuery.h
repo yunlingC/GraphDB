@@ -21,9 +21,8 @@
 #include <unordered_map>
 
 #include "LdbcCustomVisitor.h"
-#include "LdbcUpdateVisitor.h"
+//#include "LdbcUpdateVisitor.h"
 #include "BreadthFirstSearch.h"
-#include "ConcurrentBFS.h"
 #include "QueryDescription.h"
 
 #define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
@@ -34,7 +33,7 @@ class LdbcQuery : public Query{
 public:
   typedef std::pair<string, string> ParamPairType;
   typedef std::pair<string, pair<string, string> > RangePairType;
-  typedef LocksManager LockManagerType;
+//  typedef LocksManager LockManagerType;
 public:
   LdbcQuery(unsigned int Id) : QueryId(Id) {
     LdbcFile.open("ldbc"+std::to_string(Id)+".log", ios_base::out| ios_base::app);
@@ -42,13 +41,18 @@ public:
 
   virtual void runQuery(Graph & graph, VertexDescriptor StartVertex ) { }
 
-  virtual void runQuery(Graph & graph, LockManagerType & LockManager) { }
+//  virtual void runQuery(Graph & graph, LockManagerType & LockManager) { }
 
-  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
-      LockManagerType & LockManager) {}
+  virtual void runQuery(Graph & graph) { }
 
-  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
-      VertexDescriptor EndVertex, LockManagerType & LockManager) {}
+//  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
+//      LockManagerType & LockManager) {}
+
+//  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
+//      VertexDescriptor EndVertex, LockManagerType & LockManager) {}
+
+  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex, 
+      VertexDescriptor EndVertex) {}
 
   void setParam(const string & Key, const string & Value) {
     ParamPair.first = Key;
