@@ -60,6 +60,8 @@ public:
   VertexDescriptor getSecondId();
   LabelType getType();
 
+  void setFirstVertexPtr(VertexPointer Vertex);
+  void setSecondVertexPtr(VertexPointer Vertex);
   void setFirstNextEdge(EdgePointer e);
   void setFirstPreviousEdge(EdgePointer e);
   void setId(unsigned int id);
@@ -68,6 +70,7 @@ public:
   void setSecondNextEdge(EdgePointer e);
   void setSecondPreviousEdge(EdgePointer e);
   void setType(string t);
+  void setType(LabelType t);
 
   /// Constructors.
   Edge();

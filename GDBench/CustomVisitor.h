@@ -29,12 +29,16 @@ public:
   AddressVisitor() {}
 
   bool visitVertex(VertexPointer Vertex) {
+    std::cout << "Visit " << Vertex->getId()
+              << "\n"; 
+
     int  diff = reinterpret_cast<int *>(Vertex) - reinterpret_cast<int *>(PrevVertexAddr); 
     VertexAddrDis.push_back(diff);
 
-    std::cout << "Vertex:  Prev " << reinterpret_cast<int *>(PrevVertexAddr) << "\t"
-              << "Curr " << reinterpret_cast<int *>(Vertex) 
-              << "\tdiff " << diff << std::endl;;
+//    std::cout 
+// << "Vertex:  Prev " << reinterpret_cast<int *>(PrevVertexAddr) << "\t"
+//              << "Curr " << reinterpret_cast<int *>(Vertex) 
+//              << diff << "\t";;
 
 
     PrevVertexAddr = Vertex;
@@ -45,12 +49,16 @@ public:
     int diff = reinterpret_cast<int *>(edge) - reinterpret_cast<int *>(PrevEdgeAddr);
     EdgeAddrDis.push_back(diff);
 
-    std::cout << "Edge:    Prev " << reinterpret_cast<int *>(PrevEdgeAddr) << "\t"
-              << "Curr " << reinterpret_cast<int *>(edge) 
-              << "\tdiff " << diff << std::endl;;
+//    std::cout 
+//      << "Edge:    Prev " << reinterpret_cast<int *>(PrevEdgeAddr) << "\t"
+//              << "Curr " << reinterpret_cast<int *>(edge) 
+//              << diff << "\t";
 
     PrevEdgeAddr = edge;
 
+    std::cout << first->getId() << " ---- " 
+              << edge->getId() << " ---- " 
+              << second->getId() << "\n";
     return false;
   }
 
