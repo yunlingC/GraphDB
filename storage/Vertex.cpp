@@ -62,6 +62,11 @@ auto Vertex::setType (string Label)
   VertexLabel = Label;
 }
 
+auto Vertex::setType(LabelType Label)
+  -> void {
+  VertexLabel = Label;
+}
+
 auto Vertex::getType() 
   ->LabelType {
     return VertexLabel;
@@ -89,7 +94,11 @@ auto Vertex::dump()
   -> void {
 
 //    std::cout << " ========================================= " << std::endl;
-    std::cout << " Vertex: " << VertexId << ", addr:" << this << ", node size: " << sizeof(Vertex) << std::endl;
+    std::cout <<"\n";
+    std::cout << " Vertex: " << VertexId 
+              << ", addr:" << this 
+              << ", node size: " << sizeof(Vertex) 
+              << std::endl;
 //    std::cout << " Outedge ids: ";
 //    // for ( auto i = 0; i < AllEdges.size(); i++ ) {
 //    //   EdgePtr ep = AllEdges[i];
@@ -97,44 +106,51 @@ auto Vertex::dump()
 //    // }
 //    
 //    // For this node's next first edge
-//    if ( NextEdge != nullptr ) {
-//      std::cout << "\nPrint edge traversals:" << NextEdge << std::endl;
-//      cout << "=> current edge id: " << NextEdge->getId() << ", previous edge ids: \n";
-//      EdgePtr p = NextEdge;
-//      std::cout << "\n=> firstEdges\n";
-//      std::cout << "=> previous eids\n";
-//      while ( p != nullptr ) {
-//	std::cout << "=> " << p->getId() << " ";
-//	p = p->getFirstPreviousEdge();
-//      }
+    if ( NextEdge != nullptr ) {
+//      std::cout << "Print edge traversals:" << NextEdge << "\n";
+      std::cout << "=> first edge id: " << NextEdge->getId() 
+                << "\n";
+     
+      auto FirstPtr = NextEdge->getFirstVertexPtr();
+      auto SecondPtr = NextEdge->getSecondVertexPtr();
+
+      EdgePtr p = NextEdge;
+      std::cout << "=> firstEdges\n";
+      std::cout << "=> previous eids\n";
+      while ( p != nullptr ) {
+      	std::cout << "=> " << p->getId() << " ";
+      	p = p->getPreviousEdge(FirstPtr);
+      }
 //
-//      cout << "\n= next eids\n";
-//      p = NextEdge;
-//      while ( p != nullptr) {
-//	std::cout << "=> " << p->getId() << " ";
-//	p = p->getFirstNextEdge();
-//      }
+      cout << "\n=> next eids\n";
+      p = NextEdge;
+      while ( p != nullptr) {
+      	std::cout << "=> " << p->getId() << " ";
+      	p = p->getNextEdge(FirstPtr);
+      }
 //
-//      std::cout << "\n\n=> secondEdges\n";
-//      std::cout << "=> previous eids\n";
-//      while ( p != nullptr) {
-//	std::cout << "=> " << p->getId() << " ";
-//	p = p->getSecondPreviousEdge();
-//      }
-//
-//      cout << "\n= next eids\n";
-//      p = NextEdge;
-//      while ( p != nullptr) {
-//	std::cout << "=> " << p->getId() << " ";
-//	p = p->getSecondNextEdge();
-//      }
-//    }
-//
-//    std::cout << "\n"; //std::endl;
-//
-//    std::cout << "\nVertex Propertylist:\n";
-//    VertexPropertyList.print();
-//    std::cout << " ========================================= \n";
+      std::cout << "\n=> secondEdges\n";
+      std::cout << "=> previous eids\n";
+      p = NextEdge;
+      while ( p != nullptr) {
+      	std::cout << "=> " << p->getId() << " ";
+	      p = p->getPreviousEdge(SecondPtr);
+      }
+
+      cout << "\n=> next eids\n";
+      p = NextEdge;
+      while ( p != nullptr) {
+	      std::cout << "=> " << p->getId() << " ";
+	      p = p->getNextEdge(SecondPtr);
+      }
+    }
+
+    if (LastEdge != nullptr) {
+      std::cout << "\n=> last edge id: " 
+                << LastEdge->getId() << "\n";
+    }
+
+    VertexPropertyList.print();
 
   }
 

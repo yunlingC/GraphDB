@@ -52,6 +52,7 @@ public:
   ReturnPropertyValueType getPropertyValue(std::string k);
   void setId(unsigned int id);
   void setType(string t);
+  void setType(LabelType t);
   void setNextEdge(EdgePtr e);
   void setLastEdge(EdgePtr e);
   void setProperty(KeyType k, ValueType v);

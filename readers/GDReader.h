@@ -12,7 +12,6 @@
 ///
 //===----------------------------------------------------------------------===//
 
-
 #ifndef _GDREADER_H_
 #define _GDREADER_H_
 
@@ -117,10 +116,12 @@ public:
        } //END_WHILE
 
       _GDfile.close();
-      cout << " people " << _people << "\n";
-      cout << " webpages" << _webpages << "\n";
-      cout << " friends " << _friends << "\n";
-      cout << " likes " << _likes << "\n";
+      cout << "\n";
+      cout << "-- people " << _people << "\n";
+      cout << "-- webpages" << _webpages << "\n";
+      cout << "-- friends " << _friends << "\n";
+      cout << "-- likes " << _likes << "\n";
+      cout << "\n";
      }//END_TRY
     catch (int i){
       cout << "Error:"<< i <<"\tFailed to open file" <<endl;
