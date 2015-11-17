@@ -15,15 +15,17 @@
 #ifndef _QUERYDESCRIPTION_H_
 #define _QUERYDESCRIPTION_H_
 
+#include "FixedString.h"
+#include "BreadthFirstSearch.h"
+#include "DepthFirstSearch.h"
+#include "CustomVisitor.h"
+
 #include <vector>
 #include <string>
 #include <iostream>
 #include <fstream>
 
-#include "FixedString.h"
-#include "BreadthFirstSearch.h"
-#include "DepthFirstSearch.h"
-#include "CustomVisitor.h"
+using namespace std;
 
 ofstream myfile("gd_execution.log", ios_base::out | ios_base::app);
 
@@ -118,7 +120,7 @@ public:
     else
         myfile << "---------------------DFS---------------------\n";
     myfile <<"People with " <<_Key << " = " << _Value <<" is(are) as below\n";
-    auto target = v1.getVertexTargetList();
+    auto target = v1.getVertexList();
     for(auto it = target.begin(); it != target.end(); ++it) {
       myfile << "Vertex " << (*it)->getId();
       myfile << endl;
@@ -151,7 +153,7 @@ public:
     else
         myfile << "---------------------DFS---------------------\n";
     myfile << "People who likes webpage id = " << _WebId  << " are as below\n";
-    auto target= v2.getVertexTargetList();
+    auto target= v2.getVertexList();
     for(auto it = target.begin(); it != target.end(); ++it) {
       FixedString key("name");
       myfile << "Vertex " << (*it)->getId() <<"\t" << (*it)->getPropertyValue(key).first;
@@ -184,7 +186,7 @@ public:
     else
         myfile << "---------------------DFS---------------------\n";
     myfile << "Person with vid = " << _PersonId << " likes webpages:\n";
-    auto target = v3.getVertexTargetList();
+    auto target = v3.getVertexList();
     for(auto it = target.begin(); it != target.end(); ++it) {
       FixedString key("wpurl");
       myfile <<"Vertex " << (*it)->getId() << "\t"  << (*it)->getPropertyValue(key).first;
@@ -218,7 +220,7 @@ public:
     else
         myfile << "---------------------DFS---------------------\n";
     myfile <<"People with " << _Key << " = " << _Value <<" is(are) as below\n";
-    auto target = v4.getVertexTargetList();
+    auto target = v4.getVertexList();
     for(auto it = target.begin(); it != target.end(); ++it) {
       FixedString key("name");
       myfile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue(key).first;
@@ -386,7 +388,7 @@ public:
         PathVisitor v8b;
         v8b.setEndVertex(_PersonId2);
         breadthFirstSearch(graph, _PersonId1, v8b);
-        auto target = v8b.getVertexTargetList();
+        auto target = v8b.getVertexList();
         if(!target.empty())
           myfile << "There is path from " << _PersonId1 << " to " <<  _PersonId2 << endl;
         else 
@@ -424,7 +426,7 @@ public:
         PathVisitor v9b;
         v9b.setEndVertex(_PersonId2);
         breadthFirstSearch(graph, _PersonId1, v9b);
-        auto target = v9b.getVertexTargetList();
+        auto target = v9b.getVertexList();
         if(target.empty())
           myfile << _PersonId1 << " and " <<  _PersonId2 <<" are not connected" << endl;
         else {
@@ -472,7 +474,7 @@ public:
         v10d.setDepth(2);
         v10d.setEndVertex(_PersonId2);
         breadthFirstSearch(graph, _PersonId1, v10d);
-        target = v10d.getVertexTargetList();
+        target = v10d.getVertexList();
         break;
               }
       case 2: {
@@ -484,7 +486,7 @@ public:
         v10d.setDepth(2);
         v10d.setEndVertex(_PersonId2);
         depthFirstSearch(graph, _PersonId1, v10d);
-        target = v10d.getVertexTargetList();
+        target = v10d.getVertexList();
         break;
               }
     }
@@ -519,7 +521,7 @@ public:
         v11b.setDepth(2);
         v11b.setEndVertex(_PersonId2);
         breadthFirstSearch(graph, _PersonId1, v11b);
-        target = v11b.getVertexTargetList();
+        target = v11b.getVertexList();
         break;
               }
       case 2: {
@@ -531,7 +533,7 @@ public:
         v11d.setDepth(2);
         v11d.setEndVertex(_PersonId2);
         depthFirstSearch(graph, _PersonId1, v11d);
-        target = v11d.getVertexTargetList();
+        target = v11d.getVertexList();
         break;
               }
     }
@@ -560,14 +562,14 @@ public:
         AdjacencyVisitor v12b; 
         traverseThroughTypeAndDirection("FRIENDS", "out", v12b.getFilter());
         breadthFirstSearch(graph, _PersonId, v12b);
-        target = v12b.getVertexTargetList();
+        target = v12b.getVertexList();
         break;
               }
       case 2: {
         AdjacencyVisitor v12d; 
         traverseThroughTypeAndDirection("FRIENDS", "out",  v12d.getFilter());
         depthFirstSearch(graph, _PersonId, v12d);
-        target = v12d.getVertexTargetList();
+        target = v12d.getVertexList();
         break;
               }
     }

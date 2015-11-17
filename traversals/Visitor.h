@@ -17,6 +17,8 @@
 #include "GraphType.h"
 #include "Filter.h"
 
+#include <unordered_set> 
+
 class Visitor {
 public:
   typedef FixedString KeyType;
@@ -26,7 +28,8 @@ public:
   typedef GraphType::VertexPropertyList VertexPropertyList;
   typedef GraphType::EdgePropertyList EdgePropertyList;
   typedef GraphType::VertexDescriptor VertexDescriptor;
-  typedef std::vector<VertexPointer> VertexTarget;
+  typedef std::vector<VertexPointer> VertexTargetType;
+  typedef std::unordered_set<VertexPointer> VertexSetType;
   typedef std::vector<VertexPointer> VertexPath;
 public:
   virtual void setFilter(Filter & filter) {
@@ -37,8 +40,12 @@ public:
     return _Filter;
   }
 
-  virtual VertexTarget & getVertexTargetList() {
-    return _VertexTargetList;
+  virtual VertexTargetType & getVertexList() {
+    return VertexList;
+  }
+
+  virtual VertexSetType & getVertexSet() {
+    return VertexSet;
   }
 
   virtual void  visitStartVertex(VertexPointer VertexPtr) { }
@@ -92,7 +99,8 @@ public:
 
 
 protected:
-  VertexTarget _VertexTargetList; 
+  VertexTargetType VertexList; 
+  VertexSetType   VertexSet;
   Filter _Filter;
 
 };

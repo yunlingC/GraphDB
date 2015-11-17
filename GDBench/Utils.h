@@ -31,7 +31,7 @@ typedef std::string Direction;
 typedef std::vector<std::string> AttributesType;
 typedef GraphType::VertexPointer VertexPointer;
 typedef GraphType::EdgePointer    EdgePointer;
-typedef std::map<VertexPointer, unsigned int> DepthList;
+typedef std::map<VertexPointer, unsigned int> DepthListType;
 typedef std::multimap<VertexPointer, unsigned int> MultiDepthList;
 typedef std::map<VertexPointer, unsigned int> DegreeList;
 typedef std::vector<VertexPointer> VertexTargetSet;
@@ -70,8 +70,8 @@ void traverseThroughMultiRelType(RelType types, Filter & TypeFilter ) {
   AttributesType attributes;
   boost::split(attributes, types, boost::is_any_of("+"));
   for (auto it = attributes.begin(); it != attributes.end(); it++)
-    std::cout << "types " << *it ;
-  std::cout << std::endl;
+//    std::cout << "types " << *it ;
+//  std::cout << std::endl;
   TypeFilter.setTypeList(attributes);
 }
 
@@ -92,7 +92,10 @@ bool TerminateAtVertex(unsigned int targetNum, VertexTargetSet vertexSet) {
 
 
 /// compute and return the depth for second
-unsigned int computeDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthList &dl) {
+unsigned int computeDepth(VertexPointer first, 
+                          EdgePointer ep, 
+                          VertexPointer second, 
+                          DepthListType &dl) {
   typedef std::pair<VertexPointer, unsigned int> DepthPair;
 
   unsigned int depth = 1;
@@ -116,7 +119,10 @@ unsigned int computeDepth(VertexPointer first, EdgePointer ep, VertexPointer sec
   return  depth;
 }
 
-void recordDepth(VertexPointer first, EdgePointer ep, VertexPointer second, MultiDepthList &dl) {
+void recordDepth(VertexPointer first, 
+                 EdgePointer ep, 
+                 VertexPointer second, 
+                 MultiDepthList &dl) {
   typedef std::pair<VertexPointer, unsigned int> DepthPair;
 
   unsigned int depth = 1;
@@ -143,7 +149,7 @@ void recordDepth(VertexPointer first, EdgePointer ep, VertexPointer second, Mult
   return ;
 }
 
-void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthList &dl) {
+void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthListType &dl) {
   typedef std::pair<VertexPointer, unsigned int> DepthPair;
 
   unsigned int depth = 1;
@@ -168,7 +174,7 @@ void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, Dept
 }
 
 /// check if the vertex's depth == given depth
-bool checkDepth(unsigned int depth, VertexPointer vertex, DepthList & depthList) {
+bool checkDepth(unsigned int depth, VertexPointer vertex, DepthListType & depthList) {
   if (depthList.find(vertex) != depthList.end())
     if(depthList[vertex]  == depth)
       return true;
@@ -232,7 +238,7 @@ bool checkTimeRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
   } //END_FOR
   auto timeProp = GraphElem->getPropertyValue(filter.getKey());                          
   if(timeProp.second == false) {
-    std::cout << "Error: Failed to find time property\n";
+//    std::cout << "Error: Failed to find time property\n";
     return false;   /// cannot find time property ;
   }
   else  {
@@ -364,14 +370,16 @@ bool checkRange(unsigned int opt, GraphElemType elem, Filter & RangeFilter, bool
         }//switch 
 }
 
+#if DEBUG 
 void dumpVertexTarget(VertexTargetSet & VertexTargetList) {
 
   for (auto it = VertexTargetList.begin(); it != VertexTargetList.end(); ++it) {
     std::cout << "Vertex: "<< (*it)->getId() << std::endl;
   }
 }
+#endif
 
-bool TerminateAtDepth(unsigned int depth, DepthList & depthlist) {
+bool TerminateAtDepth(unsigned int depth, DepthListType & depthlist) {
   for(auto it = depthlist.begin(); it != depthlist.end(); ++ it) {
     if(it->second > depth)
       return true;
@@ -412,37 +420,30 @@ bool checkMultiRelType(EdgePointer edge, Filter & filter) {
   return typeMatch;
 }
 
-/// check if the direction of vertex to edge is 
+/// check the direction of vertex to edge 
 bool checkDirection(VertexPointer vertex, EdgePointer edge, Filter & filter ) {
-    int direction = 0;
+    unsigned int direction = 0;
 
-    if(filter.getDirection() == "" )
+    if (filter.getDirection() == "" )
       return true;
 
-    if ( filter.getDirection() == "out")
-      direction = 1;     //first vertex => outEdge for vertex;
-    else if ( filter.getDirection() == "in")
-      direction = 2;     //second vertex => inEdge for vertex;
-    else 
-      std::cout <<"Err: Irrelevant edges.\n";
+    if (filter.getDirection() == "out")
+      /// First vertex => outEdge for vertex;
+      direction = 1;     
+    else if (filter.getDirection() == "in")
+      /// Second vertex => inEdge for vertex;
+      direction = 2;     
 
     switch(direction) {
     case 1:
-      if (edge->getFirstId() == vertex->getId()) {
-        return false;
-      }
-      break;
+      return (edge->getFirstId() != vertex->getId());
 
     case 2:
-      if (edge->getSecondId() == vertex->getId()) { 
-        return false;
-      }
-      break;
+      return (edge->getSecondId() != vertex->getId());
 
     default:
       return true;
     }
-    return true;
 }
 
 
