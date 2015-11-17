@@ -18,7 +18,7 @@
 #include "GraphType.h"
 #include "FixedString.h"
 #include "macros.h"
-#include "GDReader.h"
+#include "GDBReader.h"
 #include "LinkedList.h"
 
 #include <iostream>
@@ -90,7 +90,7 @@ int main() {
   //  g.allocEdgeMemory(100);
   cout << "Begin testing\n";
 
-  GDReader reader(g);
+  GDBReader reader(g);
   reader.readFile("../tests/gd/sndata.gd");
 
   //createGraph(g);
