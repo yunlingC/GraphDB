@@ -136,9 +136,7 @@ public:
 	      NextEdge = NextEdge->getFirstNextEdge();
       } else if (NextEdge->getSecondVertexPtr()->getId() == Vertex->getId()) {
 	      NextEdge = NextEdge->getSecondNextEdge();
-      } else {
-        std::cout << "+ \nERROR: no forward movement \n";
-      }
+      } 
     }
 
     /// The end of the chain is the new edge itself.
@@ -262,7 +260,6 @@ public:
 
     for ( size_t i = 0; i <Edges.size() ; i++ ) {
       Edges[i]->dump();
-      std::cout << "\n";
     }
   }
 
