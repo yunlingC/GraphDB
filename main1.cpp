@@ -4,12 +4,12 @@
 #include "Utility.h"
 
 #include <string>
-#include "readers/GDReader.h"
+#include "GDBReader.h"
 
 int main(int argc, char * argv[]) {
 
   Graph gf;
-  GDReader reader(gf);
+  GDBReader reader(gf);
   reader.readFile("../tests/gd/sndata.gd");
   gf.print();
 

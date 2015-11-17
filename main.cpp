@@ -13,7 +13,7 @@
 #include "Utility.h"
 
 #include <string>
-#include "readers/GDReader.h"
+#include "GDBReader.h"
 
 void printmem (char* p) {
   char* q = p;
@@ -81,7 +81,7 @@ int main(int argc, char * argv[]) {
   Graph* gr = new(place) Graph();
   Graph & g = *gr;
 
-  GDReader reader(g);
+  GDBReader reader(g);
   reader.readFile("../tests/gd/sndata.gd");
   g.print();
 

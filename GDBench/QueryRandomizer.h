@@ -21,13 +21,13 @@
 #include <unistd.h>
 #include <time.h>
 
-#include "GDReader.h"
+#include "GDBReader.h"
 
 class QueryRandomizer {
 public:
   typedef GraphType::VertexDescriptor VertexDescriptor;
 public:
-  QueryRandomizer (GDReader & reader) : _gdReader(reader) { };
+  QueryRandomizer (GDBReader & reader) : _gdReader(reader) { };
 
   string & getName(unsigned int i ) {
     createName(_name, i);
@@ -90,7 +90,7 @@ private:
   string _pid;
   VertexDescriptor _person;
   VertexDescriptor _webpage;
-  GDReader & _gdReader;
+  GDBReader & _gdReader;
 };
 
 

@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
   Graph g;
   cout << "Begin testing\n";
 
-  GDReader reader(g);
+  GDBReader reader(g);
   reader.readFile("../tests/gd/sndata1000.gd");
 
   cout << "begin randomizing\n";
