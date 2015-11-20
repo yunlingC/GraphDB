@@ -1,9 +1,5 @@
 //#include "macros.h"
-#include <stdlib.h>
-#include <algorithm>
 #include <iostream>
-#include <queue>
-#include <thread>
 #include <string>
 #include <time.h>
 
@@ -55,6 +51,7 @@ int main(int argc, char *argv[]) {
 //  std::vector<unsigned int> VertexList = { 5, 10, 15, 20, 30, 50, 80};
 
   
+  
 //  for (auto & EdgeId : EdgeList) {
 //    auto res = g.removeBranch(EdgeId);
 //    std::cout << "remove edge with id " << res << "\n";
@@ -65,19 +62,41 @@ int main(int argc, char *argv[]) {
 //    std::cout << "remove vertex with id " << res2 << "\n";
 //  }
 
-//  for (unsigned int i = 0; i < 39000; i+= STEP) {
+  srand(time(NULL));
+
+  for (unsigned int i = 0; i < 39000; i+= STEP) {
+    auto EdgeId = rand()%39000;
+
+    while (g.Edges.find(EdgeId) != g.Edges.end()) {
+      EdgeId = rand()%39000;
+    }
+
+    g.Edges.insert(EdgeId);
+
+    auto res = g.removeBranch(EdgeId);
 //    auto res = g.removeBranch(i);
-////    std::cout << "remove edge with id " << res << "\n";
-//  }
-//
-//  for (unsigned int j = 1; j < 5000; j+= STEP) {
+//    std::cout << "remove edge with id " << res << "\n";
+//    fflush(stdout);
+  }
+
+  
+  for (unsigned int j = 1; j < 5000; j+= STEP) {
+    auto VertexId = rand()%4900 + 1;
+
+    while (g.Vertices.find(VertexId) != g.Vertices.end()) {
+      VertexId = rand()%4900;
+    }
+    g.Vertices.insert(VertexId);
+
+    auto res2 = g.removeVertex(VertexId);
 //    auto res2 = g.removeVertex(j);
-////    std::cout << "remove vertex with id " << res2 << "\n";
-//  }
-//
-////  std::cout <<"recover all the deletion \n";
-//
-//  g.recoverAll();
+//    std::cout << "remove vertex with id " << res2 << "\n";
+//    fflush(stdout);
+  }
+
+//  std::cout <<"recover all the deletion \n";
+
+  g.recoverAll();
 
 
 //  g.dump();
@@ -86,40 +105,76 @@ int main(int argc, char *argv[]) {
 
 //  g.dump();
 
-  Query1 Q1;
-  Q1.setPersonProperty("name", "A");
-
-  SimRoiStart();
-
-  Q1.runQuery(g, 1);
-
-  SimRoiEnd();
-
-//  AddressVisitor AddrVisitor;
+//  Query1 Q1;
+//  Q1.setPersonProperty("name", "A");
 //
 //  SimRoiStart();
 //
-//  breadthFirstSearch(g, 0, AddrVisitor);
+//  Q1.runQuery(g, 1);
 //
 //  SimRoiEnd();
 
-//  std::cout << "\nVertex\n";
-//  unsigned int i = 0;
-//  for (auto & addr : AddrVisitor.VertexAddrDis) {
-//      std::cout << addr/4 << ",";
-//      if (i%1000 == 0 ) 
-//        std::cout << std::endl;
-//      i++;
-//  }
+//  Query8 Q8;
 //
-//  i = 0;
-//  std::cout << "\n\nEdge\n";
-//  for (auto & addr : AddrVisitor.EdgeAddrDis) {
-//      std::cout << addr/4 << ",";
-//      if (i%1000 == 0) 
-//        std::cout << std::endl;
-//      i++;
-//  }
+//  Q8.setEndPoints(0, 101);
+//
+//  SimRoiStart();
+//
+//  Q8.runQuery(g, 1);
+//
+//  SimRoiEnd();
+
+//  Query14 Q14;
+//
+//  Q14.setPersonProperty("name", "A");
+//
+//  SimRoiStart();
+//
+//  Q14.runQuery(g, 1);
+//
+//  SimRoiEnd();
+
+//  Query7 Q7;
+//
+//  Q7.setPersonId(34);
+//
+//  SimRoiStart();
+//
+//  Q7.runQuery(g, 1);
+//
+//  SimRoiEnd();
+
+//  Query10 Q10;
+//  Q10.setEndPoints(14, 42);
+//  SimRoiStart();
+//  Q10.runQuery(g, 1);
+//  SimRoiEnd();
+//
+  AddressVisitor AddrVisitor;
+//
+//  SimRoiStart();
+//
+  breadthFirstSearch(g, 0, AddrVisitor);
+//
+//  SimRoiEnd();
+
+  std::cout << "\nVertex\n";
+  unsigned int i = 0;
+  for (auto & addr : AddrVisitor.VertexAddrDis) {
+      std::cout << addr/4 << ",";
+      if (i%1000 == 0 ) 
+        std::cout << std::endl;
+      i++;
+  }
+
+  i = 0;
+  std::cout << "\n\nEdge\n";
+  for (auto & addr : AddrVisitor.EdgeAddrDis) {
+      std::cout << addr/4 << ",";
+      if (i%1000 == 0) 
+        std::cout << std::endl;
+      i++;
+  }
 
   cout << "\nfinish testing\n";
   myfile.close();
