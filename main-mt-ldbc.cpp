@@ -21,31 +21,50 @@ int main( int argc, char * argv[]) {
       exit(0);
     }
   }
-
+ 
 
   Graph g[14];
+  
+#ifdef _FIXALLOC_
+  /// Allocate space for all the graphs
+
+  char* NodeMemory = new char[sizeof(Vertex)*40000*14];
+  char* EdgeMemory = new char[sizeof(Edge)*80000*14];
+
+  std::cout << "Start of node block " << reinterpret_cast<int*>(NodeMemory)
+            << " , Ending address " << reinterpret_cast<int*>(NodeMemory + sizeof(Vertex)*40000*14)
+            << "\n";
+
+  std::cout << "Start of edge block " << reinterpret_cast<int*>(EdgeMemory)
+            << " , Ending address " << reinterpret_cast<int*>(EdgeMemory + sizeof(Edge)*80000*14)
+            << "\n";
+
+#endif
 
   for (auto i = 0; i < 14; i++) {
 
   LDBCReader reader(g[i]);
 
 #ifdef _FIXALLOC_
-  g[i].allocVertexMemory(40000);
-  g[i].allocEdgeMemory(80000);
+  g[i].allocVertexMemory(NodeMemory, 40000);
+  g[i].allocEdgeMemory(EdgeMemory, 80000);
+
+  NodeMemory += sizeof(Vertex)*40000;
+  EdgeMemory += sizeof(Edge)*80000;
+
 #endif /* _FIXALLOC */
 
   reader.readDirectory("../tests/ldbc/social_network_100/New");
 
   }
   cout << "Finish reading \n";
-
+/**
   unsigned int interval = 14;
   if (argc > 2) {
     if ( std::stoi(argv[2]) > 14) {
       interval = std::stoi(argv[2]);
     }
-  }
-
+  } 
 
   LDBCRandomizer rand;
   std::vector<unsigned int> Input;
@@ -150,5 +169,11 @@ int main( int argc, char * argv[]) {
   }
 
   cout << "Finish testing\n";
+*/
+
+//#ifdef _FIXALLOC_
+//  delete NodeMemory;
+//  delete EdgeMemory;
+//#endif
 
 }

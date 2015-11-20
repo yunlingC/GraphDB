@@ -17,7 +17,6 @@
 #include <vector>
 #include <map>
 #include <stdlib.h>
-#include <algorithm>
 
 #include "util.h"
 #include "Vertex.h"
@@ -455,24 +454,24 @@ public:
     /// Thus, Vertices and _edges contain all newly created objects.
 
 //    std::cout << "GraphType: clean " << Vertices.size() << " vertices and " << Edges.size() << " edges\n";
-//    for ( size_t i=0; i < Vertices.size(); i++ ) {
-//      Vertices[i]->deleteVertex();
+    for ( size_t i=0; i < Vertices.size(); i++ ) {
+      Vertices[i]->deleteVertex();
 //      delete Vertices[i];
-//    }
+    }
 //    std::cout << "vertex cleaning is done\n";
-//
-//    for ( size_t i=0; i < Edges.size(); i++ ) {
-//      Edges[i]->deleteEdge();
-//      delete Edges[i];
-//    }
-//
-//    std::cout << "edge cleaning is done\n";
 
-#ifdef _FIXALLOC_
-    //    Delete the memory spaces.
-    delete NodeMemory;
-    delete EdgeMemory;
-#endif /* _FIXALLOC_ */
+    for ( size_t i=0; i < Edges.size(); i++ ) {
+      Edges[i]->deleteEdge();
+//      delete Edges[i];
+    }
+
+ //   std::cout << "edge cleaning is done\n";
+
+//#ifdef _FIXALLOC_
+//    //    Delete the memory spaces.
+//    delete NodeMemory;
+//    delete EdgeMemory;
+//#endif /* _FIXALLOC_ */
 
   }
 
@@ -492,6 +491,36 @@ public:
 //    cout << "Edge Memory\n + Starting address: " << reinterpret_cast<int*>(EdgeMemory) 
 //    	 << ", ending address: " << reinterpret_cast<int*>(EdgeMemory + sizeof(Edge)*sz) << "\n" << endl;
   }
+
+  /// For experiments on separate graphs
+  /// Memory allocated from a fixed address -startMemory
+  void allocVertexMemory(char * StartMemory, unsigned int sz) {
+
+    // Allocation sz number of Vertex objects.
+//    std::cout << "Vertex space: " << sizeof(Vertex)*sz << "\n";
+//    NodeMemory = new char[sizeof(Vertex)*sz];
+    NodeMemory = StartMemory;
+    std::cout << "Vertex Memory\n + Starting address: " 
+              << reinterpret_cast<int*>(NodeMemory)
+    	        << ", ending address: " 
+              << reinterpret_cast<int*>(NodeMemory + sizeof(Vertex)*sz) 
+              << "\n";
+  }
+
+  void allocEdgeMemory(char * StartMemory, unsigned int sz) {
+
+    // Allocation sz number of Edge objects.
+//    std::cout << "Edge space: " << sizeof(Edge)*sz << "\n";
+    EdgeMemory = StartMemory;
+//    EdgeMemory = new char[sizeof(Edge)*sz];
+    std::cout << "Edge Memory\n + Starting address: " 
+              << reinterpret_cast<int*>(EdgeMemory) 
+    	        << ", ending address: " 
+              << reinterpret_cast<int*>(EdgeMemory + sizeof(Edge)*sz) 
+              << "\n" << endl;
+  }
+
+
 #endif /* _FIXALLOC_ */
 
   vector<VertexPointer> getAllVertices(){
@@ -502,23 +531,13 @@ public:
     return Edges;
   }
 
-//  void handleAddr(){
-//    VerticesSort = Vertices;
-//    EdgesSort = Edges;
-//    sort(VerticesSort.begin(),VerticesSort.end());
-//    sort(EdgesSort.begin(),EdgesSort.end());
-//  //start prefetching trigger
-//    passPtr(&VerticesSort,0,&EdgesSort,0,0,0);
-//  }
 
 protected:
   /// Hold pointers to all vertices.
   vector<VertexPointer> Vertices;
-  vector<VertexPointer> VerticesSort;
   VertexMapType VertexMap;
   /// Hold pointers to all edges.
   vector<EdgePointer> Edges;
-  vector<EdgePointer> EdgesSort;
   EdgeMapType EdgeMap;
   /// Keep a count of vertices and edges.
   unsigned int NumberOfVertices;
