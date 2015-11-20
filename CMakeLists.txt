@@ -15,8 +15,7 @@ set(LDBC_DIR "LDBC")
 include_directories( 
         ${INCLUDE_DIRECTORIES} 
         ${Boost_INCLUDE_DIRS} 
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${READERS_INCLUDE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR} ${READERS_INCLUDE_DIR}
         ${SRC_DIR} 
         ${STORAGE_DIR}
         ${GDBENCH_DIR}
@@ -55,7 +54,7 @@ add_subdirectory(storage)
 set(TESTS 
         main-gdbench.cpp
         main-sample.cpp
-        #        main-ldbc.cpp
+        main-mt-ldbc.cpp
         #        main-translator.cpp
         # main-multithread.cpp
         # main-multigraphs.cpp

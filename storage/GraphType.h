@@ -1013,6 +1013,36 @@ public:
               << reinterpret_cast<int*>(EdgeMemory + sizeof(Edge)*sz) 
               << "\n" << endl;
   }
+
+  /// For experiments on separate graphs
+  /// Memory allocated from a fixed address -startMemory
+  void allocVertexMemory(char * StartMemory, unsigned int sz) {
+
+    // Allocation sz number of Vertex objects.
+    std::cout << "Vertex space: " << sizeof(Vertex)*sz << "\n";
+//    NodeMemory = new char[sizeof(Vertex)*sz];
+    NodeMemory = StartMemeory;
+    std::cout << "Vertex Memory\n + Starting address: " 
+              << reinterpret_cast<int*>(NodeMemory)
+    	        << ", ending address: " 
+              << reinterpret_cast<int*>(NodeMemory + sizeof(Vertex)*sz) 
+              << "\n";
+  }
+
+  void allocEdgeMemory(char * StartMemory, unsigned int sz) {
+
+    // Allocation sz number of Edge objects.
+    std::cout << "Edge space: " << sizeof(Edge)*sz << "\n";
+    EdgeMemory = StartMemory;
+//    EdgeMemory = new char[sizeof(Edge)*sz];
+    std::cout << "Edge Memory\n + Starting address: " 
+              << reinterpret_cast<int*>(EdgeMemory) 
+    	        << ", ending address: " 
+              << reinterpret_cast<int*>(EdgeMemory + sizeof(Edge)*sz) 
+              << "\n" << endl;
+  }
+
+
 #endif /* _FIXALLOC_ */
 
 protected:
