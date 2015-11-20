@@ -3,8 +3,7 @@
 //                     CAESR Graph Database 
 //
 // TODO: LICENSE
-// License. See LICENSE.TXT for details.
-//
+// License. See LICENSE.TXT for details.  //
 //===----------------------------------------------------------------------===//
 ///
 /// \file
@@ -17,6 +16,7 @@
 #include <vector>
 #include <unordered_map>
 #include <stdlib.h>
+#include <unordered_set>
 
 #include "util.h"
 #include "Vertex.h"
@@ -640,10 +640,11 @@ public:
   
   VertexDescriptor removeVertex(VertexPointer VertexPtr) {
     if (VertexPtr == nullptr) {
-//      std::cerr << "Vertex does NOT exist \n";
+      std::cerr << "Vertex does NOT exist \n";
       return -1;
     }
 
+    Vertices.insert(VertexPtr->getId());
     VertexCopyPointer DeletedVertex = new VertexCopy();
     DeletedVertex->makeCopy(VertexPtr);
     VertexBackup.push_back(DeletedVertex);
@@ -676,6 +677,7 @@ public:
     return -1;
     }
 
+    Edges.insert(EdgePtr->getId());
     EdgeCopyPointer  DeletedEdge = new EdgeCopy(); 
     DeletedEdge->makeCopy(EdgePtr);
     EdgeBackup.push_back(DeletedEdge);
@@ -1030,6 +1032,11 @@ protected:
   char* NodeMemory;
   char* EdgeMemory;
 #endif /* _FIXALLOC_ */
+
+public:
+  /// Temporal experiments
+  std::unordered_set<unsigned int> Vertices;
+  std::unordered_set<unsigned int> Edges;
 };
 
 #endif /* _GRAPH_TYPE_H */
