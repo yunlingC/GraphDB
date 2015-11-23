@@ -136,8 +136,6 @@ private:
   IdType    _EdgeId;
   TypeList  _TypeList;
   ValueListType _ValueRange;
-
-
 };
 
 #endif /*_FILTER_H_*/

@@ -11,6 +11,8 @@
 #include <thread>
 #include <string>
 
+using namespace std;
+
 int main(int argc, char *argv[]) {
 
   // argv[0] ./main-gdbench
@@ -139,7 +141,7 @@ int main(int argc, char *argv[]) {
     cout <<"query number is " << qid << endl;
     auto query = QueryList[qid-1];
 
-    query->runQuery(g, 1);
+    query->runQuery(g, 2);
 
   }
 
@@ -173,6 +175,5 @@ int main(int argc, char *argv[]) {
   //Q14.runQuery(g, 2);
 
   cout << "finish testing\n";
-  myfile.close();
   return 0;
 }

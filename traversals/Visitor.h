@@ -14,10 +14,12 @@
 #ifndef _VISITOR_H_
 #define _VISITOR_H_
 
-#include "GraphType.h"
+//#include "GraphType.h"
 #include "Filter.h"
 
 #include <unordered_set> 
+
+class GraphType;
 
 class Visitor {
 public:
