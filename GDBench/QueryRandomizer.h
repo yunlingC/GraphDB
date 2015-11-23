@@ -16,16 +16,17 @@
 #ifndef _QUERYRANDOMIZER_H_
 #define _QUERYRANDOMIZER_H_
 
+#include "GDBReader.h"
+
 #include <stdlib.h>
 #include <iostream>
 #include <unistd.h>
 #include <time.h>
 
-#include "GDBReader.h"
-
 class QueryRandomizer {
 public:
   typedef GraphType::VertexDescriptor VertexDescriptor;
+  typedef std::string string;
 public:
   QueryRandomizer (GDBReader & reader) : _gdReader(reader) { };
 

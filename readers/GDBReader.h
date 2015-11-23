@@ -16,7 +16,7 @@
 
 #include "GraphType.h"
 
-//#include <fstream>
+#include <fstream>
 /// This lib is used for split functions 
 #include <boost/algorithm/string.hpp>
 #include <map>
@@ -34,7 +34,6 @@ public:
   typedef Graph::VertexDescriptor VertexDescriptor;
   typedef Graph::VertexPropertyList VertexPropertyList;
   typedef Graph::EdgePropertyList EdgePropertyList;
-  typedef std::string string;
 private:
     Graph &_Graph;
     unsigned int  _People;
@@ -42,17 +41,17 @@ private:
     unsigned int  _Friends;
     unsigned int  _Likes;
     
-    vector<string> _NameList;
-    vector<string> _PersonIdList;
+    std::vector<std::string> _NameList;
+    std::vector<std::string> _PersonIdList;
  
-    map<string, VertexDescriptor> _VertexMap;
-    ifstream _GDfile;
+    std::map<std::string, VertexDescriptor> _VertexMap;
+    std::ifstream _GDfile;
 
 public:
-    string Str_Line;
+    std::string Str_Line;
     GDBReader(Graph &graph):_Graph(graph){};
 
-    void readFile(string FileName) {
+    void readFile(std::string FileName) {
       try{
         _GDfile.open(FileName.c_str());
         if (_GDfile.fail())
@@ -77,14 +76,15 @@ public:
               readLikes();
               break;
 
-            default:
-              cout << "Error: " << "2" <<"\t Failed to recognize type" << endl;
+              ///TODO bring it back later
+//            default:
+//              cout << "Error: " << "2" <<"\t Failed to recognize type" << std::endl;
           }//END_SWITCH
         } //END_WHILE
       }//END_TRY
 
     catch (int i){
-      cout << "Error:"<< i <<"\tFailed to open file" <<endl;
+//      cout << "Error:"<< i <<"\tFailed to open file" << std::endl;
     }
       _GDfile.close();
 
@@ -106,11 +106,11 @@ public:
     return _Likes;
   }
 
-  vector<string> & getNameList() {
+  std::vector<std::string> & getNameList() {
     return _NameList;
   }
 
-  vector<string> & getPidList() {
+  std::vector<std::string> & getPidList() {
     return _PersonIdList;
   }
 
@@ -136,7 +136,7 @@ private:
   void readPeople(){
 
     _People = 0;
-    vector<string> attributes;
+    std::vector<std::string> attributes;
 
     while (getline(_GDfile, Str_Line) != NULL){
 
@@ -164,7 +164,8 @@ private:
       _NameList.push_back(attributes[1]);
       _PersonIdList.push_back(attributes[0]);
       VertexDescriptor Vertex = _Graph.addVertex(PeopleProp);
-      _VertexMap.insert(pair<string, VertexDescriptor>(attributes[0], Vertex));
+      _VertexMap.insert(std::pair<std::string, VertexDescriptor>
+                                  (attributes[0], Vertex));
       _People++;
 
     }
@@ -172,9 +173,9 @@ private:
   
   void readWebpages(){
     _Webpages = 0;
-    string URL = "";
+    std::string URL = "";
     VertexPropertyList WebpagesProp;
-    vector<string> attributes;
+    std::vector<std::string> attributes;
 
     while (getline(_GDfile, Str_Line) != NULL){
       VertexPropertyList WebpagesProp;
@@ -194,7 +195,8 @@ private:
      WebpagesProp.set("URL", URL);
 
      VertexDescriptor Vertex = _Graph.addVertex(WebpagesProp);
-     _VertexMap.insert(pair<string, VertexDescriptor>(attributes[0], Vertex));
+     _VertexMap.insert(std::pair<std::string, VertexDescriptor>
+                                  (attributes[0], Vertex));
      _Webpages++;
 
     }
@@ -203,9 +205,9 @@ private:
   void readFriends(){
 
     VertexDescriptor Source, Dest;
-    string from = "";
-    string to   = "";
-    vector<string> attributes;
+    std::string from = "";
+    std::string to   = "";
+    std::vector<std::string> attributes;
 
     while (getline(_GDfile, Str_Line) != NULL){
       EdgePropertyList FriendProp;
@@ -221,7 +223,7 @@ private:
 
       if ((_VertexMap.find(from) == _VertexMap.end()) || 
           (_VertexMap.find(to) == _VertexMap.end()) ) {
-        cout << "Error: Failed to recognize " << from << "\t" << to << endl;
+//        cout << "Error: Failed to recognize " << from << "\t" << to << endl;
         exit(0);
       }
 
@@ -236,9 +238,9 @@ private:
 
   void readLikes() {
     VertexDescriptor Source, Dest;
-    string from = "";
-    string to   = "";
-    vector<string> attributes;
+    std::string from = "";
+    std::string to   = "";
+    std::vector<std::string> attributes;
     
     while (getline(_GDfile, Str_Line) != NULL){
       EdgePropertyList LikesProp;
@@ -254,7 +256,7 @@ private:
 
       if ((_VertexMap.find(from) == _VertexMap.end()) || 
           (_VertexMap.find(to) == _VertexMap.end()) ) {
-        cout << "Error: Failed to recognize " << from << "\t" << to << endl;
+//        cout << "Error: Failed to recognize " << from << "\t" << to << endl;
         exit(0);
       }
 

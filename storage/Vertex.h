@@ -18,7 +18,6 @@
 #include "PropertyList.h"
 
 #include <vector>
-#include <string>
 
 /// Forward declaration.
 class Edge;
