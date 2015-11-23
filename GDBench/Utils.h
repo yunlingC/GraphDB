@@ -11,8 +11,8 @@
 /// \brief This is the function utilities for Graph visitors.
 ///
 //===----------------------------------------------------------------------===//
-#ifndef _UTILITIES_H_
-#define _UTILITIES_H_
+#ifndef _UTILS_H_
+#define _UTILS_H_
 
 #include "Filter.h"
 #include "GraphType.h"
@@ -70,8 +70,6 @@ void traverseThroughMultiRelType(RelType types, Filter & TypeFilter ) {
   AttributesType attributes;
   boost::split(attributes, types, boost::is_any_of("+"));
   for (auto it = attributes.begin(); it != attributes.end(); it++)
-//    std::cout << "types " << *it ;
-//  std::cout << std::endl;
   TypeFilter.setTypeList(attributes);
 }
 
@@ -81,15 +79,8 @@ void traverseThroughTypeAndDirection(Type type, Direction direction, Filter & Tr
 }
 
 bool TerminateAtVertex(unsigned int targetNum, VertexTargetSet vertexSet) {
-
-    if(vertexSet.size() >= targetNum) 
-    {
-      return true;
-    }
-    else // not yet
-      return false;
-  }
-
+    return (vertexSet.size() >= targetNum);
+}
 
 /// compute and return the depth for second
 unsigned int computeDepth(VertexPointer first, 
@@ -176,8 +167,7 @@ void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, Dept
 /// check if the vertex's depth == given depth
 bool checkDepth(unsigned int depth, VertexPointer vertex, DepthListType & depthList) {
   if (depthList.find(vertex) != depthList.end())
-    if(depthList[vertex]  == depth)
-      return true;
+    return (depthList[vertex]  == depth);
   return false;
 }
 
@@ -199,9 +189,7 @@ bool checkProperty(VertexPointer vertex, Filter &filter) {
 
   ReturnValueType rv = vertex->getPropertyValue(key); 
   if((rv.second == false) || (rv.first != value))
-  {
       return false;
-  }
   return true;
 }
 
@@ -238,7 +226,6 @@ bool checkTimeRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
   } //END_FOR
   auto timeProp = GraphElem->getPropertyValue(filter.getKey());                          
   if(timeProp.second == false) {
-//    std::cout << "Error: Failed to find time property\n";
     return false;   /// cannot find time property ;
   }
   else  {
@@ -298,7 +285,6 @@ bool checkYearRange(GraphElemType elem, Filter & filter, bool & EqualFlag) {
       cmpResult[1] = true;
   }
   return (cmpResult[0] && cmpResult[1]);
-
   }
 
 template<typename ReturnValueType, typename GraphElemPointer>
@@ -380,8 +366,8 @@ void dumpVertexTarget(VertexTargetSet & VertexTargetList) {
 #endif
 
 bool TerminateAtDepth(unsigned int depth, DepthListType & depthlist) {
-  for(auto it = depthlist.begin(); it != depthlist.end(); ++ it) {
-    if(it->second > depth)
+  for (auto it = depthlist.begin(); it != depthlist.end(); ++ it) {
+    if (it->second > depth)
       return true;
   }
     return false;
@@ -391,13 +377,7 @@ bool checkType(EdgePointer edge, Filter &filter) {
     if (filter.getType() == "")
       return true;
     FixedString type(filter.getType());
-    if (edge->getType() == type)
-    {
-      return true;
-    }
-    else  {
-      return false;
-    }
+    return (edge->getType() == type);
 }
 
 bool checkMultiRelType(EdgePointer edge, Filter & filter) {
@@ -405,17 +385,13 @@ bool checkMultiRelType(EdgePointer edge, Filter & filter) {
   if(filter.getTypeList().empty())
     return true;
   for (auto it = filter.getTypeList().begin(); it != filter.getTypeList().end(); ++it) {
-   if (*it == "") {
+    if (*it == "") 
       return true;
-   }
     FixedString type(*it);
     if (edge->getType() == type)
-    {
       return true;
-    }
-    else  {
+    else  
       typeMatch = false;
-    }
   }
   return typeMatch;
 }
@@ -472,4 +448,4 @@ void computeInDegree(VertexPointer vertex, EdgePointer edge, DegreeList &list) {
   }
 }
 
-#endif /**_UTILITIES_H_*/
+#endif /**_UTILS_H_*/
