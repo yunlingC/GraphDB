@@ -39,13 +39,13 @@ void depthFirstSearch(GraphType & Graph,
     ScheduledVertex = VertexStack.back();  VertexStack.pop_back();
 
     bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
-    if(VertexMatch == true)
+    if (VertexMatch == true)
       return ;
  
     ColorMap[ScheduledVertex] = true;
 
     auto NextEdge = ScheduledVertex->getNextEdge();
-    while( NextEdge != nullptr ){
+    while ( NextEdge != nullptr ){
     
       TargetVertex = NextEdge->getTarget(ScheduledVertex);
       bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);
@@ -53,14 +53,14 @@ void depthFirstSearch(GraphType & Graph,
       bool TypeMatch = GraphVisitor.scheduleEdge(NextEdge);
       bool DirectionMatch = GraphVisitor.visitDirection(TargetVertex, NextEdge);
 
-      if(BranchMatch == true)
+      if (BranchMatch == true)
         break;
 
       if ( ColorMap.find(TargetVertex) == ColorMap.end() || RevisitFlag ) {
 
         GraphVisitor.scheduleTree(ScheduledVertex, NextEdge, TargetVertex);
 
-        if( TypeMatch && DirectionMatch) {
+        if ( TypeMatch && DirectionMatch) {
           VertexStack.push_back(TargetVertex);
           ColorMap.insert(VisitPair(TargetVertex, false));
         } else {
