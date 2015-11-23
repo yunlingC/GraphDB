@@ -18,9 +18,6 @@
 
 #include "GDBReader.h"
 
-#include <stdlib.h>
-#include <iostream>
-#include <unistd.h>
 #include <time.h>
 
 class QueryRandomizer {
@@ -28,70 +25,77 @@ public:
   typedef GraphType::VertexDescriptor VertexDescriptor;
   typedef std::string string;
 public:
-  QueryRandomizer (GDBReader & reader) : _gdReader(reader) { };
+  QueryRandomizer (GDBReader & reader) : _GDReader(reader) { };
 
-  string & getName(unsigned int i ) {
-    createName(_name, i);
-    return _name;
+  string & getName(unsigned int index ) {
+    createName(_Name, index);
+    return _Name;
   }
 
-  string & getPid(unsigned int i) {
-    createPid(_pid, i);
-    return _pid;
+  string & getPid(unsigned int index) {
+    createPid(_PID, index);
+    return _PID;
   }
 
-  VertexDescriptor & getAPersonIndex(unsigned int i) {
-    createPersonIndex(_person, i);
-    return _person;
+  VertexDescriptor & getAPersonIndex(unsigned int index) {
+    createPersonIndex(_Person, index);
+    return _Person;
   }
   
-  VertexDescriptor & getAWebpageIndex(unsigned int i) {
-    createWebpageIndex(_webpage, i);
-    return _webpage;
+  VertexDescriptor & getAWebpageIndex(unsigned int index) {
+    createWebpageIndex(_Webpage, index);
+    return _Webpage;
   }
 
 public:
-//  void createName(string & name) {
-  void createName(string & name, unsigned int i) {
-//    unsigned int nameCounter = _gdReader.getPeopleCounter();
-//    unsigned int nameId = rand() % (nameCounter/3);
-//    name = _gdReader.getNameList().at(nameId);
-    name = _gdReader.getNameList().at(i);
-    //std::cout << "Random name is " << name << std::endl;
+  void createName(string & name, unsigned int index) {
+    name = _GDReader.getNameList().at(index);
   }
 
-//  void createPid(string & pid) {
-  void createPid(string & pid, unsigned int i) {
-//    unsigned int pidCounter = _gdReader.getPeopleCounter();
-//    unsigned int pidId = rand() % (pidCounter/3);
-//    pid = _gdReader.getPidList().at(pidId);
-    pid = _gdReader.getPidList().at(i);
-    //std::cout << "Random pid is " << pid << std::endl;
+  /// Randomized output 
+  /// But need srand(time(null)) as completely randmization if necessary
+  void createName(string & name) {
+    unsigned int nameCounter = _GDReader.getPeopleCounter();
+    unsigned int nameId = rand() % (nameCounter/3);
+    name = _GDReader.getNameList().at(nameId);
   }
 
-//  void createPersonIndex(VertexDescriptor & person) {
-  void createPersonIndex(VertexDescriptor & person, unsigned int i) {
-//    unsigned int personCounter = _gdReader.getPeopleCounter();
-//    person = rand() % (personCounter/3);
-    person = i;
-    //std::cout << "Random person is " << person << std::endl;
+  void createPid(string & pid, unsigned int index) {
+    pid = _GDReader.getPidList().at(index);
   }
 
-//  void createWebpageIndex(VertexDescriptor & webpage) {
-  void createWebpageIndex(VertexDescriptor & webpage, unsigned int i) {
-    unsigned int personCounter = _gdReader.getPeopleCounter();
-//    unsigned int webCounter = _gdReader.getWebpagesCounter();
-//    webpage = rand() % (webCounter/3) + personCounter ;
-    webpage = i + personCounter ;
-    //std::cout << "Random webpage is " << webpage << std::endl;
+  void createPid(string & pid) {
+    unsigned int pidCounter = _GDReader.getPeopleCounter();
+    unsigned int pidId = rand() % (pidCounter/3);
+    pid = _GDReader.getPidList().at(pidId);
   }
-  
+
+  void createPersonIndex(VertexDescriptor & person, unsigned int index) {
+    person = index;
+  }
+
+  void createPersonIndex(VertexDescriptor & person) {
+    unsigned int personCounter = _GDReader.getPeopleCounter();
+    person = rand() % (personCounter/3);
+  }
+
+  void createWebpageIndex(VertexDescriptor & webpage, unsigned int index) {
+    unsigned int personCounter = _GDReader.getPeopleCounter();
+    webpage = index + personCounter ;
+  }
+
+  void createWebpageIndex(VertexDescriptor & webpage) {
+    unsigned int personCounter = _GDReader.getPeopleCounter();
+    unsigned int webCounter = _GDReader.getWebpagesCounter();
+    webpage = rand() % (webCounter/3) + personCounter ;
+  } 
+
 private:
-  string _name;
-  string _pid;
-  VertexDescriptor _person;
-  VertexDescriptor _webpage;
-  GDBReader & _gdReader;
+  string _Name;
+  string _PID;
+  VertexDescriptor _Person;
+  VertexDescriptor _Webpage;
+  GDBReader & _GDReader;
 };
 
 

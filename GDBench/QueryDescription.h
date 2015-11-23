@@ -15,7 +15,6 @@
 #ifndef _QUERYDESCRIPTION_H_
 #define _QUERYDESCRIPTION_H_
 
-#include "FixedString.h"
 #include "BreadthFirstSearch.h"
 #include "DepthFirstSearch.h"
 #include "CustomVisitor.h"
@@ -36,8 +35,7 @@ public:
   typedef unsigned int  TraversalType; 
   typedef GraphType::VertexDescriptor VertexDescriptor;
 public:
-  Query() {
-  }
+  Query() { }
   
   virtual void runQuery(Graph & graph, TraversalType c) { }
 
@@ -157,7 +155,7 @@ public:
            << WebId  << " are as below\n";
     auto target= v2.getVertexList();
     for(auto it = target.begin(); it != target.end(); ++it) {
-      FixedString key("name");
+      std::string key("name");
       myfile << "Vertex " << (*it)->getId() <<"\t" 
              << (*it)->getPropertyValue(key).first;
       myfile << "\n";
@@ -192,7 +190,7 @@ public:
     myfile << "Person with vid = " << PersonId << " likes webpages:\n";
     auto target = v3.getVertexList();
     for(auto it = target.begin(); it != target.end(); ++it) {
-      FixedString key("wpurl");
+      std::string key("wpurl");
       myfile <<"Vertex " << (*it)->getId() << "\t"  
              << (*it)->getPropertyValue(key).first;
       myfile << "\n";
@@ -228,7 +226,7 @@ public:
     myfile <<"People with " << Key << " = " << Value <<" is(are) as below\n";
     auto target = v4.getVertexList();
     for(auto it = target.begin(); it != target.end(); ++it) {
-      FixedString key("name");
+      std::string key("name");
       myfile <<"Vertex " << (*it)->getId() << "\t" 
              << (*it)->getPropertyValue(key).first;
       myfile << "\n";
@@ -250,7 +248,7 @@ public:
     myfile << "The friends of Person with vid = " << PersonId << " has friends\n";
 #endif
     Filter tmpFilter[2];
-    FixedString key("name");
+    std::string key("name");
     std::vector<VertexPointer> target;
     switch(c) {
       case 1: {
@@ -306,7 +304,7 @@ public:
     else
         myfile << "---------------------DFS---------------------\n";
 #endif
-    FixedString key("wpurl");
+    std::string key("wpurl");
     Filter tmpFilter[2];
     switch(c) {
       case 1: {
@@ -366,7 +364,7 @@ public:
         myfile << "---------------------DFS---------------------\n";
 #endif
     Filter tmpFilter[2];
-    FixedString key("name");
+    std::string key("name");
     switch(c) {
       case 1: {
         traverseThroughType("LIKES", tmpFilter[0]);
@@ -515,7 +513,7 @@ class Query10 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType c ) { 
     Filter tmpFilter[2];
-    FixedString key("name");
+    std::string key("name");
     std::vector<VertexPointer> target;
     switch(c) {
       case 1: {
@@ -565,7 +563,7 @@ class Query11: public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType c) {
     Filter tmpFilter[2];
-    FixedString key("name");
+    std::string key("name");
     std::vector<VertexPointer> target;
     switch(c) {
       case 1: {
@@ -603,7 +601,7 @@ public:
            << " common webpages liked by both " 
            << PersonId1 << " and " <<  PersonId2 << "\n";
     for(auto it = target.begin(); it != target.end(); ++it) {
-      FixedString key("wpurl");
+      std::string key("wpurl");
       myfile << "Vertex " << (*it)->getId() << "\t" 
              << (*it)->getPropertyValue(key).first;
       myfile << "\n";
@@ -639,7 +637,7 @@ public:
         myfile << "---------------------BFS---------------------\n";
     else
         myfile << "---------------------DFS---------------------\n";
-    FixedString key("name");
+    std::string key("name");
     myfile << "Person with vid = " << PersonId << " has name: " 
            << graph.getVertexPointer(PersonId)->getPropertyValue(key).first 
            <<" and  " << target.size() << " friends\n";
@@ -660,7 +658,7 @@ public:
         myfile << "---------------------DFS---------------------\n";
 #endif
     Filter tmpFilter[3];
-    FixedString key("name");
+    std::string key("name");
     switch(c) {
       case 1: {
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);

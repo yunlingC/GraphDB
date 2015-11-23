@@ -2,7 +2,6 @@
 #include "QueryDescription.h"
 #include "QueryRandomizer.h"
 
-
 //#include "macros.h"
 #include <stdlib.h>
 #include <algorithm>
@@ -15,10 +14,10 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-  // argv[0] ./main-gdbench
-  // argv[1] query number 1:14
-  // argv[2] param1 0:499
-  // argv[3] param2 0:499 for shortes path and path only(Q8-Q12)
+  /// argv[0] ./main-gdbench
+  /// argv[1] query number 1:14
+  /// argv[2] param1 0:499
+  /// argv[3] param2 0:499 for shortes path and path only(Q8-Q12)
 
   
   typedef GraphType Graph;
@@ -76,7 +75,12 @@ int main(int argc, char *argv[]) {
       personId3 = atoi(argv[3]);
     }
 
-    cout << "name\t" << name << endl << "pid\t" << pid << endl << "webId\t" << webId << endl << "personId1\t" <<  personId1 << endl << "personId\t" <<  personId2 << endl << "personId3\t" << personId3 << endl;
+    cout << "name\t" << name << endl 
+         << "pid\t" << pid << endl 
+         << "webId\t" << webId << endl 
+         << "personId1\t" <<  personId1 << endl 
+         << "personId\t" <<  personId2 << endl 
+         << "personId3\t" << personId3 << endl;
 
     Query1 Q1;
     Query2 Q2;
@@ -93,7 +97,8 @@ int main(int argc, char *argv[]) {
     Query13 Q13;
     Query14 Q14;
 
-//  auto id = 0; //only one set of input right now
+//  auto id = 0; 
+/// only one set of input right now
     Q1.setPersonProperty("name", name);
     Q2.setWebId(webId);
     Q3.setPersonId(personId1);
