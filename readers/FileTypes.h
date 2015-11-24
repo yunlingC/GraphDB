@@ -12,31 +12,25 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef _FILETYPES_H__
+#ifndef _FILETYPES_H_
 #define _FILETYPES_H_
-
-#include <string>
-
-#include "GraphType.h"
-
-using namespace std;
 
 class RelLabel {
 public:
   RelLabel ( ) : First(""), Second(""), Edge("") {}
 public:
-  string First;
-  string Second;
-  string Edge;
+  std::string First;
+  std::string Second;
+  std::string Edge;
 };
 
 class FileTypeReader {
 public:
-  typedef vector<string> LabelListType;
-  typedef vector<string> & LabelListTypeReference;
+  typedef std::vector<std::string> LabelListType;
+  typedef std::vector<std::string> & LabelListTypeReference;
   typedef RelLabel &   RelLabelReference;
 public:
-  auto readFileType(string FileName )
+  auto readFileType(std::string FileName )
     -> void { 
     if (FileName == COMMENT) {
       _Label.First = "COMMENT";
@@ -240,12 +234,10 @@ public:
       _VertexLabelList.push_back("TAGCLASS");
     return _VertexLabelList;
   }
-/**
   auto getRelLabelList() 
     -> LabelListTypeReference {
       return _RelLabelList;
   }
-*/ 
 private:
   unsigned int _FileTypeNum = 0; /// 0. default 1. vertex 2. relationship 3. property
   RelLabel _Label;
@@ -253,43 +245,43 @@ private:
   LabelListType _RelLabelList;
 private:
   /// Nodes: 8
-  const string COMMENT = "comment_0.csv";
-  const string POST = "post_0.csv";
-  const string PERSON = "person_0.csv";
-  const string FORUM = "forum_0.csv";
-  const string TAG = "tag_0.csv";
-  const string TAGCLASS = "tagclass_0.csv";
-  const string ORGANISATION = "organisation_0.csv";
-  const string PLACE = "place_0.csv";
+  const std::string COMMENT = "comment_0.csv";
+  const std::string POST = "post_0.csv";
+  const std::string PERSON = "person_0.csv";
+  const std::string FORUM = "forum_0.csv";
+  const std::string TAG = "tag_0.csv";
+  const std::string TAGCLASS = "tagclass_0.csv";
+  const std::string ORGANISATION = "organisation_0.csv";
+  const std::string PLACE = "place_0.csv";
 
   /// Nodes properties: 2
-  const string PERSON_SPEAKS_LANGUAGE = "person_speaks_language_0.csv";
-  const string PERSON_EMAIL_ADDRESS = "person_email_emailaddress_0.csv";
+  const std::string PERSON_SPEAKS_LANGUAGE = "person_speaks_language_0.csv";
+  const std::string PERSON_EMAIL_ADDRESS = "person_email_emailaddress_0.csv";
  
   /// Relationships 23
-  const string COMMENT_REPLY_OF_COMMENT = "comment_replyOf_comment_0.csv";
-  const string COMMENT_REPLY_OF_POST = "comment_replyOf_post_0.csv";
-  const string COMMENT_IS_LOCATED_IN_PLACE = "comment_isLocatedIn_place_0.csv";
-  const string PLACE_IS_PART_OF_PLACE = "place_isPartOf_place_0.csv";
-  const string PERSON_KNOWS_PERSON = "person_knows_person_0.csv";
-  const string PERSON_STUDIES_AT_ORGANISATION = "person_studyAt_organisation_0.csv";
-  const string COMMENT_HAS_CREATOR_PERSON = "comment_hasCreator_person_0.csv";
-  const string POST_HAS_CREATOR_PERSON = "post_hasCreator_person_0.csv";
-  const string FORUM_HAS_MODERATOR_PERSON = "forum_hasModerator_person_0.csv";
-  const string PERSON_IS_LOCATED_IN_PLACE = "person_isLocatedIn_place_0.csv";
-  const string PERSON_WORKS_AT_ORGANISATION = "person_workAt_organisation_0.csv";
-  const string PERSON_HAS_INTEREST_TAG = "person_hasInterest_tag_0.csv";
-  const string POST_HAS_TAG_TAG = "post_hasTag_tag_0.csv";
-  const string PERSON_LIKES_POST = "person_likes_post_0.csv";
-  const string POST_IS_LOCATED_IN_PLACE = "post_isLocatedIn_place_0.csv";
-  const string FORUM_HAS_MEMBER_PERSON = "forum_hasMember_person_0.csv";
-  const string FORUMS_CONTAINER_OF_POST = "forum_containerOf_post_0.csv";
-  const string FORUM_HAS_TAG_TAG = "forum_hasTag_tag_0.csv";
-  const string TAG_HAS_TYPE_TAGCLASS = "tag_hasType_tagclass_0.csv";
-  const string TAGCLASS_IS_SUBCLASS_OF_TAGCLASS = "tagclass_isSubclassOf_tagclass_0.csv";
-  const string ORGANISATION_IS_LOCATED_IN_PLACE = "organisation_isLocatedIn_place_0.csv";
-  const string PERSON_LIKES_COMMENT = "person_likes_comment_0.csv";
-  const string COMMENT_HAS_TAG_TAG = "comment_hasTag_tag_0.csv";
+  const std::string COMMENT_REPLY_OF_COMMENT = "comment_replyOf_comment_0.csv";
+  const std::string COMMENT_REPLY_OF_POST = "comment_replyOf_post_0.csv";
+  const std::string COMMENT_IS_LOCATED_IN_PLACE = "comment_isLocatedIn_place_0.csv";
+  const std::string PLACE_IS_PART_OF_PLACE = "place_isPartOf_place_0.csv";
+  const std::string PERSON_KNOWS_PERSON = "person_knows_person_0.csv";
+  const std::string PERSON_STUDIES_AT_ORGANISATION = "person_studyAt_organisation_0.csv";
+  const std::string COMMENT_HAS_CREATOR_PERSON = "comment_hasCreator_person_0.csv";
+  const std::string POST_HAS_CREATOR_PERSON = "post_hasCreator_person_0.csv";
+  const std::string FORUM_HAS_MODERATOR_PERSON = "forum_hasModerator_person_0.csv";
+  const std::string PERSON_IS_LOCATED_IN_PLACE = "person_isLocatedIn_place_0.csv";
+  const std::string PERSON_WORKS_AT_ORGANISATION = "person_workAt_organisation_0.csv";
+  const std::string PERSON_HAS_INTEREST_TAG = "person_hasInterest_tag_0.csv";
+  const std::string POST_HAS_TAG_TAG = "post_hasTag_tag_0.csv";
+  const std::string PERSON_LIKES_POST = "person_likes_post_0.csv";
+  const std::string POST_IS_LOCATED_IN_PLACE = "post_isLocatedIn_place_0.csv";
+  const std::string FORUM_HAS_MEMBER_PERSON = "forum_hasMember_person_0.csv";
+  const std::string FORUMS_CONTAINER_OF_POST = "forum_containerOf_post_0.csv";
+  const std::string FORUM_HAS_TAG_TAG = "forum_hasTag_tag_0.csv";
+  const std::string TAG_HAS_TYPE_TAGCLASS = "tag_hasType_tagclass_0.csv";
+  const std::string TAGCLASS_IS_SUBCLASS_OF_TAGCLASS = "tagclass_isSubclassOf_tagclass_0.csv";
+  const std::string ORGANISATION_IS_LOCATED_IN_PLACE = "organisation_isLocatedIn_place_0.csv";
+  const std::string PERSON_LIKES_COMMENT = "person_likes_comment_0.csv";
+  const std::string COMMENT_HAS_TAG_TAG = "comment_hasTag_tag_0.csv";
 
 } ;
 
