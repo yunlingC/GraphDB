@@ -14,7 +14,7 @@
 #ifndef _CUSTOMVISITOR_H_
 #define _CUSTOMVISITOR_H_
 
-//#include "Visitor.h"
+#include "Visitor.h"
 #include "Utils.h"
 
 #include <queue>

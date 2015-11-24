@@ -273,7 +273,7 @@ bool checkYearRange(GraphElemType elem, Filter & filter, bool & EqualFlag) {
   }
   if(elem->getPropertyValue(filter.getKey()).second == false)
     return false;
-  auto YearProp = stoi(elem->getPropertyValue(filter.getKey()).first.std_str());
+  unsigned int YearProp = stoi(elem->getPropertyValue(filter.getKey()).first.std_str());
   if(cmpResult[0] == false)
     if( YearProp >= Year[0]) {
       if (YearProp == Year[0])
