@@ -3,6 +3,7 @@
 #include "LDBCReader.h"
 #include "QueryDescription.h"
 
+
 int main( int argc, char * argv[]) {
 
   typedef GraphType Graph;
@@ -64,15 +65,20 @@ int main( int argc, char * argv[]) {
 //    fflush(stdout);
   }
 
-//  std::cout <<"recover all the deletion \n";
 
   g.recoverAll();
+//
 
+//  LdbcQuery1 q1(1);
+//  q1.setParam("firstName", "Hermann");
+//  q1.runQuery(g, Input[i]);
+
+  /// Calculate the distance between every two objects.
   AddressVisitor AddrVisitor;
   breadthFirstSearch(g, 0, AddrVisitor);
 
   std::cout << "\nVertex\n";
-  unsigned int i = 0;
+  unsigned int i = -1;
   for (auto & addr : AddrVisitor.VertexAddrDis) {
       std::cout << addr/4 << ",";
        if (i%1000 == 0 ) 
@@ -92,6 +98,5 @@ int main( int argc, char * argv[]) {
   }
 
   cout << "\nfinish testing\n";
-  myfile.close();
 
 }
