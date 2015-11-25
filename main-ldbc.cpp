@@ -1,11 +1,10 @@
-#include <algorithm>
-#include <iostream>
-#include <thread>
-
 #include "LDBCReader.h"
 #include "LinkedList.h"
 #include "LdbcQueryDescription.h"
 
+#include <iostream>
+
+using namespace std;
 
 int main() {
 
@@ -27,14 +26,10 @@ int main() {
 
   cout << "start person " << persons[1] << endl;
 
-  passPtr(0,0,0,0,0,0);
-  //start prefetching trigger
   
   LdbcQuery1 q1;
 
-  SimRoiStart();
   q1.runQuery(g, persons[0]);
-  SimRoiEnd();
 
 //  LdbcQuery2 q2;
 //  q2.runQuery(g, persons[0]);
