@@ -1021,7 +1021,7 @@ public:
     // Allocation sz number of Vertex objects.
     std::cout << "Vertex space: " << sizeof(Vertex)*sz << "\n";
 //    NodeMemory = new char[sizeof(Vertex)*sz];
-    NodeMemory = StartMemeory;
+    NodeMemory = StartMemory;
     std::cout << "Vertex Memory\n + Starting address: " 
               << reinterpret_cast<int*>(NodeMemory)
     	        << ", ending address: " 
