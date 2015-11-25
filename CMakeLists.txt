@@ -55,7 +55,7 @@ set(TESTS
   #        main-linkedlist.cpp
         #      main-dfs.cpp
         main-gdbench.cpp
-        #main-ldbc.cpp
+        main-ldbc.cpp
         )
 
 # This will generate all the executables listed in the TESTS variable

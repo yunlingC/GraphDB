@@ -15,22 +15,20 @@
 #ifndef _LDBCQUERYDESCRIPTION_H_
 #define _LDBCQUERYDESCRIPTION_H_
 
-#include <vector>
-#include <string>
-#include <iostream>
-
 #include "LdbcCustomVisitor.h"
 #include "BreadthFirstSearch.h"
 #include "QueryDescription.h"
+
+#include <iostream>
 
 
 class LdbcQuery1 : public Query {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    cout << "===============Query 1================\n";
+    std::cout << "===============Query 1================\n";
     Filter tmpFilter[3];
     Filter NameFilter;
-    string name = "Benedejcic";
+    std::string name = "Benedejcic";
     filtProperty("lastName", name, NameFilter); 
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
@@ -42,11 +40,11 @@ public:
         v1.setNameFilter(NameFilter);
         v1.setDepth(3);
         breadthFirstSearch(graph, startVertex, v1);
-        auto target = v1.getVertexTargetList();
-        cout << startVertex << " is connected with " << target.size() << " people with firstName : " << name << endl;
+        auto target = v1.getVertexList();
+        std::cout << startVertex << " is connected with " << target.size() << " people with firstName : " << name << "\n";
         for(auto it = target.begin(); it != target.end(); ++it) {
-          cout <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("lastName").first;
-        cout << endl;
+          std::cout <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("lastName").first;
+        std::cout << "\n";
     }
   }
 };
@@ -54,7 +52,7 @@ public:
 class LdbcQuery2 : public Query {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    cout << "===============Query 2================\n";
+    std::cout << "===============Query 2================\n";
     Filter tmpFilter[3];
     traverseThroughMultiRelType("KNOWS", tmpFilter[0]); 
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", tmpFilter[1]); 
@@ -68,12 +66,12 @@ public:
         v2.setDepthToCheckRange(2);
         v2.setPropToCheck(2); //check date
         breadthFirstSearch(graph, startVertex, v2);
-        auto target = v2.getVertexTargetList();
+        auto target = v2.getVertexList();
         auto targets = v2.getTargetsMap();
-        cout << startVertex << " has friends made " << target.size() << " comments and posts \n";
+        std::cout << startVertex << " has friends made " << target.size() << " comments and posts \n";
         for(auto it = targets.begin(); it != targets.end(); ++it) {
-          cout <<"person " << (*it).second->getPropertyValue("id").first << "\t" <<"comments/posts " << (*it).first->getPropertyValue("id").first << "\t" << (*it).first->getPropertyValue("creationDate").first ;
-          cout << endl;
+          std::cout <<"person " << (*it).second->getPropertyValue("id").first << "\t" <<"comments/posts " << (*it).first->getPropertyValue("id").first << "\t" << (*it).first->getPropertyValue("creationDate").first ;
+          std::cout << "\n";
         }
   }
 
@@ -82,11 +80,11 @@ public:
 
 class LdbcQuery3 : public Query {
 public:
-  typedef map<VertexPointer, vector<VertexPointer>> PersonListMapType;
-  typedef pair<VertexPointer, vector<VertexPointer>> PersonListPair;
+  typedef std::map<VertexPointer, std::vector<VertexPointer>> PersonListMapType;
+  typedef std::pair<VertexPointer, std::vector<VertexPointer>> PersonListPair;
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    cout << "===============Query 3================\n";
+    std::cout << "===============Query 3================\n";
     Filter tmpFilter[2];
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
@@ -96,8 +94,8 @@ public:
     v3.setFilter(tmpFilter[1]);
     v3.setDepth(2);
     breadthFirstSearch(graph, startVertex, v3);
-    auto target = v3.getVertexTargetList();
-    cout << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+    auto target = v3.getVertexList();
+    std::cout << startVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
     Filter FilterSet[4];
     traverseThroughMultiRelType("PERSON_IS_LOCATED_IN", FilterSet[0]); 
     traverseThroughMultiRelType("IS_PART_OF", FilterSet[1]); 
@@ -146,12 +144,12 @@ public:
       vpr3.setDepthToCheckVertexProp(2);
       auto startVertex = (*it)->getId();
       breadthFirstSearch(graph, startVertex, vpr3);
-      auto targetList = vpr3.getVertexTargetList();
+      auto targetList = vpr3.getVertexList();
       PersonListMap.insert(PersonListPair((*it), targetList));
     }
 
     for(auto it = PersonListMap.begin(); it != PersonListMap.end(); ++it) {
-      cout <<"friend " << (*it).first->getPropertyValue("firstName").first  << " has " <<(*it).second.size() << " commmets/posts made in " << country1 << " or " << country2 << endl; 
+      std::cout <<"friend " << (*it).first->getPropertyValue("firstName").first  << " has " <<(*it).second.size() << " commmets/posts made in " << country1 << " or " << country2 << "\n"; 
     }
   }
 };
@@ -159,7 +157,7 @@ public:
 class LdbcQuery4 : public Query {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    cout << "===============Query 4================\n";
+    std::cout << "===============Query 4================\n";
     Filter tmpFilter[4];
     traverseThroughMultiRelType("KNOWS", tmpFilter[0]); 
     traverseThroughMultiRelType("POST_HAS_CREATOR", tmpFilter[1]); 
@@ -176,20 +174,20 @@ public:
     v4.setPropToCheck(1); //check time
     breadthFirstSearch(graph, startVertex, v4);
     auto targets = v4.getReturnResultMap();
-    cout << startVertex << " has friends made posts of " << targets.size() << " tags\n";
+    std::cout << startVertex << " has friends made posts of " << targets.size() << " tags\n";
     for(auto it = targets.begin(); it != targets.end(); ++it) {
-      cout <<"tags " << (*it).first->getPropertyValue("id").first << "\t" <<"num of posts " << (*it).second <<  endl;
+      std::cout <<"tags " << (*it).first->getPropertyValue("id").first << "\t" <<"num of posts " << (*it).second <<  "\n";
     }
   }
 };
 
 class LdbcQuery5 : public Query {
 public:
-  typedef map<VertexPointer, vector<VertexPointer>> PersonListMapType;
-  typedef pair<VertexPointer, vector<VertexPointer>> PersonListPair;
+  typedef std::map<VertexPointer, std::vector<VertexPointer>> PersonListMapType;
+  typedef std::pair<VertexPointer, std::vector<VertexPointer>> PersonListPair;
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    cout << "===============Query 5================\n";
+    std::cout << "===============Query 5================\n";
     Filter tmpFilter[2];
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
@@ -199,21 +197,21 @@ public:
     v5.setFilter(tmpFilter[1]);
     v5.setDepth(2);
     breadthFirstSearch(graph, startVertex, v5);
-    auto target = v5.getVertexTargetList();
-    cout << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+    auto target = v5.getVertexList();
+    std::cout << startVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
     Filter Filters[4];
     traverseThroughMultiRelType("HAS_MEMBER", Filters[0]); 
     Filters[1].setValueRange("joinDate", "2012-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
     traverseThroughMultiRelType("CONTAINER_OF",Filters[2]); 
     traverseThroughMultiRelType("POST_HAS_CREATOR",Filters[3]); 
-    vector<Filter> VertexFilter;
+    std::vector<Filter> VertexFilter;
     for(auto iter = target.begin(); iter != target.end(); iter++) {
       Filter newFilter;
       newFilter.setProperty("id", (*iter)->getPropertyValue("id").first.std_str());
       VertexFilter.push_back(newFilter);
     }
 
-    map<VertexPointer, unsigned int> targetMap;
+    std::map<VertexPointer, unsigned int> targetMap;
     for(auto it = target.begin(); it != target.end(); it++) {
       MultiPropertyVisitor mpv5;
       mpv5.setFilter(Filters[0]);
@@ -231,18 +229,18 @@ public:
     }
     for(auto it = targetMap.begin(); it != targetMap.end(); ++it) {
       if((*it).second != 0)
-        cout <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< endl; 
+        std::cout <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< "\n"; 
     }
   }
 };
 
 class LdbcQuery6 : public Query {
 public:
-  typedef map<VertexPointer, vector<VertexPointer>> PersonListMapType;
-  typedef pair<VertexPointer, vector<VertexPointer>> PersonListPair;
+  typedef std::map<VertexPointer, std::vector<VertexPointer>> PersonListMapType;
+  typedef std::pair<VertexPointer, std::vector<VertexPointer>> PersonListPair;
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    cout << "===============Query 5================\n";
+    std::cout << "===============Query 5================\n";
     Filter tmpFilter[2];
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
@@ -252,16 +250,16 @@ public:
     v6.setFilter(tmpFilter[1]);
     v6.setDepth(2);
     breadthFirstSearch(graph, startVertex, v6);
-    auto target = v6.getVertexTargetList();
-    cout << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+    auto target = v6.getVertexList();
+    std::cout << startVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
 
     Filter Filters[3];
     traverseThroughMultiRelType("POST_HAS_CREATOR", Filters[0]); 
     traverseThroughMultiRelType("POST_HAS_TAG", Filters[1]); 
-    string id = "62";
+    std::string id = "62";
     Filters[2].setProperty("id", id);
     
-    map<string, unsigned int> TagMap; 
+    std::map<std::string, unsigned int> TagMap; 
     for(auto it = target.begin(); it != target.end(); it++) {
       SinglePropertyVisitor  vpv6;
       vpv6.setFilter(Filters[0]);
@@ -276,29 +274,29 @@ public:
         if((*it).second ) {
           for(auto iter = vpv6.getResultTargetsMap()[(*it).first].begin(); 
               iter != vpv6.getResultTargetsMap()[(*it).first].end(); iter++) {
-            // (*iter) --> Tag id (string)
+            // (*iter) --> Tag id (std::string)
             if(TagMap.find(*iter) == TagMap.end()) {
-              TagMap.insert(pair<string, unsigned int>((*iter), 1));
+              TagMap.insert(std::pair<std::string, unsigned int>((*iter), 1));
             } else {
               TagMap[*iter]++;
-              cout << (*iter) << " with " << TagMap[*iter] << " posts \n";
+              std::cout << (*iter) << " with " << TagMap[*iter] << " posts \n";
             }
           }
         }
       }
     }
     for (auto it = TagMap.begin(); it != TagMap.end(); it++)
-      cout << "Tag " << (*it).first << " has " << (*it).second << " posts\n";
+      std::cout << "Tag " << (*it).first << " has " << (*it).second << " posts\n";
   }
 };
 
 class LdbcQuery7 : public Query {
 public:
-  typedef map<VertexPointer, vector<VertexPointer>> PersonListMapType;
-  typedef pair<VertexPointer, vector<VertexPointer>> PersonListPair;
+  typedef std::map<VertexPointer, std::vector<VertexPointer>> PersonListMapType;
+  typedef std::pair<VertexPointer, std::vector<VertexPointer>> PersonListPair;
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    cout << "===============Query 5================\n";
+    std::cout << "===============Query 5================\n";
     Filter tmpFilter[2];
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
 
@@ -306,15 +304,15 @@ public:
     v7.setFilter(tmpFilter[0]);
     v7.setDepth(1);
     breadthFirstSearch(graph, startVertex, v7);
-    auto target = v7.getVertexTargetList();
-    vector<Filter> VertexFilter;
+    auto target = v7.getVertexList();
+    std::vector<Filter> VertexFilter;
     for(auto iter = target.begin(); iter != target.end(); iter++) {
       Filter newFilter;
       newFilter.setProperty("id", (*iter)->getPropertyValue("id").first.std_str());
       VertexFilter.push_back(newFilter);
     }
 
-    cout << startVertex << " is connected with " << target.size() << " friends" << endl;
+    std::cout << startVertex << " is connected with " << target.size() << " friends" << "\n";
     Filter Filters[2];
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]); 
     traverseThroughMultiRelType("LIKES_COMMENT+LIKES_POST", Filters[1]); 
@@ -328,12 +326,12 @@ public:
     breadthFirstSearch(graph, startVertex, vmv7);
     auto targetsMap = vmv7.getTimeMap();
     for(auto it = targetsMap.begin(); it != targetsMap.end(); it++) {
-      cout << (*it).first->getPropertyValue("firstName").first << "\t" << (*it).first->getPropertyValue("id").first<< " likes comment/posts at " << (*it).second << endl; 
+      std::cout << (*it).first->getPropertyValue("firstName").first << "\t" << (*it).first->getPropertyValue("id").first<< " likes comment/posts at " << (*it).second << "\n"; 
     }
     auto personMap = vmv7.getPersonMap();
     for(auto it = personMap.begin(); it != personMap.end(); it++)  {
       if((*it).second == true) 
-        cout << "comment/post " << (*it).first->getPropertyValue("id").first << " are made by friend\n" ;
+        std::cout << "comment/post " << (*it).first->getPropertyValue("id").first << " are made by friend\n" ;
     }
   }
 };
@@ -341,7 +339,7 @@ public:
 class LdbcQuery8 : public Query {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex) {
-    cout << "===============Query 8================\n";
+    std::cout << "===============Query 8================\n";
     Filter Filters[3];
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]); 
     traverseThroughMultiRelType("REPLY_OF_COMMENT+REPLY_OF_POST", Filters[1]); 
@@ -356,18 +354,18 @@ public:
     breadthFirstSearch(graph, startVertex, v8);
     auto vertexMap = v8.getVertexMap();
     for(auto it = vertexMap.begin(); it != vertexMap.end(); it++) {
-      cout << "Person " << (*it).second->getPropertyValue("firstName").first << " made replies " << (*it).first->getPropertyValue("id").first << " at " << (*it).first->getPropertyValue("creationDate").first << " to startperson's posts/comments\n";
+      std::cout << "Person " << (*it).second->getPropertyValue("firstName").first << " made replies " << (*it).first->getPropertyValue("id").first << " at " << (*it).first->getPropertyValue("creationDate").first << " to startperson's posts/comments\n";
     }
   }
 };
 
 class LdbcQuery9 : public Query {
 public:
-  typedef map<VertexPointer, VertexPointer> ReturnMapType;
-  typedef pair<VertexPointer, VertexPointer> ReturnMapPair;
+  typedef std::map<VertexPointer, VertexPointer> ReturnMapType;
+  typedef std::pair<VertexPointer, VertexPointer> ReturnMapPair;
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    cout << "===============Query 9================\n";
+    std::cout << "===============Query 9================\n";
     Filter tmpFilter[2];
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
@@ -376,15 +374,15 @@ public:
     v9.setFilter(tmpFilter[1]);
     v9.setDepth(2);
     breadthFirstSearch(graph, startVertex, v9);
-    auto target = v9.getVertexTargetList();
-    cout << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+    auto target = v9.getVertexList();
+    std::cout << startVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
     Filter Filters[2];
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR",Filters[0]); 
     Filters[1].setValueRange("creationDate", "", "2011-07-16T23:59:00.255"); 
           
     ReturnMapType TargetsMap; 
     for(auto it = target.begin(); it != target.end(); ++it) {
-      cout <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << endl; 
+      std::cout <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << "\n"; 
  
       MultiRelTypeVisitor sv9;
       sv9.setFilter(Filters[0]);
@@ -398,7 +396,7 @@ public:
       TargetsMap.insert(targets.begin(), targets.end());
    }
     for(auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
-      cout << "posts/comments " << (*iter).first->getPropertyValue("id").first << "\t" << (*iter).first->getPropertyValue("creationDate").first << " made by person " << (*iter).second->getPropertyValue("id").first << "\t" <<  (*iter).second->getPropertyValue("firstName").first << endl;
+      std::cout << "posts/comments " << (*iter).first->getPropertyValue("id").first << "\t" << (*iter).first->getPropertyValue("creationDate").first << " made by person " << (*iter).second->getPropertyValue("id").first << "\t" <<  (*iter).second->getPropertyValue("firstName").first << "\n";
     }
   }
 };
@@ -408,7 +406,7 @@ public:
 class LdbcQuery10 : public Query {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    cout << "===============Query 11================\n";
+    std::cout << "===============Query 11================\n";
     Filter tmpFilter[7];
     traverseThroughMultiRelType("KNOWS",  tmpFilter[0]);
     traverseThroughMultiRelType("KNOWS",  tmpFilter[1]);
@@ -435,13 +433,13 @@ public:
 */
 class LdbcQuery11 : public Query {
 public:
-  typedef pair<EdgePointer, VertexPointer> MapPair;
-  typedef multimap<VertexPointer, MapPair> MatchMapType; 
-  typedef pair<VertexPointer, VertexPointer> ReturnMapPair;
-  typedef vector<MatchMapType> ReturnTargetsType;
+  typedef std::pair<EdgePointer, VertexPointer> MapPair;
+  typedef std::multimap<VertexPointer, MapPair> MatchMapType; 
+  typedef std::pair<VertexPointer, VertexPointer> ReturnMapPair;
+  typedef std::vector<MatchMapType> ReturnTargetsType;
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    cout << "===============Query 11================\n";
+    std::cout << "===============Query 11================\n";
     Filter tmpFilter[2];
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
     traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
@@ -451,8 +449,8 @@ public:
     v11.setFilter(tmpFilter[1]);
     v11.setDepth(2);
     breadthFirstSearch(graph, startVertex, v11);
-    auto target = v11.getVertexTargetList();
-    cout << startVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+    auto target = v11.getVertexList();
+    std::cout << startVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
     Filter Filters[4];
     traverseThroughMultiRelType("WORKS_AT",Filters[0]); 
     traverseThroughMultiRelType("ORGANISATION_IS_LOCATED_IN",Filters[1]); 
@@ -461,7 +459,7 @@ public:
 
     MatchMapType TargetsMap;
     for(auto it = target.begin(); it != target.end(); ++it) {
-      cout <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << endl; 
+      std::cout <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << "\n"; 
    
       VertexPropertyVisitor sv11;
       sv11.setFilter(Filters[0]);
@@ -478,7 +476,7 @@ public:
     }
       FixedString key("workFrom");
       for(auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
-        cout << (*iter).first->getPropertyValue("firstName").first << " works at "  << (*iter).second.second->getPropertyValue("id").first << " from " << (*iter).second.first->getPropertyValue(key).first << endl;
+        std::cout << (*iter).first->getPropertyValue("firstName").first << " works at "  << (*iter).second.second->getPropertyValue("id").first << " from " << (*iter).second.first->getPropertyValue(key).first << "\n";
       }
   }
 };
@@ -489,13 +487,13 @@ public:
     PathVisitor v13;
     v13.setEndVertex(endVertex);
     breadthFirstSearch(graph, startVertex, v13);
-    auto target = v13.getVertexTargetList();
+    auto target = v13.getVertexList();
     if(target.empty())
-      cout << startVertex << " and " <<  endVertex <<" are not connected" << endl;
+      std::cout << startVertex << " and " <<  endVertex <<" are not connected" << "\n";
     else {
-      cout << "There are  shortest paths of length " << target.size() << "  from " << startVertex << " to " << endVertex << endl;
+      std::cout << "There are  shortest paths of length " << target.size() << "  from " << startVertex << " to " << endVertex << "\n";
       for(auto it = target.begin(); it != target.end(); ++it) {
-        cout <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("firstName").first<< endl;
+        std::cout <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("firstName").first<< "\n";
       }
     }
   }

@@ -14,7 +14,6 @@
 #ifndef _VISITOR_H_
 #define _VISITOR_H_
 
-//#include "GraphType.h"
 #include "Filter.h"
 
 #include <unordered_set> 

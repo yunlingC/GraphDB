@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 */
 
   if(argc < 3) {
-    cout <<"Err: At least 2 arguments\n";
+    cout <<"Error: At least 2 arguments\n";
     return 1;
   } else {
     string name, pid;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
     auto id = atoi(argv[2]);
     if ((id < 0) || (id > 499)) {
-      cout <<"Err: Out of range(0:499)\n";
+      cout <<"Error: Out of range(0:499)\n";
       return 0;
     }
 
@@ -133,13 +133,13 @@ int main(int argc, char *argv[]) {
 
     auto qid = atoi(argv[1]);
     if((qid < 1) || (qid > 14)) {
-      cout <<"Err: Out of range(1:14)\n";
+      cout <<"Error: Out of range(1:14)\n";
       return 1;
     }
 
     if((qid > 7) && (qid < 12)) {
       if(personId3 < 0) {
-        cout <<"Err: No end vertex id\n";
+        cout <<"Error: No end vertex id\n";
         return 1;
       }
     }
