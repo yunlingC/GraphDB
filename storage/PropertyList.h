@@ -1,4 +1,4 @@
-//===-- src/PropertyList.h - Graph class type ------------------*- C++ -*-===//
+//===-- storage/PropertyList.h - PropertyList type ---------------*- C++ -*-===//
 //
 //                     CAESR Graph Database 
 //
