@@ -73,7 +73,7 @@ public:
 
   ~GraphType();
 
-#if DEBUG
+#ifdef _DEBUG_
   void dump();
 #endif
   

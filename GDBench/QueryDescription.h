@@ -19,9 +19,10 @@
 #include "DepthFirstSearch.h"
 #include "CustomVisitor.h"
 
-#include <fstream>
+#define _PRINTGDB_ 1
 
 #ifdef _PRINTGDB_
+#include <fstream>
 std::ofstream myfile("gd_execution.log", std::ios_base::out 
                                        | std::ios_base::app);
 #endif

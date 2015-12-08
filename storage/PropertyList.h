@@ -17,7 +17,7 @@
 
 #include "LinkedList.h"
 
-#if DEBUG
+#ifdef _DEBUG_
 #include <iostream>
 #endif 
 
@@ -109,7 +109,7 @@ public:
     return _LinkedList.size();
   }
 
-#if DEBUG
+#ifdef _DEBUG_
   void print() {
     _LinkedList.print();
   }

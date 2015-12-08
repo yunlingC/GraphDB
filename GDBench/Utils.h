@@ -356,7 +356,7 @@ bool checkRange(unsigned int opt, GraphElemType elem, FilterType & RangeFilter, 
         }//switch 
 }
 
-#if DEBUG 
+#ifdef _DEBUG_
 void dumpVertexTarget(VertexTargetSet & VertexTargetList) {
 
   for (auto it = VertexTargetList.begin(); it != VertexTargetList.end(); ++it) {

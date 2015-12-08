@@ -23,7 +23,9 @@
 #include <map>
 #include <dirent.h>
 
-#if DEBUG 
+#define _DEBUG_ 0
+
+#ifdef _DEBUG_ 
 #include <iostream>
 #endif
 
@@ -53,7 +55,7 @@ public:
 
     _DirPointer = opendir( DirName.c_str() );
     if (_DirPointer == NULL) {
-#if DEBUG
+#ifdef _DEBUG_
       std::cerr << "Error " << errno << " Cannot open " << DirName << "\n";
 #endif
       exit(errno);
@@ -87,7 +89,7 @@ public:
         case 0:
           break;
         default:
-#if DEBUG
+#ifdef _DEBUG_
           std::cerr << "Error : Cannot recognize file type "
                     << _DirEntry->d_name << "\n";
 #endif
@@ -143,12 +145,12 @@ private:
 
         counter++;
       } //END_WHILE
-#if DEBUG
+#ifdef _DEBUG_
       std::cout << counter << " Nodes are read in this file\n";
 #endif
     }//END_TRY
     catch (int i){
-#if DEBUG
+#ifdef  _DEBUG_
       std::cerr << "Error:"<< i <<"\tFailed to open file" <<"\n";
 #endif
       exit(0);
@@ -183,14 +185,14 @@ private:
 
         if ((_VertexLabelMap.find(EdgeLabel.First) == _VertexLabelMap.end()) ||
             (_VertexLabelMap.find(EdgeLabel.Second) == _VertexLabelMap.end()) ) {
-#if DEBUG
+#ifdef  _DEBUG_
           std::cerr << "Error: Cannot recognize vertex label\n";
 #endif
           exit(0);
         }
          if ((_VertexLabelMap[EdgeLabel.First].find(attributes[0]) == _VertexLabelMap[EdgeLabel.First].end()) ||
              (_VertexLabelMap[EdgeLabel.Second].find(attributes[1]) == _VertexLabelMap[EdgeLabel.First].end())) {
-#if DEBUG
+#ifdef  _DEBUG_
            std::cerr << "Error: Cannot find vertex " 
                       << attributes[0] 
                       << attributes[1]  << "\n";
@@ -203,12 +205,12 @@ private:
         _Graph.addEdge(vs,vd, EdgeLabel.Edge, PropertyList);
         counter++;
       } //END_WHILE
-#if DEBUG
+#ifdef _DEBUG_
       std::cout << counter << " Rels are read in this file\n";
 #endif
     }//END_TRY
     catch (int i){
-#if DEBUG
+#ifdef _DEBUG_
       std::cerr << "Error:"<< i <<"\tFailed to open file" <<"\n";
 #endif
       exit(0);
@@ -220,6 +222,7 @@ private:
 
   auto readPropertyInfo(std::string FileName, RelLabel & PropertyLabel) 
     -> void {
+  /**
     auto counter= 0;
     std::string line;
     KeyListType keys;
@@ -237,14 +240,14 @@ private:
       while (getline(_LDBCFile, line) != NULL){ 
         boost::split(attributes, line, boost::is_any_of("|"));
         if (_VertexLabelMap.find(PropertyLabel.First) == _VertexLabelMap.end()) {
-#if DEBUG
-          std::cerr << "Error: Cannot not recognize label " 
+#ifdef _DEBUG_
+          std::cerr << "Error: Cannot recognize label " 
                     << PropertyLabel.First << "\n";
 #endif
           exit(0);
         }
         if (_VertexLabelMap[PropertyLabel.First].find(attributes[0]) == _VertexLabelMap[PropertyLabel.First].end() ) {
-#if DEBUG
+#ifdef _DEBUG_
           std::cerr << "Error: Cannot find vertex " << attributes[0] << "\n";
 #endif
           exit(0); // should not break
@@ -257,18 +260,20 @@ private:
           counter++;
         }
       } //END_WHILE
-#if DEBUG
+#ifdef _DEBUG_
       std::cout << counter << " new properties are read in this file\n";
 #endif
     }//END_TRY
     catch (int i){
-#if DEBUG
+#ifdef  _DEBUG_
       std::cerr << "Error:"<< i <<"\tFailed to open file" <<"\n";
       exit(0);
 #endif 
     }
 
     _LDBCFile.close();
+
+ */
   }//END_READNODEINFO_
 };
 
