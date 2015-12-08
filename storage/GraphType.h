@@ -31,45 +31,52 @@ public:
   typedef PropertyListType EdgePropertyList;
 
 public:
-  VertexPointer getVertexPointer(VertexDescriptor Vertex) { }
+  VertexPointer getVertexPointer(VertexDescriptor Vertex);
 
-  EdgeList getOutEdges(VertexPointer CurrentVertex) { }
+  EdgeList getOutEdges(VertexPointer CurrentVertex);
 
-  EdgeList getInEdges(VertexPointer CurrentVertex) { }
+  EdgeList getInEdges(VertexPointer CurrentVertex);
 
-  VertexDescriptor addVertex() { }
+  VertexDescriptor addVertex();
 
-  VertexDescriptor addVertex(std::string Label, 
-                            PropertyListType & InitialPropertyList) { }
+  VertexDescriptor addVertex(std::string Label, PropertyListType & InitialPropertyList);
 
-  VertexDescriptor addVertex(PropertyListType & InitialPropertyList) { }
+  VertexDescriptor addVertex(PropertyListType & InitialPropertyList);
 
   void chainEdges(VertexPointer Vertex, EdgePointer FirstNextEdge, 
-                  EdgePointer NewEdge) { }
+                  EdgePointer NewEdge);
 
   void assignPointers(VertexDescriptor vs, VertexDescriptor vd, 
-                      EdgePointer NewEdge) { }
+                      EdgePointer NewEdge);
 
   EdgeDescriptor addEdge(VertexDescriptor StartVertex, 
-                         VertexDescriptor EndVertex) { }
-
-  EdgeDescriptor addEdge(VertexDescriptor StartVertex, 
-                         VertexDescriptor EndVertex, 
-                         const std::string & Label) { }
+                         VertexDescriptor EndVertex);
 
   EdgeDescriptor addEdge(VertexDescriptor StartVertex, 
                          VertexDescriptor EndVertex, 
-                         PropertyListType & InitialPropertyList) { }
+                         const std::string & Label);
+
+  EdgeDescriptor addEdge(VertexDescriptor StartVertex, 
+                         VertexDescriptor EndVertex, 
+                         PropertyListType & InitialPropertyList);
 
   EdgeDescriptor addEdge(VertexDescriptor StartVertex, 
                          VertexDescriptor EndVertex, 
                          const std::string & Label, 
-                         PropertyListType & InitialPropertyList) { }
+                         PropertyListType & InitialPropertyList);
 
-  void dump() { }
+  VertexList getAllVertices();
+
+  EdgeList getAllEdges();
+
+  GraphType();
+
+  ~GraphType();
+
+#if DEBUG
+  void dump();
+#endif
   
-  ~GraphType() { }
-
   
 protected:
   /// Hold pointers to all vertices.

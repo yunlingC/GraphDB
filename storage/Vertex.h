@@ -38,8 +38,6 @@ public:
 
 public:
   Vertex();
-  void dump();
-
   unsigned int getId();
   EdgePtr getNextEdge();
   LabelType getType();
@@ -52,6 +50,11 @@ public:
   void setPropertyList(PropertyListType & List);
   PropertyListType &  getPropertyList();
   void deleteVertex();
+
+#if DEBUG 
+  void dump();
+#endif
+
 
 protected:
   // Vertex id.
