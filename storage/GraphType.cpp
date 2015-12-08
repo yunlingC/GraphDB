@@ -1,4 +1,4 @@
-//===-- storage/GraphType.cpp - Graph class type ------------------*- C++ -*-===//
+//===-- storage/GraphType.cpp - Graph class type ----------------*- C++ -*-===//
 //
 //                     CAESR Graph Database 
 //
@@ -11,19 +11,19 @@
 /// \brief This is the main class for the Graph structure.
 ///
 //===----------------------------------------------------------------------===//
-#ifndef _GRAPH_TYPE_CPP_ 
-#define _GRAPH_TYPE_CPP_ 
 
 #include "GraphType.h"
 
-VertexPointer GraphType::getVertexPointer(VertexDescriptor Vertex) {
+auto GraphType::getVertexPointer(VertexDescriptor Vertex) 
+  -> VertexPointer {
   if ( (Vertex > Vertices.size() - 1) || (Vertex < 0) ) {
     return nullptr;
   }
   return Vertices[Vertex];
 }
 
-EdgeList GraphTYpe::getOutEdges(VertexPointer CurrentVertex) {
+auto GraphType::getOutEdges(VertexPointer CurrentVertex) 
+  -> EdgeList {
   EdgeList OutEdges;
 
   auto NextEdge = CurrentVertex->getNextEdge();
@@ -51,7 +51,8 @@ EdgeList GraphTYpe::getOutEdges(VertexPointer CurrentVertex) {
   return OutEdges;
 }
 
-EdgeList GraphType::getInEdges(VertexPointer CurrentVertex) {
+auto GraphType::getInEdges(VertexPointer CurrentVertex) 
+  -> EdgeList {
   EdgeList InEdges;
 
   auto NextEdge = CurrentVertex->getNextEdge();
@@ -80,7 +81,8 @@ EdgeList GraphType::getInEdges(VertexPointer CurrentVertex) {
   return InEdges;
 }
 
-VertexDescriptor GraphType::addVertex() {
+auto  GraphType::addVertex() 
+  -> VertexDescriptor {
   VertexPointer NewVertex = new Vertex();
 
   NewVertex->setId(NumberOfVertices); 
@@ -89,8 +91,9 @@ VertexDescriptor GraphType::addVertex() {
   return NewVertex->getId();
 }
 
-VertexDescriptor GraphType::addVertex(std::string Label, 
-                          PropertyListType & InitialPropertyList) {
+auto GraphType::addVertex(std::string Label, 
+                          PropertyListType & InitialPropertyList) 
+  -> VertexDescriptor {
   VertexPointer NewVertex = new Vertex();
   NewVertex->setPropertyList(InitialPropertyList);
   NewVertex->setId(NumberOfVertices); 
@@ -100,7 +103,8 @@ VertexDescriptor GraphType::addVertex(std::string Label,
   return NewVertex->getId();
 }
 
-VertexDescriptor GraphType::addVertex(PropertyListType & InitialPropertyList) {
+auto GraphType::addVertex(PropertyListType & InitialPropertyList) 
+  -> VertexDescriptor {
   VertexPointer NewVertex = new Vertex();
   NewVertex->setPropertyList(InitialPropertyList);
   NewVertex->setId(NumberOfVertices); 
@@ -109,8 +113,9 @@ VertexDescriptor GraphType::addVertex(PropertyListType & InitialPropertyList) {
   return NewVertex->getId();
 }
 
-void GraphType::chainEdges(VertexPointer Vertex, EdgePointer FirstNextEdge, 
-                EdgePointer NewEdge) {
+auto GraphType::chainEdges(VertexPointer Vertex, EdgePointer FirstNextEdge, 
+                EdgePointer NewEdge) 
+  -> void {
 
   EdgePointer NextEdge = FirstNextEdge;
   EdgePointer PreviousEdge = nullptr;
@@ -161,8 +166,9 @@ NewEdge->setSecondNextEdge(nullptr);
   }
 }
 
-void GraphType::assignPointers(VertexDescriptor vs, VertexDescriptor vd, 
-                    EdgePointer NewEdge) {
+auto GraphType::assignPointers(VertexDescriptor vs, VertexDescriptor vd, 
+                    EdgePointer NewEdge) 
+  -> void {
   
   VertexPointer FirstVertexPointer = NewEdge->getFirstVertexPtr();
   VertexPointer SecondVertexPointer = NewEdge->getSecondVertexPtr();
@@ -186,7 +192,9 @@ void GraphType::assignPointers(VertexDescriptor vs, VertexDescriptor vd,
 
 }
 
-EdgeDescriptor GraphType::addEdge(VertexDescriptor StartVertex, VertexDescriptor EndVertex) {
+auto GraphType::addEdge(VertexDescriptor StartVertex, 
+                        VertexDescriptor EndVertex) 
+  -> EdgeDescriptor {
   EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
   NewEdge->setId(NumberOfEdges);
   assignPointers(StartVertex, EndVertex, NewEdge);
@@ -195,8 +203,10 @@ EdgeDescriptor GraphType::addEdge(VertexDescriptor StartVertex, VertexDescriptor
   return NewEdge->getId();
 }
 
-EdgeDescriptor GraphType::addEdge(VertexDescriptor StartVertex, VertexDescriptor EndVertex, 
-                       const std::string & Label) {
+auto GraphType::addEdge(VertexDescriptor StartVertex, 
+                                      VertexDescriptor EndVertex, 
+                                      const std::string & Label) 
+  -> EdgeDescriptor {
   EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
   
   NewEdge->setId(NumberOfEdges);
@@ -207,9 +217,10 @@ EdgeDescriptor GraphType::addEdge(VertexDescriptor StartVertex, VertexDescriptor
   return NewEdge->getId();
 }
 
-EdgeDescriptor GraphType::addEdge(VertexDescriptor StartVertex, 
+auto  GraphType::addEdge(VertexDescriptor StartVertex, 
                        VertexDescriptor EndVertex, 
-                       PropertyListType & InitialPropertyList) {
+                       PropertyListType & InitialPropertyList) 
+  -> EdgeDescriptor {
 
   EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
 
@@ -221,10 +232,11 @@ EdgeDescriptor GraphType::addEdge(VertexDescriptor StartVertex,
   return NewEdge->getId();
 }
 
-EdgeDescriptor GraphType::addEdge(VertexDescriptor StartVertex, 
+auto GraphType::addEdge(VertexDescriptor StartVertex, 
                        VertexDescriptor EndVertex, 
                        const std::string & Label, 
-                       PropertyListType & InitialPropertyList) {
+                       PropertyListType & InitialPropertyList) 
+  -> EdgeDescriptor {
 
   EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
 
@@ -237,7 +249,9 @@ EdgeDescriptor GraphType::addEdge(VertexDescriptor StartVertex,
   return NewEdge->getId();
 }
 
-void GraphType::dump() {
+#if DEBUG
+auto GraphType::dump() 
+  -> void {
   for ( size_t  i = 0; i < Vertices.size(); i++ ) {
     Vertices[i]->dump();
   }
@@ -246,15 +260,24 @@ void GraphType::dump() {
     Edges[i]->dump();
   }
 }
+#endif 
 
-GraphType::GraphType(): NumberOfVertices(0), NumberOfEdges(0) {
-
+auto GraphType::getAllVertices()
+  -> VertexList {
+  return Vertices;
 }
+
+auto GraphType::getAllEdges()
+  -> EdgeList {
+  return Edges;
+}
+
+GraphType::GraphType(): NumberOfVertices(0), NumberOfEdges(0) {}
 
 GraphType::~GraphType() {
   /// Must manually delete the objects.  
   /// However, only one place is necessary since everywhere else, 
-  /// since I am storing pointers.
+  /// I am storing pointers.
   /// Thus, Vertices and _edges contain all newly created objects.
 
   for ( size_t i= 0; i < Vertices.size(); i++ ) {
@@ -268,24 +291,4 @@ GraphType::~GraphType() {
   }
 }
 
-VertexList getAllVertices(){
-  return Vertices;
-}
-
-EdgeList getAllEdges(){
-  return Edges;
-}
-
-  
-protected:
-  /// Hold pointers to all vertices.
-  std::vector<VertexPointer> Vertices;
-  /// Hold pointers to all edges.
-  std::vector<EdgePointer> Edges;
-  /// Keep a count of vertices and edges.
-  unsigned int NumberOfVertices;
-  unsigned int NumberOfEdges;
-};
-
-#endif /* _GRAPH_TYPE_CPP_ */
 

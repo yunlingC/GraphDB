@@ -35,7 +35,9 @@ public:
 
 public:
 
+#if DEBUG
   void dump();
+#endif
   VertexDescriptor getFirstId();
   VertexPointer getFirstVertexPtr();
   VertexPointer getSecondVertexPtr();
