@@ -76,7 +76,7 @@ auto Vertex::getNextEdge() -> EdgePtr {
 }
 
 
-#if DEBUG
+#ifdef _DEBUG_
 auto Vertex::dump() 
   -> void {
     std::cout << " ========================================= \n"; 

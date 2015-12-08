@@ -35,7 +35,7 @@ public:
 
 public:
 
-#if DEBUG
+#ifdef _DEBUG_
   void dump();
 #endif
   VertexDescriptor getFirstId();

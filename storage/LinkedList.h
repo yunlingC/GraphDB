@@ -16,7 +16,7 @@
 
 #include "FixedString.h"
 
-#if DEBUG
+#ifdef _DEBUG_
 #include <iostream>
 #endif
 
@@ -160,7 +160,7 @@ public:
     }
   }
 
-#if DEBUG
+#ifdef _DEBUG_
   void print() {
     // Iterate over the linked list and delete it.
     ListNode * it = _Head;

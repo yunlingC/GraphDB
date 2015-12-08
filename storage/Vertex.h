@@ -51,7 +51,7 @@ public:
   PropertyListType &  getPropertyList();
   void deleteVertex();
 
-#if DEBUG 
+#ifdef _DEBUG_
   void dump();
 #endif
 

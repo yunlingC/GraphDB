@@ -14,13 +14,13 @@
 #include "Vertex.h"
 #include "Edge.h"
 
-#if DEBUG
+#ifdef _DEBUG_
 #include <iostream>
 #endif
 
 //using namespace std;
 
-#if DEBUG
+#ifdef _DEBUG_
 auto Edge::dump() 
   -> void {
   std::cout << "\nEdge id: " << EdgeId 

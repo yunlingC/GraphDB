@@ -249,7 +249,7 @@ auto GraphType::addEdge(VertexDescriptor StartVertex,
   return NewEdge->getId();
 }
 
-#if DEBUG
+#ifdef _DEBUG_
 auto GraphType::dump() 
   -> void {
   for ( size_t  i = 0; i < Vertices.size(); i++ ) {
