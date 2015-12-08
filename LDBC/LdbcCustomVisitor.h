@@ -15,47 +15,45 @@
 #ifndef _LDBCCUSTOMVISITOR_H_
 #define _LDBCCUSTOMVISITOR_H_
 
+#include <queue>
+
 #include "CustomVisitor.h"
 #include "Utils.h"
 
+using namespace std;
+
 class LimitedDepthVisitor : public Visitor {
 public:
-  typedef std::pair<FixedString, bool> ReturnValueType;
+  typedef pair<FixedString, bool> ReturnValueType;
   typedef std::queue<VertexPath>  PathQueueType;
 public:
-  auto setNameFilter (Filter & filter) 
+  auto setNameFilter(FilterType & filter) 
     -> void {
-    _NameFilter = filter;
+    NameFilter = filter;
   }
    
-  virtual void setFilter(Filter & filter) {
-    FilterList.push_back(filter);
+  virtual void setFilter(FilterType & f) {
+    FilterList.push_back(f);
   }
 
-  virtual void setDepth(unsigned int Depth) {
-    DepthSetting = Depth;
+  virtual void setDepth(unsigned int depth) {
+    DepthSetting = depth;
   }
 
-
-  virtual void visitStartVertex(VertexPointer StartVertex ) {
+  virtual void visitStartVertex(VertexPointer startVertex ) {
     VertexPath newPath;
-    newPath.push_back(StartVertex);
+    newPath.push_back(startVertex);
     PathQueue.push(newPath);
   }
 
-  virtual bool visitVertex(VertexPointer Vertex) {
-    std::cout << "==>visit vertex " << Vertex->getId() << "\n";
+  virtual bool visitVertex(VertexPointer vertex) {
     PrevPath  = PathQueue.front();
     PathQueue.pop();
     if (PrevPath.size() > DepthSetting)
       return true;
-    auto NameMatch = checkProperty<ReturnValueType>(Vertex, _NameFilter); 
+    auto NameMatch = checkProperty<ReturnValueType>(vertex, NameFilter); 
     if (NameMatch == true) {
-      VertexList.push_back(Vertex);
-      std::cout << "path size: " << PrevPath.size() << "\n";
-      for (auto it = PrevPath.begin(); it != PrevPath.end(); ++it)
-        std::cout << (*it)->getId() << "\t";
-      std::cout << "\nVertex " << Vertex->getId() << " is found\n";
+      VertexList.push_back(vertex);
     }
     return false; 
   }
@@ -65,15 +63,14 @@ public:
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-//    std::cout << "-- schedule edge " << edge->getType() << "\n";
-    unsigned int depthSecond = 0;
+    unsigned int DepthSecond = 0;
     if(PrevPath.back() == first) {
-      depthSecond = PrevPath.size();
+      DepthSecond = PrevPath.size();
     }
 
-    Filter filter;
-    if(depthSecond > 0)
-      filter = FilterList[depthSecond-1];
+    FilterType filter;
+    if(DepthSecond > 0)
+      filter = FilterList[DepthSecond-1];
     else
       filter.setDefault();
    
@@ -86,25 +83,23 @@ public:
       VertexPath newPath = PrevPath;
       newPath.push_back(second);
       PathQueue.push(newPath);
-      std::cout << "==>vid\t" << first->getPropertyValue("id").first << "\t" <<  second->getPropertyValue("id").first << "\t" << second->getPropertyValue("firstName").first << "\n";
     }
     return false;
   }
 
 protected:
   unsigned int  TypeMatch;
-  unsigned int  _direcMatch;
+  unsigned int  DirecMatch;
   unsigned int  DepthSetting;
-  std::vector<Filter> FilterList;
+  std::vector<FilterType> FilterList;
   VertexPath   PrevPath;
   PathQueueType  PathQueue;
-  Filter _NameFilter;
+  FilterType NameFilter;
 };
 
 class SingleRelTypeVisitor : public LimitedDepthVisitor {
 public:
-  virtual bool visitVertex(VertexPointer Vertex) {
-    std::cout << "==>visit vertex " << Vertex->getId() << "\n";
+  virtual bool visitVertex(VertexPointer vertex) {
     PrevPath  = PathQueue.front();
     PathQueue.pop();
     if (PrevPath.size() > DepthSetting)
@@ -119,7 +114,6 @@ public:
       newPath.push_back(second);
       PathQueue.push(newPath);
       VertexList.push_back(second); //unique
-      std::cout << "==>vid\t" << second->getPropertyValue("id").first << "\t" << second->getPropertyValue("firstName").first  << "\n";
     }
     return false;
   }
@@ -127,13 +121,13 @@ public:
  
 class MultiRelTypeVisitor: public ReachabilityVisitor {
 public:
-  typedef Filter &  FilterReference;
-  typedef std::pair<FixedString, bool> ReturnValueType;
-  typedef std::map<VertexPointer, VertexPointer> ReturnTargetsType;
-  typedef std::map<VertexPointer, VertexPointer> ReturnTargetsTypeReference;
-  typedef std::pair<VertexPointer, VertexPointer> TargetsPair;
+  typedef FilterType &  FilterReference;
+  typedef pair<FixedString, bool> ReturnValueType;
+  typedef map<VertexPointer, VertexPointer> ReturnTargetsType;
+  typedef map<VertexPointer, VertexPointer> ReturnTargetsTypeReference;
+  typedef pair<VertexPointer, VertexPointer> TargetsPair;
 public:
-  virtual void setRangeFilter(Filter & filter) {
+  virtual void setRangeFilter(FilterType & filter) {
     _RangeFilter = filter;
   }
 
@@ -150,7 +144,6 @@ public:
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-    std::cout << "==>vid " << vertex->getId() << "\t" <<  vertex->getPropertyValue("id").first << vertex->getPropertyValue("firstName").first <<  "\n";
     PrevPath = PathQueue.front();
     PathQueue.pop();
     if(PrevPath.size() > DepthSetting) {
@@ -184,43 +177,26 @@ public:
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    unsigned int depthSecond;
+    unsigned int DepthSecond = 0;
     if(PrevPath.back() == first) {
-      depthSecond = PrevPath.size();
-      _CurrentDepth = depthSecond;
+      DepthSecond = PrevPath.size();
+      _CurrentDepth = DepthSecond;
     }
 
-    Filter filter;
-    if(depthSecond > 0) {
-      filter = FilterList[depthSecond-1];
+    FilterType filter;
+    if(DepthSecond > 0) {
+      filter = FilterList[DepthSecond-1];
     }
     else 
       filter.setDefault();
     
-    for(auto it = filter.getTypeList().begin() ; it != filter.getTypeList().end(); it++) {
-      std::cout << "Filt Type " << (*it) << "\t" ;
-    }
-    std::cout << "\n";
     TypeMatch = checkMultiRelType(edge, filter);
     if(TypeMatch == true) {
       if(_CurrentDepth == _DepthToCheckRange) {
         auto equal = false;
-        switch(_PropToCheck) {
-          case 1:
-            TypeMatch = checkTimeRange<ReturnValueType, VertexPointer>(second, _RangeFilter, equal);
-            break;
-          case 2:
-            TypeMatch = checkDateRange<ReturnValueType, VertexPointer>(second, _RangeFilter, equal);
-            break;
-          case 0:
-            break;
-          default:
-            break;
-        }
+        TypeMatch = checkRange<VertexPointer>(_PropToCheck, second, _RangeFilter, equal);
       }
     }
-    std::cout << "scheduleBranch typeMatch : " << TypeMatch << "\n";
-
     return false;
   }
 
@@ -229,7 +205,6 @@ public:
       VertexPath newPath = PrevPath;
       newPath.push_back(second);
       PathQueue.push(newPath);
-      std::cout << "first " << first->getPropertyValue("id").first << "\t" << " second " << second->getPropertyValue("id").first << " is on path now\n";
     }
     return false;
   }
@@ -239,14 +214,14 @@ protected:
   unsigned int _PropToCheck = 0;  /// 0 default 1 time 2 date 3 year
   unsigned int _CurrentDepth;
   ReturnTargetsType _TargetsMap;
-  Filter  _RangeFilter;
+  FilterType  _RangeFilter;
 };
 
 class MultiResultVisitor : public MultiRelTypeVisitor {
 public:
-  typedef std::map<VertexPointer, unsigned int> ReturnResultMapType;
-  typedef std::map<VertexPointer, unsigned int> &  ResultMapTypeReference;
-  typedef std::pair<VertexPointer, unsigned int> ReturnMapPair;
+  typedef map<VertexPointer, unsigned int> ReturnResultMapType;
+  typedef map<VertexPointer, unsigned int> &  ResultMapTypeReference;
+  typedef pair<VertexPointer, unsigned int> ReturnMapPair;
 public:
 
   virtual ResultMapTypeReference getReturnResultMap() {
@@ -254,7 +229,7 @@ public:
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-    std::cout << "==>vid " << vertex->getId() << "\t" <<  vertex->getPropertyValue("id").first << "\n";
+//    cout << "==>vid " << vertex->getId() << "\t" <<  vertex->getPropertyValue("id").first << endl;
     PrevPath = PathQueue.front();
     PathQueue.pop();
     if(PrevPath.size() > DepthSetting) {
@@ -281,17 +256,17 @@ protected:
 
 class VertexPropertyVisitor : public MultiRelTypeVisitor {
 public:
-  typedef std::map<EdgePointer, VertexPointer> BranchMapType;
-  typedef std::pair<EdgePointer, VertexPointer> BranchPair;
-  typedef std::pair<VertexPointer, BranchPair> MapPair;
-  typedef std::multimap<VertexPointer, BranchPair> PathMapType;
+  typedef map<EdgePointer, VertexPointer> BranchMapType;
+  typedef pair<EdgePointer, VertexPointer> BranchPair;
+  typedef pair<VertexPointer, BranchPair> MapPair;
+  typedef multimap<VertexPointer, BranchPair> PathMapType;
 
 public:
   virtual void setDepthToCheckVertexProp ( unsigned int depth) {
     _DepthToCheckVertexProp = depth;
   }
 
-  virtual void setVertexFilter (Filter & filter) {
+  virtual void setVertexFilter (FilterType & filter) {
     _VertexFilter = filter;
   }
 
@@ -300,48 +275,49 @@ public:
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    unsigned int depthSecond;
-    if(PrevPath.back() == first) {
-      depthSecond = PrevPath.size();
-      _CurrentDepth = depthSecond;
+    unsigned int DepthSecond = 0;
+    if (PrevPath.back() == first) {
+      DepthSecond = PrevPath.size();
+      _CurrentDepth = DepthSecond;
     }
 
-    Filter filter;
-    if(depthSecond > 0) {
-      filter = FilterList[depthSecond-1];
+    FilterType filter;
+    if ( DepthSecond > 0 ) {
+      filter = FilterList[DepthSecond-1];
     }
     else 
       filter.setDefault();
     
-    for(auto it = filter.getTypeList().begin() ; it != filter.getTypeList().end(); it++) {
-//      std::cout << "Filt Type " << (*it) << "\t" ;
-    }
-//    std::cout << "edge label " << edge->getType() << "\n";
+//    for(auto it = filter.getTypeList().begin() ; it != filter.getTypeList().end(); it++) {
+//      cout << "Filt Type " << (*it) << "\t" ;
+//    }
+//    cout << "edge label " << edge->getType() << endl;
     auto MultiTypeMatch = checkMultiRelType(edge, filter);
     auto RangeMatch = true;
     auto VertexMatch = true;
     auto equalFlag = false;
-    if((_CurrentDepth == _DepthToCheckRange) && MultiTypeMatch) 
+
+    if ( (_CurrentDepth == _DepthToCheckRange) && MultiTypeMatch ) {
       RangeMatch = checkYearRange<EdgePointer>(edge, _RangeFilter, equalFlag);
+    }
     if((_CurrentDepth == _DepthToCheckVertexProp ) && MultiTypeMatch) {
       VertexMatch = checkProperty<ReturnValueType>(second, _VertexFilter); 
-//      std::cout << "vertex place.id " << second->getPropertyValue("name").first << "\n";
     }
-//    std::cout << "scheduleBranch:  MultiTypeMatch  " << MultiTypeMatch << " RangeMatch " << RangeMatch << " VertexMatch " << VertexMatch  << "\n";
+//    cout << "scheduleBranch:  MultiTypeMatch  " << MultiTypeMatch << " RangeMatch " << RangeMatch << " VertexMatch " << VertexMatch  << endl;
     TypeMatch = (MultiTypeMatch && RangeMatch && VertexMatch);
     
-    if(TypeMatch ) {
-      if(_CurrentDepth != DepthSetting) {
-        auto branchPair = std::make_pair(edge, second);
+    if  ( TypeMatch ) {
+      if ( _CurrentDepth != DepthSetting ) {
+        auto branchPair = make_pair(edge, second);
         _PathMap.insert(MapPair(first, branchPair));
       } 
     }
     if((_CurrentDepth == DepthSetting) && (VertexMatch == false)){
       for (auto it = _PathMap.begin(); it != _PathMap.end(); it++) {
-//        std::cout << "++VertexMatch " << VertexMatch <<"\t"<< (*it).second.second->getId() <<"\t"<< first->getId() << "\n";
+//        cout << "++VertexMatch " << VertexMatch <<"\t"<< (*it).second.second->getId() <<"\t"<< first->getId() << endl;
         if ((*it).second.second  == first) {
           _PathMap.erase(it);
-//          std::cout << "vertex " << first->getPropertyValue("id").first << " is rm\n";
+//          cout << "vertex " << first->getPropertyValue("id").first << " is rm\n";
         }
       }
     } //else
@@ -349,14 +325,14 @@ public:
   }
 
 protected:
-  Filter _VertexFilter;
+  FilterType _VertexFilter;
   unsigned int _DepthToCheckVertexProp;
   PathMapType _PathMap;
 };
 
 class VertexPropertyRangeVisitor : public VertexPropertyVisitor {
 public:
-  virtual void setVertexFilters(Filter & filter) {
+  virtual void setVertexFilters(FilterType & filter) {
     _VertexFilterList.push_back(filter);
   }
 
@@ -365,43 +341,43 @@ public:
   }
   
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    unsigned int depthSecond;
+    unsigned int DepthSecond = 0;
     if(PrevPath.back() == first) {
-      depthSecond = PrevPath.size();
-      _CurrentDepth = depthSecond;
+      DepthSecond = PrevPath.size();
+      _CurrentDepth = DepthSecond;
     }
 
-    Filter filter;
-    if(depthSecond > 0) {
-      filter = FilterList[depthSecond-1];
+    FilterType filter;
+    if(DepthSecond > 0) {
+      filter = FilterList[DepthSecond-1];
     }
     else 
       filter.setDefault();
     
-    for(auto it = filter.getTypeList().begin() ; it != filter.getTypeList().end(); it++) {
-      std::cout << "Filt Type " << (*it) << "\t" ;
-    }
-    std::cout << "edge label " << edge->getType() << "\n";
+//    for(auto it = filter.getTypeList().begin() ; it != filter.getTypeList().end(); it++) {
+//      cout << "Filt Type " << (*it) << "\t" ;
+//    }
+//    cout << "edge label " << edge->getType() << endl;
     auto MultiTypeMatch = checkMultiRelType(edge, filter);
     bool RangeMatch = true;
     bool VertexMatch = true;
-    std::cout << "++Current Depth " << _CurrentDepth << "\n";
+//    cout << "++Current Depth " << _CurrentDepth << endl;
     if((_CurrentDepth == _DepthToCheckRange) && MultiTypeMatch)  {
       bool equalFlag;
       RangeMatch = checkRange<EdgePointer>(_PropToCheck, edge, _RangeFilter, equalFlag); 
     }
     if((_CurrentDepth == _DepthToCheckVertexProp ) && MultiTypeMatch) {
-      std::cout << "vertex place.name " << second->getPropertyValue("name").first << "\n";
+//      cout << "vertex place.name " << second->getPropertyValue("name").first << endl;
       VertexMatch = false;
       for(auto it = _VertexFilterList.begin(); it != _VertexFilterList.end(); it++) {
-        std::cout << "vertexfilter list " << (*it).getValue() << "\n";
+//        cout << "vertexfilter list " << (*it).getValue() << endl;
         if(checkProperty<ReturnValueType>(second, (*it)) == true) {
           VertexMatch = true;
           break;
         }
       }
     }
-    std::cout << "scheduleBranch:  MultiTypeMatch  " << MultiTypeMatch << " RangeMatch " << RangeMatch << " VertexMatch " << VertexMatch  << "\n";
+//    cout << "scheduleBranch:  MultiTypeMatch  " << MultiTypeMatch << " RangeMatch " << RangeMatch << " VertexMatch " << VertexMatch  << endl;
 
     TypeMatch = (MultiTypeMatch && RangeMatch && VertexMatch);
     
@@ -409,7 +385,7 @@ public:
       if(MultiTypeMatch && RangeMatch )
         if(VertexMatch == true) {
           _IncludeState= false; 
-          std::cout <<"-->Include state " << _IncludeState << "\n";
+//          cout <<"-->Include state " << _IncludeState << endl;
         }
     } 
     return false;
@@ -417,16 +393,16 @@ public:
 
 protected:
   bool _IncludeState= true;
-  std::vector<Filter> _VertexFilterList;
+  vector<FilterType> _VertexFilterList;
 };
 
 class MultiPropertyVisitor: public VertexPropertyRangeVisitor {
 public:
-  typedef std::vector<Filter> FilterListType;
-  typedef std::pair<VertexPointer, unsigned int> ResultPair;
-  typedef std::map<VertexPointer, unsigned int> ResultMapType;
+  typedef vector<FilterType> FilterListType;
+  typedef pair<VertexPointer, unsigned int> ResultPair;
+  typedef map<VertexPointer, unsigned int> ResultMapType;
 public:
-  virtual void setVertexFilterlist(Filter & filter) {
+  virtual void setVertexFilterlist(FilterType & filter) {
     _VertexFilterList.push_back(filter);
   }
 
@@ -443,15 +419,15 @@ public:
   }
  
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    unsigned int depthSecond;
+    unsigned int DepthSecond = 0;
     if(PrevPath.back() == first) {
-      depthSecond = PrevPath.size();
-      _CurrentDepth = depthSecond;
+      DepthSecond = PrevPath.size();
+      _CurrentDepth = DepthSecond;
     }
 
-    Filter filter;
-    if(depthSecond > 0) {
-      filter = FilterList[depthSecond-1];
+    FilterType filter;
+    if(DepthSecond > 0) {
+      filter = FilterList[DepthSecond-1];
     }
     else 
       filter.setDefault();
@@ -486,10 +462,10 @@ public:
       }
       if (_CurrentDepth == DepthSetting) {
         if(_ResultMap.find(newPath[1]) != _ResultMap.end()) {
-          std::cout << _ResultMap[newPath[1]] << " posts are collected now\n";
+//          cout << _ResultMap[newPath[1]] << " posts are collected now\n";
           _ResultMap[newPath[1]]++;
         } else {
-          std::cout << "Failed to find "<< newPath[1]->getPropertyValue("id").first << "\n";
+//          cout << "Failed to find "<< newPath[1]->getPropertyValue("id").first << endl;
         }
       }
     }
@@ -502,8 +478,8 @@ protected:
 
 class TimeCompareVisitor : public MultiPropertyVisitor {
 public:
-  typedef std::map<VertexPointer, VertexPointer> VertexMapType;
-  typedef std::pair<VertexPointer, VertexPointer> VertexPair;
+  typedef map<VertexPointer, VertexPointer> VertexMapType;
+  typedef pair<VertexPointer, VertexPointer> VertexPair;
 public:
   virtual void setDepthToCompareTime(unsigned int depth) {
     _DepthToCompareTime = depth;
@@ -514,7 +490,7 @@ public:
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-    std::cout << "==>visit vertex " << vertex->getId() << "\t" << vertex->getPropertyValue("id").first << "\n";
+//    cout << "==>visit vertex " << vertex->getId() << "\t" << vertex->getPropertyValue("id").first << endl;
     PrevPath  = PathQueue.front();
     PathQueue.pop();
     _RangeFilter.setValueRange("creationDate", "", "");
@@ -525,14 +501,14 @@ public:
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    unsigned int depthSecond;
+    unsigned int DepthSecond = 0 ;
     if(PrevPath.back() == first) {
-      depthSecond = PrevPath.size();
-      _CurrentDepth = depthSecond;
+      DepthSecond = PrevPath.size();
+      _CurrentDepth = DepthSecond;
     }
-    Filter filter;
-    if(depthSecond > 0) 
-      filter = FilterList[depthSecond-1];
+    FilterType filter;
+    if(DepthSecond > 0) 
+      filter = FilterList[DepthSecond-1];
     else 
       filter.setDefault();
     
@@ -558,14 +534,14 @@ public:
         if((DateEqualFlag && TimeMatch) || (DateMatch && (!DateEqualFlag))) {
           _RangeFilter.setValueRange("creationDate", second->getPropertyValue("creationDate").first.std_str(), ""); 
           if(_MatchMap.find(PrevPath[1]) == _MatchMap.end()) {
-          _MatchMap.insert(std::pair<VertexPointer, VertexPointer>(PrevPath[1], second));
+          _MatchMap.insert(pair<VertexPointer, VertexPointer>(PrevPath[1], second));
           } else {
           _MatchMap[PrevPath[1]] = second;
          }
        }
     }
     if((_CurrentDepth == _DepthToCompareTime + 1) && MultiTypeMatch) {
-      std::map<VertexPointer, VertexPointer>::iterator it;
+      map<VertexPointer, VertexPointer>::iterator it;
       for(it = _MatchMap.begin(); it != _MatchMap.end(); it++) {
         if ((*it).second == first)
           break;
@@ -598,11 +574,11 @@ protected:
 
 class VertexMatchVisitor: public TimeCompareVisitor {
 public:
-  typedef std::map<VertexPointer, bool> PersonMatchMapType;
-  typedef std::pair<VertexPointer, bool> PersonMatchPair;
-  typedef std::map<VertexPointer, VertexPointer> ReturnMapType; 
-  typedef std::map<VertexPointer, std::string> TimeMatchMapType;
-  typedef std::pair<VertexPointer, std::string> TimeMatchPair;
+  typedef map<VertexPointer, bool> PersonMatchMapType;
+  typedef pair<VertexPointer, bool> PersonMatchPair;
+  typedef map<VertexPointer, VertexPointer> ReturnMapType; 
+  typedef map<VertexPointer, string> TimeMatchMapType;
+  typedef pair<VertexPointer, string> TimeMatchPair;
 public:
   virtual TimeMatchMapType & getTimeMap() {
     return _TimeMatchMap;
@@ -612,7 +588,7 @@ public:
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-    std::cout << "==>visit vertex " << vertex->getId() << "\t" << vertex->getPropertyValue("id").first << "\n";
+//    cout << "==>visit vertex " << vertex->getId() << "\t" << vertex->getPropertyValue("id").first << endl;
     PrevPath  = PathQueue.front();
     PathQueue.pop();
     _PersonMatchMap.insert(PersonMatchPair(vertex, false));
@@ -621,15 +597,15 @@ public:
 
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    unsigned int depthSecond;
+    unsigned int DepthSecond = 0;
     if(PrevPath.back() == first) {
-      depthSecond = PrevPath.size();
-      _CurrentDepth = depthSecond;
+      DepthSecond = PrevPath.size();
+      _CurrentDepth = DepthSecond;
     }
 
-    Filter filter;
-    if(depthSecond > 0) {
-      filter = FilterList[depthSecond-1];
+    FilterType filter;
+    if(DepthSecond > 0) {
+      filter = FilterList[DepthSecond-1];
     }
     else 
       filter.setDefault();
@@ -681,40 +657,40 @@ protected:
 
 class SinglePropertyVisitor : public VertexMatchVisitor {
 public:
-  typedef std::pair<VertexPointer, bool> VertexPair;
-  typedef std::vector<std::string> VertexListType;
-  typedef std::map<VertexPointer, VertexListType> TargetsMapType;
+  typedef pair<VertexPointer, bool> VertexPair;
+  typedef vector<string> VertexListType;
+  typedef map<VertexPointer, VertexListType> TargetsMapType;
 public:
   virtual TargetsMapType & getResultTargetsMap() {
     return _ResultMap;
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
-    std::cout << "==>visit vertex " << vertex->getId() << "\t" << vertex->getPropertyValue("id").first << "\n";
+//    cout << "==>visit vertex " << vertex->getId() << "\t" << vertex->getPropertyValue("id").first << endl;
     PrevPath  = PathQueue.front(); PathQueue.pop();
     VertexListType VertexList;
-    _PersonMatchMap.insert(std::pair<VertexPointer, bool>(vertex, false));
-    _ResultMap.insert(std::pair<VertexPointer, VertexListType>(vertex, VertexList));
+    _PersonMatchMap.insert(pair<VertexPointer, bool>(vertex, false));
+    _ResultMap.insert(pair<VertexPointer, VertexListType>(vertex, VertexList));
     return  ((PrevPath.size() > DepthSetting) ? true : false);
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
-    unsigned int depthSecond;
+    unsigned int DepthSecond = 0;
     if(PrevPath.back() == first) {
-      depthSecond = PrevPath.size();
-      _CurrentDepth = depthSecond;
+      DepthSecond = PrevPath.size();
+      _CurrentDepth = DepthSecond;
     }
 
-    Filter filter;
-    if(depthSecond > 0) {
-      filter = FilterList[depthSecond-1];
+    FilterType filter;
+    if(DepthSecond > 0) {
+      filter = FilterList[DepthSecond-1];
     }
     else 
       filter.setDefault();
     
     TypeMatch = checkMultiRelType(edge, filter);
     if((_CurrentDepth == _DepthToCheckVertexProp ) && TypeMatch) {
-      std::cout << "++Tag id " << second->getPropertyValue("id").first << "\n"; 
+//      cout << "++Tag id " << second->getPropertyValue("id").first << endl; 
       if(checkProperty<ReturnValueType>(second, _VertexFilter ) == true) {
         _PersonMatchMap[first] = true;
       }
@@ -726,6 +702,229 @@ public:
 
 protected:
   TargetsMapType _ResultMap;
+};
+
+class SimilarityVisitor : public VertexMatchVisitor {
+public:
+  typedef pair<VertexPointer, bool> VertexPair;
+  typedef vector<string> VertexListType;
+  ///<post.id, post_interted_by_personx>
+  typedef std::unordered_map<unsigned int, bool> PostMapType;
+public:
+  PostMapType & getPostMap() {
+    return PostMap;
+  }
+
+  virtual bool visitVertex(VertexPointer vertex) {
+    PrevPath  = PathQueue.front(); PathQueue.pop();
+    _CurrentDepth = PrevPath.size();
+    return  ((PrevPath.size() > DepthSetting ) ? true : false);
+  }
+
+  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
+    unsigned int DepthSecond = 0 ;
+    if(PrevPath.back() == first) {
+      DepthSecond = PrevPath.size();
+    }
+    FilterType filter;
+    if(DepthSecond > 0) {
+      filter = FilterList[DepthSecond-1];
+    }
+    else 
+      filter.setDefault();
+    
+    TypeMatch = checkMultiRelType(edge, filter);
+    if ( (_CurrentDepth == 1) && TypeMatch ) {
+      PostMap.insert(std::pair<unsigned int, bool>(second->getId(), false));
+    }
+
+    if((_CurrentDepth == 3) && TypeMatch) {
+      if(checkProperty<ReturnValueType>(second, _VertexFilter)) {
+        PostMap[PrevPath[1]->getId()] = true;
+      }
+    }
+    return false;
+  }
+
+protected:
+  PostMapType PostMap;
+};
+
+class ExpertVisitor : public SimilarityVisitor {
+public:
+  typedef pair<VertexPointer, bool> VertexPair;
+  typedef vector<string> VertexListType;
+  typedef std::unordered_map<unsigned int, bool> PostMapType;
+public:
+  PostMapType & getPostMap() {
+    return PostMap;
+  }
+
+  virtual bool visitVertex(VertexPointer vertex) {
+    PrevPath  = PathQueue.front(); PathQueue.pop();
+    _CurrentDepth = PrevPath.size();
+    return  ((PrevPath.size() > DepthSetting) ? true : false);
+  }
+
+  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
+
+//    std::cout << "--current depth " << _CurrentDepth << "\n"; 
+//    std::cout << "--first " << first->getType() << "\tsecond " << second->getType() << "\n";
+
+    unsigned int DepthSecond = 0 ;
+    if(PrevPath.back() == first) {
+      DepthSecond = PrevPath.size();
+    }
+    FilterType filter;
+    if(DepthSecond > 0) {
+      filter = FilterList[DepthSecond-1];
+    }
+    else 
+      filter.setDefault();
+    
+    TypeMatch = checkMultiRelType(edge, filter);
+
+    if ( TypeMatch ) {
+//      std::cout << first->getType() << first->getId() <<"\t" 
+//        << second->getType() << second->getId() << "\n";
+    }
+
+    if ( (_CurrentDepth == 1) && TypeMatch ) {
+//      std::cout << second->getId() << " post +1 \n";
+      PostMap.insert(std::pair<unsigned int, bool>(second->getId(), false));
+    }
+
+    
+    if ( (_CurrentDepth == 4) && TypeMatch ) {
+      if(checkProperty<ReturnValueType>(second, _VertexFilter ) == true) {
+//        std::cout << second->getPropertyValue("name").first.std_str() << "\n";
+        TypeMatch = false;
+        PostMap[PrevPath[1]->getId()] = true;
+      }
+    }
+
+    if ( (_CurrentDepth == 5) && TypeMatch ) {
+      if ( checkProperty<ReturnValueType>(second, _VertexFilter ) == true) {
+//        std::cout << second->getPropertyValue("name").first.std_str() << "\n";
+        PostMap[PrevPath[1]->getId()] = true;
+      }
+    }
+
+    return false;
+  }
+
+protected:
+  PostMapType PostMap;
+};
+
+class SubGraphVisitor : public PathVisitor {
+public:
+  typedef std::queue<VertexPath>  PathQueueType;
+public:
+  SubGraphVisitor (): TypeMatch(false), DirecMatch(false)  { }
+
+  virtual void setEdgeFilter(FilterType & filter) {
+    EdgeFilter = filter;
+  }
+
+  virtual bool visitDirection(VertexPointer target, EdgePointer Edge) {
+    return DirecMatch;
+  }
+
+  virtual bool scheduleEdge(EdgePointer Edge) {
+    return TypeMatch;
+  }
+
+  virtual bool scheduleBranch(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
+    TypeMatch = checkType(Edge, EdgeFilter);
+    DirecMatch = checkDirection(Second, Edge, EdgeFilter);
+    return false;
+  }
+
+  virtual bool scheduleTree(VertexPointer First, EdgePointer Edge, VertexPointer Second) {
+    if ( TypeMatch && DirecMatch ) {
+      VertexPath NewPath = PrevPath;
+      NewPath.push_back(Second);
+      PathQueue.push(NewPath);
+      if(Second->getId() == EndVertex) {
+        VertexList = NewPath;
+        return true;
+      }
+    }
+    return false;
+  }
+
+protected:
+  FilterType EdgeFilter;
+  bool TypeMatch;
+  bool DirecMatch;
+};
+
+
+class WeightedPathVisitor : public SimilarityVisitor {
+public:
+  typedef pair<VertexPointer, bool> VertexPair;
+  typedef vector<string> VertexListType;
+public:
+
+  WeightedPathVisitor ():Score(0.0) {}
+  float getScore() {
+    return Score;
+  }
+
+  virtual bool visitVertex(VertexPointer vertex) {  
+    PrevPath  = PathQueue.front(); PathQueue.pop();
+    _CurrentDepth = PrevPath.size();
+    return  ((PrevPath.size() > DepthSetting) ? true : false);
+  }
+
+  virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
+
+    unsigned int DepthSecond = 0 ;
+    if(PrevPath.back() == first) {
+      DepthSecond = PrevPath.size();
+    }
+    FilterType filter;
+    if(DepthSecond > 0) {
+      filter = FilterList[DepthSecond-1];
+    }
+    else 
+      filter.setDefault();
+    
+    TypeMatch = checkMultiRelType(edge, filter);
+
+    if ( TypeMatch ) {
+//      std::cout << first->getType() << first->getId() <<"\t" 
+//        << second->getType() << second->getId() << "\n";
+    }
+
+//    if ( (_CurrentDepth ==  1) && TypeMatch ) {
+//      std::cout << second->getId() << " post +1 \n";
+//      PostMap.insert(std::pair<unsigned int, bool>(second->getId(), false));
+//    }
+    
+    if ( (_CurrentDepth == 3) && TypeMatch ) {
+      if ( checkProperty<ReturnValueType>(second, _VertexFilter ) == true) {
+      ///comment_replyOf_comment 0.5
+      ///comment_replyOf_post    1.0
+        auto Reply = PrevPath[1]->getType().std_str();
+        auto ReplyOf = PrevPath[2]->getType().std_str();
+//        std::cout << "reply " << Reply << " ReplyOf " << ReplyOf << "\n";
+        if ( "COMMENT" == Reply && "POST" == ReplyOf) {
+          Score += 1; 
+//          std::cout << "score+1\n";
+        } else if ( "COMMENT" == Reply && "COMMENT" == ReplyOf ) {
+          Score += 0.5;
+//          std::cout << "score+.5\n";
+        }
+
+      }
+    }
+    return false;
+  }
+
+protected:
+  float Score;
 };
 
 #endif /*_LDBCCUSTOMVISITOR_H_*/
