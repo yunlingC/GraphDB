@@ -14,7 +14,7 @@
 #ifndef _VISITOR_H_
 #define _VISITOR_H_
 
-#include "Filter.h"
+#include "FilterType.h"
 
 #include <unordered_set> 
 
@@ -33,12 +33,12 @@ public:
   typedef std::unordered_set<VertexPointer> VertexSetType;
   typedef std::vector<VertexPointer> VertexPath;
 public:
-  virtual void setFilter(Filter & filter) {
-    _Filter = filter;
+  virtual void setFilter(FilterType & filter) {
+    Filter = filter;
   }
 
-  virtual Filter & getFilter() { 
-    return _Filter;
+  virtual FilterType & getFilter() { 
+    return Filter;
   }
 
   virtual VertexTargetType & getVertexList() {
@@ -98,12 +98,10 @@ public:
     return false;
   }
 
-
 protected:
   VertexTargetType VertexList; 
   VertexSetType   VertexSet;
-  Filter _Filter;
-
+  FilterType Filter;
 };
 
 #endif /*_VISITORS_H_ */

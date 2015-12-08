@@ -247,7 +247,7 @@ public:
         myfile << "---------------------DFS---------------------\n";
     myfile << "The friends of Person with vid = " << PersonId << " has friends\n";
 #endif
-    Filter tmpFilter[2];
+    FilterType tmpFilter[2];
     std::string key("name");
     std::vector<VertexPointer> target;
     switch(c) {
@@ -305,7 +305,7 @@ public:
         myfile << "---------------------DFS---------------------\n";
 #endif
     std::string key("wpurl");
-    Filter tmpFilter[2];
+    FilterType tmpFilter[2];
     switch(c) {
       case 1: {
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
@@ -363,7 +363,7 @@ public:
     else
         myfile << "---------------------DFS---------------------\n";
 #endif
-    Filter tmpFilter[2];
+    FilterType tmpFilter[2];
     std::string key("name");
     switch(c) {
       case 1: {
@@ -512,7 +512,7 @@ public:
 class Query10 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType c ) { 
-    Filter tmpFilter[2];
+    FilterType tmpFilter[2];
     std::string key("name");
     std::vector<VertexPointer> target;
     switch(c) {
@@ -562,7 +562,7 @@ public:
 class Query11: public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType c) {
-    Filter tmpFilter[2];
+    FilterType tmpFilter[2];
     std::string key("name");
     std::vector<VertexPointer> target;
     switch(c) {
@@ -657,7 +657,7 @@ public:
     else
         myfile << "---------------------DFS---------------------\n";
 #endif
-    Filter tmpFilter[3];
+    FilterType tmpFilter[3];
     std::string key("name");
     switch(c) {
       case 1: {

@@ -56,7 +56,7 @@ public:
   }
 
   virtual bool scheduleEdge(EdgePointer EdgePtr) {
-    return checkType(EdgePtr, _Filter);
+    return checkType(EdgePtr, Filter);
   }
 
 
@@ -68,8 +68,8 @@ public:
                             , EdgePointer Edge
                             , VertexPointer Second) {
 
-    bool TypeMatch = checkType(Edge, _Filter);
-    DirectionMatch = checkDirection(Second, Edge, _Filter);
+    bool TypeMatch = checkType(Edge, Filter);
+    DirectionMatch = checkDirection(Second, Edge, Filter);
 
     if (DirectionMatch && TypeMatch ) {
       VertexList.push_back(Second);
@@ -93,7 +93,7 @@ public:
 public:
   ReachabilityVisitor () { }
 
-  virtual void setFilter(Filter & f) {
+  virtual void setFilter(FilterType & f) {
     FilterList.push_back(f);
   }
 
@@ -152,7 +152,7 @@ public:
       DepthSecond = PrevPath.size();
     }
 
-    Filter filter;
+    FilterType filter;
     if (DepthSecond > 0)
       filter = FilterList[DepthSecond-1];
     else
@@ -172,7 +172,7 @@ protected:
   unsigned int  TypeMatch;
   unsigned int  DirectionMatch;
   unsigned int  DepthSetting;
-  std::vector<Filter> FilterList;
+  std::vector<FilterType> FilterList;
   VertexPath   PrevPath;
   PathQueueType  PathQueue;
   VertexSetType TargetSet;
@@ -228,7 +228,7 @@ public:
 public:
   PatternVisitor () { }
 
-  void setFilter(Filter & f) {
+  void setFilter(FilterType & f) {
     FilterList.push_back(f);
   }
 
@@ -285,7 +285,7 @@ public:
       DepthSecond = PrevPath.size();
     }
 
-    Filter filter;
+    FilterType filter;
     if (DepthSecond > 0)
         filter = FilterList[DepthSecond-1];
     else
@@ -313,7 +313,7 @@ protected:
   bool DirectionMatch;
   unsigned int  DepthSetting;
   VertexDescriptor EndVertex;
-  std::vector<Filter> FilterList;
+  std::vector<FilterType> FilterList;
   VertexPath   PrevPath;
   PathQueueType  PathQueue;
 };
@@ -326,7 +326,7 @@ public:
 public:
   DFSReachabilityVisitor() {}
 
-  virtual void setFilter(Filter & f) {
+  virtual void setFilter(FilterType & f) {
     FilterList.push_back(f);
   }
 
@@ -366,7 +366,7 @@ public:
         it != DepthList.equal_range(first).second; ++it) {
       if ((*it).first == first) {
         if ((*it).second < DepthSetting) {
-          Filter filter = FilterList[(*it).second];
+          FilterType filter = FilterList[(*it).second];
           if (DepthList.count(second) <= DepthSetting) {
             TypeMatch = checkType(edge, filter);
             DirectionMatch = checkDirection(second, edge, filter);
@@ -389,14 +389,14 @@ public:
   }
 
 protected:
-  Filter _Filter;
+  FilterType Filter;
   MultiDepthList   DepthList;
   VertexPointer    StartVertex;
   bool TypeMatch;
   bool DirectionMatch;
   unsigned int     DepthSetting;
   VertexTargetMapType     VertexList;
-  std::vector<Filter> FilterList;
+  std::vector<FilterType> FilterList;
 };
 
 
@@ -406,7 +406,7 @@ public:
 public:
   DFSPatternVisitor() {}
 
-  void setFilter(Filter & f) {
+  void setFilter(FilterType & f) {
     FilterList.push_back(f);
   }
 
@@ -463,7 +463,7 @@ public:
       firstDepth = PrevPath.size() - 1;
     }
 
-    Filter filter;
+    FilterType filter;
       if (firstDepth >= 0 && firstDepth < DepthSetting)
         filter = FilterList[firstDepth];
     else
@@ -494,7 +494,7 @@ protected:
   unsigned int  DepthSetting;
   VertexPointer StartVertex;
   VertexDescriptor EndVertex;
-  std::vector<Filter> FilterList;
+  std::vector<FilterType> FilterList;
   VertexPath   PrevPath;
   PathStackType PathStack;
 };
@@ -593,7 +593,7 @@ protected:
   unsigned int  DepthSetting;
   VertexPointer StartVertex;
   VertexDescriptor EndVertex;
-  std::vector<Filter> FilterList;
+  std::vector<FilterType> FilterList;
   PathMapType     PathMap;
   VertexPath   PrevPath;
   PathStackType PathStack;

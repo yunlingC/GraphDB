@@ -14,7 +14,7 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
-#include "Filter.h"
+#include "FilterType.h"
 #include "GraphType.h"
 
 #include <stack>
@@ -39,41 +39,41 @@ typedef std::stack<unsigned int > LayerStack;
 typedef std::map<unsigned int, VertexTargetSet> LayerMap;
 
 
-void filtProperty(KeyType key, ValueType value, Filter & TraversalFilter){
+void filtProperty(KeyType key, ValueType value, FilterType & TraversalFilter){
   TraversalFilter.setKey(key);
   TraversalFilter.setValue(value);
 }
 
-void filtVertexId(IdType vid , Filter & TraversalFilter) {
+void filtVertexId(IdType vid , FilterType & TraversalFilter) {
   TraversalFilter.setVertexId(vid);
 }
 
-void filtEdgeId (IdType eid, Filter & TraversalFilter) {
+void filtEdgeId (IdType eid, FilterType & TraversalFilter) {
   TraversalFilter.setEdgeId(eid);
 }
 
 //TODO set flag 
-void filtType (Type type, Filter & TraversalFilter) {
+void filtType (Type type, FilterType & TraversalFilter) {
   TraversalFilter.setType(type);
 //  filtTypeFlag = true;
 }
 
-void traverseThroughDirection(Direction direction, Filter & TraversalFilter) {
+void traverseThroughDirection(Direction direction, FilterType & TraversalFilter) {
   TraversalFilter.setDirection(direction);
 }
 
-void traverseThroughType(Type type, Filter & TraversalFilter) {
+void traverseThroughType(Type type, FilterType & TraversalFilter) {
   TraversalFilter.setType(type);
 }
 
-void traverseThroughMultiRelType(RelType types, Filter & TypeFilter ) {
+void traverseThroughMultiRelType(RelType types, FilterType & TypeFilter ) {
   AttributesType attributes;
   boost::split(attributes, types, boost::is_any_of("+"));
   for (auto it = attributes.begin(); it != attributes.end(); it++)
   TypeFilter.setTypeList(attributes);
 }
 
-void traverseThroughTypeAndDirection(Type type, Direction direction, Filter & TraversalFilter) {
+void traverseThroughTypeAndDirection(Type type, Direction direction, FilterType & TraversalFilter) {
   TraversalFilter.setDirection(direction);
   TraversalFilter.setType(type);
 }
@@ -181,7 +181,7 @@ unsigned int  checkMaxDepth(MultiDepthList & dl) {
 }
 
 template<typename ReturnValueType>
-bool checkProperty(VertexPointer vertex, Filter &filter) {
+bool checkProperty(VertexPointer vertex, FilterType &filter) {
   if ((filter.getValue() == "") || (filter.getKey() == "") )
       return true; 
   FixedString value(filter.getValue());
@@ -205,7 +205,7 @@ int compareTime(time_t time1, time_t time2) {
 }
 
 template<typename ReturnValueType, typename GraphElemPointer>
-bool checkTimeRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag) {
+bool checkTimeRange(GraphElemPointer GraphElem, FilterType &filter, bool & EqualFlag) {
   char buf[32];
   std::string times;  
   struct tm  time[2];
@@ -260,7 +260,7 @@ bool checkTimeRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
  }
 
 template<typename GraphElemType>
-bool checkYearRange(GraphElemType elem, Filter & filter, bool & EqualFlag) {
+bool checkYearRange(GraphElemType elem, FilterType & filter, bool & EqualFlag) {
   EqualFlag = false;
   bool cmpResult[2] = {false, false};
   unsigned int Year[2] = {0, 0};
@@ -288,7 +288,7 @@ bool checkYearRange(GraphElemType elem, Filter & filter, bool & EqualFlag) {
   }
 
 template<typename ReturnValueType, typename GraphElemPointer>
-bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag) {
+bool checkDateRange(GraphElemPointer GraphElem, FilterType &filter, bool & EqualFlag) {
   char buf[32];
   std::string times;  
   struct tm date[2];
@@ -340,7 +340,7 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
  }
 
 template<typename GraphElemType>
-bool checkRange(unsigned int opt, GraphElemType elem, Filter & RangeFilter, bool & EqualFlag) {
+bool checkRange(unsigned int opt, GraphElemType elem, FilterType & RangeFilter, bool & EqualFlag) {
   typedef std::pair<FixedString, bool> ReturnValueType;
   switch(opt) {
           case 1:
@@ -373,14 +373,14 @@ bool TerminateAtDepth(unsigned int depth, DepthListType & depthlist) {
     return false;
 }
 
-bool checkType(EdgePointer edge, Filter &filter) {
+bool checkType(EdgePointer edge, FilterType &filter) {
     if (filter.getType() == "")
       return true;
     FixedString type(filter.getType());
     return (edge->getType() == type);
 }
 
-bool checkMultiRelType(EdgePointer edge, Filter & filter) {
+bool checkMultiRelType(EdgePointer edge, FilterType & filter) {
   auto typeMatch = false;   
   if(filter.getTypeList().empty())
     return true;
@@ -397,7 +397,7 @@ bool checkMultiRelType(EdgePointer edge, Filter & filter) {
 }
 
 /// check the direction of vertex to edge 
-bool checkDirection(VertexPointer vertex, EdgePointer edge, Filter & filter ) {
+bool checkDirection(VertexPointer vertex, EdgePointer edge, FilterType & filter ) {
     unsigned int direction = 0;
 
     if (filter.getDirection() == "" )
