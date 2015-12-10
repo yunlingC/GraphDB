@@ -22,6 +22,23 @@ auto GraphType::getVertexPointer(VertexDescriptor Vertex)
   return Vertices[Vertex];
 }
 
+auto GraphType::getAllVertices()
+  -> VertexList {
+  return Vertices;
+}
+
+auto GraphType::getAllEdges()
+  -> EdgeList {
+  return Edges;
+}
+
+/// TODO: attention nullptr
+auto GraphType::getOutEdges(VertexDescriptor VertexId) 
+-> EdgeList {
+  auto CurrentVertex = GraphType::getVertexPointer(VertexId);
+  return GraphType::getOutEdges(CurrentVertex);
+}
+
 auto GraphType::getOutEdges(VertexPointer CurrentVertex) 
   -> EdgeList {
   EdgeList OutEdges;
@@ -49,6 +66,11 @@ auto GraphType::getOutEdges(VertexPointer CurrentVertex)
     }
   } 
   return OutEdges;
+}
+
+auto GraphType::getInEdges(VertexDescriptor VertexId)
+  -> EdgeList {
+  return GraphType::getInEdges(GraphType::getVertexPointer(VertexId));
 }
 
 auto GraphType::getInEdges(VertexPointer CurrentVertex) 
@@ -81,6 +103,73 @@ auto GraphType::getInEdges(VertexPointer CurrentVertex)
   return InEdges;
 }
 
+auto GraphType::getOutNeighbors(VertexDescriptor VertexId) 
+-> VertexIDList {
+  return getOutNeighbors(GraphType::getVertexPointer(VertexId));
+}
+
+auto GraphType::getOutNeighbors(VertexPointer CurrentVertex) 
+-> VertexIDList {
+  VertexIDList OutNeighbors;
+
+  auto NextEdge = CurrentVertex->getNextEdge();
+
+  if (NextEdge != nullptr) {
+    if (CurrentVertex == NextEdge->getFirstVertexPtr()) {
+      OutNeighbors.push_back(NextEdge->getSecondVertexPtr()->getId());
+    }
+    auto EdgeIterator = NextEdge->getNextEdge(CurrentVertex);
+    while (EdgeIterator != nullptr) {
+      if (CurrentVertex == EdgeIterator->getFirstVertexPtr()) {
+        OutNeighbors.push_back(EdgeIterator->getSecondVertexPtr()->getId());
+      }
+      EdgeIterator = EdgeIterator->getNextEdge(CurrentVertex);
+    }
+  
+    EdgeIterator = NextEdge->getPreviousEdge(CurrentVertex);
+    while (EdgeIterator != nullptr) {
+      if (CurrentVertex == EdgeIterator->getFirstVertexPtr()) {
+        OutNeighbors.push_back(EdgeIterator->getSecondVertexPtr()->getId());
+      }
+      EdgeIterator = EdgeIterator->getPreviousEdge(CurrentVertex);
+    }
+  }
+  return OutNeighbors;
+}
+
+auto GraphType::getInNeighbors(VertexDescriptor VertexId) 
+-> VertexIDList {
+  return GraphType::getInNeighbors(GraphType::getVertexPointer(VertexId));
+}
+
+auto GraphType::getInNeighbors(VertexPointer CurrentVertex)
+  -> VertexIDList {
+  VertexIDList InNeighbors;
+
+  auto NextEdge = CurrentVertex->getNextEdge();
+  if (NextEdge != nullptr) {
+    if (CurrentVertex == NextEdge->getSecondVertexPtr()) {
+      InNeighbors.push_back(NextEdge->getFirstVertexPtr()->getId());
+    } 
+    auto EdgeIterator = NextEdge->getNextEdge(CurrentVertex);
+    while (EdgeIterator != nullptr) {
+      if (CurrentVertex == EdgeIterator->getSecondVertexPtr()) {
+        InNeighbors.push_back(EdgeIterator->getFirstVertexPtr()->getId());
+      }
+      EdgeIterator = EdgeIterator->getNextEdge(CurrentVertex);
+    }
+  
+    EdgeIterator = NextEdge->getPreviousEdge(CurrentVertex);
+    while (EdgeIterator != nullptr) {
+      if (CurrentVertex == EdgeIterator->getSecondVertexPtr()) {
+        InNeighbors.push_back(EdgeIterator->getFirstVertexPtr()->getId());
+      }
+      EdgeIterator = EdgeIterator->getPreviousEdge(CurrentVertex);
+    }
+  }
+  return InNeighbors;
+}
+
 auto  GraphType::addVertex() 
   -> VertexDescriptor {
   VertexPointer NewVertex = new Vertex();
@@ -103,10 +192,7 @@ auto GraphType::addVertex(std::string Label,
   return NewVertex->getId();
 }
 
-auto GraphType::addVertex(PropertyListType & InitialPropertyList) 
-  -> VertexDescriptor {
-  VertexPointer NewVertex = new Vertex();
-  NewVertex->setPropertyList(InitialPropertyList);
+auto GraphType::addVertex(PropertyListType & InitialPropertyList) -> VertexDescriptor { VertexPointer NewVertex = new Vertex(); NewVertex->setPropertyList(InitialPropertyList);
   NewVertex->setId(NumberOfVertices); 
   ++NumberOfVertices;
   Vertices.push_back(NewVertex);
@@ -262,15 +348,6 @@ auto GraphType::dump()
 }
 #endif 
 
-auto GraphType::getAllVertices()
-  -> VertexList {
-  return Vertices;
-}
-
-auto GraphType::getAllEdges()
-  -> EdgeList {
-  return Edges;
-}
 
 GraphType::GraphType(): NumberOfVertices(0), NumberOfEdges(0) {}
 
