@@ -1,6 +1,6 @@
 //===-- storage/GraphType.h - Graph class type ------------------*- C++ -*-===//
 //
-//                     CAESR Graph Database 
+ //                     CAESR Graph Database 
 //
 // TODO: LICENSE
 // License. See LICENSE.TXT for details.
@@ -26,17 +26,39 @@ public:
   typedef Edge* EdgePointer;
   typedef std::vector<EdgePointer> EdgeList;
   typedef std::vector<VertexPointer> VertexList;
+  typedef std::vector<VertexDescriptor> VertexIDList;
   typedef PropertyList<FixedString, FixedString> PropertyListType;
   typedef PropertyListType VertexPropertyList;
   typedef PropertyListType EdgePropertyList;
 
 public:
+  /// Index <VertexDescriptor, VertexPointer>
   VertexPointer getVertexPointer(VertexDescriptor Vertex);
+
+  /// All edges and vertices
+  VertexList getAllVertices();
+
+  EdgeList getAllEdges();
+
+  /// OutEdges and InEdges
+  EdgeList getOutEdges(VertexDescriptor VertexId);
 
   EdgeList getOutEdges(VertexPointer CurrentVertex);
 
+  EdgeList getInEdges(VertexDescriptor VertexId);
+
   EdgeList getInEdges(VertexPointer CurrentVertex);
 
+  /// OutNeighbors and InNeighbors
+  VertexIDList getOutNeighbors(VertexDescriptor VertexId);
+
+  VertexIDList getOutNeighbors(VertexPointer CurrentVertex);
+  
+  VertexIDList getInNeighbors(VertexDescriptor VertexId);
+
+  VertexIDList getInNeighbors(VertexPointer CurrentVertex);
+
+  /// Update operations to the graph
   VertexDescriptor addVertex();
 
   VertexDescriptor addVertex(std::string Label, PropertyListType & InitialPropertyList);
@@ -65,14 +87,14 @@ public:
                          const std::string & Label, 
                          PropertyListType & InitialPropertyList);
 
-  VertexList getAllVertices();
-
-  EdgeList getAllEdges();
+  /// Constructor and destructor
 
   GraphType();
 
   ~GraphType();
 
+  /// Print graph
+  
 #ifdef _DEBUG_
   void dump();
 #endif
