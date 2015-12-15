@@ -17,6 +17,8 @@
 #include "Vertex.h"
 #include "Edge.h"
 
+///TODO : GraphType for immutable graphs
+
 class GraphType {
 public:
   /// Typedefs that are used to refer to within other classes.
@@ -30,6 +32,8 @@ public:
   typedef PropertyList<FixedString, FixedString> PropertyListType;
   typedef PropertyListType VertexPropertyList;
   typedef PropertyListType EdgePropertyList;
+//  typedef std::unordered_map<VertexDescriptor, VertexPointer> VertexMapType;
+//  typedef std::unordered_map<EdgeDescriptor, EdgePointer> EdgeMapType;
 
 public:
   /// Index <VertexDescriptor, VertexPointer>
