@@ -14,7 +14,8 @@ void Print_Map(std::vector<unsigned int> Dist) {
 
   for (unsigned int i = 0; i < Dist.size(); i++) {
     std::cout << "Vertex  " << i ;
-    if (Dist[i] == -1)
+    unsigned int UNDEF = -1;
+    if (Dist[i] == UNDEF)
       std::cout << "\tNIL" << "\n";
     else 
       std::cout << "\t" << Dist[i] << "\n";
@@ -40,32 +41,31 @@ void Print_PageRank(std::unordered_map<unsigned int, double> PageRankTable) {
 
 int main() {
   typedef GraphType Graph;
-  typedef Graph::VertexDescriptor VertexDescriptor;
+//  typedef Graph::VertexDescriptor VertexDescriptor;
   typedef std::vector<unsigned int> VertexMapType;
-  typedef std::vector<std::vector<VertexDescriptor> > ComponentType;
 
   Graph g;
   cout << "Begin testing\n";
 
-//  GDBReader reader(g);
-//  reader.readFile("../tests/gd/sndata1000.gd");
-//
-//  cout << "Finish reading \n";
+  GDBReader reader(g);
+  reader.readFile("../tests/gd/sndata1000.gd");
 
-  auto v0 = g.addVertex();
-  auto v1 = g.addVertex();
-  auto v2 = g.addVertex();
-  auto v3 = g.addVertex();
+  cout << "Finish reading \n";
+
+//  auto v0 = g.addVertex();
+//  auto v1 = g.addVertex();
+//  auto v2 = g.addVertex();
+//  auto v3 = g.addVertex();
 //  auto v4 = g.addVertex();
 //  auto v5 = g.addVertex();
 //  auto v7 = g.addVertex();
 //
-  g.addEdge(v0, v1);
-  g.addEdge(v0, v2);
-  g.addEdge(v0, v3);
-  g.addEdge(v1, v3);
-  g.addEdge(v2, v3);
-  g.addEdge(v2, v0);
+//  g.addEdge(v0, v1);
+//  g.addEdge(v0, v2);
+//  g.addEdge(v0, v3);
+//  g.addEdge(v1, v3);
+//  g.addEdge(v2, v3);
+//  g.addEdge(v2, v0);
 //  g.addEdge(v0, v1);
  
 //  g.addEdge(v2, v3);

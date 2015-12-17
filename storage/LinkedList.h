@@ -30,14 +30,12 @@ public:
 public:
   ListNode(KeyType key, ValueType value): _Key(key)
                                         , _Value(value)
-                                        , _Next(nullptr)
-                                        , _Previous(nullptr) {}
+                                        , _Next(nullptr) {}
 
   ListNode(const ListNode & From) {
     _Key = From._Key;
     _Value = From._Value;
     _Next = From._Next;
-    _Previous = From._Previous;
   }
 
   ListNode &  operator=(const ListNode & From) {
@@ -45,7 +43,6 @@ public:
       _Key = From._Key;
       _Value = From._Value;
       _Next = From._Next;
-      _Previous = From._Previous;
     }
     return *this;
   }
@@ -66,23 +63,14 @@ public:
     return _Next;
   }
 
-  ListNode * getPrevious() {
-    return _Previous;
-  }
-
   void setNext(ListNode * next) {
     _Next = next;
-  }
-
-  void setPrevious(ListNode * prev) {
-    _Previous = prev;
   }
 
 private:
   KeyType _Key;
   ValueType _Value;
   ListNode * _Next;
-  ListNode * _Previous;
 };
 
 class LinkedList {
@@ -94,13 +82,11 @@ public:
 
 public:
   LinkedList(): _Head(nullptr)
-              , _Tail(nullptr)
               , _Size(0) {}
 
   LinkedList & operator=(const LinkedList & From) {
     if (this != &From) {
       _Head = From._Head;
-      _Tail = From._Tail;
       _Size = From._Size;
     }
     return *this;
@@ -117,21 +103,10 @@ public:
     /// but we'll allow it for now and change later if necessary
     ListNode * NewNode = new ListNode(key, value);
 
-    // Set head only once.
-    if (_Head == nullptr) {
-      _Head = NewNode;
-    }
+    // Add to Head of linked list.
+    NewNode->setNext(_Head);
 
-    // Add to end of linked list.
-    // Set current node
-    NewNode->setNext(nullptr);
-    NewNode->setPrevious(_Tail);
-
-    // Set previous node
-    if (_Tail != nullptr) {
-      _Tail->setNext(NewNode);
-    }
-    _Tail = NewNode;
+    _Head = NewNode;
 
     ++_Size;
   }
@@ -168,7 +143,7 @@ public:
     while (it != nullptr) {
       std::cout << "key: " << it->getKey() << ", " 
                 << "value: " << it->getValue() 
-                << std::endl;
+                << "\n";
       it = it->getNext();
     }
   }
@@ -182,9 +157,6 @@ public:
     return _Head;
   }
 
-  ListNode* end() {
-    return _Tail;
-  }
 
   void deleteList() {
     // Iterate over the linked list and delete it.
@@ -200,7 +172,6 @@ public:
 
 private:
   ListNode * _Head;
-  ListNode * _Tail;
   unsigned int _Size;
 };
 
