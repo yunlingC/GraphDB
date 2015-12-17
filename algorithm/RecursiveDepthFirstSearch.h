@@ -28,7 +28,6 @@ namespace algorithm {
                                 ) {
   
     typedef std::pair<GraphType::VertexPointer, bool> ColorMapPair;
-    typedef std::map<GraphType::VertexPointer, bool> ColorMap;
     typedef std::vector<GraphType::EdgePointer> EdgeList;
   
     GraphType::VertexPointer CurrentVertex =

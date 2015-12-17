@@ -58,7 +58,8 @@ namespace algorithm {
     /// connected componets in DFS tree with vertex Vertex
     for (auto & VertexPtr : Vertices) {
       unsigned int Vertex = VertexPtr->getId();
-      if (Index[Vertex] == UNDEFINED) {
+      unsigned int UNDEF = UNDEFINED;
+      if (Index[Vertex] == UNDEF) {
         StrongConnect(Graph, Vertex, Index, LowLink, Stack, InStack, Components);
       }
     }
@@ -92,7 +93,8 @@ namespace algorithm {
     //  Neighbors.insert(Neighbors.end(), InNeighbors.begin(), InNeighbors.end());
     for (auto & Neighbor : Neighbors) {
       /// Neighbor has NOT been visited, recur on it
-      if (Index[Neighbor] == UNDEFINED) {
+      unsigned int UNDEF = UNDEFINED;
+      if (Index[Neighbor] == UNDEF) {
         StrongConnect(Graph, Neighbor, Index, LowLink, Stack, InStack, Components); 
   
         /// Check if the subtree rooted with 'Neighbor' has 
