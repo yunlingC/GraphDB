@@ -1,6 +1,6 @@
 //===-- storage/GraphType.h - Graph class type ------------------*- C++ -*-===//
 //
- //                     CAESR Graph Database 
+//                     CAESR Graph Database 
 //
 // TODO: LICENSE
 // License. See LICENSE.TXT for details.
