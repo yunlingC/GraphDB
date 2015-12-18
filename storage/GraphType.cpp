@@ -16,10 +16,20 @@
 
 auto GraphType::getVertexPointer(VertexDescriptor Vertex) 
   -> VertexPointer {
-  if ( (Vertex > Vertices.size() - 1) || (Vertex < 0) ) {
+  if( VertexMap.find(Vertex) != VertexMap.end() ) {
+    return VertexMap[Vertex];
+  } else {
     return nullptr;
   }
-  return Vertices[Vertex];
+}
+
+auto GraphType::getEdgePointer(EdgeDescriptor Edge) 
+  -> EdgePointer {
+  if ( EdgeMap.find(Edge) != EdgeMap.end() ) {
+    return EdgeMap[Edge];
+  } else {
+    return nullptr;
+  }
 }
 
 auto GraphType::getAllVertices()
@@ -175,6 +185,7 @@ auto  GraphType::addVertex()
   VertexPointer NewVertex = new Vertex();
 
   NewVertex->setId(NumberOfVertices); 
+  VertexMap.insert(VertexEntryType(NumberOfVertices, NewVertex));
   ++NumberOfVertices;
   Vertices.push_back(NewVertex);
   return NewVertex->getId();
@@ -187,13 +198,18 @@ auto GraphType::addVertex(std::string Label,
   NewVertex->setPropertyList(InitialPropertyList);
   NewVertex->setId(NumberOfVertices); 
   NewVertex->setType(Label);
+  VertexMap.insert(VertexEntryType(NumberOfVertices, NewVertex));
   ++NumberOfVertices;
   Vertices.push_back(NewVertex);
   return NewVertex->getId();
 }
 
-auto GraphType::addVertex(PropertyListType & InitialPropertyList) -> VertexDescriptor { VertexPointer NewVertex = new Vertex(); NewVertex->setPropertyList(InitialPropertyList);
+auto GraphType::addVertex(PropertyListType & InitialPropertyList) 
+  -> VertexDescriptor { 
+  VertexPointer NewVertex = new Vertex(); 
+  NewVertex->setPropertyList(InitialPropertyList);
   NewVertex->setId(NumberOfVertices); 
+  VertexMap.insert(VertexEntryType(NumberOfVertices, NewVertex));
   ++NumberOfVertices;
   Vertices.push_back(NewVertex);
   return NewVertex->getId();
@@ -261,29 +277,44 @@ auto GraphType::assignPointers(VertexDescriptor vs, VertexDescriptor vd,
 
   /// 1. See if first's and second's nextEdge is set or not.
   /// If it is not set then set it. Doesn't matter who the next really is.
-  if (FirstVertexPointer->getNextEdge() == nullptr) {
-    FirstVertexPointer->setNextEdge(NewEdge);
-  }
-  if (SecondVertexPointer->getNextEdge() == nullptr) {
-    SecondVertexPointer->setNextEdge(NewEdge);
+
+  NewEdge->setFirstPreviousEdge(nullptr);
+  NewEdge->setSecondPreviousEdge(nullptr);
+
+  EdgePointer FirstNextEdge = FirstVertexPointer->getNextEdge();
+  EdgePointer SecondNextEdge = SecondVertexPointer->getNextEdge();
+
+  NewEdge->setFirstNextEdge(FirstNextEdge);
+  NewEdge->setSecondNextEdge(SecondNextEdge);
+
+  if (FirstNextEdge != nullptr) { 
+    if (FirstNextEdge->getFirstVertexPtr() == FirstVertexPointer)  {
+      FirstNextEdge->setFirstPreviousEdge(NewEdge);
+    } else if (FirstNextEdge->getSecondVertexPtr() == FirstVertexPointer) {
+      FirstNextEdge->setSecondPreviousEdge(NewEdge);
+    }
   }
 
-  /// 2. Find the end of the chain for each first/second node.
-  /// The chain is going to iterate over first and second pointers based on who is source.
-  EdgePointer FirstNextEdge = FirstVertexPointer->getNextEdge();
-  chainEdges(FirstVertexPointer, FirstNextEdge, NewEdge);
-  /// Chain the edges for the second vertex.
-  FirstNextEdge = SecondVertexPointer->getNextEdge();
-  chainEdges(SecondVertexPointer, FirstNextEdge, NewEdge);
+  if (SecondNextEdge != nullptr)  {
+    if (SecondNextEdge->getFirstVertexPtr() == SecondVertexPointer) {
+      SecondNextEdge->setFirstPreviousEdge(NewEdge);
+    } else if (SecondNextEdge->getSecondVertexPtr() == SecondVertexPointer) {
+      SecondNextEdge->setSecondPreviousEdge(NewEdge);
+    }
+  }
+
+  FirstVertexPointer->setNextEdge(NewEdge);
+  SecondVertexPointer->setNextEdge(NewEdge);
 
 }
 
 auto GraphType::addEdge(VertexDescriptor StartVertex, 
                         VertexDescriptor EndVertex) 
   -> EdgeDescriptor {
-  EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
+  EdgePointer NewEdge = new Edge(VertexMap[StartVertex], VertexMap[EndVertex]);
   NewEdge->setId(NumberOfEdges);
   assignPointers(StartVertex, EndVertex, NewEdge);
+  EdgeMap.insert(EdgeEntryType(NumberOfEdges, NewEdge));
   ++NumberOfEdges;
   Edges.push_back(NewEdge);
   return NewEdge->getId();
@@ -293,11 +324,12 @@ auto GraphType::addEdge(VertexDescriptor StartVertex,
                                       VertexDescriptor EndVertex, 
                                       const std::string & Label) 
   -> EdgeDescriptor {
-  EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
+  EdgePointer NewEdge = new Edge(VertexMap[StartVertex], VertexMap[EndVertex]);
   
   NewEdge->setId(NumberOfEdges);
   NewEdge->setType(Label);
   assignPointers(StartVertex, EndVertex, NewEdge);
+  EdgeMap.insert(EdgeEntryType(NumberOfEdges, NewEdge));
   ++NumberOfEdges;
   Edges.push_back(NewEdge);
   return NewEdge->getId();
@@ -308,11 +340,12 @@ auto  GraphType::addEdge(VertexDescriptor StartVertex,
                        PropertyListType & InitialPropertyList) 
   -> EdgeDescriptor {
 
-  EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
+  EdgePointer NewEdge = new Edge(VertexMap[StartVertex], VertexMap[EndVertex]);
 
   NewEdge->setPropertyList(InitialPropertyList);
   NewEdge->setId(NumberOfEdges);    
   assignPointers(StartVertex, EndVertex, NewEdge);
+  EdgeMap.insert(EdgeEntryType(NumberOfEdges, NewEdge));
   ++NumberOfEdges;
   Edges.push_back(NewEdge);
   return NewEdge->getId();
@@ -324,12 +357,13 @@ auto GraphType::addEdge(VertexDescriptor StartVertex,
                        PropertyListType & InitialPropertyList) 
   -> EdgeDescriptor {
 
-  EdgePointer NewEdge = new Edge(Vertices[StartVertex], Vertices[EndVertex]);
+  EdgePointer NewEdge = new Edge(VertexMap[StartVertex], VertexMap[EndVertex]);
 
   NewEdge->setType(Label);
   NewEdge->setPropertyList(InitialPropertyList);
   NewEdge->setId(NumberOfEdges);    
   assignPointers(StartVertex, EndVertex, NewEdge);
+  EdgeMap.insert(EdgeEntryType(NumberOfEdges, NewEdge));
   ++NumberOfEdges;
   Edges.push_back(NewEdge);
   return NewEdge->getId();
@@ -338,12 +372,12 @@ auto GraphType::addEdge(VertexDescriptor StartVertex,
 #ifdef _DEBUG_
 auto GraphType::dump() 
   -> void {
-  for ( size_t  i = 0; i < Vertices.size(); i++ ) {
-    Vertices[i]->dump();
+  for ( size_t  i = 0; i < VertexMap.size(); i++ ) {
+    VertexMap[i]->dump();
   }
 
-  for ( size_t i = 0; i <Edges.size() ; i++ ) {
-    Edges[i]->dump();
+  for ( size_t i = 0; i <EdgeMap.size() ; i++ ) {
+    EdgeMap[i]->dump();
   }
 }
 #endif 
@@ -358,13 +392,13 @@ GraphType::~GraphType() {
   /// Thus, Vertices and _edges contain all newly created objects.
 
   for ( size_t i= 0; i < Vertices.size(); i++ ) {
-    Vertices[i]->deleteVertex();
-    delete Vertices[i];
+    VertexMap[i]->deleteVertex();
+    delete VertexMap[i];
   }
 
   for ( size_t i=0; i < Edges.size(); i++ ) {
-    Edges[i]->deleteEdge();
-    delete Edges[i];
+    EdgeMap[i]->deleteEdge();
+    delete EdgeMap[i];
   }
 }
 

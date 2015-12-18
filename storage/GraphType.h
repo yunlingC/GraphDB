@@ -17,8 +17,9 @@
 #include "Vertex.h"
 #include "Edge.h"
 
-///TODO : GraphType for immutable graphs
+#include <unordered_map>
 
+///TODO : GraphType for immutable graphs
 class GraphType {
 public:
   /// Typedefs that are used to refer to within other classes.
@@ -32,12 +33,16 @@ public:
   typedef PropertyList<FixedString, FixedString> PropertyListType;
   typedef PropertyListType VertexPropertyList;
   typedef PropertyListType EdgePropertyList;
-//  typedef std::unordered_map<VertexDescriptor, VertexPointer> VertexMapType;
-//  typedef std::unordered_map<EdgeDescriptor, EdgePointer> EdgeMapType;
+  typedef std::pair<VertexDescriptor, VertexPointer> VertexEntryType;
+  typedef std::pair<EdgeDescriptor, EdgePointer> EdgeEntryType;
+  typedef std::unordered_map<VertexDescriptor, VertexPointer> VertexMapType;
+  typedef std::unordered_map<EdgeDescriptor, EdgePointer> EdgeMapType;
 
 public:
   /// Index <VertexDescriptor, VertexPointer>
   VertexPointer getVertexPointer(VertexDescriptor Vertex);
+
+  EdgePointer getEdgePointer(EdgeDescriptor Edge);
 
   /// All edges and vertices
   VertexList getAllVertices();
@@ -105,6 +110,9 @@ public:
   
   
 protected:
+  /// Map holds <id, pointer>
+  VertexMapType VertexMap;
+  EdgeMapType  EdgeMap;
   /// Hold pointers to all vertices.
   std::vector<VertexPointer> Vertices;
   /// Hold pointers to all edges.
