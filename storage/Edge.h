@@ -14,10 +14,7 @@
 #ifndef _EDGE_H_
 #define _EDGE_H_
 
-#include <string>
-
 #include "PropertyList.h"
-#include "FixedString.h"
 
 class Vertex;
 
@@ -38,7 +35,9 @@ public:
 
 public:
 
+#ifdef _DEBUG_
   void dump();
+#endif
   VertexDescriptor getFirstId();
   VertexPointer getFirstVertexPtr();
   VertexPointer getSecondVertexPtr();
@@ -69,8 +68,7 @@ public:
   void setPropertyList(PropertyListType l);
   void setSecondNextEdge(EdgePointer e);
   void setSecondPreviousEdge(EdgePointer e);
-  void setType(string t);
-  void setType(LabelType t);
+  void setType(std::string t);
 
   /// Constructors.
   Edge();
