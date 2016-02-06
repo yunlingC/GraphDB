@@ -24,11 +24,9 @@ void depthFirstSearch(GraphType & Graph,
 
   typedef std::pair<GraphType::VertexPointer, bool> VisitPair;
   GraphType::VertexPointer ScheduledVertex = Graph.getVertexPointer(StartVertex);
-  //pass hint
-//  passNodeHint(ScheduledVertex);
 
   std::vector<GraphType::VertexPointer> VertexStack;
-  std::map<GraphType::VertexPointer, bool> ColorMap;
+  std::unordered_map<GraphType::VertexPointer, bool> ColorMap;
 
   VertexStack.push_back(ScheduledVertex);
   GraphVisitor.visitStartVertex(ScheduledVertex);
@@ -39,16 +37,15 @@ void depthFirstSearch(GraphType & Graph,
 
   while ( !VertexStack.empty() ) {
     ScheduledVertex = VertexStack.back();  VertexStack.pop_back();
-    //pass hint
-    //passNodeHint(ScheduledVertex);
+
     bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
-    if(VertexMatch == true)
+    if (VertexMatch == true)
       return ;
  
     ColorMap[ScheduledVertex] = true;
 
     auto NextEdge = ScheduledVertex->getNextEdge();
-    while( NextEdge != nullptr ){
+    while ( NextEdge != nullptr ){
     
       TargetVertex = NextEdge->getTarget(ScheduledVertex);
       bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);
@@ -56,14 +53,14 @@ void depthFirstSearch(GraphType & Graph,
       bool TypeMatch = GraphVisitor.scheduleEdge(NextEdge);
       bool DirectionMatch = GraphVisitor.visitDirection(TargetVertex, NextEdge);
 
-      if(BranchMatch == true)
+      if (BranchMatch == true)
         break;
 
       if ( ColorMap.find(TargetVertex) == ColorMap.end() || RevisitFlag ) {
 
         GraphVisitor.scheduleTree(ScheduledVertex, NextEdge, TargetVertex);
 
-        if( TypeMatch && DirectionMatch) {
+        if ( TypeMatch && DirectionMatch) {
           VertexStack.push_back(TargetVertex);
           ColorMap.insert(VisitPair(TargetVertex, false));
         } else {

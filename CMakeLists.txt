@@ -11,6 +11,7 @@ set(STORAGE_DIR "storage")
 set(TRAVERSALS_DIR "traversals")
 set(GDBENCH_DIR "GDBench")
 set(LDBC_DIR "LDBC")
+set(ALGO_DIR "algorithm")
 
 include_directories( 
         ${INCLUDE_DIRECTORIES} 
@@ -21,6 +22,7 @@ include_directories(
         ${GDBENCH_DIR}
 	      ${TRAVERSALS_DIR}
         ${LDBC_DIR}
+        ${ALGO_DIR}
         )
 
 link_directories(
@@ -53,11 +55,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_F
 add_subdirectory(storage)
 set(TESTS 
         main-gdbench.cpp
-        main-sample.cpp
-        main-mt-ldbc.cpp
-        #        main-translator.cpp
-        # main-multithread.cpp
-        # main-multigraphs.cpp
+        main-ldbc.cpp
+        main-algo.cpp
         )
 
 # This will generate all the executables listed in the TESTS variable
