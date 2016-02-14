@@ -1,20 +1,13 @@
 #include "LinkedList.h"
 #include "QueryDescription.h"
 #include "QueryRandomizer.h"
+#include "GraphType.h"
 
 //#include "macros.h"
 #include <iostream>
 #include <string>
 #include <time.h>
 
-<<<<<<< HEAD
-#include "LinkedList.h"
-#include "QueryDescription.h"
-#include "QueryRandomizer.h"
-
-int main(int argc, char *argv[]) {
-
-=======
 using namespace std;
 
 int main(int argc, char *argv[]) {
@@ -23,9 +16,7 @@ int main(int argc, char *argv[]) {
   /// argv[1] query number 1:14
   /// argv[2] param1 0:499
   /// argv[3] param2 0:499 for shortes path and path only(Q8-Q12)
-
-  
->>>>>>> llvm
+ 
   typedef GraphType Graph;
 
   Graph g;
@@ -38,18 +29,6 @@ int main(int argc, char *argv[]) {
 
   std::cout << "Begin testing\n";
 
-<<<<<<< HEAD
-  GDReader reader(g);
-  reader.setPrintInterval(10000);
-  reader.readFile("../tests/gd/sndata5000.gd");
-
-  cout << "Finish reading\n";
-
-  unsigned int STEP = 100;
-  if (argc > 1) {
-    if ((std::stoi(argv[1]) > 1) && 
-        (std::stoi(argv[1]) < 5000)) {
-=======
   GDBReader reader(g);
   reader.readFile("../tests/gd/sndata1000.gd");
 
@@ -76,75 +55,30 @@ int main(int argc, char *argv[]) {
   }
 */
 
+
   if(argc < 3) {
     cout <<"Error: At least 2 arguments\n";
     return 1;
   } else {
     string name, pid;
-    VertexDescriptor webId, personId1, personId2, personId3;
+    GraphType::VertexDescriptor webId, personId1, personId2, personId3;
 
     auto id = atoi(argv[2]);
     if ((id < 0) || (id > 499)) {
       cout <<"Error: Out of range(0:499)\n";
       return 0;
     }
->>>>>>> llvm
 
-        STEP = std::stoi(argv[1]);
-    }
-  }
-//  g.dump();
-
-//  std::cout <<" start deleting \n";
-
-<<<<<<< HEAD
-//  GraphType::EdgeDescriptor  Edge1 = 25; 
-//  GraphType::VertexDescriptor Vertex1 = 9;
-//  
-//  std::vector<unsigned int> EdgeList = { 10, 15, 20, 25, 40,  
-//                                         60, 80, 100, 200, 300, 
-//                                         400, 500, 600, 700, 800,
-//                                         900
-//                                        };
-//
-//  std::vector<unsigned int> VertexList = { 5, 10, 15, 20, 30, 50, 80};
-
-  
-  
-//  for (auto & EdgeId : EdgeList) {
-//    auto res = g.removeBranch(EdgeId);
-//    std::cout << "remove edge with id " << res << "\n";
-//  }
-//
-//  for (auto & VertexId : VertexList) {
-//    auto res2 = g.removeVertex(VertexId);
-//    std::cout << "remove vertex with id " << res2 << "\n";
-//  }
-
-  srand(time(NULL));
-
-  for (unsigned int i = 0; i < 39000; i+= STEP) {
-    auto EdgeId = rand()%39000;
-
-    while (g.Edges.find(EdgeId) != g.Edges.end()) {
-      EdgeId = rand()%39000;
+    name = rander.getName(id);
+    pid  = rander.getPid(id);
+    webId = rander.getAWebpageIndex(id);
+    personId1 = rander.getAPersonIndex(id);
+    personId2 = rander.getAPersonIndex(id);
+    personId3 = 0;
+    if(argc > 3) {
+      personId3 = atoi(argv[3]);
     }
 
-    g.Edges.insert(EdgeId);
-
-    auto res = g.removeBranch(EdgeId);
-//    auto res = g.removeBranch(i);
-//    std::cout << "remove edge with id " << res << "\n";
-//    fflush(stdout);
-  }
-
-  
-  for (unsigned int j = 1; j < 5000; j+= STEP) {
-    auto VertexId = rand()%4900 + 1;
-
-    while (g.Vertices.find(VertexId) != g.Vertices.end()) {
-      VertexId = rand()%4900;
-=======
     cout << "name\t" << name << endl 
          << "pid\t" << pid << endl 
          << "webId\t" << webId << endl 
@@ -184,8 +118,8 @@ int main(int argc, char *argv[]) {
     Q13.setPersonId(personId1);
     Q14.setPersonProperty("name", name);
 
-
     vector<Query*> QueryList;
+
     QueryList.push_back(&Q1);
     QueryList.push_back(&Q2);
     QueryList.push_back(&Q3);
@@ -212,135 +146,45 @@ int main(int argc, char *argv[]) {
         cout <<"Error: No end vertex id\n";
         return 1;
       }
->>>>>>> llvm
     }
-    g.Vertices.insert(VertexId);
 
-<<<<<<< HEAD
-    auto res2 = g.removeVertex(VertexId);
-//    auto res2 = g.removeVertex(j);
-//    std::cout << "remove vertex with id " << res2 << "\n";
-//    fflush(stdout);
-  }
-=======
+    cout <<"query number is " << qid << endl;
+    auto query = QueryList[qid-1];
+
     query->runQuery(g, 2);
->>>>>>> llvm
 
-//  std::cout <<"recover all the deletion \n";
-
-  g.recoverAll();
+  }
 
 
-//  g.dump();
 
-//  g.recoverAll();
-
-//  g.dump();
-
-//  Query1 Q1;
-//  Q1.setPersonProperty("name", "A");
-//
-//  SimRoiStart();
-//
-//  Q1.runQuery(g, 1);
-//
-//  SimRoiEnd();
-
-//  Query8 Q8;
-//
-//  Q8.setEndPoints(0, 101);
-//
-//  SimRoiStart();
-//
-//  Q8.runQuery(g, 1);
-//
-//  SimRoiEnd();
-
-//  Query14 Q14;
-//
-//  Q14.setPersonProperty("name", "A");
-//
-//  SimRoiStart();
-//
-//  Q14.runQuery(g, 1);
-//
-//  SimRoiEnd();
-
-//  Query7 Q7;
-//
-//  Q7.setPersonId(34);
-//
-//  SimRoiStart();
-//
+//  Q1.runQuery(g,  2);
+//  Q2.runQuery(g,  1);
+//  Q2.runQuery(g, 2);
+//  Q3.runQuery(g, 1);
+//  Q3.runQuery(g, 2);
+//  Q4.runQuery(g, 1);
+//  Q4.runQuery(g, 2);
+//  Q5.runQuery(g, 1);
+//  Q5.runQuery(g, 2);
+//  Q6.runQuery(g, 1);
+//  Q6.runQuery(g, 2);
 //  Q7.runQuery(g, 1);
-//
-//  SimRoiEnd();
-
-//  Query10 Q10;
-//  Q10.setEndPoints(14, 42);
-//  SimRoiStart();
+//  Q7.runQuery(g, 2);
+//  Q8.runQuery(g, 1);
+//  Q8.runQuery(g, 2);
+//  Q9.runQuery(g, 1);
+//  Q9.runQuery(g, 2);
 //  Q10.runQuery(g, 1);
-//  SimRoiEnd();
-//
-  AddressVisitor AddrVisitor;
-//
-//  SimRoiStart();
-//
-  breadthFirstSearch(g, 0, AddrVisitor);
-//
-//  SimRoiEnd();
-
-  std::cout << "\nVertex\n";
-  unsigned int i = 0;
-  for (auto & addr : AddrVisitor.VertexAddrDis) {
-      std::cout << addr/4 << ",";
-      if (i%1000 == 0 ) 
-        std::cout << std::endl;
-      i++;
-  }
-
-  i = 0;
-  std::cout << "\n\nEdge\n";
-  for (auto & addr : AddrVisitor.EdgeAddrDis) {
-      std::cout << addr/4 << ",";
-      if (i%1000 == 0) 
-        std::cout << std::endl;
-      i++;
-  }
-
-<<<<<<< HEAD
-  cout << "\nfinish testing\n";
-  myfile.close();
-=======
-  //Q1.runQuery(g,  2);
-  //Q2.runQuery(g,  1);
-  //Q2.runQuery(g, 2);
-  //Q3.runQuery(g, 1);
-  //Q3.runQuery(g, 2);
-  //Q4.runQuery(g, 1);
-  //Q4.runQuery(g, 2);
-  //Q5.runQuery(g, 1);
-  //Q5.runQuery(g, 2);
-  //Q6.runQuery(g, 1);
-  //Q6.runQuery(g, 2);
-  //Q7.runQuery(g, 1);
-  //Q7.runQuery(g, 2);
-  //Q8.runQuery(g, 1);
-  //Q8.runQuery(g, 2);
-  //Q9.runQuery(g, 1);
-  //Q9.runQuery(g, 2);
-  //Q10.runQuery(g, 1);
-  //Q10.runQuery(g, 2);
-  //Q11.runQuery(g, 1);
-  //Q11.runQuery(g, 2);
-  //Q12.runQuery(g, 1);
-  //Q12.runQuery(g, 2);
-  //Q13.runQuery(g, 1);
-  //Q13.runQuery(g, 2);
-  //Q14.runQuery(g, 1);
-  //Q14.runQuery(g, 2);
+//  Q10.runQuery(g, 2);
+//  Q11.runQuery(g, 1);
+//  Q11.runQuery(g, 2);
+//  Q12.runQuery(g, 1);
+//  Q12.runQuery(g, 2);
+//  Q13.runQuery(g, 1);
+//  Q13.runQuery(g, 2);
+//  Q14.runQuery(g, 1);
+//  Q14.runQuery(g, 2);
 
   cout << "finish testing\n";
->>>>>>> llvm
   return 0;
 }

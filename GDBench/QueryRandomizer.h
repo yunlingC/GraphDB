@@ -52,23 +52,12 @@ public:
     name = _GDReader.getNameList().at(index);
   }
 
-<<<<<<< HEAD
-//  void createPid(string & pid) {
-  void createPid(string & pid, unsigned int i) {
-//    unsigned int pidCounter = _gdReader.getPeopleCounter();
-//    unsigned int pidId = rand() % (pidCounter/3);
-//    pid = _gdReader.getPidList().at(pidId);
-//    pid = _gdReader.getPidList().at(i);
-    pid = std::to_string(i + 1);
-    //std::cout << "Random pid is " << pid << std::endl;
-=======
   /// Randomized output 
   /// But need srand(time(null)) as completely randmization if necessary
   void createName(string & name) {
     unsigned int nameCounter = _GDReader.getPeopleCounter();
     unsigned int nameId = rand() % (nameCounter/3);
     name = _GDReader.getNameList().at(nameId);
->>>>>>> llvm
   }
 
   void createPid(string & pid, unsigned int index) {
