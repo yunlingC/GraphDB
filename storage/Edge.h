@@ -69,6 +69,7 @@ public:
   void setSecondNextEdge(EdgePointer e);
   void setSecondPreviousEdge(EdgePointer e);
   void setType(std::string t);
+  void setType(LabelType Type);
 
   /// Constructors.
   Edge();

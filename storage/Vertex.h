@@ -46,7 +46,9 @@ public:
   ReturnPropertyValueType getPropertyValue(std::string Key);
   void setId(unsigned int Id);
   void setType(std::string Type);
+  void setType(LabelType Type);
   void setNextEdge(EdgePtr Edge);
+  void setLastEdge(EdgePtr Edge);
   void setProperty(KeyType Key, ValueType Value);
   void setPropertyList(PropertyListType & List);
   PropertyListType &  getPropertyList();

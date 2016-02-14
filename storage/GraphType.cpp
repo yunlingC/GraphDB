@@ -215,8 +215,7 @@ auto GraphType::addVertex(PropertyListType & InitialPropertyList)
   return NewVertex->getId();
 }
 
-auto GraphType::chainEdges(VertexPointer Vertex, EdgePointer FirstNextEdge, 
-                EdgePointer NewEdge) 
+auto GraphType::chainEdges(VertexPointer Vertex, EdgePointer FirstNextEdge, EdgePointer NewEdge) 
   -> void {
 
   EdgePointer NextEdge = FirstNextEdge;
@@ -382,7 +381,6 @@ auto GraphType::dump()
 }
 #endif 
 
-
 GraphType::GraphType(): NumberOfVertices(0), NumberOfEdges(0) {}
 
 GraphType::~GraphType() {
@@ -400,6 +398,27 @@ GraphType::~GraphType() {
     EdgeMap[i]->deleteEdge();
     delete EdgeMap[i];
   }
+
+#ifdef _FIXALLOC_
+    //    Delete the memory spaces.
+    delete NodeMemory;
+    delete EdgeMemory;
+#endif /* _FIXALLOC_ */
 }
+
+#ifdef _FIXALLOC_
+  auto GraphType::allocVertexMemory(unsigned int sz) 
+  -> void {
+    // Allocation sz number of Vertex objects.
+    NodeMemory = new char[sizeof(Vertex)*sz];
+  }
+
+  auto GraphType::allocEdgeMemory(unsigned int sz) 
+  -> void {
+    // Allocation sz number of Vertex objects.
+    EdgeMemory = new char[sizeof(Edge)*sz];
+  }
+#endif /* _FIXALLOC_ */
+
 
 

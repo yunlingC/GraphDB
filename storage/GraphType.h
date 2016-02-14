@@ -17,6 +17,7 @@
 #include "Edge.h"
 
 #include <unordered_map>
+#include <unordered_set>
 
 ///TODO : GraphType for immutable graphs
 class GraphType {
@@ -73,39 +74,6 @@ public:
 
   VertexDescriptor addVertex(PropertyListType & InitialPropertyList);
 
-  VertexDescriptor addVertexBack(VertexCopyPointer VertexCopyPtr) {
-  #ifdef _FIXALLOC_
-    if (NodeMemory == NULL) {
-      cerr << "ERROR: Edge space not allocated\n";
-      exit(1);
-    }
-
-    unsigned int VertexNumber = VertexMap.size();
-    char* PlacePtr = NodeMemory + VertexNumber*sizeof(Vertex);
-    VertexPointer NewVertex = new(PlacePtr) Vertex();
-
-  #else 
-       VertexPointer NewVertex = new Vertex();
-  #endif /* _FIXALLOC_ */
-
-    NewVertex->setPropertyList(VertexCopyPtr->VertexPropertyList);
-    NewVertex->setId(VertexCopyPtr->VertexId); 
-    NewVertex->setType(VertexCopyPtr->VertexLabel);
-    if (VertexMap.find(VertexCopyPtr->VertexId) != VertexMap.end()) {
-      std::cerr << "Vertex " << VertexCopyPtr->VertexId << " exists in graph\n";
-    } else {
-      VertexMap.insert(std::pair<unsigned int, VertexPointer>(VertexCopyPtr->VertexId, NewVertex));
-    }
-
-//    std::cout << "Vertex " << NewVertex->getId() 
-//              << " new address "  << NewVertex 
-//              << "\n";
-
-//    std::cout << "NewVeretx addback \n";
-//    NewVertex->dump();
-//
-    return NewVertex->getId();
-  }
 
   /// TODO Delete this function if we have LastEdge field 
   /// or insert edge to the head of the list
@@ -130,6 +98,14 @@ public:
                          VertexDescriptor EndVertex, 
                          const std::string & Label, 
                          PropertyListType & InitialPropertyList);
+
+/// Allocate memory for vertices and edges
+#ifdef _FIXALLOC_
+  void allocVertexMemory(unsigned int Size);
+
+  void allocEdgeMemory(unsigned int Size);
+
+#endif /* _FIXALLOC_ */
 
   /// Constructor and destructor
 
@@ -156,19 +132,11 @@ protected:
   unsigned int NumberOfVertices;
   unsigned int NumberOfEdges;
 
-  /// The two vector below just for experiments
-  std::vector<VertexCopyPointer> VertexBackup;
-  std::vector<EdgeCopyPointer> EdgeBackup;
-
 #ifdef _FIXALLOC_
   char* NodeMemory;
   char* EdgeMemory;
 #endif /* _FIXALLOC_ */
 
-public:
-  /// Temporal experiments
-  std::unordered_set<unsigned int> Vertices;
-  std::unordered_set<unsigned int> Edges;
 };
 
 #endif /* _GRAPH_TYPE_H */

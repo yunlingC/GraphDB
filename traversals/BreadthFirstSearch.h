@@ -30,6 +30,8 @@ void breadthFirstSearch(GraphType & Graph,
 
   std::queue<GraphType::VertexPointer> VertexQueue;
 
+  auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
+
   /// True means visited and false means not visited.
   std::unordered_map<GraphType::VertexPointer, bool> ColorMap;
 
