@@ -11,18 +11,19 @@ set(STORAGE_DIR "storage")
 set(TRAVERSALS_DIR "traversals")
 set(GDBENCH_DIR "GDBench")
 set(LDBC_DIR "LDBC")
-#set(TRANSACTIONS_DIR "transactions")
+set(ALGO_DIR "algorithm")
 
 include_directories( 
-        ${INCLUDE_DIRECTORIES} ${Boost_INCLUDE_DIRS} 
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${READERS_INCLUDE_DIR}
+        ${INCLUDE_DIRECTORIES} 
+        ${Boost_INCLUDE_DIRS} 
+        ${CMAKE_CURRENT_SOURCE_DIR} ${READERS_INCLUDE_DIR}
         ${SRC_DIR} 
         ${STORAGE_DIR}
         ${GDBENCH_DIR}
 	      ${TRAVERSALS_DIR}
         #        ${TRANSACTIONS_DIR}
         ${LDBC_DIR}
+        ${ALGO_DIR}
         )
 
 link_directories(
@@ -50,12 +51,19 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++14 -D_FIXAL
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_FIXALLOC_ -D_PRINTLOG_  -Wall")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_FIXALLOC_  -D_SKIP_ -Wall")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -Wall")
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++11 -Wall")
+
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -Wall")
 
 
 # Storage sub directory
 add_subdirectory(storage)
 set(TESTS 
         main-mt-ldbc.cpp
+        main-gdbench.cpp
+        main-algo.cpp
         )
 
 # This will generate all the executables listed in the TESTS variable

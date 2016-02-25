@@ -31,12 +31,13 @@
 /// This is the base class for LdbcQuery
 class LdbcQuery : public Query{
 public:
-  typedef std::pair<string, string> ParamPairType;
-  typedef std::pair<string, pair<string, string> > RangePairType;
+  typedef std::pair<std::string, std::string> ParamPairType;
+  typedef std::pair<std::string, std::pair<std::string, std::string> > RangePairType;
 //  typedef LocksManager LockManagerType;
 public:
   LdbcQuery(unsigned int Id) : QueryId(Id) {
-    LdbcFile.open("ldbc"+std::to_string(Id)+".log", ios_base::out| ios_base::app);
+    LdbcFile.open("ldbc"+std::to_string(Id)+".log", std::ios_base::out | 
+                   std::ios_base::app);
   }
 
   virtual void runQuery(Graph & graph, VertexDescriptor StartVertex ) { }
@@ -54,7 +55,7 @@ public:
   virtual void runQuery(Graph & graph, VertexDescriptor StartVertex, 
       VertexDescriptor EndVertex) {}
 
-  void setParam(const string & Key, const string & Value) {
+  void setParam(const std::string & Key, const std::string & Value) {
     ParamPair.first = Key;
     ParamPair.second = Value;
   }
@@ -63,13 +64,13 @@ public:
     ParamPair = Param;
   }
 
-  void setRange(string Key, string Min, string Max) {
+  void setRange(std::string Key, std::string Min, std::string Max) {
     ValueRange.first = Key;
     ValueRange.second.first = Min;
     ValueRange.second.second = Max;
   }
 
-  void setPropertyRange(string Key, string MinValue, string MaxValue) {
+  void setPropertyRange(std::string Key, std::string MinValue, std::string MaxValue) {
     PropRange.first = Key;
     PropRange.second.first = MinValue;
     PropRange.second.second = MaxValue;

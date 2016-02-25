@@ -1,10 +1,12 @@
+#include "LDBCReader.h"
+#include "LdbcConcurrentQuery.cpp"
+#include "LDBCRandomizer.h"
+
 #include <algorithm>
 #include <iostream>
 #include <thread>
 
-#include "LDBCReader.h"
-#include "LdbcConcurrentQuery.cpp"
-#include "LDBCRandomizer.h"
+using namespace std;
 
 int main( int argc, char * argv[]) {
 
@@ -57,7 +59,7 @@ int main( int argc, char * argv[]) {
   reader.readDirectory("../tests/ldbc/social_network_100/New");
 
   }
-  cout << "Finish reading \n";
+  std::cout << "Finish reading \n";
 /**
   unsigned int interval = 14;
   if (argc > 2) {
@@ -175,5 +177,4 @@ int main( int argc, char * argv[]) {
 //  delete NodeMemory;
 //  delete EdgeMemory;
 //#endif
-
 }

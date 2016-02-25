@@ -1,10 +1,24 @@
-#ifndef _FILTER_H_
-#define _FILTER_H_
+//===-- traversals/FilterType.h - Filter class ------------------*- C++ -*-===//
+//
+//                     CAESR Graph Database 
+//
+// TODO: LICENSE
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// \brief This is the base class for Filter used in visitor.
+///
+//===----------------------------------------------------------------------===//
+#ifndef _FILTER_TYPE_H_
+#define _FILTER_TYPE_H_
 
-#include <map>
 #include "FixedString.h"
 
-struct Filter {
+#include <map>
+
+class FilterType {
 public:
   ///TODO: enum every type
   typedef std::string KeyType;
@@ -23,118 +37,118 @@ public:
   typedef BranchPropertyType & BranchPropertyTypeReference;
   typedef BranchMapType & BranchMapTypeReference;
 public:
-  Filter() : _key(""), 
-             _value(""), 
-             _type(""), 
-             _direction(""),
-             _vertexId(0), 
-             _edgeId(0)  { }
+  FilterType() : _Key(""), 
+                _Value(""), 
+                _Type(""), 
+                _Direction(""),
+                _VertexId(0), 
+                _EdgeId(0)  { }
 
-  void setKey(KeyType k) {
-    _key = k;
+  void setKey(KeyType key) {
+    _Key = key;
   }
   
-  void setValue(ValueType v)  {
-    _value = v;
+  void setValue(ValueType value)  {
+    _Value = value;
   }
 
-  void setProperty(KeyType key, ValueType value) {
-    setKey(key);
-    setValue(value);
+  void setProperty(KeyType Key, ValueType Value) {
+    setKey(Key);
+    setValue(Value);
    }
 
-  void setType(Type t)  {
-    _type = t;
+  void setType(Type type)  {
+    _Type = type;
   }
  
-  void setDirection(Direction d) {
-    _direction = d;
+  void setDirection(Direction direct) {
+    _Direction = direct;
   }
 
-  void setVertexId(IdType vid) {
-    _vertexId = vid;
+  void setVertexId(IdType VertexId) {
+    _VertexId = VertexId;
   }
   
-  void setEdgeId(IdType eid) {
-    _edgeId = eid;
+  void setEdgeId(IdType EdgeId) {
+    _EdgeId = EdgeId;
   }
 
   void setTypeList(TypeList & typeList) {
-    _typeList = typeList;
+    _TypeList = typeList;
   }
 
   auto setValueRange(KeyType key, ValueType valueMin, ValueType valueMax) 
     -> void {
-    _key = key;
+    _Key = key;
     ValueListType ValueList;
     ValueList.push_back(valueMin);
     ValueList.push_back(valueMax);
-    _valueRange = ValueList;
+    _ValueRange = ValueList;
   }
 
   auto setValueList(KeyType key, ValueListType & ValueList) 
     -> void {
-    _key = key;
+    _Key = key;
     _ValueList = ValueList;
   }
 
-  auto setPropertyMap(PropertyMapType & pm)
+  auto setPropertyMap(PropertyMapType & PropertyMap)
     -> void {
-    _PropertyMap = pm;
+    _PropertyMap = PropertyMap;
   }
 
-  auto setBranchPropertyMap(BranchPropertyType & bm) 
+  auto setBranchPropertyMap(BranchPropertyType & BrPropertyType) 
     -> void {
-   _BranchPropertyMap = bm;
+   _BranchPropertyMap = BrPropertyType;
   }
 
-  auto setBranchMap(BranchMapType & bm) 
+  auto setBranchMap(BranchMapType & BrMap) 
     -> void {
-   _BranchMap = bm;
+   _BranchMap = BrMap;
   }
 
-
+  
   void setDefault() {
-    _key = "";
-    _value = "";
-    _type = "";
-    _direction = "";
-    _vertexId = 0;
-    _edgeId = 0;
-    _typeList.push_back("");
+    _Key = "";
+    _Value = "";
+    _Type = "";
+    _Direction = "";
+    _VertexId = 0;
+    _EdgeId = 0;
+    _TypeList.push_back("");
   }
 
   KeyType & getKey() {
-    return _key;
+    return _Key;
   }
 
   ValueType & getValue() {
-    return _value;
+    return _Value;
   }
 
   Type & getType() { 
-    return _type; 
+    return _Type; 
   }
 
   Direction & getDirection() {
-    return _direction;
+    return _Direction;
   }
 
   IdType & getVertexId() {
-    return _vertexId;
+    return _VertexId;
   }
 
   IdType & getEdgeId() {
-    return _edgeId;
+    return _EdgeId;
   }
 
   TypeList & getTypeList() {
-    return _typeList;
+    return _TypeList;
   }
 
   auto getValueRange() 
     -> ValueListTypeReference {
-    return _valueRange;
+    return _ValueRange;
   }
 
   auto getValueList()
@@ -158,18 +172,18 @@ public:
   }
 
 private:
-  KeyType   _key;
-  ValueType _value;
-  Type      _type;
-  Direction _direction;
-  IdType    _vertexId;
-  IdType    _edgeId;
-  TypeList  _typeList;
-  ValueListType _valueRange;
+  KeyType   _Key;
+  ValueType _Value;
+  Type      _Type;
+  Direction _Direction;
+  IdType    _VertexId;
+  IdType    _EdgeId;
+  TypeList  _TypeList;
+  ValueListType _ValueRange;
   ValueListType _ValueList;
   PropertyMapType _PropertyMap;
   BranchMapType _BranchMap;
   BranchPropertyType _BranchPropertyMap;
 };
 
-#endif /*_FILTER_H_*/
+#endif /*_FILTER_TYPE_H_*/

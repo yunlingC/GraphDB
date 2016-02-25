@@ -14,11 +14,12 @@
 #ifndef _LINKED_LIST_H_
 #define _LINKED_LIST_H_
 
-#if DEBUG
+#include "FixedString.h"
+
+#ifdef _DEBUG_
 #include <iostream>
 #endif
 
-#include "FixedString.h"
 // This class is necessary to have fixed size linked lists.
 // These will serve as PropertyLists.
 
@@ -26,161 +27,140 @@ class ListNode {
 public:
   typedef FixedString KeyType;
   typedef FixedString ValueType;
+public:
+  ListNode(KeyType key, ValueType value): _Key(key)
+                                        , _Value(value)
+                                        , _Next(nullptr) {}
 
-
-  ListNode(KeyType k, ValueType v): _key(k), _value(v), _next(nullptr), _previous(nullptr) {
+  ListNode(const ListNode & From) {
+    _Key = From._Key;
+    _Value = From._Value;
+    _Next = From._Next;
   }
 
-  ListNode(const ListNode & from) {
-    _key = from._key;
-    _value = from._value;
-    _next = from._next;
-    _previous = from._previous;
-  }
-
-  ListNode &  operator=(const ListNode & from) {
-    if (this != &from) {
-      _key = from._key;
-      _value = from._value;
-      _next = from._next;
-      _previous = from._previous;
+  ListNode &  operator=(const ListNode & From) {
+    if (this != &From) {
+      _Key = From._Key;
+      _Value = From._Value;
+      _Next = From._Next;
     }
     return *this;
   }
     
   const KeyType & getKey() {
-    return _key;
+    return _Key;
   }
 
   const ValueType & getValue() {
-    return _value;
+    return _Value;
   }
 
   void updateValue(const ValueType & value) {
-    _value = value;
+    _Value = value;
   }
 
   ListNode * getNext() {
-    return _next;
+    return _Next;
   }
 
-  ListNode * getPrevious() {
-    return _previous;
-  }
-
-  void setNext(ListNode * n) {
-    _next = n;
-  }
-
-  void setPrevious(ListNode * p) {
-    _previous = p;
+  void setNext(ListNode * next) {
+    _Next = next;
   }
 
 private:
-  KeyType _key;
-  ValueType _value;
-  ListNode * _next;
-  ListNode * _previous;
-
+  KeyType _Key;
+  ValueType _Value;
+  ListNode * _Next;
 };
 
 class LinkedList {
 public:
   typedef FixedString KeyType;
   typedef FixedString ValueType;
-
   // Make it work with iterator
   typedef ListNode* iterator;
 
 public:
-  LinkedList(): _head(nullptr), _tail(nullptr), _size(0) {
-  }
+  LinkedList(): _Head(nullptr)
+              , _Size(0) {}
 
-  LinkedList & operator=(const LinkedList & from) {
-    if (this != &from) {
-      _head = from._head;
-      _tail = from._tail;
-      _size = from._size;
+  LinkedList & operator=(const LinkedList & From) {
+    if (this != &From) {
+      _Head = From._Head;
+      _Size = From._Size;
     }
     return *this;
   }
 
-  void insert(const char * k, const char * v) {
-    KeyType kk(k); ValueType vv(v);
-    insert(kk, vv);
+  void insert(const char * key, const char * value) {
+    KeyType Key(key); 
+    ValueType Value(value);
+    insert(Key, Value);
   }
 
-  void insert(const KeyType & k, const ValueType & v) {
-    // This should be a placement new, but we'll allow it for now and change later.
-    ListNode * l = new ListNode(k, v);
+  void insert(const KeyType & key, const ValueType & value) {
+    /// TODO This should be a placement new, 
+    /// but we'll allow it for now and change later if necessary
+    ListNode * NewNode = new ListNode(key, value);
 
-    // Set head only once.
-    if (_head == nullptr) {
-      _head = l;
-    }
+    // Add to Head of linked list.
+    NewNode->setNext(_Head);
 
-    // Add to end of linked list.
-    // Set current node
-    l->setNext(nullptr);
-    l->setPrevious(_tail);
-    // Set previous node
-    if (_tail != nullptr) {
-      _tail->setNext(l);
-    }
-    _tail = l;
-    ++_size;
+    _Head = NewNode;
+
+    ++_Size;
   }
 
-  ListNode * find(const KeyType & k) {
-    ListNode * it = _head;
+  ListNode * find(const KeyType & key) {
+    ListNode * it = _Head;
     ListNode * fit = nullptr;
     bool found = false;
     while ( it != nullptr && found == false ) {
-      if ( it->getKey() == k ) {
-	fit = it;
-	found = true;
+      if ( it->getKey() == key ) {
+      	fit = it;
+      	found = true;
       }
       it = it->getNext();
     }
     return fit;
   }
   
-  bool update(const KeyType & k, const ValueType & value) {
-    ListNode * fit = find(k);
-    if (fit == nullptr) {
+  bool update(const KeyType & key, const ValueType & value) {
+    ListNode * fit = find(key);
+    if (fit == nullptr) 
       return false;
-    } else {
+    else {
       fit->updateValue(value);
       return true;
     }
   }
 
+#ifdef _DEBUG_
   void print() {
     // Iterate over the linked list and delete it.
-    ListNode * it = _head;
+    ListNode * it = _Head;
     
     while (it != nullptr) {
-      cout << "k: " << it->getKey() << ", " << "v: " << it->getValue() << endl;
+      std::cout << "key: " << it->getKey() << ", " 
+                << "value: " << it->getValue() 
+                << "\n";
       it = it->getNext();
-
     }
   }
+#endif
 
   unsigned int size() {
-    return _size;
+    return _Size;
   }
 
   ListNode* begin() {
-    return _head;
+    return _Head;
   }
 
-  ListNode* end() {
-    return _tail;
-  }
 
   void deleteList() {
     // Iterate over the linked list and delete it.
-    ListNode * it = _head;
+    ListNode * it = _Head;
     ListNode * del = nullptr;
     
     while (it != nullptr) {
@@ -191,9 +171,8 @@ public:
   }
 
 private:
-  ListNode * _head;
-  ListNode * _tail;
-  unsigned int _size;
+  ListNode * _Head;
+  unsigned int _Size;
 };
 
 #endif /* _LINKED_LIST_H_ */

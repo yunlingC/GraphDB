@@ -33,7 +33,7 @@ public:
   auto getRandPersonInput(unsigned int num);
     
 
-  auto getIntervalPersonInput(unsigned int num, vector<unsigned int> & params) 
+  auto getIntervalPersonInput(unsigned int num, std::vector<unsigned int> & params) 
   -> void {
     _Num = _InputParams.size();
     unsigned int interval = 0;

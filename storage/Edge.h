@@ -14,10 +14,7 @@
 #ifndef _EDGE_H_
 #define _EDGE_H_
 
-#include <string>
-
 #include "PropertyList.h"
-#include "FixedString.h"
 
 #ifdef _LOCKING_
 class EdgeLock;
@@ -45,7 +42,9 @@ public:
 
 public:
 
+#ifdef _DEBUG_
   void dump();
+#endif
   VertexDescriptor getFirstId();
   VertexPointer getFirstVertexPtr();
   VertexPointer getSecondVertexPtr();
@@ -68,6 +67,8 @@ public:
   VertexDescriptor getSecondId();
   LabelType getType();
 
+  void setFirstVertexPtr(VertexPointer Vertex);
+  void setSecondVertexPtr(VertexPointer Vertex);
   void setFirstNextEdge(EdgePointer e);
   void setFirstPreviousEdge(EdgePointer e);
   void setId(unsigned int id);
@@ -75,7 +76,8 @@ public:
   void setPropertyList(PropertyListType l);
   void setSecondNextEdge(EdgePointer e);
   void setSecondPreviousEdge(EdgePointer e);
-  void setType(string t);
+  void setType(std::string t);
+  void setType(LabelType Type);
 
 #ifdef _LOCKING_
   void setEdgeLock(EdgeLockPointer el);

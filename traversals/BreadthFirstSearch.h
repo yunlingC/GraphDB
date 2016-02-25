@@ -14,47 +14,47 @@
 #ifndef _BREADTHFIRSTSEARCH_H_
 #define _BREADTHFIRSTSEARCH_H_
 
-/// Standard includes.
-#include <queue>
-#include <map>
-
 /// Local includes.
 #include "GraphType.h"
 #include "Visitor.h"
 
+/// Standard includes.
+#include <queue>
+#include <unordered_map>
+
 void breadthFirstSearch(GraphType & Graph, 
-                        const GraphType::VertexDescriptor & StartVertex,  
+                        const GraphType::VertexDescriptor & StartVertex, 
                         Visitor & GraphVisitor) {
 
-  typedef pair<GraphType::VertexPointer, bool> VisitPair;
-  auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
-  //pass hint
-//  passNodeHint(ScheduledVertex);
+  typedef std::pair<GraphType::VertexPointer, bool> VisitPair;
 
-  // Start traversing the graph from here. 
   std::queue<GraphType::VertexPointer> VertexQueue;
+
+  auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
+
   /// True means visited and false means not visited.
-  std::map<GraphType::VertexPointer, bool> ColorMap;
+  std::unordered_map<GraphType::VertexPointer, bool> ColorMap;
 
   VertexQueue.push(ScheduledVertex);               
+
   GraphVisitor.visitStartVertex(ScheduledVertex);
 
-  ColorMap.insert(VisitPair(ScheduledVertex,false));
+  ColorMap.insert(VisitPair(ScheduledVertex, false));
 
   GraphType::VertexPointer TargetVertex = nullptr;
 
   while ( !VertexQueue.empty() ) {
     ScheduledVertex = VertexQueue.front();  VertexQueue.pop();
-    //pass hint
-    //passNodeHint(ScheduledVertex);
+
     bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
-    if( VertexMatch == true )
+    if (VertexMatch == true)
       return;
       
-    // Set to visited.    
+    /// Set to visited.    
     ColorMap[ScheduledVertex] = true;
 
     auto NextEdge = ScheduledVertex->getNextEdge();
+
     while ( NextEdge != nullptr ) {                  
       /// Get the target node.
       TargetVertex = NextEdge->getTarget(ScheduledVertex);     
@@ -64,20 +64,21 @@ void breadthFirstSearch(GraphType & Graph,
       bool TypeMatch =  GraphVisitor.scheduleEdge(NextEdge);
       bool DirectionMatch = GraphVisitor.visitDirection(TargetVertex, NextEdge);
 
-      if( BranchMatch == true )
+      if (BranchMatch == true)
         return;
 
-      if ( ColorMap.find(TargetVertex ) == ColorMap.end() || RevisitFlag ) {
-	// queue the target for visitation
+      if (ColorMap.find(TargetVertex) == ColorMap.end()|| RevisitFlag) {
+       	// Queue up the target for visitation
         GraphVisitor.scheduleTree(ScheduledVertex, NextEdge, TargetVertex);
 
-        if( TypeMatch && DirectionMatch )   {//control the vertex to be visited filtered by type
+        /// Determine whether the vertex to be visited based on the filters 
+        if (TypeMatch && DirectionMatch)   {
 	        VertexQueue.push(TargetVertex);
-        //}
+
 	        ColorMap.insert(VisitPair(TargetVertex,false));
         }
       } else {
-        GraphVisitor.revisitVertex( TargetVertex );
+        GraphVisitor.revisitVertex(TargetVertex);
       }
       // Get the next edge from the scheduled vertex. 
       NextEdge = NextEdge->getNextEdge(ScheduledVertex);

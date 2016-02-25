@@ -11,15 +11,16 @@
 /// \brief This is the function utilities for Graph visitors.
 ///
 //===----------------------------------------------------------------------===//
-#ifndef _UTILITIES_H_
-#define _UTILITIES_H_
+#ifndef _UTILS_H_
+#define _UTILS_H_
+
+#include "FilterType.h"
+#include "GraphType.h"
 
 #include <stack>
 #include <time.h>
+#include <map>
 #include <boost/algorithm/string.hpp>
-
-#include "Filter.h"
-#include "GraphType.h"
 
 typedef std::string KeyType;
 typedef std::string ValueType;
@@ -27,10 +28,10 @@ typedef std::string Type;
 typedef std::string RelType;
 typedef unsigned int IdType;
 typedef std::string Direction;
-typedef std::vector<string> AttributesType;
+typedef std::vector<std::string> AttributesType;
 typedef GraphType::VertexPointer VertexPointer;
 typedef GraphType::EdgePointer    EdgePointer;
-typedef std::map<VertexPointer, unsigned int> DepthList;
+typedef std::map<VertexPointer, unsigned int> DepthListType;
 typedef std::multimap<VertexPointer, unsigned int> MultiDepthList;
 typedef std::map<VertexPointer, unsigned int> DegreeList;
 typedef std::vector<VertexPointer> VertexTargetSet;
@@ -40,66 +41,60 @@ typedef std::vector<ValueType> ValueListType;
 typedef std::vector<ValueType> &  ValueListTypeReference;
 typedef std::pair<bool, std::pair<std::string, GraphType::PropertyListType> > ReturnBranchType;
 
-void filtProperty(KeyType key, ValueType value, Filter & TraversalFilter){
+void filtProperty(KeyType key, ValueType value, FilterType & TraversalFilter){
   TraversalFilter.setKey(key);
   TraversalFilter.setValue(value);
 }
 
-void filtPropertyList(KeyType key, ValueListTypeReference ValueList, Filter & TraversalFilter) {
+void filtPropertyList(KeyType key, ValueListTypeReference ValueList, FilterType & TraversalFilter) {
   TraversalFilter.setKey(key);
   TraversalFilter.setValueList(key, ValueList);
 }
 
-void filtVertexId(IdType vid , Filter & TraversalFilter) {
+void filtVertexId(IdType vid , FilterType & TraversalFilter) {
   TraversalFilter.setVertexId(vid);
 }
 
-void filtEdgeId (IdType eid, Filter & TraversalFilter) {
+void filtEdgeId (IdType eid, FilterType & TraversalFilter) {
   TraversalFilter.setEdgeId(eid);
 }
 
 //TODO set flag 
-void filtType (Type type, Filter & TraversalFilter) {
+void filtType (Type type, FilterType & TraversalFilter) {
   TraversalFilter.setType(type);
 //  filtTypeFlag = true;
 }
 
-void traverseThroughDirection(Direction direction, Filter & TraversalFilter) {
+void traverseThroughDirection(Direction direction, FilterType & TraversalFilter) {
   TraversalFilter.setDirection(direction);
 }
 
-void traverseThroughType(Type type, Filter & TraversalFilter) {
+void traverseThroughType(Type type, FilterType & TraversalFilter) {
   TraversalFilter.setType(type);
 }
 
-void traverseThroughMultiRelType(RelType types, Filter & TypeFilter ) {
+void traverseThroughMultiRelType(RelType types, FilterType & TypeFilter ) {
   AttributesType attributes;
   boost::split(attributes, types, boost::is_any_of("+"));
   for (auto it = attributes.begin(); it != attributes.end(); it++)
-//    cout << "types " << *it ;
-//  cout << endl;
   TypeFilter.setTypeList(attributes);
 }
 
-void traverseThroughTypeAndDirection(Type type, Direction direction, Filter & TraversalFilter) {
+void traverseThroughTypeAndDirection(Type type, Direction direction, FilterType & TraversalFilter) {
   TraversalFilter.setDirection(direction);
   TraversalFilter.setType(type);
 }
 
-bool terminateAtVertex(unsigned int targetNum, VertexTargetSet vertexSet) {
-
-    if(vertexSet.size() >= targetNum) 
-    {
-      return true;
-    }
-    else // not yet
-      return false;
-  }
-
+bool TerminateAtVertex(unsigned int targetNum, VertexTargetSet vertexSet) {
+    return (vertexSet.size() >= targetNum);
+}
 
 /// compute and return the depth for second
-unsigned int computeDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthList &dl) {
-  typedef pair<VertexPointer, unsigned int> DepthPair;
+unsigned int computeDepth(VertexPointer first, 
+                          EdgePointer ep, 
+                          VertexPointer second, 
+                          DepthListType &dl) {
+  typedef std::pair<VertexPointer, unsigned int> DepthPair;
 
   unsigned int depth = 1;
   if (dl.find(first) == dl.end()) {
@@ -122,8 +117,11 @@ unsigned int computeDepth(VertexPointer first, EdgePointer ep, VertexPointer sec
   return  depth;
 }
 
-void recordDepth(VertexPointer first, EdgePointer ep, VertexPointer second, MultiDepthList &dl) {
-  typedef pair<VertexPointer, unsigned int> DepthPair;
+void recordDepth(VertexPointer first, 
+                 EdgePointer ep, 
+                 VertexPointer second, 
+                 MultiDepthList &dl) {
+  typedef std::pair<VertexPointer, unsigned int> DepthPair;
 
   unsigned int depth = 1;
   if (dl.find(first) == dl.end()) {
@@ -149,8 +147,8 @@ void recordDepth(VertexPointer first, EdgePointer ep, VertexPointer second, Mult
   return ;
 }
 
-void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthList &dl) {
-  typedef pair<VertexPointer, unsigned int> DepthPair;
+void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthListType &dl) {
+  typedef std::pair<VertexPointer, unsigned int> DepthPair;
 
   unsigned int depth = 1;
   if (dl.find(first) == dl.end()) {
@@ -174,10 +172,9 @@ void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, Dept
 }
 
 /// check if the vertex's depth == given depth
-bool checkDepth(unsigned int depth, VertexPointer vertex, DepthList & depthList) {
+bool checkDepth(unsigned int depth, VertexPointer vertex, DepthListType & depthList) {
   if (depthList.find(vertex) != depthList.end())
-    if(depthList[vertex]  == depth)
-      return true;
+    return (depthList[vertex]  == depth);
   return false;
 }
 
@@ -191,7 +188,7 @@ unsigned int  checkMaxDepth(MultiDepthList & dl) {
 }
 
 template<typename ReturnValueType>
-bool checkProperty(VertexPointer vertex, Filter &filter) {
+bool checkProperty(VertexPointer vertex, FilterType &filter) {
   if ((filter.getValue() == "") || (filter.getKey() == "") )
       return true; 
   FixedString value(filter.getValue());
@@ -199,14 +196,12 @@ bool checkProperty(VertexPointer vertex, Filter &filter) {
   ReturnValueType rv = vertex->getPropertyValue(key); 
 //  std::cout << " checkProperty " << rv.first.std_str() << "\t" << filter.getValue() << "\n";
   if((rv.second == false) || (rv.first != value))
-  {
       return false;
-  }
   return true;
 }
 
 template<typename ReturnValueType>
-bool checkPropertyList(VertexPointer vertex, Filter & filter) {
+bool checkPropertyList(VertexPointer vertex, FilterType & filter) {
   auto itend = filter.getValueList().end();
   if ( filter.getKey() == "") 
     return true;
@@ -227,7 +222,7 @@ bool checkPropertyList(VertexPointer vertex, Filter & filter) {
 }
 
 template<typename ReturnValueType>
-bool checkPropertyValue(VertexPointer vertex, Filter & filter) {
+bool checkPropertyValue(VertexPointer vertex, FilterType & filter) {
   auto itend = filter.getPropertyMap().end();
   for ( auto it = filter.getPropertyMap().begin(); it != itend; it++) {
     FixedString Label((*it).first);
@@ -245,7 +240,7 @@ bool checkPropertyValue(VertexPointer vertex, Filter & filter) {
 }
 
 template<typename ReturnValueType>
-bool checkBranchProperty(VertexPointer vertex, EdgePointer edge, Filter & filter) {
+bool checkBranchProperty(VertexPointer vertex, EdgePointer edge, FilterType & filter) {
   std::string EdgeType = edge->getType().std_str();
   if ( filter.getBranchPropertyMap().find(EdgeType) 
       == filter.getBranchPropertyMap().end() ) { 
@@ -268,7 +263,7 @@ bool checkBranchProperty(VertexPointer vertex, EdgePointer edge, Filter & filter
 ///checking vertex property to see if a new branch could grow here
 ///Vertex property format pair<Vertex->getType(), Vertex->getId()>
 //template<typename ReturnValueType>
-//bool checkBranch(VertexPointer vertex, Filter & filter) {
+//bool checkBranch(VertexPointer vertex, FilterType & filter) {
 //  auto rv = vertex->getPropertyValue("id");
 //  if(rv.second == false) {
 //    ///TODO exception here
@@ -284,7 +279,7 @@ bool checkBranchProperty(VertexPointer vertex, EdgePointer edge, Filter & filter
 //}
 
 template<typename ReturnValueType>
-ReturnBranchType checkBranch(VertexPointer vertex, Filter & filter) {
+ReturnBranchType checkBranch(VertexPointer vertex, FilterType & filter) {
   GraphType::PropertyListType EdgeProp;
   EdgeProp.set("null", "null");
   ReturnBranchType rb = std::make_pair(false, std::make_pair("", EdgeProp));
@@ -315,13 +310,13 @@ int compareTime(time_t time1, time_t time2) {
 }
 
 template<typename ReturnValueType, typename GraphElemPointer>
-bool checkTimeRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag) {
+bool checkTimeRange(GraphElemPointer GraphElem, FilterType &filter, bool & EqualFlag) {
   char buf[32];
-  string times;  
+  std::string times;  
   struct tm  time[2];
   bool cmpResult[2] = {false, false};
   EqualFlag = false;
-  vector<string> attributes;
+  std::vector<std::string> attributes;
   for (auto i = 0; i < 2; i++) {
     times = filter.getValueRange().at(i);
     if(times == "")
@@ -336,7 +331,6 @@ bool checkTimeRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
   } //END_FOR
   auto timeProp = GraphElem->getPropertyValue(filter.getKey());                          
   if(timeProp.second == false) {
-    cout << "Error: Failed to find time property\n";
     return false;   /// cannot find time property ;
   }
   else  {
@@ -371,7 +365,7 @@ bool checkTimeRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
  }
 
 template<typename GraphElemType>
-bool checkYearRange(GraphElemType elem, Filter & filter, bool & EqualFlag) {
+bool checkYearRange(GraphElemType elem, FilterType & filter, bool & EqualFlag) {
   EqualFlag = false;
   bool cmpResult[2] = {false, false};
   unsigned int Year[2] = {0, 0};
@@ -396,17 +390,16 @@ bool checkYearRange(GraphElemType elem, Filter & filter, bool & EqualFlag) {
       cmpResult[1] = true;
   }
   return (cmpResult[0] && cmpResult[1]);
-
   }
 
 template<typename ReturnValueType, typename GraphElemPointer>
-bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag) {
+bool checkDateRange(GraphElemPointer GraphElem, FilterType &filter, bool & EqualFlag) {
   char buf[32];
-  string times;  
+  std::string times;  
   struct tm date[2];
   EqualFlag = false;
   bool cmpResult[2] = {false, false};
-  vector<string> attributes;
+  std::vector<std::string> attributes;
   for (auto i = 0; i < 2; i++) {
     times = filter.getValueRange().at(i);
     if ( times == "" ) 
@@ -456,13 +449,13 @@ bool checkDateRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag
 ///apply to birthday within given ranges: xxxx-0m-0d : xxxx-0m'-0d'
 //DOES NOT apply to single range  xxxx-0m-0d : now
 template<typename ReturnValueType, typename GraphElemPointer>
-bool checkBirthdayRange(GraphElemPointer GraphElem, Filter &filter, bool & EqualFlag) {
+bool checkBirthdayRange(GraphElemPointer GraphElem, FilterType &filter, bool & EqualFlag) {
   char buf[32];
-  string times;  
+  std::string times;  
   struct tm date[2];
   EqualFlag = false;
   bool cmpResult[2] = {false, false};
-  vector<string> attributes;
+  std::vector<std::string> attributes;
   for (auto i = 0; i < 2; i++) {
     times = filter.getValueRange().at(i);
     if ( times == "" ) 
@@ -503,7 +496,7 @@ bool checkBirthdayRange(GraphElemPointer GraphElem, Filter &filter, bool & Equal
 
 
 template<typename GraphElemType>
-bool checkRange(unsigned int opt, GraphElemType elem, Filter & RangeFilter, bool & EqualFlag) {
+bool checkRange(unsigned int opt, GraphElemType elem, FilterType & RangeFilter, bool & EqualFlag) {
   typedef std::pair<FixedString, bool> ReturnValueType;
   switch(opt) {
           case 1:
@@ -522,105 +515,75 @@ bool checkRange(unsigned int opt, GraphElemType elem, Filter & RangeFilter, bool
         }//switch 
 }
 
+#ifdef _DEBUG_
 void dumpVertexTarget(VertexTargetSet & VertexTargetList) {
 
   for (auto it = VertexTargetList.begin(); it != VertexTargetList.end(); ++it) {
-    cout << "Vertex: "<< (*it)->getId() << endl;
+    std::cout << "Vertex: "<< (*it)->getId() << std::endl;
   }
 }
+#endif
 
-bool TerminateAtDepth(unsigned int depth, DepthList & depthlist) {
-  for(auto it = depthlist.begin(); it != depthlist.end(); ++ it) {
-    if(it->second > depth)
+bool TerminateAtDepth(unsigned int depth, DepthListType & depthlist) {
+  for (auto it = depthlist.begin(); it != depthlist.end(); ++ it) {
+    if (it->second > depth)
       return true;
   }
     return false;
 }
 
-bool checkEdgeType(EdgePointer edge, Type type) {
-    if (type == "")
+bool checkType(EdgePointer edge, FilterType &filter) {
+    if (filter.getType() == "")
       return true;
-    FixedString FixType(type);
-//    std::cout << "edge type " << edge->getType() << " ?= " << type <<"\n";
-    if (edge->getType() == FixType)
-      return true;
-    else  
-      return false;
+    FixedString type(filter.getType());
+    return (edge->getType() == type);
 }
 
-bool checkType(EdgePointer edge, Filter &filter) {
-  return checkEdgeType(edge, filter.getType());
-}
-
-//bool checkTypes(EdgePointer edge, Filter & filter) {
-//  auto itend = filter.getBranchMap().end();
-//  auto IsMatch = false;
-//  for ( auto it = filter.getBranchMap().begin(); it != itend; it++ ) {
-////    std::cout  << "Utils: Type : " << (*it).first << "\n";
-//    IsMatch = checkType(edge, (*it).first);
-//    if ( IsMatch ) 
-//      break;
-//  }
-//  return IsMatch;
-//}
-
-///TODO could be changed
-bool checkMultiRelType(EdgePointer edge, Filter & filter) {
+bool checkMultiRelType(EdgePointer edge, FilterType & filter) {
   auto typeMatch = false;   
   if(filter.getTypeList().empty())
     return true;
   for (auto it = filter.getTypeList().begin(); it != filter.getTypeList().end(); ++it) {
-    if (*it == "") {
+    if (*it == "") 
       return true;
-    }
     FixedString type(*it);
     if (edge->getType() == type)
-    {
       return true;
-    }
-    else  {
+    else  
       typeMatch = false;
-    }
   }
   return typeMatch;
 }
 
-/// check if the direction of vertex to edge is 
-bool checkDirection(VertexPointer vertex, EdgePointer edge, Filter & filter ) {
-    int direction = 0;
+/// check the direction of vertex to edge 
+bool checkDirection(VertexPointer vertex, EdgePointer edge, FilterType & filter ) {
+    unsigned int direction = 0;
 
-    if(filter.getDirection() == "" )
+    if (filter.getDirection() == "" )
       return true;
 
-    if ( filter.getDirection() == "out")
-      direction = 1;     //first vertex => outEdge for vertex;
-    else if ( filter.getDirection() == "in")
-      direction = 2;     //second vertex => inEdge for vertex;
-    else 
-      cout <<"Err: Irrelevant edges.\n";
+    if (filter.getDirection() == "out")
+      /// First vertex => outEdge for vertex;
+      direction = 1;     
+    else if (filter.getDirection() == "in")
+      /// Second vertex => inEdge for vertex;
+      direction = 2;     
 
     switch(direction) {
     case 1:
-      if (edge->getFirstId() == vertex->getId()) {
-        return false;
-      }
-      break;
+      return (edge->getFirstId() != vertex->getId());
 
     case 2:
-      if (edge->getSecondId() == vertex->getId()) { 
-        return false;
-      }
-      break;
+      return (edge->getSecondId() != vertex->getId());
 
     default:
       return true;
     }
-    return true;
 }
 
 
 void computeOutDegree(VertexPointer vertex, EdgePointer edge, DegreeList &list) {
-  typedef pair<VertexPointer, unsigned int> DegreePair; 
+  typedef std::pair<VertexPointer, unsigned int> DegreePair; 
 
   if( list.find(vertex) == list.end() ) {
     list.insert(DegreePair(vertex, 0));
@@ -633,7 +596,7 @@ void computeOutDegree(VertexPointer vertex, EdgePointer edge, DegreeList &list) 
 }
 
 void computeInDegree(VertexPointer vertex, EdgePointer edge, DegreeList &list) {
-  typedef pair<VertexPointer, unsigned int> DegreePair; 
+  typedef std::pair<VertexPointer, unsigned int> DegreePair; 
 
   if( list.find(vertex) == list.end() ) {
     list.insert(DegreePair(vertex, 0));
@@ -644,4 +607,4 @@ void computeInDegree(VertexPointer vertex, EdgePointer edge, DegreeList &list) {
   }
 }
 
-#endif /**_UTILITIES_H_*/
+#endif /**_UTILS_H_*/
