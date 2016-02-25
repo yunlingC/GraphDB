@@ -64,6 +64,7 @@ set(TESTS
         main-mt-ldbc.cpp
         main-gdbench.cpp
         main-algo.cpp
+        main-ldbc.cpp
         )
 
 # This will generate all the executables listed in the TESTS variable

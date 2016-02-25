@@ -25,16 +25,12 @@ std::ofstream LdbcFile("ldbc_execution.log", std::ios_base::out| std::ios_base::
 
 class LdbcQuery : public Query{
 public:
-  typedef std::pair<string, string> ParamPairType;
-  typedef pair<string, pair<string, string> > RangePairType;
-  typedef LocksManager LocksManagerType;
+  typedef std::pair<std::string, std::string> ParamPairType;
+  typedef std::pair<std::string, std::pair<std::string, std::string> > RangePairType;
 public:
   virtual void runQuery(Graph & graph, VertexDescriptor startVertex ) { }
 
-  virtual void runQuery(Graph & graph, VertexDescriptor startVertex,
-      LockManagerType & LockManager) {}
-
-  void setParam(const string & Key, const string & Value) {
+  void setParam(const std::string & Key, const std::string & Value) {
     ParamPair.first = Key;
     ParamPair.second = Value;
   }
@@ -82,7 +78,7 @@ public:
              << target.size() << " people with " 
              << ParamPair.first <<": " 
              << ParamPair.second<< "\n";
-      for(auto it = target.begin(); it != target.end(); ++it) {
+      for (auto it = target.begin(); it != target.end(); ++it) {
         LdbcFile << "Vertex " << (*it)->getId() << "\t" 
                 << (*it)->getPropertyValue("id").first << "\n"
                 << (*it)->getPropertyValue("firstName").first <<"\t" 
@@ -113,7 +109,7 @@ public:
     LdbcFile << "===============Query 2================\n";
     auto target = v2.getVertexList();
     auto targets = v2.getTargetsMap();
-    for(auto it = targets.begin(); it != targets.end(); ++it) {
+    for (auto it = targets.begin(); it != targets.end(); ++it) {
       LdbcFile << "person " << (*it).second->getPropertyValue("id").first << "\t" 
               << "comments/posts " << (*it).first->getPropertyValue("id").first << "\t" 
               << (*it).first->getPropertyValue("creationDate").first ;
@@ -154,7 +150,7 @@ public:
     FilterSet[3].setProperty("name", country2);
     
     auto it = target.begin(); 
-    while(it != target.end()) {
+    while (it != target.end()) {
       VertexPropertyRangeVisitor vp3;
       vp3.setFilter(FilterSet[0]);
       vp3.setFilter(FilterSet[1]);
@@ -164,7 +160,7 @@ public:
       vp3.setDepthToCheckVertexProp(2);
       auto startVertex = (*it)->getId();
       breadthFirstSearch(graph, startVertex, vp3);
-      if(vp3.getIncludeState() == false) {
+      if (vp3.getIncludeState() == false) {
         target.erase(it);
       }
       else {
@@ -198,7 +194,7 @@ public:
     }
 
 #ifdef _PRINTLDBC_
-    for(auto it = PersonListMap.begin(); it != PersonListMap.end(); ++it) {
+    for (auto it = PersonListMap.begin(); it != PersonListMap.end(); ++it) {
       LdbcFile << "friend " << (*it).first->getPropertyValue("firstName").first  
               << " has " <<(*it).second.size() 
               << " commmets/posts made in " << country1 
@@ -231,7 +227,7 @@ public:
     auto targets = v4.getReturnResultMap();
     LdbcFile << startVertex << " has friends made posts of " 
              << targets.size() << " tags\n";
-    for(auto it = targets.begin(); it != targets.end(); ++it) {
+    for (auto it = targets.begin(); it != targets.end(); ++it) {
       LdbcFile << "tags " << (*it).first->getPropertyValue("id").first << "\t" 
               << "num of posts " << (*it).second <<  "\n";
     }
@@ -266,14 +262,14 @@ public:
     traverseThroughMultiRelType("CONTAINER_OF",Filters[2]); 
     traverseThroughMultiRelType("POST_HAS_CREATOR",Filters[3]); 
     std::vector<FilterType> VertexFilter;
-    for(auto iter = target.begin(); iter != target.end(); iter++) {
+    for (auto iter = target.begin(); iter != target.end(); iter++) {
       FilterType newFilter;
       newFilter.setProperty("id", (*iter)->getPropertyValue("id").first.std_str());
       VertexFilter.push_back(newFilter);
     }
 
     std::map<VertexPointer, unsigned int> targetMap;
-    for(auto it = target.begin(); it != target.end(); it++) {
+    for (auto it = target.begin(); it != target.end(); it++) {
       MultiPropertyVisitor mpv5;
       mpv5.setFilter(Filters[0]);
       mpv5.setFilter(Filters[2]);
@@ -289,8 +285,8 @@ public:
       targetMap.insert(mpv5.getResultMap().begin(), mpv5.getResultMap().end());
     }
 #ifdef _PRINTLDBC_
-    for(auto it = targetMap.begin(); it != targetMap.end(); ++it) {
-      if((*it).second != 0)
+    for (auto it = targetMap.begin(); it != targetMap.end(); ++it) {
+      if ((*it).second != 0)
         LdbcFile << "forum " << (*it).first->getPropertyValue("id").first  
                 << " has " <<(*it).second << " posts made by friends"<< "\n"; 
     }
@@ -326,7 +322,7 @@ public:
     Filters[2].setProperty(ParamPair.first, ParamPair.second);
     
     std::map<std::string, unsigned int> TagMap; 
-    for(auto it = target.begin(); it != target.end(); it++) {
+    for (auto it = target.begin(); it != target.end(); it++) {
       SinglePropertyVisitor  vpv6;
       vpv6.setFilter(Filters[0]);
       vpv6.setFilter(Filters[1]);
@@ -336,12 +332,12 @@ public:
       unsigned int startVertex = (*it)->getId();
       breadthFirstSearch(graph, startVertex, vpv6);
       auto personMap = vpv6.getPersonMap(); 
-      for(auto it = personMap.begin(); it != personMap.end(); it++) {
-        if((*it).second ) {
-          for(auto iter = vpv6.getResultTargetsMap()[(*it).first].begin(); 
+      for (auto it = personMap.begin(); it != personMap.end(); it++) {
+        if ((*it).second ) {
+          for (auto iter = vpv6.getResultTargetsMap()[(*it).first].begin(); 
               iter != vpv6.getResultTargetsMap()[(*it).first].end(); iter++) {
             // (*iter) --> Tag id (string)
-            if(TagMap.find(*iter) == TagMap.end()) {
+            if (TagMap.find(*iter) == TagMap.end()) {
               TagMap.insert(std::pair<std::string, unsigned int>((*iter), 1));
             } else {
               TagMap[*iter]++;
@@ -372,7 +368,7 @@ public:
     breadthFirstSearch(graph, startVertex, v7);
     auto target = v7.getVertexList();
     std::vector<FilterType> VertexFilter;
-    for(auto iter = target.begin(); iter != target.end(); iter++) {
+    for (auto iter = target.begin(); iter != target.end(); iter++) {
       FilterType newFilter;
       newFilter.setProperty("id", (*iter)->getPropertyValue("id").first.std_str());
       VertexFilter.push_back(newFilter);
@@ -396,14 +392,14 @@ public:
     breadthFirstSearch(graph, startVertex, vmv7);
 #ifdef _PRINTLDBC_
     auto targetsMap = vmv7.getTimeMap();
-    for(auto it = targetsMap.begin(); it != targetsMap.end(); it++) {
+    for (auto it = targetsMap.begin(); it != targetsMap.end(); it++) {
       LdbcFile << (*it).first->getPropertyValue("firstName").first << "\t" 
                 << (*it).first->getPropertyValue("id").first 
                 << " likes comment/posts at " << (*it).second << "\n"; 
     }
     auto personMap = vmv7.getPersonMap();
-    for(auto it = personMap.begin(); it != personMap.end(); it++)  {
-      if((*it).second == true) 
+    for (auto it = personMap.begin(); it != personMap.end(); it++)  {
+      if ((*it).second == true) 
         LdbcFile << "comment/post " << (*it).first->getPropertyValue("id").first 
                  << " are made by friend\n" ;
     }
@@ -429,7 +425,7 @@ public:
 #ifdef _PRINTLDBC_
     LdbcFile << "===============Query 8================\n";
     auto vertexMap = v8.getVertexMap();
-    for(auto it = vertexMap.begin(); it != vertexMap.end(); it++) {
+    for (auto it = vertexMap.begin(); it != vertexMap.end(); it++) {
       LdbcFile << "Person " << (*it).second->getPropertyValue("firstName").first 
                 << " made replies " << (*it).first->getPropertyValue("id").first 
                 << " at " << (*it).first->getPropertyValue("creationDate").first 
@@ -464,7 +460,7 @@ public:
     Filters[1].setValueRange("creationDate", "", "2011-07-16T23:59:00.255"); 
           
     ReturnMapType TargetsMap; 
-    for(auto it = target.begin(); it != target.end(); ++it) {
+    for (auto it = target.begin(); it != target.end(); ++it) {
 #ifdef _PRINTLDBC_
       LdbcFile << "friend " << (*it)->getId() << "\t" 
                << (*it)->getPropertyValue("id").first << "\t" 
@@ -482,7 +478,7 @@ public:
       TargetsMap.insert(targets.begin(), targets.end());
    }
 #ifdef _PRINTLDBC_
-    for(auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
+    for (auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
       LdbcFile << "posts/comments " << (*iter).first->getPropertyValue("id").first 
               << "\t" << (*iter).first->getPropertyValue("creationDate").first 
               << " made by person " << (*iter).second->getPropertyValue("id").first 
@@ -512,7 +508,7 @@ public:
     BDFilter.setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
     for (VertexPointer StartVertex : av1.getVertexList()) {
       auto EqualFlag = false; 
-      if ( checkRange<VertexPointer>(4, StartVertex, BDFilter, EqualFlag) == true ) {
+      if (checkRange<VertexPointer>(4, StartVertex, BDFilter, EqualFlag) == true ) {
         SimMap[StartVertex] = 0;
         AdjacencyVisitor av2; 
         traverseThroughTypeAndDirection("KNOWS", "out", av2.getFilter());
@@ -524,16 +520,16 @@ public:
 
     }
 
-    for ( VertexPointer Vertex : targets) {
+    for (VertexPointer Vertex : targets) {
       auto EqualFlag = false; 
-      if ( checkRange<VertexPointer>(4, Vertex, BDFilter, EqualFlag) == true ) {
+      if (checkRange<VertexPointer>(4, Vertex, BDFilter, EqualFlag) == true ) {
         SimMap[Vertex] = 0;
       }
     }
 
     ///iterate over the friends who satisfy the condition
     auto itend  = SimMap.end();
-    for ( auto it = SimMap.begin(); it != itend; it++ ) {
+    for (auto it = SimMap.begin(); it != itend; it++ ) {
       FilterType tmpFilter[4];
       traverseThroughMultiRelType("POST_HAS_CREATOR", tmpFilter[0]); 
       traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[1]); 
@@ -544,13 +540,13 @@ public:
       v10.setDepth(3);
       v10.setDepthToCheckVertexProp(3);
       v10.setVertexFilter(tmpFilter[3]);
-      for ( unsigned int i = 0; i < 3; i++ ) {
+      for (unsigned int i = 0; i < 3; i++ ) {
         v10.setFilter(tmpFilter[i]);
       }
       breadthFirstSearch(graph, (*it).first->getId(), v10);
       auto iterend = v10.getPostMap().end();
       unsigned int PostItrd = 0;
-      for ( auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
+      for (auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
         if ((*iter).second ) { PostItrd++; }
       }
 
@@ -594,7 +590,7 @@ public:
     Filters[3].setProperty(ParamPair.first, ParamPair.second);  
 
     MatchMapType TargetsMap;
-    for(auto it = target.begin(); it != target.end(); ++it) {
+    for (auto it = target.begin(); it != target.end(); ++it) {
 #ifdef _PRINTLDBC_
       LdbcFile <<"friend " << (*it)->getId() << "\t" 
               << (*it)->getPropertyValue("id").first << "\t" 
@@ -616,7 +612,7 @@ public:
   }
 #ifdef _PRINTLDBC_
     FixedString key("workFrom");
-    for(auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
+    for (auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
       LdbcFile << (*iter).first->getPropertyValue("firstName").first 
               << " works at "  << (*iter).second.second->getPropertyValue("id").first 
               << " from " << (*iter).second.first->getPropertyValue(key).first << "\n";
@@ -657,13 +653,13 @@ public:
       v10.setDepth(5);
       v10.setDepthToCheckVertexProp(4);
       v10.setVertexFilter(tmpFilter[5]);
-      for ( unsigned int i = 0; i < 5; i++ ) {
+      for (unsigned int i = 0; i < 5; i++ ) {
         v10.setFilter(tmpFilter[i]);
       }
       breadthFirstSearch(graph, StartVertex->getId(), v10);
       auto iterend = v10.getPostMap().end();
       auto PostNum = 0;
-      for ( auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
+      for (auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
         if ((*iter).second ) { PostNum++; }
       }
 
@@ -679,74 +675,24 @@ protected:
   SimMapType SimMap;
 };
 
-class LdbcQuery12 : public LdbcQuery {
-public:
-  typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  
-public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    LdbcFile << "===============Query 12================\n";
-    ///first find start person's friends
-    AdjacencyVisitor av1; 
-    traverseThroughTypeAndDirection("KNOWS", "out", av1.getFilter());
-    breadthFirstSearch(graph, startVertex, av1);
-
-    ///find friends of friends of start person
-    std::vector<VertexPointer> targets;
-      Filter tmpFilter[6];
-      traverseThroughMultiRelType("COMMENT_HAS_CREATOR", tmpFilter[0]); 
-      traverseThroughMultiRelType("REPLY_OF_POST", tmpFilter[1]); 
-      traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[2]); 
-      traverseThroughMultiRelType("HAS_TYPE", tmpFilter[3]); 
-      traverseThroughMultiRelType("IS_SUBCLASS_OF", tmpFilter[4]); 
-      tmpFilter[5].setProperty(ParamPair.first, ParamPair.second);
-
-
-    for (VertexPointer StartVertex : av1.getVertexTargetList()) {
-//      std::cout << "friend " << StartVertex->getId() << "\n";
-      SimMap[StartVertex] = 0;
-
-      ExpertVisitor v10;
-      v10.setDepth(5);
-      v10.setDepthToCheckVertexProp(4);
-      v10.setVertexFilter(tmpFilter[5]);
-      for ( unsigned int i = 0; i < 5; i++ ) {
-        v10.setFilter(tmpFilter[i]);
-      }
-      breadthFirstSearch(graph, StartVertex->getId(), v10);
-      auto iterend = v10.getPostMap().end();
-      auto PostNum = 0;
-      for ( auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
-        if ((*iter).second ) { PostNum++; }
-//          std::cout << "post " << (*iter).first << "\t" << (*iter).second << "\n";
-      }
-
-      SimMap[StartVertex] = PostNum; 
-      LdbcFile << "person: " << StartVertex->getId() << " expert post " << PostNum << "\n";
-  
-    }
-  }
-protected:
-  SimMapType SimMap;
-};
 
 
 class LdbcQuery13 : public LdbcQuery {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex, VertexDescriptor endVertex ) {
-    LdbcFile << "===============Query 13================\n";
     PathVisitor v13;
     v13.setEndVertex(endVertex);
     breadthFirstSearch(graph, startVertex, v13);
 #ifdef _PRINTLDBC_
     LdbcFile << "===============Query 13================\n";
     auto target = v13.getVertexList();
-    if(target.empty())
+    if (target.empty())
       LdbcFile << startVertex << " and " <<  endVertex 
                 << " are not connected" << "\n";
     else {
       LdbcFile << "There are  shortest paths of length " << target.size() 
               << "  from " << startVertex << " to " << endVertex << "\n";
-      for(auto it = target.begin(); it != target.end(); ++it) {
+      for (auto it = target.begin(); it != target.end(); ++it) {
         LdbcFile <<"Vertex " << (*it)->getId() << "\t" 
                 << (*it)->getPropertyValue("id").first 
                 << (*it)->getPropertyValue("firstName").first<< "\n";
@@ -768,13 +714,13 @@ public:
     auto target = v13.getVertexList();
 #ifdef _PRINTLDBC_
     LdbcFile << "===============Query 14================\n";
-    if(target.empty())
+    if (target.empty())
       LdbcFile << startVertex << " and " <<  endVertex 
                << " are not connected" << "\n";
     else {
       LdbcFile << "There are  shortest paths of length " << target.size() 
               << "  from " << startVertex << " to " << endVertex << "\n";
-      for(auto it = target.begin(); it != target.end(); ++it) {
+      for (auto it = target.begin(); it != target.end(); ++it) {
         LdbcFile <<"Vertex " << (*it)->getId() << "\t" 
                   << (*it)->getPropertyValue("id").first <<"\t" 
                   << (*it)->getPropertyValue("firstName").first<< "\n";
@@ -785,7 +731,7 @@ public:
 ///already found all the paths, calculate weights now  
   auto itend = target.end();
   float Weight = 0.0;
-  for ( auto it = target.begin(); it != itend-1; it++ ) {  
+  for (auto it = target.begin(); it != itend-1; it++ ) {  
  
   FilterType tmpFilter[4];
   traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", tmpFilter[0]); 
@@ -793,7 +739,7 @@ public:
   traverseThroughMultiRelType("POST_HAS_CREATOR+COMMENT_HAS_CREATOR", tmpFilter[2]); 
 
   WeightedPathVisitor v14;
-  for ( unsigned int i = 0; i < 3; i++ ) {
+  for (unsigned int i = 0; i < 3; i++ ) {
     v14.setFilter(tmpFilter[i]);
   }
 
@@ -810,54 +756,6 @@ public:
 #endif
 
  }
-};
-
-class LdbcQuery14 : public Query {
-public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex, VertexDescriptor endVertex ) {
-    LdbcFile << "===============Query 14================\n";
-    SubGraphVisitor v13;
-    v13.setEndVertex(endVertex);
-    Filter EdgeFilter;
-    traverseThroughTypeAndDirection("KNOWS", "out",  EdgeFilter);
-    v13.setEdgeFilter(EdgeFilter);
-    breadthFirstSearch(graph, startVertex, v13);
-    auto target = v13.getVertexTargetList();
-    if(target.empty())
-      LdbcFile << startVertex << " and " <<  endVertex <<" are not connected" << endl;
-    else {
-      LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << startVertex << " to " << endVertex << endl;
-      for(auto it = target.begin(); it != target.end(); ++it) {
-        LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first <<"\t" << (*it)->getPropertyValue("firstName").first<< endl;
-      }//for
-    }//else
-    ///already found all the paths, calculate weights now  
-
-  auto itend = target.end();
-  float Weight = 0.0;
-  for ( auto it = target.begin(); it != itend-1; it++ ) {  
- 
-  Filter tmpFilter[4];
-  traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", tmpFilter[0]); 
-  traverseThroughMultiRelType("REPLY_OF_POST+REPLY_OF_COMMENT", tmpFilter[1]); 
-  traverseThroughMultiRelType("POST_HAS_CREATOR+COMMENT_HAS_CREATOR", tmpFilter[2]); 
-
-  WeightedPathVisitor v14;
-  for ( unsigned int i = 0; i < 3; i++ ) {
-    v14.setFilter(tmpFilter[i]);
-  }
-
-    auto it2 = it+1;
-    tmpFilter[3].setProperty("id",(*it2)->getPropertyValue("id").first.std_str());
-    v14.setVertexFilter(tmpFilter[3]);
-    v14.setDepth(3);
-//    std::cout << "calculating weights\n";
-    breadthFirstSearch(graph, (*it)->getId(), v14);
-//    std::cout << "weight: " << v14.getScore() << "\n";
-    Weight += v14.getScore();
- } 
-  LdbcFile << "weight " << Weight <<"\n";
- }//run
 };
 
 

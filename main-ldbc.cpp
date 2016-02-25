@@ -3,7 +3,7 @@
 #include "LdbcQueryDescription.h"
 #include "Visitor.h"
 
-<#include <iostream>
+#include <iostream>
 
 using namespace std;
 
@@ -63,9 +63,6 @@ int main() {
 
   LdbcQuery13 q13;
   q13.runQuery(g, persons[0], persons[4]);
-
-  LdbcQuery3 q3;
-  q3.runQuery(g, persons[0]);
 
   cout << "Finish testing\n ";
 
