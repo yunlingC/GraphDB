@@ -12,6 +12,7 @@ set(TRAVERSALS_DIR "traversals")
 set(GDBENCH_DIR "GDBench")
 set(LDBC_DIR "LDBC")
 set(ALGO_DIR "algorithm")
+set(TRANSACTIONS_DIR "transactions")
 
 include_directories( 
         ${INCLUDE_DIRECTORIES} 
@@ -21,7 +22,7 @@ include_directories(
         ${STORAGE_DIR}
         ${GDBENCH_DIR}
 	      ${TRAVERSALS_DIR}
-        #        ${TRANSACTIONS_DIR}
+        ${TRANSACTIONS_DIR}
         ${LDBC_DIR}
         ${ALGO_DIR}
         )
@@ -45,10 +46,10 @@ set(GDB_LD_FLAGS storage)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
 
 # Debug flags
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++14 -D_FIXALLOC_ -Wall")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++14  -Wall")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++14 -D_FIXALLOC_ -D_SKIP_ -Wall")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_FIXALLOC_ -D_PRINTLOG_  -Wall")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_PRINTLOG_  -Wall")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_FIXALLOC_  -D_SKIP_ -Wall")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -Wall")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++11 -Wall")

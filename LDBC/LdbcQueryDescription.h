@@ -18,9 +18,10 @@
 #include "LdbcCustomVisitor.h"
 #include "QueryDescription.h"
 
+#define _PRINTLDBC_ 1
 #ifdef _PRINTLDBC_
 #include <fstream>
-std::ofstream LdbcFile("ldbc_execution.log", std::ios_base::out| std::ios_base::app);
+std::ofstream LdbcFile;
 #endif
 
 class LdbcQuery : public Query{
@@ -72,6 +73,7 @@ public:
     v1.setDepth(3);
     breadthFirstSearch(graph, startVertex, v1);
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 1================\n";
     auto target = v1.getVertexList(); 
     LdbcFile << startVertex << " is connected with " 
@@ -85,6 +87,7 @@ public:
                 << (*it)->getPropertyValue("lastName").first;
         LdbcFile << "\n";
     }
+      LdbcFile.close();
 #endif
   }
 };
@@ -106,6 +109,7 @@ public:
     v2.setPropToCheck(2); //check date
     breadthFirstSearch(graph, startVertex, v2);
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 2================\n";
     auto target = v2.getVertexList();
     auto targets = v2.getTargetsMap();
@@ -115,6 +119,7 @@ public:
               << (*it).first->getPropertyValue("creationDate").first ;
       LdbcFile << "\n";
     }
+      LdbcFile.close();
 #endif
   }
 };
@@ -137,6 +142,7 @@ public:
     breadthFirstSearch(graph, startVertex, v3);
     auto target = v3.getVertexList();
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 3================\n";
     LdbcFile << startVertex << " is connected with " << target.size() 
             << " friends and friends of friends" << "\n";
@@ -200,6 +206,7 @@ public:
               << " commmets/posts made in " << country1 
               << " or " << country2 << "\n"; 
     }
+      LdbcFile.close();
 #endif
   }
 };
@@ -223,6 +230,7 @@ public:
     v4.setPropToCheck(1); //check time
     breadthFirstSearch(graph, startVertex, v4);
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 4================\n";
     auto targets = v4.getReturnResultMap();
     LdbcFile << startVertex << " has friends made posts of " 
@@ -231,6 +239,7 @@ public:
       LdbcFile << "tags " << (*it).first->getPropertyValue("id").first << "\t" 
               << "num of posts " << (*it).second <<  "\n";
     }
+      LdbcFile.close();
 #endif
   }
 };
@@ -252,6 +261,7 @@ public:
     breadthFirstSearch(graph, startVertex, v5);
     auto target = v5.getVertexList();
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 5================\n";
     LdbcFile << startVertex << " is connected with " 
              << target.size() << " friends and friends of friends" << "\n";
@@ -290,6 +300,7 @@ public:
         LdbcFile << "forum " << (*it).first->getPropertyValue("id").first  
                 << " has " <<(*it).second << " posts made by friends"<< "\n"; 
     }
+      LdbcFile.close();
 #endif
   }
 };
@@ -311,6 +322,7 @@ public:
     breadthFirstSearch(graph, startVertex, v6);
     auto target = v6.getVertexList();
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 6================\n";
     LdbcFile << startVertex << " is connected with " 
             << target.size() << " friends and friends of friends" << "\n";
@@ -349,6 +361,8 @@ public:
 #ifdef _PRINTLDBC_
     for (auto it = TagMap.begin(); it != TagMap.end(); it++)
       LdbcFile << "Tag " << (*it).first << " has " << (*it).second << " posts\n";
+
+      LdbcFile.close();
 #endif
   }
 };
@@ -375,6 +389,7 @@ public:
     }
 
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 7================\n";
     LdbcFile << startVertex << " is connected with " 
               << target.size() << " friends" << "\n";
@@ -403,6 +418,8 @@ public:
         LdbcFile << "comment/post " << (*it).first->getPropertyValue("id").first 
                  << " are made by friend\n" ;
     }
+
+    LdbcFile.close();
 #endif
   }
 };
@@ -423,6 +440,7 @@ public:
     v8.setDepthToCompareTime(2);
     breadthFirstSearch(graph, startVertex, v8);
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 8================\n";
     auto vertexMap = v8.getVertexMap();
     for (auto it = vertexMap.begin(); it != vertexMap.end(); it++) {
@@ -431,6 +449,7 @@ public:
                 << " at " << (*it).first->getPropertyValue("creationDate").first 
                 << " to startperson's posts/comments\n";
     }
+    LdbcFile.close();
 #endif
   }
 };
@@ -451,6 +470,7 @@ public:
     breadthFirstSearch(graph, startVertex, v9);
     auto target = v9.getVertexList();
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 9================\n";
     LdbcFile << startVertex << " is connected with " 
               << target.size() << " friends and friends of friends" << "\n";
@@ -484,6 +504,7 @@ public:
               << " made by person " << (*iter).second->getPropertyValue("id").first 
               << "\t" <<  (*iter).second->getPropertyValue("firstName").first << "\n";
     }
+    LdbcFile.close();
 #endif
   }
 };
@@ -494,6 +515,7 @@ public:
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 10================\n";
 #endif
     ///first find start person's friends
@@ -554,6 +576,8 @@ public:
 #ifdef _PRINTLDBC_
       LdbcFile << "person: " << (*it).first->getId() 
               << " similarity score " << (*it).second << "\n";
+
+      LdbcFile.close();
 #endif
     }
   }
@@ -579,6 +603,7 @@ public:
     breadthFirstSearch(graph, startVertex, v11);
     auto target = v11.getVertexList();
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 11================\n";
     LdbcFile << startVertex << " is connected with " 
              << target.size() << " friends and friends of friends" << "\n";
@@ -617,6 +642,7 @@ public:
               << " works at "  << (*iter).second.second->getPropertyValue("id").first 
               << " from " << (*iter).second.first->getPropertyValue(key).first << "\n";
       }
+      LdbcFile.close();
 #endif
   }
 };
@@ -627,6 +653,7 @@ public:
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 12================\n";
 #endif
 
@@ -668,6 +695,7 @@ public:
       LdbcFile << "person: " << StartVertex->getId() 
               << " expert post " << PostNum << "\n";
   
+      LdbcFile.close();
 #endif
     }
   }
@@ -684,6 +712,7 @@ public:
     v13.setEndVertex(endVertex);
     breadthFirstSearch(graph, startVertex, v13);
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 13================\n";
     auto target = v13.getVertexList();
     if (target.empty())
@@ -698,6 +727,7 @@ public:
                 << (*it)->getPropertyValue("firstName").first<< "\n";
       }
     }
+    LdbcFile.close();
 #endif
   }
 };
@@ -713,6 +743,7 @@ public:
     breadthFirstSearch(graph, startVertex, v13);
     auto target = v13.getVertexList();
 #ifdef _PRINTLDBC_
+    LdbcFile.open("ldbc_execution.log", std::ios::out | std::ios::app);
     LdbcFile << "===============Query 14================\n";
     if (target.empty())
       LdbcFile << startVertex << " and " <<  endVertex 
@@ -726,6 +757,7 @@ public:
                   << (*it)->getPropertyValue("firstName").first<< "\n";
       }
     }
+    LdbcFile.close();
 #endif
 
 ///already found all the paths, calculate weights now  
@@ -753,6 +785,7 @@ public:
 
 #ifdef _PRINTLDBC_
   LdbcFile << "weight " << Weight <<"\n";
+  LdbcFile.close();
 #endif
 
  }
