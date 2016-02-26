@@ -23,7 +23,7 @@
 #include <iostream>
 #include <queue>
 
-//#include "RecursiveDepthFirstSearch.h"
+#include "RecursiveDepthFirstSearch.h"
 #include "DepthFirstSearch.h"
 
 /// Test
@@ -34,7 +34,7 @@ using namespace std;
 class DFSVisitor : public Visitor {
 public:
   virtual bool visitVertex(VertexPointer VertexPtr) {
-    std::cout << VertexPtr->getId() << "=>" ;
+    std::cout << VertexPtr->getId() << " => " ;
     return false;
   }
 
@@ -46,14 +46,20 @@ int main() {
 
   Graph g;
   DFSVisitor v;
+  cout << "Create test graph g1\n";
+  createGraph(g);
   cout << "Begin testing\n";
-  GDBReader reader(g);
-  reader.readFile("../tests/gd/sndata.gd");
+  //  GDBReader reader(g);
+  //  reader.readFile("../tests/gd/sndata.gd");
 
   //createGraph(g);
   Graph::VertexPointer vp0 = g.getVertexPointer(0);
   cout << "DFS start: " << vp0 << "\n";
   depthFirstSearch(g, 0, v);
+  std::cout << "\n";
+
+  std::cout << "recursive DFS\n";
+  recursiveDepthFirstSearch(g, 0, v);
 
   return 0;
 }
