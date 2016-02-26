@@ -83,7 +83,7 @@ void recursiveDepthFirstSearch(GraphType & Graph,
     auto VisitedVertex = VisitedColor.find(TargetVertex);
     if ( VisitedVertex == VisitedColor.end() || RevisitFlag ) {
 //      std::cout << "Vertex " << TargetVertex->getId() << " comes to recursive\n";
-      if( TypeMatch) {
+      if( TypeMatch ) {
         recursiveDepthFirstSearch(Graph, TargetVertex->getId(), GraphVisitor, VisitedColor);
       }
     }
