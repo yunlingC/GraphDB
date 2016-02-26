@@ -86,10 +86,10 @@ void recursiveDepthFirstSearch(GraphType & Graph,
       if( TypeMatch) {
         recursiveDepthFirstSearch(Graph, TargetVertex->getId(), GraphVisitor, VisitedColor);
       }
-      else {
+    }
+    else {
       VisitedColor.insert(ColorMapPair(TargetVertex, true));
       bool RevisitMatch = GraphVisitor.revisitVertex(TargetVertex);
-      }
     }
   }
 };
