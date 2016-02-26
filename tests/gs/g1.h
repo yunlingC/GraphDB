@@ -5,7 +5,7 @@
 void createGraph(GraphType & g) {
   typedef GraphType Graph;
 
-  cout << "start adding vertices\n";
+  std::cout << "start adding vertices\n";
   Graph::VertexDescriptor v0 = g.addVertex();
   Graph::VertexDescriptor v1 = g.addVertex();
   Graph::VertexDescriptor v2 = g.addVertex();

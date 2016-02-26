@@ -18,6 +18,7 @@
 #include "macros.h"
 #include "GDBReader.h"
 #include "LinkedList.h"
+#include "Visitor.h"
 
 #include <iostream>
 #include <queue>
@@ -30,19 +31,29 @@
 
 using namespace std;
 
+class DFSVisitor : public Visitor {
+public:
+  virtual bool visitVertex(VertexPointer VertexPtr) {
+    std::cout << VertexPtr->getId() << "=>" ;
+    return false;
+  }
+
+};
+
 int main() {
 
   typedef GraphType Graph;
 
   Graph g;
+  DFSVisitor v;
   cout << "Begin testing\n";
   GDBReader reader(g);
   reader.readFile("../tests/gd/sndata.gd");
 
   //createGraph(g);
-  Graph::VertexPtr vp0 = g.getVertexPointer(0);
-  cout << "DFS start\n";
-  depthFirstSearch(g, 0);
+  Graph::VertexPointer vp0 = g.getVertexPointer(0);
+  cout << "DFS start: " << vp0 << "\n";
+  depthFirstSearch(g, 0, v);
 
   return 0;
 }
