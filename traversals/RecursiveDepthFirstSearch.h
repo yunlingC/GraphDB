@@ -18,7 +18,7 @@
 #include "GraphType.h"
 #include "Visitor.h"
 
-void recursiveDepthFirstSearch(GraphType & Graph,
+void recursiveDFS(GraphType & Graph,
 			       GraphType::VertexDescriptor VertexSourceId,
              Visitor & GraphVisitor, 
 			       std::map<GraphType::VertexPointer, bool> & VisitedColor) {
@@ -31,8 +31,7 @@ void recursiveDepthFirstSearch(GraphType & Graph,
   VisitedColor.insert(ColorMapPair(CurrentVertex, true));
 
   bool VertexMatch = GraphVisitor.visitVertex(CurrentVertex);
-  if (VertexMatch == true) {
-    ///should be exit here
+  if (VertexMatch == true) { ///should be exit here
     //return ;
     exit(0);
   }
@@ -58,7 +57,7 @@ void recursiveDepthFirstSearch(GraphType & Graph,
       GraphVisitor.scheduleTree(CurrentVertex, NextEdge, TargetVertex);
 
       if (TypeMatch && DirectionMatch) {
-        recursiveDepthFirstSearch(Graph, TargetVertex->getId(), 
+        recursiveDFS(Graph, TargetVertex->getId(), 
                                 GraphVisitor, VisitedColor);
       }
     }
@@ -77,7 +76,7 @@ void recursiveDepthFirstSearch(GraphType & Graph,
   ColorMap Color;
   
   GraphVisitor.visitStartVertex( Graph.getVertexPointer(StartVertex));
-  recursiveDepthFirstSearch(Graph, StartVertex, GraphVisitor, Color);
+  recursiveDFS(Graph, StartVertex, GraphVisitor, Color);
   GraphVisitor.finishVisit();
 };
 #endif /* _RECURSIVE_DEPTH_FIRST_SEARCH_H_ */
