@@ -40,8 +40,8 @@ public:
   typedef std::map<unsigned int, EdgeLock>    EdgeLockMapType;
   typedef std::pair<unsigned int, VertexLock> VLockPair;
   typedef std::pair<unsigned int, EdgeLock>   ELockPair;
-  typedef std::vector<pair<VertexPtr, pair<MutexType, LockType> > > VLockListType; 
-  typedef std::vector<pair<EdgePtr, pair<MutexType, LockType> > > ELockListType; 
+  typedef std::vector<std::pair<VertexPtr, std::pair<MutexType, LockType> > > VLockListType; 
+  typedef std::vector<std::pair<EdgePtr, std::pair<MutexType, LockType> > > ELockListType; 
 public:
 
 #ifndef _LOCKING_
@@ -189,9 +189,9 @@ public:
   auto releaseEdgeAll(ELockListType & EdgeLocks) 
     -> void {
     for (auto it = EdgeLocks.begin(), itend = EdgeLocks.end(); 
-        it != itend; ++it) {
+          it != itend; ++it) {
       releaseEdgeLock((*it).first, 
-          (*it).second.first, (*it).second.second);
+        (*it).second.first, (*it).second.second);
     }
   }
 

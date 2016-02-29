@@ -20,7 +20,7 @@
 #include <vector>
 
 /// Local includes.
-#include "util.h"
+//#include "util.h"
 #include "GraphType.h"
 #include "Visitor.h"
 #include "LocksManager.h"

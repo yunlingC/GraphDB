@@ -15,15 +15,16 @@
 #ifndef _LDBCQUERYDESCRIPTION_H_
 #define _LDBCQUERYDESCRIPTION_H_
 
+#include "LdbcCustomVisitor.h"
+#include "LdbcUpdateVisitor.h"
+//#include "BreadthFirstSearch.h"
+#include "ConcurrentBFS.h"
+#include "QueryDescription.h"
+
 #include <vector>
 #include <string>
 #include <time.h>
 #include <unordered_map>
-
-#include "LdbcCustomVisitor.h"
-//#include "LdbcUpdateVisitor.h"
-#include "BreadthFirstSearch.h"
-#include "QueryDescription.h"
 
 #define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
 #define MILLION 100000
@@ -32,28 +33,22 @@
 class LdbcQuery : public Query{
 public:
   typedef std::pair<std::string, std::string> ParamPairType;
-  typedef std::pair<std::string, std::pair<std::string, std::string> > RangePairType;
-//  typedef LocksManager LockManagerType;
+  typedef std::pair<std::string, pair<std::string, std::string> > RangePairType;
+  typedef LocksManager LockManagerType;
 public:
   LdbcQuery(unsigned int Id) : QueryId(Id) {
-    LdbcFile.open("ldbc"+std::to_string(Id)+".log", std::ios_base::out | 
-                   std::ios_base::app);
+    LdbcFile.open("ldbc"+std::to_string(Id)+".log", ios_base::out| ios_base::app);
   }
 
   virtual void runQuery(Graph & graph, VertexDescriptor StartVertex ) { }
 
-//  virtual void runQuery(Graph & graph, LockManagerType & LockManager) { }
+  virtual void runQuery(Graph & graph, LockManagerType & LockManager) { }
 
-  virtual void runQuery(Graph & graph) { }
+  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
+      LockManagerType & LockManager) {}
 
-//  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
-//      LockManagerType & LockManager) {}
-
-//  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
-//      VertexDescriptor EndVertex, LockManagerType & LockManager) {}
-
-  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex, 
-      VertexDescriptor EndVertex) {}
+  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
+      VertexDescriptor EndVertex, LockManagerType & LockManager) {}
 
   void setParam(const std::string & Key, const std::string & Value) {
     ParamPair.first = Key;
@@ -121,6 +116,33 @@ public:
   }
 protected:
   PropertyListType VertexPropertyList;
+};
+
+
+/// to return function pointer to pthread_create();
+/// pointer to non-static functions could NOT be functor for "this" pointer
+/// in member functions of class
+class QueryHelper {
+public:
+  typedef GraphType::VertexDescriptor Vertex;
+public:
+  QueryHelper(GraphType & graph, 
+            Vertex  StartV,
+            Vertex  EndV,
+            LocksManager &LockM,
+            LdbcQuery &query):
+            Graph (graph),
+            StartVertex(StartV),
+            EndVertex(EndV),
+            LockManager(LockM),
+            Query (query){}
+
+public:
+  GraphType &Graph;
+  Vertex StartVertex;
+  Vertex EndVertex;
+  LocksManager &LockManager;
+  LdbcQuery &Query;
 };
 
 

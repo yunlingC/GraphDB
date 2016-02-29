@@ -62,7 +62,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_P
 # Storage sub directory
 add_subdirectory(storage)
 set(TESTS 
-        main-mt-ldbc.cpp
         main-gdbench.cpp
         main-algo.cpp
         main-ldbc.cpp
