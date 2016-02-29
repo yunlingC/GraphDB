@@ -18,6 +18,7 @@
 #include "BreadthFirstSearch.h"
 #include "DepthFirstSearch.h"
 #include "CustomVisitor.h"
+#include "RecursiveDepthFirstSearch.h"
 
 #define _PRINTGDB_ 1
 
@@ -98,25 +99,27 @@ class Query1 : public Query {
 public:
  virtual void runQuery(Graph & graph, TraversalType c) {
     SelectionVisitor v1;
+    filtProperty(Key, Value, v1.getFilter());
+    traverseThroughType("FRIENDS", v1.getFilter());
     switch(c) {
       case 1:
-        filtProperty(Key, Value, v1.getFilter());
-        traverseThroughType("FRIENDS", v1.getFilter());
         breadthFirstSearch(graph, 0, v1 );
         break;
       case 2:
-        filtProperty(Key, Value, v1.getFilter());
-        traverseThroughType("FRIENDS", v1.getFilter());
         depthFirstSearch(graph, 0, v1);
         break;
+      case 3:
+        recursiveDepthFirstSearch(graph, 0, v1);
     }
 
 #ifdef _PRINTGDB_
     myfile << "Query 1\n";
     if(c == 1)
         myfile << "---------------------BFS---------------------\n";
-    else
+    else if (c == 2)
         myfile << "---------------------DFS---------------------\n";
+    else 
+        myfile << "----------------recursiveDFS-----------------\n";
     myfile <<"People with " << Key << " = " 
            << Value <<" is(are) as below\n";
     auto target = v1.getVertexList();

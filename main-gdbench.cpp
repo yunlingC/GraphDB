@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
     cout <<"query number is " << qid << endl;
     auto query = QueryList[qid-1];
 
-    query->runQuery(g, 2);
+    query->runQuery(g, 1);
 
   }
 
