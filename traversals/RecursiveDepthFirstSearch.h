@@ -31,9 +31,11 @@ void recursiveDepthFirstSearch(GraphType & Graph,
   VisitedColor.insert(ColorMapPair(CurrentVertex, true));
 
   bool VertexMatch = GraphVisitor.visitVertex(CurrentVertex);
-  if (VertexMatch == true)
-    return ;
-
+  if (VertexMatch == true) {
+    ///should be exit here
+    //return ;
+    exit(0);
+  }
   auto NextEdge = CurrentVertex->getNextEdge();
   while (NextEdge != nullptr) {
     GraphType::VertexPointer TargetVertex =
@@ -43,16 +45,21 @@ void recursiveDepthFirstSearch(GraphType & Graph,
 
     bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);
 
-    GraphVisitor.scheduleBranch(CurrentVertex, NextEdge, TargetVertex);
+    bool BranchMatch = GraphVisitor.scheduleBranch(CurrentVertex, NextEdge, TargetVertex);
     bool TypeMatch = GraphVisitor.scheduleEdge(NextEdge);
+    bool DirectionMatch = GraphVisitor.visitDirection(TargetVertex, NextEdge);
 
+    if (BranchMatch == true) {
+      return;
+    }
     // Get color and check if false.
-    auto VisitedVertex = VisitedColor.find(TargetVertex);
-    if (VisitedVertex == VisitedColor.end() || RevisitFlag) {
-      if (TypeMatch) {
+    if (VisitedColor.find(TargetVertex) == VisitedColor.end() || RevisitFlag) {
+
+      GraphVisitor.scheduleTree(CurrentVertex, NextEdge, TargetVertex);
+
+      if (TypeMatch && DirectionMatch) {
         recursiveDepthFirstSearch(Graph, TargetVertex->getId(), 
                                 GraphVisitor, VisitedColor);
-        VisitedColor.insert(ColorMapPair(TargetVertex, true));
       }
     }
     else {

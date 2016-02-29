@@ -43,7 +43,7 @@ void breadthFirstSearch(GraphType & Graph,
 
   GraphType::VertexPointer TargetVertex = nullptr;
 
-  while ( !VertexQueue.empty() ) {
+  while (!VertexQueue.empty()) {
     ScheduledVertex = VertexQueue.front();  VertexQueue.pop();
 
     bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
@@ -55,7 +55,7 @@ void breadthFirstSearch(GraphType & Graph,
 
     auto NextEdge = ScheduledVertex->getNextEdge();
 
-    while ( NextEdge != nullptr ) {                  
+    while (NextEdge != nullptr) {                  
       /// Get the target node.
       TargetVertex = NextEdge->getTarget(ScheduledVertex);     
       bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);             
@@ -68,7 +68,7 @@ void breadthFirstSearch(GraphType & Graph,
         return;
 
       if (ColorMap.find(TargetVertex) == ColorMap.end()|| RevisitFlag) {
-       	// Queue up the target for visitation
+       	/// Queue up the target for visitation
         GraphVisitor.scheduleTree(ScheduledVertex, NextEdge, TargetVertex);
 
         /// Determine whether the vertex to be visited based on the filters 
