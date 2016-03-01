@@ -226,25 +226,29 @@ class Query4 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
     SelectionVisitor  v4;
+    filtProperty(Key, Value, v4.getFilter());
+    traverseThroughType("FRIENDS", v4.getFilter());
     switch(Traversal) {
       case 1:
-        filtProperty(Key, Value, v4.getFilter());
-        traverseThroughType("FRIENDS", v4.getFilter());
         breadthFirstSearch(graph, 0, v4);
         break;
       case 2:
-        filtProperty(Key, Value, v4.getFilter());
-        traverseThroughType("FRIENDS", v4.getFilter());
         depthFirstSearch(graph, 0, v4);
+        break;
+      case 3:
+        recursiveDepthFirstSearch(graph, 0, v4);
         break;
     }
 
 #ifdef _PRINTGDB_
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 4\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
-    else
+    else if (Traversal == 2)
         GDFile << "---------------------DFS---------------------\n";
+    else 
+        GDFile << "----------------recursiveDFS-----------------\n";
     GDFile <<"People with " << Key << " = " << Value <<" is(are) as below\n";
     auto target = v4.getVertexList();
     for(auto it = target.begin(); it != target.end(); ++it) {
@@ -253,6 +257,7 @@ public:
              << (*it)->getPropertyValue(key).first;
       GDFile << "\n";
     }
+    GDFile.close();
 #endif
  }
 };
@@ -635,36 +640,45 @@ public:
 
 class Query12 : public Query {
 public:
- virtual void runQuery(Graph & graph, TraversalType Traversal ) {
-   std::vector<VertexPointer>  target;
+  virtual void runQuery(Graph & graph, TraversalType Traversal ) {
+    std::vector<VertexPointer>  target;
+    AdjacencyVisitor v12; 
+    traverseThroughTypeAndDirection("FRIENDS", "out", v12.getFilter());
     switch(Traversal) {
       case 1: {
-        AdjacencyVisitor v12b; 
-        traverseThroughTypeAndDirection("FRIENDS", "out", v12b.getFilter());
-        breadthFirstSearch(graph, PersonId, v12b);
-        target = v12b.getVertexList();
+        breadthFirstSearch(graph, PersonId, v12);
+        target = v12.getVertexList();
         break;
               }
       case 2: {
-        AdjacencyVisitor v12d; 
-        traverseThroughTypeAndDirection("FRIENDS", "out",  v12d.getFilter());
-        depthFirstSearch(graph, PersonId, v12d);
-        target = v12d.getVertexList();
+        depthFirstSearch(graph, PersonId, v12);
+        target = v12.getVertexList();
         break;
               }
+      case 3:
+        recursiveDepthFirstSearch(graph, PersonId, v12);
+        target = v12.getVertexList();
+        break;
+
     }
 #ifdef _PRINTGDB_
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 12\n";
-    if(Traversal == 1)
+    if (Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
-    else
+    else if (Traversal == 2)
         GDFile << "---------------------DFS---------------------\n";
+    else
+        GDFile << "----------------recursiveDFS-----------------\n";
+
     std::string key("name");
     GDFile << "Person with vid = " << PersonId << " has name: " 
            << graph.getVertexPointer(PersonId)->getPropertyValue(key).first 
            <<" and  " << target.size() << " friends\n";
     for (auto it = target.begin(); it != target.end(); it++)
       GDFile << "Vertex " << (*it)->getId() << "\n";
+    
+    GDFile.close();
 #endif
  }
 };
