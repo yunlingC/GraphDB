@@ -59,6 +59,13 @@ public:
     return false;
   }
 
+  ///for RecursiveDepthFirstSearch only
+  /// shoulb be built in another derived class
+  ///TODO
+  virtual bool checkVertex(VertexPointer VertexPtr) {
+    return false;
+  }
+
   virtual bool scheduleVertex(VertexPointer VertexPtr, EdgePointer EdgePtr) {
     return false;
   }

@@ -24,8 +24,7 @@
 
 #ifdef _PRINTGDB_
 #include <fstream>
-std::ofstream myfile("gd_execution.log", std::ios_base::out 
-                                       | std::ios_base::app);
+std::ofstream GDFile;
 #endif
 
 class Query {
@@ -39,7 +38,7 @@ public:
 public:
   Query() { }
   
-  virtual void runQuery(Graph & graph, TraversalType c) { }
+  virtual void runQuery(Graph & graph, TraversalType Traversal) { }
 
   void setPersonProperty(const KeyType & key, const ValueType & value) {
     Key = key;
@@ -69,9 +68,9 @@ protected:
 
 class Query14 : public Query {
 public:
- virtual void runQuery(Graph & graph, TraversalType c) {
+  virtual void runQuery(Graph & graph, TraversalType Traversal) {
     Visitor v1;
-    switch(c) {
+    switch(Traversal) {
       case 1:
         filtProperty(Key, Value, v1.getFilter());
         breadthFirstSearch(graph, 0, v1 );
@@ -83,12 +82,14 @@ public:
     }
 
 #ifdef _PRINTGDB_
-    myfile << "Query 14\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
-    else
-        myfile << "---------------------DFS---------------------\n";
-    myfile << "Traversal from vertex 0.\n";
+  GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
+  GDFile << "Query 14\n";
+  if(Traversal == 1)
+      GDFile << "---------------------BFS---------------------\n";
+  else
+      GDFile << "---------------------DFS---------------------\n";
+  GDFile << "Traversal from vertex 0.\n";
+  GDFile.close();
 #endif
  }
 
@@ -97,11 +98,11 @@ public:
 
 class Query1 : public Query {
 public:
- virtual void runQuery(Graph & graph, TraversalType c) {
+  virtual void runQuery(Graph & graph, TraversalType Traversal) {
     SelectionVisitor v1;
     filtProperty(Key, Value, v1.getFilter());
     traverseThroughType("FRIENDS", v1.getFilter());
-    switch(c) {
+    switch(Traversal) {
       case 1:
         breadthFirstSearch(graph, 0, v1 );
         break;
@@ -113,21 +114,23 @@ public:
     }
 
 #ifdef _PRINTGDB_
-    myfile << "Query 1\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
-    else if (c == 2)
-        myfile << "---------------------DFS---------------------\n";
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
+    GDFile << "Query 1\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
+    else if (Traversal == 2)
+        GDFile << "---------------------DFS---------------------\n";
     else 
-        myfile << "----------------recursiveDFS-----------------\n";
-    myfile <<"People with " << Key << " = " 
+        GDFile << "----------------recursiveDFS-----------------\n";
+    GDFile <<"People with " << Key << " = " 
            << Value <<" is(are) as below\n";
     auto target = v1.getVertexList();
     for(auto it = target.begin(); it != target.end(); ++it) {
-      myfile << "Vertex " << (*it)->getId();
-      myfile << "\n";
+      GDFile << "Vertex " << (*it)->getId();
+      GDFile << "\n";
     }
-    myfile << "\n";;
+    GDFile << "\n";;
+    GDFile.close();
 #endif
  }
 
@@ -136,35 +139,42 @@ public:
 
 class Query2 : public Query {
 public:
- virtual void runQuery(Graph & graph, TraversalType c) {
+  virtual void runQuery(Graph & graph, TraversalType Traversal) {
     AdjacencyVisitor v2; 
-    switch(c) {
+    traverseThroughTypeAndDirection("LIKES","in", v2.getFilter());
+    switch(Traversal) {
       case 1:
-        traverseThroughTypeAndDirection("LIKES","in", v2.getFilter());
         breadthFirstSearch(graph, WebId, v2);
         break;
       case 2:
-        traverseThroughTypeAndDirection("LIKES","in", v2.getFilter());
         depthFirstSearch(graph, WebId, v2);
+        break;
+      case 3:
+        recursiveDepthFirstSearch(graph,WebId, v2);
         break;
     }
 
 #ifdef _PRINTGDB_
-    myfile << "Query 2\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
-    else
-        myfile << "---------------------DFS---------------------\n";
-    myfile << "People who likes webpage id = " 
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
+    GDFile << "Query 2\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
+    else if (Traversal == 2)
+        GDFile << "---------------------DFS---------------------\n";
+    else 
+        GDFile << "----------------recursiveDFS-----------------\n";
+
+    GDFile << "People who likes webpage id = " 
            << WebId  << " are as below\n";
     auto target= v2.getVertexList();
     for(auto it = target.begin(); it != target.end(); ++it) {
       std::string key("name");
-      myfile << "Vertex " << (*it)->getId() <<"\t" 
+      GDFile << "Vertex " << (*it)->getId() <<"\t" 
              << (*it)->getPropertyValue(key).first;
-      myfile << "\n";
+      GDFile << "\n";
     }
-    myfile << "\n";
+    GDFile << "\n";
+    GDFile.close();
 #endif
  }
 };
@@ -172,43 +182,51 @@ public:
 
 class Query3 : public Query {
 public:
- virtual void runQuery(Graph & graph, TraversalType c ) {
+  virtual void runQuery(Graph & graph, TraversalType Traversal ) {
     AdjacencyVisitor v3; 
-    switch(c) {
+    traverseThroughType("LIKES", v3.getFilter());
+    switch(Traversal) {
       case 1:
-        traverseThroughType("LIKES", v3.getFilter());
         breadthFirstSearch(graph, PersonId, v3);
         break;
       case 2:
-        traverseThroughType("LIKES", v3.getFilter());
         depthFirstSearch(graph, PersonId, v3);
+        break;
+      case 3:
+        recursiveDepthFirstSearch(graph, PersonId, v3);
         break;
     }
 
 #ifdef _PRINTGDB_
-    myfile << "Query 3\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
+    GDFile << "Query 3\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
+    else if (Traversal == 2)
+        GDFile << "---------------------DFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile << "Person with vid = " << PersonId << " likes webpages:\n";
+        GDFile << "----------------recursiveDFS-----------------\n";
+
     auto target = v3.getVertexList();
+    GDFile << "Person with vid = " << PersonId << " likes webpages: " 
+           << target.size() <<" in totoal \n";
     for(auto it = target.begin(); it != target.end(); ++it) {
-      std::string key("wpurl");
-      myfile <<"Vertex " << (*it)->getId() << "\t"  
+      std::string key("URL");
+      GDFile <<"Vertex " << (*it)->getId() << "\t"  
              << (*it)->getPropertyValue(key).first;
-      myfile << "\n";
+      GDFile << "\n";
     }
-    myfile << "\n";
+    GDFile << "\n";
+    GDFile.close();
 #endif
  }
 };
 
 class Query4 : public Query {
 public:
-  virtual void runQuery(Graph & graph, TraversalType c) {
+  virtual void runQuery(Graph & graph, TraversalType Traversal) {
     SelectionVisitor  v4;
-    switch(c) {
+    switch(Traversal) {
       case 1:
         filtProperty(Key, Value, v4.getFilter());
         traverseThroughType("FRIENDS", v4.getFilter());
@@ -222,18 +240,18 @@ public:
     }
 
 #ifdef _PRINTGDB_
-    myfile << "Query 4\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+    GDFile << "Query 4\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile <<"People with " << Key << " = " << Value <<" is(are) as below\n";
+        GDFile << "---------------------DFS---------------------\n";
+    GDFile <<"People with " << Key << " = " << Value <<" is(are) as below\n";
     auto target = v4.getVertexList();
     for(auto it = target.begin(); it != target.end(); ++it) {
       std::string key("name");
-      myfile <<"Vertex " << (*it)->getId() << "\t" 
+      GDFile <<"Vertex " << (*it)->getId() << "\t" 
              << (*it)->getPropertyValue(key).first;
-      myfile << "\n";
+      GDFile << "\n";
     }
 #endif
  }
@@ -241,20 +259,20 @@ public:
 
 class Query5 : public Query {
 public:
-  virtual void runQuery(Graph & graph, TraversalType c ) {
+  virtual void runQuery(Graph & graph, TraversalType Traversal ) {
 
 #ifdef _PRINTGDB_
-    myfile << "Query 5\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+    GDFile << "Query 5\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile << "The friends of Person with vid = " << PersonId << " has friends\n";
+        GDFile << "---------------------DFS---------------------\n";
+    GDFile << "The friends of Person with vid = " << PersonId << " has friends\n";
 #endif
     FilterType tmpFilter[2];
     std::string key("name");
     std::vector<VertexPointer> target;
-    switch(c) {
+    switch(Traversal) {
       case 1: {
         traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
@@ -266,7 +284,7 @@ public:
 #ifdef _PRINTGDB_
         auto TargetSet = v5b.getTargetSet(); 
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
-          myfile <<"Vertex " << (*it)->getId() << "\t" 
+          GDFile <<"Vertex " << (*it)->getId() << "\t" 
                  << (*it)->getPropertyValue(key).first << "\n";
         }
 #endif
@@ -283,11 +301,11 @@ public:
         auto target = v5d.getVertexTargetMap();
 
 #ifdef _PRINTGDB_
-        myfile << "---------------------DFS---------------------\n";
+        GDFile << "---------------------DFS---------------------\n";
         for(auto it = target.begin(); it != target.end(); ++it) {
-          myfile <<"Vertex " << (*it).first->getId() << "\t" 
+          GDFile <<"Vertex " << (*it).first->getId() << "\t" 
                  << (*it).first->getPropertyValue(key).first;
-        myfile << "\n";
+        GDFile << "\n";
         }
 #endif
         break;
@@ -299,18 +317,18 @@ public:
 
 class Query6: public Query {
 public:
-  virtual void runQuery(Graph & graph, TraversalType c) {
+  virtual void runQuery(Graph & graph, TraversalType Traversal) {
 
 #ifdef _PRINTGDB_
-    myfile << "Query 6\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+    GDFile << "Query 6\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
+        GDFile << "---------------------DFS---------------------\n";
 #endif
     std::string key("wpurl");
     FilterType tmpFilter[2];
-    switch(c) {
+    switch(Traversal) {
       case 1: {
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
         traverseThroughTypeAndDirection("LIKES", "out", tmpFilter[1]);
@@ -322,10 +340,10 @@ public:
 
 #ifdef _PRINTGDB_
         auto TargetSet = v6b.getTargetSet(); 
-        myfile << "The friends of Person with vid = " << PersonId 
+        GDFile << "The friends of Person with vid = " << PersonId 
                << " like " << TargetSet.size() << " webpages\n";
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
-          myfile <<"Vertex " << (*it)->getId() << "\t" 
+          GDFile <<"Vertex " << (*it)->getId() << "\t" 
                  << (*it)->getPropertyValue(key).first << "\n";
         }
 #endif
@@ -342,12 +360,12 @@ public:
 
 #ifdef _PRINTGDB_
         auto target = v6d.getVertexTargetMap();
-        myfile << "The friends of Person with vid = " << PersonId 
+        GDFile << "The friends of Person with vid = " << PersonId 
                << " like " << target.size() << " webpages\n";
         for(auto it = target.begin(); it != target.end(); ++it) {
-          myfile <<"Vertex " << (*it).first->getId() << "\t" 
+          GDFile <<"Vertex " << (*it).first->getId() << "\t" 
                  << (*it).first->getPropertyValue(key).first;
-        myfile << "\n";
+        GDFile << "\n";
         }
 #endif
         break;
@@ -358,18 +376,18 @@ public:
 
 class Query7: public Query {
 public:
-  virtual void runQuery(Graph & graph, TraversalType c ) {
+  virtual void runQuery(Graph & graph, TraversalType Traversal ) {
 
 #ifdef _PRINTGDB_
-    myfile << "Query 7\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+    GDFile << "Query 7\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
+        GDFile << "---------------------DFS---------------------\n";
 #endif
     FilterType tmpFilter[2];
     std::string key("name");
-    switch(c) {
+    switch(Traversal) {
       case 1: {
         traverseThroughType("LIKES", tmpFilter[0]);
         traverseThroughType("LIKES", tmpFilter[1]);
@@ -381,10 +399,10 @@ public:
 
 #ifdef _PRINTGDB_
         auto TargetSet = v7b.getTargetSet(); 
-        myfile << "The webpages liked by person vid = " << PersonId 
+        GDFile << "The webpages liked by person vid = " << PersonId 
                << " are liked by " << TargetSet.size() << " people: \n";
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
-          myfile <<"Vertex " << (*it)->getId() << "\t" 
+          GDFile <<"Vertex " << (*it)->getId() << "\t" 
                  << (*it)->getPropertyValue(key).first << "\n";
         }
 #endif
@@ -401,12 +419,12 @@ public:
 
 #ifdef _PRINTGDB_
         auto target = v7d.getVertexTargetMap();
-        myfile << "The webpages liked by person vid = " << PersonId 
+        GDFile << "The webpages liked by person vid = " << PersonId 
                << " are liked by  " << target.size() << " people\n";
         for(auto it = target.begin(); it != target.end(); ++it) {
-          myfile <<"Vertex " << (*it).first->getId() << "\t" 
+          GDFile <<"Vertex " << (*it).first->getId() << "\t" 
                  << (*it).first->getPropertyValue(key).first;
-          myfile << "\n";
+          GDFile << "\n";
         }
 #endif
         break;
@@ -418,16 +436,16 @@ public:
 
 class Query8 : public Query {
 public:
-  virtual void runQuery(Graph & graph, TraversalType c) {
+  virtual void runQuery(Graph & graph, TraversalType Traversal) {
 
 #ifdef _PRINTGDB_
-    myfile << "Query 8\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+    GDFile << "Query 8\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
+        GDFile << "---------------------DFS---------------------\n";
 #endif
-    switch(c) {
+    switch(Traversal) {
       case 1: {
         PathVisitor v8b;
         v8b.setEndVertex(PersonId2);
@@ -435,9 +453,9 @@ public:
 #ifdef _PRINTGDB_
         auto target = v8b.getVertexList();
         if(!target.empty())
-          myfile << "There is path from " << PersonId1 << " to " <<  PersonId2 << "\n";
+          GDFile << "There is path from " << PersonId1 << " to " <<  PersonId2 << "\n";
         else 
-          myfile << PersonId1 << " and " <<  PersonId2 <<" are not connected" << "\n";
+          GDFile << PersonId1 << " and " <<  PersonId2 <<" are not connected" << "\n";
 #endif
         break;
               }
@@ -448,9 +466,9 @@ public:
 #ifdef _PRINTGDB_
         auto target = v8d.getPathList();
         if(!target.empty())
-          myfile << "There is path from " << PersonId1 << " to " <<  PersonId2 << "\n";
+          GDFile << "There is path from " << PersonId1 << " to " <<  PersonId2 << "\n";
         else 
-          myfile << PersonId1 << " and " <<  PersonId2 <<" are not connected" << "\n";
+          GDFile << PersonId1 << " and " <<  PersonId2 <<" are not connected" << "\n";
 #endif
         break;
               }
@@ -460,17 +478,17 @@ public:
 
 class Query9: public Query {
 public:
-  virtual void runQuery(Graph & graph, TraversalType c ) {
+  virtual void runQuery(Graph & graph, TraversalType Traversal ) {
 #ifdef _PRINTGDB_
-    myfile << "Query 9\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+    GDFile << "Query 9\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
+        GDFile << "---------------------DFS---------------------\n";
 #endif
     //PathVisitor v9;
     //v9.setEndVertex(PersonId2);
-    switch(c) {
+    switch(Traversal) {
       case 1: {
         PathVisitor v9b;
         v9b.setEndVertex(PersonId2);
@@ -478,12 +496,12 @@ public:
 #ifdef _PRINTGDB_
         auto target = v9b.getVertexList();
         if(target.empty())
-          myfile << PersonId1 << " and " <<  PersonId2 <<" are not connected" << "\n";
+          GDFile << PersonId1 << " and " <<  PersonId2 <<" are not connected" << "\n";
         else {
-            myfile << "There are  shortest paths from " << PersonId1 
+            GDFile << "There are  shortest paths from " << PersonId1 
                    << " to " <<  PersonId2 << "\n";
           for(auto it = target.begin(); it != target.end(); ++it) {
-            myfile <<"Vertex " << (*it)->getId() << "\n";
+            GDFile <<"Vertex " << (*it)->getId() << "\n";
           }
         }
 #endif
@@ -496,14 +514,14 @@ public:
 #ifdef _PRINTGDB_
         auto target = v9d.getPathList();
         if(target.empty())
-          myfile << PersonId1 << " and " <<  PersonId2 <<" are not connected" << "\n";
+          GDFile << PersonId1 << " and " <<  PersonId2 <<" are not connected" << "\n";
         else {
-          myfile << "There are " << target.size() << " shortest paths from " 
+          GDFile << "There are " << target.size() << " shortest paths from " 
                  << PersonId1 << " to " <<  PersonId2 << "\n";
           for(auto it = target.begin(); it != target.end(); ++it) {
             for (auto iter = (*it).second.begin(); iter != (*it).second.end(); ++iter)
-              myfile <<"Vertex " << (*iter)->getId() << "\n";
-          myfile << "\n";
+              GDFile <<"Vertex " << (*iter)->getId() << "\n";
+          GDFile << "\n";
          }
        }
 #endif
@@ -515,11 +533,11 @@ public:
 
 class Query10 : public Query {
 public:
-  virtual void runQuery(Graph & graph, TraversalType c ) { 
+  virtual void runQuery(Graph & graph, TraversalType Traversal ) { 
     FilterType tmpFilter[2];
     std::string key("name");
     std::vector<VertexPointer> target;
-    switch(c) {
+    switch(Traversal) {
       case 1: {
         traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
         traverseThroughTypeAndDirection("FRIENDS", "in", tmpFilter[1]);
@@ -546,17 +564,17 @@ public:
               }
     }
 #ifdef _PRINTGDB_
-    myfile << "Query 10\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+    GDFile << "Query 10\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile << "There are " << target.size() << " common friends between  " 
+        GDFile << "---------------------DFS---------------------\n";
+    GDFile << "There are " << target.size() << " common friends between  " 
            << PersonId1 << " and " <<  PersonId2 << "\n";
     for(auto it = target.begin(); it != target.end(); ++it) {
-      myfile << "Vertex " << (*it)->getId() << "\t" 
+      GDFile << "Vertex " << (*it)->getId() << "\t" 
              << (*it)->getPropertyValue(key).first;
-    myfile << "\n";
+    GDFile << "\n";
     }
 #endif
   }
@@ -565,11 +583,11 @@ public:
 
 class Query11: public Query {
 public:
-  virtual void runQuery(Graph & graph, TraversalType c) {
+  virtual void runQuery(Graph & graph, TraversalType Traversal) {
     FilterType tmpFilter[2];
     std::string key("name");
     std::vector<VertexPointer> target;
-    switch(c) {
+    switch(Traversal) {
       case 1: {
         traverseThroughTypeAndDirection("LIKES", "out",  tmpFilter[0]);
         traverseThroughTypeAndDirection("LIKES", "in",   tmpFilter[1]);
@@ -596,19 +614,19 @@ public:
               }
     }
 #ifdef _PRINTGDB_
-    myfile << "Query 11\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+    GDFile << "Query 11\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
-    myfile << "There are " << target.size() 
+        GDFile << "---------------------DFS---------------------\n";
+    GDFile << "There are " << target.size() 
            << " common webpages liked by both " 
            << PersonId1 << " and " <<  PersonId2 << "\n";
     for(auto it = target.begin(); it != target.end(); ++it) {
       std::string key("wpurl");
-      myfile << "Vertex " << (*it)->getId() << "\t" 
+      GDFile << "Vertex " << (*it)->getId() << "\t" 
              << (*it)->getPropertyValue(key).first;
-      myfile << "\n";
+      GDFile << "\n";
     }
 #endif
 
@@ -617,9 +635,9 @@ public:
 
 class Query12 : public Query {
 public:
- virtual void runQuery(Graph & graph, TraversalType c ) {
+ virtual void runQuery(Graph & graph, TraversalType Traversal ) {
    std::vector<VertexPointer>  target;
-    switch(c) {
+    switch(Traversal) {
       case 1: {
         AdjacencyVisitor v12b; 
         traverseThroughTypeAndDirection("FRIENDS", "out", v12b.getFilter());
@@ -636,34 +654,34 @@ public:
               }
     }
 #ifdef _PRINTGDB_
-    myfile << "Query 12\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+    GDFile << "Query 12\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
+        GDFile << "---------------------DFS---------------------\n";
     std::string key("name");
-    myfile << "Person with vid = " << PersonId << " has name: " 
+    GDFile << "Person with vid = " << PersonId << " has name: " 
            << graph.getVertexPointer(PersonId)->getPropertyValue(key).first 
            <<" and  " << target.size() << " friends\n";
     for (auto it = target.begin(); it != target.end(); it++)
-      myfile << "Vertex " << (*it)->getId() << "\n";
+      GDFile << "Vertex " << (*it)->getId() << "\n";
 #endif
  }
 };
 
 class Query13: public Query {
 public:
-  virtual void runQuery(Graph & graph, TraversalType c ) {
+  virtual void runQuery(Graph & graph, TraversalType Traversal ) {
 #ifdef _PRINTGDB_
-    myfile << "Query 13\n";
-    if(c == 1)
-        myfile << "---------------------BFS---------------------\n";
+    GDFile << "Query 13\n";
+    if(Traversal == 1)
+        GDFile << "---------------------BFS---------------------\n";
     else
-        myfile << "---------------------DFS---------------------\n";
+        GDFile << "---------------------DFS---------------------\n";
 #endif
     FilterType tmpFilter[3];
     std::string key("name");
-    switch(c) {
+    switch(Traversal) {
       case 1: {
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
         traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
@@ -676,10 +694,10 @@ public:
         breadthFirstSearch(graph, PersonId, v13b);
 #ifdef _PRINTGDB_
         auto TargetSet = v13b.getTargetSet(); 
-        myfile << "The friends of friends of person vid = " << PersonId 
+        GDFile << "The friends of friends of person vid = " << PersonId 
                << " has " << TargetSet.size() << " friends: \n";
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
-          myfile <<"Vertex " << (*it)->getId() << "\t" 
+          GDFile <<"Vertex " << (*it)->getId() << "\t" 
                 << (*it)->getPropertyValue(key).first << "\n";
         }
 #endif
@@ -697,13 +715,13 @@ public:
         depthFirstSearch(graph, PersonId, v13d);
 #ifdef _PRINTGDB_
         auto target = v13d.getVertexTargetMap();
-        myfile << "The friends of friends of person vid = " << PersonId 
+        GDFile << "The friends of friends of person vid = " << PersonId 
                << " has " << target.size() << " friends: \n";
         for(auto it = target.begin(); it != target.end(); ++it) {
         if( (*it).first->getId() != PersonId ) {
-        myfile << "Vertex " << (*it).first->getId() << "\t"  
+        GDFile << "Vertex " << (*it).first->getId() << "\t"  
                << (*it).first->getPropertyValue(key).first;
-      myfile << "\n";
+        GDFile << "\n";
         }
       }
 #endif

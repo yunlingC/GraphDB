@@ -31,10 +31,16 @@ void recursiveDFS(GraphType & Graph,
   VisitedColor.insert(ColorMapPair(CurrentVertex, true));
 
   bool VertexMatch = GraphVisitor.visitVertex(CurrentVertex);
-  if (VertexMatch == true) { ///should be exit here
-    //return ;
+  if (VertexMatch == true) { 
+    return ;
+  }
+
+  bool ExitMatch = GraphVisitor.checkVertex(CurrentVertex);
+  if (ExitMatch == true) { 
+    ///should be exit here
     exit(0);
   }
+
   auto NextEdge = CurrentVertex->getNextEdge();
   while (NextEdge != nullptr) {
     GraphType::VertexPointer TargetVertex =

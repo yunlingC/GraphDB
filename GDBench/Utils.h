@@ -90,6 +90,7 @@ bool TerminateAtVertex(unsigned int targetNum, VertexTargetSet vertexSet) {
 }
 
 /// compute and return the depth for second
+/// also show the most depth for the second
 unsigned int computeDepth(VertexPointer first, 
                           EdgePointer ep, 
                           VertexPointer second, 

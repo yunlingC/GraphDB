@@ -56,7 +56,10 @@ int main(int argc, char *argv[]) {
 
 
   if(argc < 3) {
-    cout <<"Error: At least 2 arguments\n";
+    cout <<"Error: At least 3 arguments\n";
+    cout <<" 1. query number \n"
+         <<" 2. parameter #  \n"
+         <<" 3. traversal    \n";
     return 1;
   } else {
     string name, pid;
@@ -194,10 +197,16 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    auto traversal = atoi(argv[3]);
+    if (traversal !=1 && traversal !=2 && traversal !=3) {
+      cout << " no way to traversing \n";
+      return 1;
+    }
+
     cout <<"query number is " << qid << endl;
     auto query = QueryList[qid-1];
 
-    query->runQuery(g, 1);
+    query->runQuery(g, traversal);
 
   }
 
