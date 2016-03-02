@@ -133,11 +133,13 @@ void recordDepth(VertexPointer first,
     for( auto it = dl.equal_range(first).first; it != dl.equal_range(first).second; ++it ) {
         depth = (*it).second + 1;
         unsigned int unique = true;
-        if(dl.count(second) != 0)
-        for(auto iter = dl.equal_range(second).first; iter != dl.equal_range(second).second; ++iter) {
-          if((*iter).second == depth) {
-            unique = false;
-            break;
+        if(dl.count(second) != 0) {
+          auto iter_end = dl.equal_range(second).second;
+          for(auto iter = dl.equal_range(second).first; iter != iter_end; ++iter) {
+            if((*iter).second == depth) {
+              unique = false;
+              break;
+            }
           }
         }
           if(unique == true) {

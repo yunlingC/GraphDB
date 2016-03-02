@@ -391,11 +391,12 @@ public:
 
   virtual bool visitVertex(VertexPointer vertex) {
     if (checkMaxDepth(DepthList) >= DepthSetting) {
-     for (auto it = DepthList.begin(); it != DepthList.end(); ++it ) {
-       if ((*it).second == DepthSetting) {
-         VertexList.insert(VertexTargetPair((*it).first, true));
-       }
-     }
+      auto it_end = DepthList.end();
+      for (auto it = DepthList.begin(); it != it_end; ++it ) {
+        if ((*it).second == DepthSetting) {
+          VertexList.insert(VertexTargetPair((*it).first, true));
+        }
+      }
     }
     return false;
   }
@@ -407,7 +408,7 @@ public:
     TypeMatch = false;
     DirectionMatch = false;
 
-    /// TODO I forgot what I was doing here, add comments later
+    /// TODO Forgot what I was doing here, add comments later
     for (auto it = DepthList.equal_range(first).first; 
         it != DepthList.equal_range(first).second; ++it) {
       if ((*it).first == first) {
