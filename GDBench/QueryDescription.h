@@ -18,6 +18,7 @@
 #include "BreadthFirstSearch.h"
 #include "DepthFirstSearch.h"
 #include "CustomVisitor.h"
+#include "RecursiveDFSCustomVisitor.h"
 #include "RecursiveDepthFirstSearch.h"
 
 #define _PRINTGDB_ 1
@@ -86,8 +87,10 @@ public:
   GDFile << "Query 14\n";
   if(Traversal == 1)
       GDFile << "---------------------BFS---------------------\n";
-  else
-      GDFile << "---------------------DFS---------------------\n";
+   else if (Traversal == 2)
+       GDFile << "---------------------DFS---------------------\n";
+   else
+       GDFile << "----------------recursiveDFS-----------------\n";
   GDFile << "Traversal from vertex 0.\n";
   GDFile.close();
 #endif
@@ -200,7 +203,7 @@ public:
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 3\n";
-    if(Traversal == 1)
+    if (Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
     else if (Traversal == 2)
         GDFile << "---------------------DFS---------------------\n";
@@ -267,20 +270,22 @@ public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
 
 #ifdef _PRINTGDB_
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 5\n";
-    if(Traversal == 1)
+    if (Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
+    else if (Traversal == 2)
+       GDFile << "----------------------DFS---------------------\n";
     else
-        GDFile << "---------------------DFS---------------------\n";
-    GDFile << "The friends of Person with vid = " << PersonId << " has friends\n";
+       GDFile << "-----------------recursiveDFS-----------------\n";
 #endif
     FilterType tmpFilter[2];
     std::string key("name");
     std::vector<VertexPointer> target;
+    traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
+    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
     switch(Traversal) {
       case 1: {
-        traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
-        traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
         ReachabilityVisitor  v5b;
         v5b.setFilter(tmpFilter[0]);
         v5b.setFilter(tmpFilter[1]);
@@ -288,30 +293,51 @@ public:
         breadthFirstSearch(graph, PersonId, v5b);
 #ifdef _PRINTGDB_
         auto TargetSet = v5b.getTargetSet(); 
+        GDFile << "The friends of Person with vid = " << PersonId 
+               << " has friends " << TargetSet.size() << " in total\n";
         for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
           GDFile <<"Vertex " << (*it)->getId() << "\t" 
                  << (*it)->getPropertyValue(key).first << "\n";
         }
+        GDFile.close();
 #endif
         break;
               }
       case 2: {
-        traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
-        traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
         DFSReachabilityVisitor v5d;
         v5d.setFilter(tmpFilter[0]);
         v5d.setFilter(tmpFilter[1]);
         v5d.setDepth(2);
         depthFirstSearch(graph, PersonId, v5d);
-        auto target = v5d.getVertexTargetMap();
-
 #ifdef _PRINTGDB_
-        GDFile << "---------------------DFS---------------------\n";
+        auto target = v5d.getVertexTargetMap();
+        GDFile << "The friends of Person with vid = " << PersonId 
+              << " has friends " << target.size() << " in total\n";
         for(auto it = target.begin(); it != target.end(); ++it) {
           GDFile <<"Vertex " << (*it).first->getId() << "\t" 
                  << (*it).first->getPropertyValue(key).first;
-        GDFile << "\n";
+          GDFile << "\n";
         }
+        GDFile.close();
+#endif
+        break;
+              }
+      case 3: {
+        RecursiveDFSReachabilityVisitor v5r;
+        v5r.setFilter(tmpFilter[0]);
+        v5r.setFilter(tmpFilter[1]);
+        v5r.setDepth(2);
+        recursiveDepthFirstSearch(graph, PersonId, v5r);
+#ifdef _PRINTGDB_
+        auto target = v5r.getTargetSet();
+        GDFile << "The friends of Person with vid = " << PersonId 
+              << " has friends " << target.size() <<" in total\n";
+        for(auto it = target.begin(); it != target.end(); ++it) {
+          GDFile <<"Vertex " << (*it)->getId() << "\t" 
+                 << (*it)->getPropertyValue(key).first;
+          GDFile << "\n";
+        }
+        GDFile.close();
 #endif
         break;
               }
@@ -325,18 +351,21 @@ public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
 
 #ifdef _PRINTGDB_
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 6\n";
     if(Traversal == 1)
-        GDFile << "---------------------BFS---------------------\n";
+      GDFile << "---------------------BFS---------------------\n";
+    else if (Traversal == 2)
+      GDFile << "---------------------DFS---------------------\n";
     else
-        GDFile << "---------------------DFS---------------------\n";
+      GDFile << "----------------recursiveDFS-----------------\n";
 #endif
-    std::string key("wpurl");
+    std::string key("URL");
     FilterType tmpFilter[2];
+    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
+    traverseThroughTypeAndDirection("LIKES", "out", tmpFilter[1]);
     switch(Traversal) {
       case 1: {
-        traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
-        traverseThroughTypeAndDirection("LIKES", "out", tmpFilter[1]);
         ReachabilityVisitor  v6b;
         v6b.setFilter(tmpFilter[0]);
         v6b.setFilter(tmpFilter[1]);
@@ -351,12 +380,11 @@ public:
           GDFile <<"Vertex " << (*it)->getId() << "\t" 
                  << (*it)->getPropertyValue(key).first << "\n";
         }
+        GDFile.close();
 #endif
         break;
               }
       case 2: {
-        traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
-        traverseThroughTypeAndDirection("LIKES", "out", tmpFilter[1]);
         DFSReachabilityVisitor v6d;
         v6d.setFilter(tmpFilter[0]);
         v6d.setFilter(tmpFilter[1]);
@@ -372,6 +400,28 @@ public:
                  << (*it).first->getPropertyValue(key).first;
         GDFile << "\n";
         }
+        GDFile.close();
+#endif
+        break;
+              }
+
+      case 3: {
+        RecursiveDFSReachabilityVisitor v6r;
+        v6r.setFilter(tmpFilter[0]);
+        v6r.setFilter(tmpFilter[1]);
+        v6r.setDepth(2);
+        recursiveDepthFirstSearch(graph, PersonId, v6r);
+
+#ifdef _PRINTGDB_
+        auto target = v6r.getTargetSet();
+        GDFile << "The friends of Person with vid = " << PersonId 
+               << " like " << target.size() << " webpages\n";
+        for(auto it = target.begin(); it != target.end(); ++it) {
+          GDFile <<"Vertex " << (*it)->getId() << "\t" 
+                 << (*it)->getPropertyValue(key).first;
+        GDFile << "\n";
+        }
+        GDFile.close();
 #endif
         break;
               }
@@ -384,18 +434,24 @@ public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
 
 #ifdef _PRINTGDB_
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 7\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
+    else if (Traversal == 2)
+       GDFile << "---------------------DFS---------------------\n";
     else
-        GDFile << "---------------------DFS---------------------\n";
+       GDFile << "----------------recursiveDFS-----------------\n";
 #endif
+
     FilterType tmpFilter[2];
     std::string key("name");
+//    traverseThroughType("LIKES", tmpFilter[0]);
+//    traverseThroughType("LIKES", tmpFilter[1]);
+    traverseThroughTypeAndDirection("LIKES", "out", tmpFilter[0]);
+    traverseThroughTypeAndDirection("LIKES", "in", tmpFilter[1]);
     switch(Traversal) {
       case 1: {
-        traverseThroughType("LIKES", tmpFilter[0]);
-        traverseThroughType("LIKES", tmpFilter[1]);
         ReachabilityVisitor  v7b;
         v7b.setFilter(tmpFilter[0]);
         v7b.setFilter(tmpFilter[1]);
@@ -410,12 +466,11 @@ public:
           GDFile <<"Vertex " << (*it)->getId() << "\t" 
                  << (*it)->getPropertyValue(key).first << "\n";
         }
+        GDFile.close();
 #endif
         break;
               }
       case 2: {
-        traverseThroughType("LIKES", tmpFilter[0]);
-        traverseThroughType("LIKES", tmpFilter[1]);
         DFSReachabilityVisitor v7d;
         v7d.setFilter(tmpFilter[0]);
         v7d.setFilter(tmpFilter[1]);
@@ -431,6 +486,28 @@ public:
                  << (*it).first->getPropertyValue(key).first;
           GDFile << "\n";
         }
+        GDFile.close();
+#endif
+        break;
+              }
+
+      case 3: {
+        RecursiveDFSReachabilityVisitor v7r;
+        v7r.setFilter(tmpFilter[0]);
+        v7r.setFilter(tmpFilter[1]);
+        v7r.setDepth(2);
+        recursiveDepthFirstSearch(graph, PersonId, v7r);
+
+#ifdef _PRINTGDB_
+        auto target = v7r.getTargetSet();
+        GDFile << "The webpages liked by person vid = " << PersonId 
+               << " are liked by  " << target.size() << " people\n";
+        for (auto it = target.begin(); it != target.end(); ++it) {
+          GDFile <<"Vertex " << (*it)->getId() << "\t" 
+                 << (*it)->getPropertyValue(key).first;
+          GDFile << "\n";
+        }
+        GDFile.close();
 #endif
         break;
               }
@@ -447,8 +524,10 @@ public:
     GDFile << "Query 8\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
-    else
+    else if (Traversal == 2)
         GDFile << "---------------------DFS---------------------\n";
+    else
+        GDFile << "----------------recursiveDFS-----------------\n";
 #endif
     switch(Traversal) {
       case 1: {
@@ -488,8 +567,10 @@ public:
     GDFile << "Query 9\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
-    else
+    else if (Traversal == 2)
         GDFile << "---------------------DFS---------------------\n";
+    else
+        GDFile << "----------------recursiveDFS-----------------\n";
 #endif
     //PathVisitor v9;
     //v9.setEndVertex(PersonId2);
@@ -572,8 +653,10 @@ public:
     GDFile << "Query 10\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
-    else
+    else if (Traversal == 2)
         GDFile << "---------------------DFS---------------------\n";
+    else
+        GDFile << "----------------recursiveDFS-----------------\n";
     GDFile << "There are " << target.size() << " common friends between  " 
            << PersonId1 << " and " <<  PersonId2 << "\n";
     for(auto it = target.begin(); it != target.end(); ++it) {
@@ -622,13 +705,15 @@ public:
     GDFile << "Query 11\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
-    else
+    else if (Traversal == 2)
         GDFile << "---------------------DFS---------------------\n";
+    else
+        GDFile << "----------------recursiveDFS-----------------\n";
     GDFile << "There are " << target.size() 
            << " common webpages liked by both " 
            << PersonId1 << " and " <<  PersonId2 << "\n";
     for(auto it = target.begin(); it != target.end(); ++it) {
-      std::string key("wpurl");
+      std::string key("URL");
       GDFile << "Vertex " << (*it)->getId() << "\t" 
              << (*it)->getPropertyValue(key).first;
       GDFile << "\n";
@@ -690,8 +775,10 @@ public:
     GDFile << "Query 13\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
-    else
+    else if (Traversal == 2)
         GDFile << "---------------------DFS---------------------\n";
+    else
+        GDFile << "----------------recursiveDFS-----------------\n";
 #endif
     FilterType tmpFilter[3];
     std::string key("name");

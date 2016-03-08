@@ -18,7 +18,12 @@
 
 #include <queue>
 #include <set>
+
+#define _PRINTGDB_ 1
+
+#ifdef _PRINTGDB_
 #include <iostream>
+#endif /*_PRINTGDB*/
 
 /// just for address distribution analysis
 class AddressVisitor : public Visitor {
@@ -163,7 +168,7 @@ public:
    Limiting the depth to explore in the graph could be a way to avoid the loop
   */
   virtual bool discoverVertex(VertexPointer Vertex) {
-    return true;
+    return false;
   }
 
   virtual bool visitVertex(VertexPointer Vertex) {
@@ -199,10 +204,12 @@ public:
     }
 
     FilterType filter;
-    if (DepthSecond > 0)
+    if (DepthSecond > 0) {
       filter = FilterList[DepthSecond-1];
-    else
+    }
+    else {
       filter.setDefault();
+    }
    
     TypeMatch = checkType(edge, filter);
     DirectionMatch = checkDirection(second, edge, filter);
@@ -215,8 +222,8 @@ public:
   }
 
 protected:
-  unsigned int  TypeMatch;
-  unsigned int  DirectionMatch;
+  bool TypeMatch;
+  bool DirectionMatch;
   unsigned int  DepthSetting;
   std::vector<FilterType> FilterList;
   VertexPath   PrevPath;
@@ -297,8 +304,10 @@ public:
     PrevPath = PathQueue.front();
     PathQueue.pop();
     if (PrevPath.size() > DepthSetting) {
-      if (PrevPath.at(DepthSetting)->getId() == EndVertex) 
+      if (PrevPath.at(DepthSetting)->getId() == EndVertex){
+        /// The common friend node is the second one in the path 
         VertexSet.insert(PrevPath.at(1));
+      }
       while (!PathQueue.empty()) {
         auto path = PathQueue.front(); PathQueue.pop();
         if (path.at(DepthSetting)->getId() == EndVertex) {
@@ -389,15 +398,13 @@ public:
     DepthSetting = depth;
   }
 
+  virtual bool discoverVertex(VertexPointer Vertex) {
+    /// This should be set as true, i.e. in default, revisit 
+    /// should be allowed.
+    return true;
+  }
+
   virtual bool visitVertex(VertexPointer vertex) {
-    if (checkMaxDepth(DepthList) >= DepthSetting) {
-      auto it_end = DepthList.end();
-      for (auto it = DepthList.begin(); it != it_end; ++it ) {
-        if ((*it).second == DepthSetting) {
-          VertexList.insert(VertexTargetPair((*it).first, true));
-        }
-      }
-    }
     return false;
   }
 
@@ -408,18 +415,16 @@ public:
     TypeMatch = false;
     DirectionMatch = false;
 
-    /// TODO Forgot what I was doing here, add comments later
     for (auto it = DepthList.equal_range(first).first; 
-        it != DepthList.equal_range(first).second; ++it) {
-      if ((*it).first == first) {
-        if ((*it).second < DepthSetting) {
-          FilterType filter = FilterList[(*it).second];
-          if (DepthList.count(second) <= DepthSetting) {
-            TypeMatch = checkType(edge, filter);
-            DirectionMatch = checkDirection(second, edge, filter);
-            if (TypeMatch && DirectionMatch)
-              recordDepth(first, edge, second, DepthList);
-          } //end if 
+      it != DepthList.equal_range(first).second; ++it) {
+      if ((*it).second < DepthSetting) {
+        FilterType filter = FilterList[(*it).second];
+        if (DepthList.count(second) < DepthSetting) {
+          TypeMatch = checkType(edge, filter);
+          DirectionMatch = checkDirection(second, edge, filter);
+          if (TypeMatch && DirectionMatch) {
+            recordDepth(first, edge, second, DepthList);
+          }
         }
       }
     }
@@ -433,6 +438,16 @@ public:
 
   virtual bool scheduleEdge(EdgePointer edge) {
     return TypeMatch;
+  }
+
+  virtual bool finishVisit() {
+    auto it_end = DepthList.end();
+    for (auto it = DepthList.begin(); it != it_end; ++it ) {
+      if ((*it).second == DepthSetting) {
+        VertexList.insert(VertexTargetPair((*it).first, true));
+      }
+    }
+    return  false;
   }
 
 protected:
@@ -486,6 +501,8 @@ public:
   }
 
   virtual bool discoverVertex(VertexPointer vertex) {
+    /// Revisit should NOT be allowed since we only explore 3 hops
+    /// Only the start vertex can possibly revisit, which is not a desired result.
     return true; 
   }
 
@@ -578,7 +595,8 @@ public:
     PrevPath = PathStack.back();
     PathStack.pop_back();
     if (PrevPath.size() >=  TempMinDepth) {
-      TurnFlag = true; //prune not to go on with this branch
+      /// prune not to go on with this branch
+      TurnFlag = true; 
     } else 
       TurnFlag = false;
     return false;
