@@ -17,6 +17,31 @@ public:
   typedef  std::pair<VertexDescriptor, EdgeList> Element;
   typedef  std::map<VertexDescriptor, EdgeList> AdjacencyListContainer;
 
+
+  
+  struct Debug {
+
+    typedef std::list<VertexDescriptor> ListType;
+    typedef std::_List_node<VertexDescriptor> _Node;
+    typedef std::_List_iterator<VertexDescriptor> InternalListIterator;
+
+    void dumpNext(EdgeList& Edges) {
+      ListType::iterator ListIt = Edges.begin();
+      if (ListIt == Edges.end()) {
+        return;
+      }
+      
+      InternalListIterator* bit = &ListIt;
+
+      /// Cast it to a pointer to the internal _Node type. 
+      InternalListIterator::_Node* bn =static_cast<InternalListIterator::_Node*>(bit->_M_node) ;
+      std::cout << "# data: " << bn->_M_data << ", from cast: " << **bit << std::endl;
+      std::cout << "# next data (using ptr): "<< static_cast< _Node* >(bn->_M_next)->_M_data << std::endl;
+
+
+    };
+  };
+
 public:
   AdjacencyList() {
 
@@ -65,6 +90,9 @@ public:
         std::cout << Target << ", ";
       }
       std::cout << "\n";
+
+      Debug DB;
+      DB.dumpNext(Edges);
     }
   }
 
