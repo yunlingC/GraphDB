@@ -27,7 +27,6 @@
 *.out
 *.app
 
-# -*- mode: gitignore; -*-
 *~
 \#*\#
 /.emacs.desktop
@@ -38,3 +37,9 @@ tramp
 .\#*
 
 t/
+
+# Ignore pybuild
+
+.pybind
+
+# -*- mode: gitignore; -*-
