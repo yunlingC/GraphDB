@@ -18,6 +18,12 @@
 #include "GraphType.h"
 #include "Visitor.h"
 
+#define _DB_ 0
+
+#ifdef _DB_
+#include <iostream>
+#endif 
+
 void recursiveDFS(GraphType & Graph,
 			       GraphType::VertexDescriptor VertexSourceId,
              Visitor & GraphVisitor, 
@@ -48,10 +54,11 @@ void recursiveDFS(GraphType & Graph,
 
     GraphVisitor.visitEdge(NextEdge);
 
+    bool BranchMatch = GraphVisitor.scheduleBranch(CurrentVertex, NextEdge, TargetVertex);
     bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);
 
-    bool BranchMatch = GraphVisitor.scheduleBranch(CurrentVertex, NextEdge, TargetVertex);
     bool TypeMatch = GraphVisitor.scheduleEdge(NextEdge);
+
     bool DirectionMatch = GraphVisitor.visitDirection(TargetVertex, NextEdge);
 
     if (BranchMatch == true) {
@@ -63,13 +70,17 @@ void recursiveDFS(GraphType & Graph,
       GraphVisitor.scheduleTree(CurrentVertex, NextEdge, TargetVertex);
 
       if (TypeMatch && DirectionMatch) {
+
         recursiveDFS(Graph, TargetVertex->getId(), 
                                 GraphVisitor, VisitedColor);
+
+        GraphVisitor.lastVisit(TargetVertex);
       }
     }
     else {
       GraphVisitor.revisitVertex(TargetVertex);
     }
+
     NextEdge = NextEdge->getNextEdge(CurrentVertex);
   }
 };
@@ -81,7 +92,7 @@ void recursiveDepthFirstSearch(GraphType & Graph,
   typedef std::map<GraphType::VertexPointer, bool> ColorMap;
   ColorMap Color;
   
-  GraphVisitor.visitStartVertex( Graph.getVertexPointer(StartVertex));
+  GraphVisitor.visitStartVertex(Graph.getVertexPointer(StartVertex));
   recursiveDFS(Graph, StartVertex, GraphVisitor, Color);
   GraphVisitor.finishVisit();
 };

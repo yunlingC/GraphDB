@@ -45,7 +45,7 @@ void depthFirstSearch(GraphType & Graph,
     ColorMap[ScheduledVertex] = true;
 
     auto NextEdge = ScheduledVertex->getNextEdge();
-    while ( NextEdge != nullptr ){
+    while (NextEdge != nullptr) {
     
       TargetVertex = NextEdge->getTarget(ScheduledVertex);
       bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);

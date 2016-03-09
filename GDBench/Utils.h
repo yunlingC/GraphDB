@@ -22,6 +22,8 @@
 #include <map>
 #include <boost/algorithm/string.hpp>
 
+#include <iostream> 
+
 typedef std::string KeyType;
 typedef std::string ValueType;
 typedef std::string Type;
@@ -118,7 +120,7 @@ unsigned int computeDepth(VertexPointer first,
   return  depth;
 }
 
-void recordDepth(VertexPointer first, 
+unsigned int recordDepth(VertexPointer first, 
                  EdgePointer ep, 
                  VertexPointer second, 
                  MultiDepthList &dl) {
@@ -130,7 +132,7 @@ void recordDepth(VertexPointer first,
     dl.insert(DepthPair(second, 1));
   }
   else {
-    for( auto it = dl.equal_range(first).first; it != dl.equal_range(first).second; ++it ) {
+    for (auto it = dl.equal_range(first).first; it != dl.equal_range(first).second; ++it ) {
         depth = (*it).second + 1;
         unsigned int unique = true;
         if(dl.count(second) != 0) {
@@ -144,10 +146,14 @@ void recordDepth(VertexPointer first,
         }
           if(unique == true) {
             dl.insert(DepthPair(second, depth));
+//            if ( second->getId() == 87) {
+            std::cout <<"insert " << second->getId() + 1 
+                      << " " << depth << " depth list \n";
+ //           }
           }
     }
   }
-  return ;
+  return depth;
 }
 
 void updateDepth(VertexPointer first, EdgePointer ep, VertexPointer second, DepthListType &dl) {
@@ -181,11 +187,28 @@ bool checkDepth(unsigned int depth, VertexPointer vertex, DepthListType & depthL
   return false;
 }
 
+/// TODO not a good design(O(N))
 unsigned int  checkMaxDepth(MultiDepthList & dl) {
   unsigned int depth = 0;
   for(auto it = dl.begin(); it != dl.end(); it ++) {
     if( (*it).second > depth)
       depth = (*it).second;
+  }
+  return depth;
+}
+
+/// Check the most depth of Vertex
+/// Usually used for loop-checking
+unsigned int checkVertexMaxDepth(VertexPointer Vertex, MultiDepthList & DepthList) {
+  unsigned int depth = 0; 
+  if (DepthList.count(Vertex) > 0) {
+    auto it_end = DepthList.equal_range(Vertex).second;
+    for (auto it = DepthList.equal_range(Vertex).first; 
+            it != it_end; it++) {
+      if (it->second > depth) {
+        depth = it->second;
+      }
+    }
   }
   return depth;
 }
@@ -536,8 +559,9 @@ bool TerminateAtDepth(unsigned int depth, DepthListType & depthlist) {
 }
 
 bool checkType(EdgePointer edge, FilterType &filter) {
-    if (filter.getType() == "")
+    if (filter.getType() == "") {
       return true;
+    }
     FixedString type(filter.getType());
     return (edge->getType() == type);
 }

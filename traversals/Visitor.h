@@ -100,6 +100,10 @@ public:
     return false;
   }
 
+  virtual bool lastVisit(VertexPointer VertexPtr) {
+    return false;
+  }
+
   virtual bool finishVisit()
   {
     return false;
