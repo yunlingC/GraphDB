@@ -101,6 +101,42 @@ public:
 
     }
   }
+
+
+  /// Using a stack.
+  void dfs(VertexDescriptor Source) {
+
+    typedef std::pair<VertexDescriptor, bool> VisitPair;
+  
+    // Start traversing the graph from here. 
+    std::vector<VertexDescriptor> VertexStack;
+    /// True means visited and false means not visited.
+    std::unordered_map<VertexDescriptor, bool> ColorMap;
+  
+    auto ScheduledVertex = Source;
+    
+    VertexStack.push_back(ScheduledVertex);               
+    ColorMap.insert(VisitPair(ScheduledVertex, false));
+    
+    while ( !VertexStack.empty() ) {
+      ScheduledVertex = VertexStack.back();  VertexStack.pop_back();
+      std::cout << "Visit: " << ScheduledVertex << "\n";
+      /// Set to visited.    
+      ColorMap[ScheduledVertex] = true;
+
+      for ( auto TargetEdge: getAdjacentVertices(ScheduledVertex) ) {
+        VertexDescriptor TargetVertex = TargetEdge.second;
+        if (ColorMap.find(TargetVertex) == ColorMap.end()) {
+          /// Queue up the target for visitation
+          VertexStack.push_back(TargetVertex);
+  
+          ColorMap.insert(VisitPair(TargetVertex,false));
+        } 
+          
+      }
+
+    }
+  }
   
 protected:
 
@@ -124,8 +160,11 @@ int main() {
   
 
   Graph.dump();
-
+  
+  std::cout << "BFS\n";
   Graph.bfs(0);
+  std::cout << "DFS\n";
+  Graph.dfs(0);
   return 0;
 }
 
