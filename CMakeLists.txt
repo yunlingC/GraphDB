@@ -64,10 +64,10 @@ set(GDB_LD_FLAGS storage)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
 
 # Debug flags
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++11  -Wall")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++11  -Wall -fPIC")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++14 -D_FIXALLOC_ -D_SKIP_ -Wall")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_PRINTLOG_  -Wall")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_PRINTLOG_  -Wall -fPIC")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_FIXALLOC_  -D_SKIP_ -Wall")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -Wall")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++11 -Wall")
@@ -79,13 +79,15 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_P
 
 # Storage sub directory
 add_subdirectory(storage)
-add_subdirectory(pybind)
+#add_subdirectory(pybind)
+
 set(TESTS 
   main-gdbench.cpp
   main-algo.cpp
   main-ldbc.cpp
   main-dfs.cpp
   )
+
 
 # This will generate all the executables listed in the TESTS variable
 foreach( testsourcefile ${TESTS} ) 
@@ -94,3 +96,16 @@ foreach( testsourcefile ${TESTS} )
   # Make sure YourLib is linked to each app 
   target_link_libraries( ${testname} ${STORAGE_LIB}) 
 endforeach( testsourcefile ${TESTS} )
+
+# macro(PYEXPORT _name pybind/_srccpp)
+#   PYTHON_ADD_MODULE(${_name} ${_srccpp})
+#   target_link_libraries(${_name} ${STORAGE_LIB})
+#   FILE(COPY pybind/${_name}.py DESTINATION .)
+# endmacro()
+          
+#PYEXPORT(graph_python pybind/graph_python.cpp)
+
+# This works
+python_add_module(graph_python pybind/graph_python.cpp)
+target_link_libraries(graph_python ${STORAGE_LIB})
+file(COPY pybind/graph_python.py DESTINATION .)
