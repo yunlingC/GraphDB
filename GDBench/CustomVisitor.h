@@ -168,14 +168,14 @@ public:
    Limiting the depth to explore in the graph could be a way to avoid the loop
   */
   virtual bool discoverVertex(VertexPointer Vertex) {
-    return false;
+    return true;
   }
 
   virtual bool visitVertex(VertexPointer Vertex) {
     PrevPath = PathQueue.front();
     PathQueue.pop();
     if (PrevPath.size() > DepthSetting) {
-      VertexList.push_back(PrevPath.at(DepthSetting));
+//      VertexList.push_back(PrevPath.at(DepthSetting));
       TargetSet.insert(PrevPath.at(DepthSetting));
       while (!PathQueue.empty()) {
         auto Path = PathQueue.front(); PathQueue.pop();
@@ -198,6 +198,7 @@ public:
   virtual bool scheduleBranch(VertexPointer first
                             , EdgePointer edge
                             , VertexPointer second) {
+
     unsigned int DepthSecond = 0;
     if (PrevPath.back() == first) {
       DepthSecond = PrevPath.size();
@@ -213,6 +214,12 @@ public:
    
     TypeMatch = checkType(edge, filter);
     DirectionMatch = checkDirection(second, edge, filter);
+
+//    std::cout << first->getId() + 1 << "-" << second->getId() + 1
+//              << " depth " << DepthSecond 
+//              << " Type " << TypeMatch
+//              << " Direction " << DirectionMatch << "\n";
+
     if (TypeMatch && DirectionMatch) {
       VertexPath NewPath = PrevPath;
       NewPath.push_back(second);
@@ -419,7 +426,7 @@ public:
       it != DepthList.equal_range(first).second; ++it) {
       if ((*it).second < DepthSetting) {
         FilterType filter = FilterList[(*it).second];
-        if (DepthList.count(second) < DepthSetting) {
+        if (DepthList.count(second) <= DepthSetting) {
           TypeMatch = checkType(edge, filter);
           DirectionMatch = checkDirection(second, edge, filter);
           if (TypeMatch && DirectionMatch) {
@@ -584,6 +591,7 @@ public:
 
   virtual void visitStartVertex(VertexPointer startVertex ) {
     StartVertex = startVertex;
+    /// Initialize it with a large value
     TempMinDepth = 500;
     TurnFlag = false;
     VertexPath NewPath;
@@ -672,15 +680,16 @@ public:
     if (PrevPath.size() >=  TempMinDepth) {
       /// Prune not to go on with this branch
       TurnFlag = true; 
-    } else 
+    } else {
       TurnFlag = false;
-      return TerminateFlag;
+    }
+    return TerminateFlag;
   }
 
   virtual bool scheduleBranch(VertexPointer first, EdgePointer edge, VertexPointer second) {
     TypeMatch = false;
     DirectionMatch = false;
-    /// if the depth of this branch already exceeds the shortest path, then prune
+    /// if the depth of this branch already exceeds the shortest path, prune
     if (TurnFlag == true) {
       return true;
     }

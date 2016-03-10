@@ -16,7 +16,8 @@
 
 #include "CustomVisitor.h"
 
-class RecursiveDFSReachabilityVisitor: public Visitor { public:
+class RecursiveDFSReachabilityVisitor: public Visitor { 
+public:
   typedef std::map<VertexPointer,  unsigned int> VertexTargetMapType;
   typedef std::pair<VertexPointer, unsigned int> VertexTargetPair;
   typedef std::set<VertexPointer> VertexSetType;
@@ -127,6 +128,14 @@ protected:
   std::vector<FilterType> FilterList;
   PathStackType PathStack;
   VertexSetType VertexSet;
+
+};
+
+class RecursiveDFSPathVisitor : public Visitor {
+public:
+
+
+protected:
 
 };
 

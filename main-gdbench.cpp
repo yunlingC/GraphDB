@@ -58,14 +58,14 @@ int main(int argc, char *argv[]) {
   if(argc < 3) {
     cout <<"Error: At least 3 arguments\n";
     cout <<" 1. query number \n"
-         <<" 2. parameter #  \n"
-         <<" 3. traversal    \n";
+         <<" 2. traversal    \n"
+         <<" 3. parameter #  \n";
     return 1;
   } else {
     string name, pid;
     GraphType::VertexDescriptor webId, personId1, personId2, personId3;
 
-    auto id = atoi(argv[2]);
+    auto id = atoi(argv[3]);
     if ((id < 0) || (id > 499)) {
       cout <<"Error: Out of range(0:499)\n";
       return 0;
@@ -77,8 +77,9 @@ int main(int argc, char *argv[]) {
     personId1 = rander.getAPersonIndex(id);
     personId2 = rander.getAPersonIndex(id);
     personId3 = 0;
-    if(argc > 3) {
-      personId3 = atoi(argv[3]);
+
+    if(argc > 4) {
+      personId3 = atoi(argv[4]);
     }
 
     cout << "name\t" << name << endl 
@@ -197,7 +198,7 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    auto traversal = atoi(argv[3]);
+    auto traversal = atoi(argv[2]);
     if (traversal !=1 && traversal !=2 && traversal !=3) {
       cout << " no way to traversing \n";
       return 1;

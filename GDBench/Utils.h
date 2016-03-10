@@ -146,10 +146,6 @@ unsigned int recordDepth(VertexPointer first,
         }
           if(unique == true) {
             dl.insert(DepthPair(second, depth));
-//            if ( second->getId() == 87) {
-            std::cout <<"insert " << second->getId() + 1 
-                      << " " << depth << " depth list \n";
- //           }
           }
     }
   }

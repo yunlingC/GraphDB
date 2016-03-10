@@ -521,6 +521,7 @@ public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
 
 #ifdef _PRINTGDB_
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 8\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -540,6 +541,8 @@ public:
           GDFile << "There is path from " << PersonId1 << " to " <<  PersonId2 << "\n";
         else 
           GDFile << PersonId1 << " and " <<  PersonId2 <<" are not connected" << "\n";
+
+        GDFile.close();
 #endif
         break;
               }
@@ -553,6 +556,23 @@ public:
           GDFile << "There is path from " << PersonId1 << " to " <<  PersonId2 << "\n";
         else 
           GDFile << PersonId1 << " and " <<  PersonId2 <<" are not connected" << "\n";
+
+        GDFile.close();
+#endif
+        break;
+              }
+      case 3: {
+        DFSPathVisitor v8r;
+        v8r.setEndVertex(PersonId2);
+        recursiveDepthFirstSearch(graph, PersonId1, v8r);
+#ifdef _PRINTGDB_
+        auto target = v8r.getPathList();
+        if(!target.empty())
+          GDFile << "There is path from " << PersonId1 << " to " <<  PersonId2 << "\n";
+        else 
+          GDFile << PersonId1 << " and " <<  PersonId2 <<" are not connected" << "\n";
+
+        GDFile.close();
 #endif
         break;
               }
@@ -772,6 +792,7 @@ class Query13: public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
 #ifdef _PRINTGDB_
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 13\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -782,17 +803,18 @@ public:
 #endif
     FilterType tmpFilter[3];
     std::string key("name");
+    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
+    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
+    traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[2]);
     switch(Traversal) {
       case 1: {
-        traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
-        traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
-        traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[2]);
         ReachabilityVisitor  v13b;
         v13b.setFilter(tmpFilter[0]);
         v13b.setFilter(tmpFilter[1]);
         v13b.setFilter(tmpFilter[2]);
         v13b.setDepth(3);
         breadthFirstSearch(graph, PersonId, v13b);
+
 #ifdef _PRINTGDB_
         auto TargetSet = v13b.getTargetSet(); 
         GDFile << "The friends of friends of person vid = " << PersonId 
@@ -801,13 +823,12 @@ public:
           GDFile <<"Vertex " << (*it)->getId() << "\t" 
                 << (*it)->getPropertyValue(key).first << "\n";
         }
+
+        GDFile.close();
 #endif
         break;
               }
       case 2: {
-        traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
-        traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
-        traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[2]);
         DFSReachabilityVisitor v13d;
         v13d.setFilter(tmpFilter[0]);
         v13d.setFilter(tmpFilter[1]);
@@ -820,11 +841,36 @@ public:
                << " has " << target.size() << " friends: \n";
         for(auto it = target.begin(); it != target.end(); ++it) {
         if( (*it).first->getId() != PersonId ) {
-        GDFile << "Vertex " << (*it).first->getId() << "\t"  
+          GDFile << "Vertex " << (*it).first->getId() << "\t"  
                << (*it).first->getPropertyValue(key).first;
-        GDFile << "\n";
+          GDFile << "\n";
+          }
         }
-      }
+
+        GDFile.close();
+#endif
+        break;
+              }
+
+      case 3: {
+        RecursiveDFSReachabilityVisitor v13r;
+        v13r.setFilter(tmpFilter[0]);
+        v13r.setFilter(tmpFilter[1]);
+        v13r.setFilter(tmpFilter[2]);
+        v13r.setDepth(3);
+        recursiveDepthFirstSearch(graph, PersonId, v13r);
+#ifdef _PRINTGDB_
+        auto target = v13r.getTargetSet();
+        GDFile << "The friends of friends of person vid = " << PersonId 
+               << " has " << target.size() << " friends: \n";
+        for(auto it = target.begin(); it != target.end(); ++it) {
+        if( (*it)->getId() != PersonId ) {
+          GDFile << "Vertex " << (*it)->getId() << "\t"  
+               << (*it)->getPropertyValue(key).first;
+          GDFile << "\n";
+          }
+        }
+        GDFile.close();
 #endif
         break;
               }
