@@ -605,8 +605,9 @@ public:
     if (PrevPath.size() >=  TempMinDepth) {
       /// prune not to go on with this branch
       TurnFlag = true; 
-    } else 
+    } else {
       TurnFlag = false;
+    }
     return false;
   }
 

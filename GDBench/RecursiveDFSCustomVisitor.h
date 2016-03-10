@@ -131,12 +131,103 @@ protected:
 
 };
 
-class RecursiveDFSPathVisitor : public Visitor {
+class RecursiveDFSShortestPathVisitor : public Visitor {
+public:
+  typedef std::vector<VertexPath> PathStackType;
 public:
 
+  void setFilter(FilterType & Filter) {
+    FilterList.push_back(Filter);
+  }
+
+  VertexPath & getShortestPath() {
+    return ShortestPath;
+  }
+
+  void setEndVertex(VertexDescriptor  EndVertexId) {
+    EndVertex = EndVertexId; 
+  }
+
+  /// Set to true to allow revisit to vertices 
+  /// that show up in different depths
+  virtual bool discoverVertex(VertexPointer Vertex) {
+    return true;
+  }
+
+  virtual void visitStartVertex(VertexPointer Vertex) {
+    /// If the given vertices are the same, no shortest path found;
+    /// return immediately.
+    if (Vertex->getId() == EndVertex) {
+      exit(0);
+    }
+
+    VertexPath NewPath;
+    NewPath.push_back(Vertex);
+    PathStack.push_back(NewPath);
+
+    /// Initialize the tmpShortestlength to be a big number
+    TmpShortestLength = 1000;
+    ReturnFlag = false;
+  }
+
+  /// Check if the current path is already longer than the current shortest one
+  virtual bool visitVertex(VertexPointer Vertex) {
+    auto PrevPath = PathStack.back();
+    std::cout << "--vertex " << Vertex->getId() + 1 
+              << " -- depth " << PrevPath.size() -1 << "\n";
+    return (PrevPath.size() > TmpShortestLength);
+  }
+
+  virtual bool scheduleBranch(VertexPointer FirstVertex
+                            , EdgePointer Edge
+                            , VertexPointer SecondVertex) {
+
+    if (ReturnFlag) {
+      /// Flip back so that recursive functions won't return forever.
+      ReturnFlag = false;
+      return true;;
+    }
+
+    /// This is to make sure the same vertex won't be revisited again 
+    /// in the current path --> prevent infinite loop
+    auto PrevPath = PathStack.back();
+    for (auto it = PrevPath.begin(), it_end = PrevPath.end();
+            it != it_end; it++) {
+      if ((*it) == SecondVertex) {
+        return true;
+      }
+    }
+    auto CurrentPath = PrevPath;
+    CurrentPath.push_back(SecondVertex);
+
+    if (SecondVertex->getId() == EndVertex) {
+      ShortestPath = CurrentPath;
+      TmpShortestLength = CurrentPath.size() - 1 ;
+      /// Set to true so that the previous level can exit without 
+      /// visiting more vertices of the same depth
+      ReturnFlag = true;
+    } else {
+      PathStack.push_back(CurrentPath);
+    }
+    return false;
+  }
+
+  virtual bool lastVisit(VertexPointer Vertex) {
+    auto LastPath = PathStack.back();
+    if (LastPath.back() == Vertex) {
+      PathStack.pop_back(); 
+    }
+    return false;
+  }
 
 protected:
-
+ bool ReturnFlag;
+ unsigned int TmpShortestLength;
+// VertexPointer StartVertex;
+ VertexDescriptor EndVertex;
+ std::vector<FilterType> FilterList;
+ PathStackType PathStack;
+ VertexPath ShortestPath;
 };
 
 #endif /*_RECURSIVE_DFS_CUSTOMVISITOR_H_*/

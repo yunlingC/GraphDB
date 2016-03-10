@@ -584,6 +584,7 @@ class Query9: public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
 #ifdef _PRINTGDB_
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 9\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -633,6 +634,26 @@ public:
 #endif
         break;
               }
+      case 3: {
+        RecursiveDFSShortestPathVisitor v9r;
+        v9r.setEndVertex(PersonId2);
+        recursiveDepthFirstSearch(graph, PersonId1, v9r);
+#ifdef _PRINTGDB_
+        auto Path = v9r.getShortestPath();
+        if (Path.empty())
+          GDFile << PersonId1 << " and " <<  PersonId2 <<" are not connected" << "\n";
+        else {
+          GDFile << "There is 1 shortest path from " 
+                 << PersonId1 << " to " <<  PersonId2 << "\n";
+          for (auto it = Path.begin(), it_end = Path.end(); 
+                it != it_end; it++) {
+            GDFile << "Vertex " << (*it)->getId() << "\n";
+          }
+        }
+        GDFile.close();
+#endif
+        break;
+              }
     }
   }
 };
@@ -670,6 +691,7 @@ public:
               }
     }
 #ifdef _PRINTGDB_
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 10\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -722,6 +744,7 @@ public:
               }
     }
 #ifdef _PRINTGDB_
+    GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 11\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
