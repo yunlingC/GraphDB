@@ -131,14 +131,13 @@ protected:
 
 };
 
+/// This is not efficient in terms of algorithm
+/// It takes like forever to find a shortest path between 0 and 1
+/// without going into a loop
 class RecursiveDFSShortestPathVisitor : public Visitor {
 public:
   typedef std::vector<VertexPath> PathStackType;
 public:
-
-  void setFilter(FilterType & Filter) {
-    FilterList.push_back(Filter);
-  }
 
   VertexPath & getShortestPath() {
     return ShortestPath;
@@ -173,8 +172,8 @@ public:
   /// Check if the current path is already longer than the current shortest one
   virtual bool visitVertex(VertexPointer Vertex) {
     auto PrevPath = PathStack.back();
-    std::cout << "--vertex " << Vertex->getId() + 1 
-              << " -- depth " << PrevPath.size() -1 << "\n";
+//    std::cout << "--vertex " << Vertex->getId() + 1 
+//              << " -- depth " << PrevPath.size() -1 << "\n";
     return (PrevPath.size() > TmpShortestLength);
   }
 
@@ -197,6 +196,7 @@ public:
         return true;
       }
     }
+
     auto CurrentPath = PrevPath;
     CurrentPath.push_back(SecondVertex);
 
@@ -223,11 +223,100 @@ public:
 protected:
  bool ReturnFlag;
  unsigned int TmpShortestLength;
-// VertexPointer StartVertex;
  VertexDescriptor EndVertex;
- std::vector<FilterType> FilterList;
  PathStackType PathStack;
  VertexPath ShortestPath;
+};
+
+
+class RecursiveDFSPathVisitor : public Visitor {
+public:
+  typedef std::vector<VertexPath> PathStackType;
+public:
+  VertexPath & getTargetPath() {
+    return TargetPath;
+  }
+
+  void setEndVertex(VertexDescriptor  EndVertexId) {
+    EndVertex = EndVertexId; 
+  }
+
+  /// We don't revisit the vertex if we cannot find a 
+  /// connection the first time we viist it
+  virtual bool discoverVertex(VertexPointer Vertex) {
+    return false;
+  }
+
+  virtual void visitStartVertex(VertexPointer Vertex) {
+    /// If the given vertices are the same, no shortest path found;
+    /// return immediately.
+    if (Vertex->getId() == EndVertex) {
+      exit(0);
+    }
+
+    VertexPath NewPath;
+    NewPath.push_back(Vertex);
+    PathStack.push_back(NewPath);
+
+    /// Initialize the exit flag 
+    ExitMatch = false;
+  }
+
+  virtual bool checkVertex(VertexPointer Vertex) {
+//    auto PrevPath = PathStack.back();
+//    std::cout << "--vertex " << Vertex->getId() + 1 
+//              << " -- depth " << PrevPath.size() -1 << "\n";
+//    if (ExitMatch) {
+//      std::cout <<"exit now \n";
+//    }
+    return ExitMatch;
+  }
+
+  virtual bool scheduleTree(VertexPointer FirstVertex
+                            , EdgePointer Edge
+                            , VertexPointer SecondVertex) {
+
+    ///TODO Might be redundant
+    if (ExitMatch) {
+      return true;;
+    }
+
+    /// This is to make sure the same vertex won't be revisited again 
+    /// in the current path --> prevent infinite loop
+    auto PrevPath = PathStack.back();
+    for (auto it = PrevPath.begin(), it_end = PrevPath.end();
+            it != it_end; it++) {
+      if ((*it) == SecondVertex) {
+        return true;
+      }
+    }
+
+    auto CurrentPath = PrevPath;
+    CurrentPath.push_back(SecondVertex);
+
+    if (SecondVertex->getId() == EndVertex) {
+      TargetPath = CurrentPath;
+      ExitMatch = true;
+      return true;
+    } else {
+      PathStack.push_back(CurrentPath);
+    }
+    return false;
+  }
+
+  virtual bool lastVisit(VertexPointer Vertex) {
+    auto LastPath = PathStack.back();
+    if (LastPath.back() == Vertex) {
+      PathStack.pop_back(); 
+    }
+    return false;
+  }
+
+protected:
+  bool ExitMatch;
+  VertexDescriptor EndVertex;
+  PathStackType PathStack;
+  VertexPath TargetPath;
 };
 
 #endif /*_RECURSIVE_DFS_CUSTOMVISITOR_H_*/

@@ -562,11 +562,11 @@ public:
         break;
               }
       case 3: {
-        DFSPathVisitor v8r;
+        RecursiveDFSPathVisitor v8r;
         v8r.setEndVertex(PersonId2);
         recursiveDepthFirstSearch(graph, PersonId1, v8r);
 #ifdef _PRINTGDB_
-        auto target = v8r.getPathList();
+        auto target = v8r.getTargetPath();
         if(!target.empty())
           GDFile << "There is path from " << PersonId1 << " to " <<  PersonId2 << "\n";
         else 
