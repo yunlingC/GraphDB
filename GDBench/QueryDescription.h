@@ -33,7 +33,7 @@ public:
   typedef std::string KeyType;
   typedef std::string ValueType;
   typedef GraphType Graph;
-  /// TraversalMethodSwitch: 1: bfs 2: dfs
+  /// TraversalMethodSwitch: 1: bfs 2: dfs 3: recursive dfs
   typedef unsigned int  TraversalType; 
   typedef GraphType::VertexDescriptor VertexDescriptor;
 public:
@@ -169,7 +169,7 @@ public:
 
     GDFile << "People who likes webpage id = " 
            << WebId  << " are as below\n";
-    auto target= v2.getVertexList();
+    auto target= v2.getVertexSet();
     for(auto it = target.begin(); it != target.end(); ++it) {
       std::string key("name");
       GDFile << "Vertex " << (*it)->getId() <<"\t" 
@@ -210,7 +210,7 @@ public:
     else
         GDFile << "----------------recursiveDFS-----------------\n";
 
-    auto target = v3.getVertexList();
+    auto target = v3.getVertexSet();
     GDFile << "Person with vid = " << PersonId << " likes webpages: " 
            << target.size() <<" in totoal \n";
     for(auto it = target.begin(); it != target.end(); ++it) {
@@ -253,7 +253,7 @@ public:
     else 
         GDFile << "----------------recursiveDFS-----------------\n";
     GDFile <<"People with " << Key << " = " << Value <<" is(are) as below\n";
-    auto target = v4.getVertexList();
+    auto target = v4.getVertexSet();
     for(auto it = target.begin(); it != target.end(); ++it) {
       std::string key("name");
       GDFile <<"Vertex " << (*it)->getId() << "\t" 
@@ -663,32 +663,40 @@ public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) { 
     FilterType tmpFilter[2];
     std::string key("name");
-    std::vector<VertexPointer> target;
+    std::unordered_set<VertexPointer> TargetSet;
+    traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
+    traverseThroughTypeAndDirection("FRIENDS", "in", tmpFilter[1]);
     switch(Traversal) {
       case 1: {
-        traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
-        traverseThroughTypeAndDirection("FRIENDS", "in", tmpFilter[1]);
         PatternVisitor v10d;
         v10d.setFilter(tmpFilter[0]);
         v10d.setFilter(tmpFilter[1]);
         v10d.setDepth(2);
         v10d.setEndVertex(PersonId2);
         breadthFirstSearch(graph, PersonId1, v10d);
-        target = v10d.getVertexList();
+        TargetSet = v10d.getVertexSet();
         break;
               }
       case 2: {
-        traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
-        traverseThroughTypeAndDirection("FRIENDS", "in", tmpFilter[1]);
         DFSPatternVisitor v10d;
         v10d.setFilter(tmpFilter[0]);
         v10d.setFilter(tmpFilter[1]);
         v10d.setDepth(2);
         v10d.setEndVertex(PersonId2);
         depthFirstSearch(graph, PersonId1, v10d);
-        target = v10d.getVertexList();
+        TargetSet = v10d.getVertexSet();
         break;
               }
+      case 3: {
+        RecursiveDFSPatternVisitor v10r;
+        v10r.setFilter(tmpFilter[0]);
+        v10r.setFilter(tmpFilter[1]);
+        v10r.setEndVertex(PersonId2);
+        recursiveDepthFirstSearch(graph, PersonId1, v10r);
+        TargetSet = v10r.getVertexSet();
+        break;
+              }
+
     }
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
@@ -699,13 +707,14 @@ public:
         GDFile << "---------------------DFS---------------------\n";
     else
         GDFile << "----------------recursiveDFS-----------------\n";
-    GDFile << "There are " << target.size() << " common friends between  " 
-           << PersonId1 << " and " <<  PersonId2 << "\n";
-    for(auto it = target.begin(); it != target.end(); ++it) {
-      GDFile << "Vertex " << (*it)->getId() << "\t" 
-             << (*it)->getPropertyValue(key).first;
-    GDFile << "\n";
-    }
+
+      GDFile << "There are " << TargetSet.size() << " common friends between  " 
+             << PersonId1 << " and " <<  PersonId2 << "\n";
+      for(auto it = TargetSet.begin(); it != TargetSet.end(); ++it) {
+        GDFile << "Vertex " << (*it)->getId() << "\t" 
+               << (*it)->getPropertyValue(key).first;
+      GDFile << "\n";
+      }
 #endif
   }
 };
@@ -716,30 +725,38 @@ public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
     FilterType tmpFilter[2];
     std::string key("name");
-    std::vector<VertexPointer> target;
+    std::unordered_set<VertexPointer> target;
+    traverseThroughTypeAndDirection("LIKES", "out",  tmpFilter[0]);
+    traverseThroughTypeAndDirection("LIKES", "in",   tmpFilter[1]);
     switch(Traversal) {
       case 1: {
-        traverseThroughTypeAndDirection("LIKES", "out",  tmpFilter[0]);
-        traverseThroughTypeAndDirection("LIKES", "in",   tmpFilter[1]);
         PatternVisitor v11b;
         v11b.setFilter(tmpFilter[0]);
         v11b.setFilter(tmpFilter[1]);
         v11b.setDepth(2);
         v11b.setEndVertex(PersonId2);
         breadthFirstSearch(graph, PersonId1, v11b);
-        target = v11b.getVertexList();
+        target = v11b.getVertexSet();
         break;
               }
       case 2: {
-        traverseThroughTypeAndDirection("LIKES", "out",  tmpFilter[0]);
-        traverseThroughTypeAndDirection("LIKES", "in",   tmpFilter[1]);
         DFSPatternVisitor v11d;
         v11d.setFilter(tmpFilter[0]);
         v11d.setFilter(tmpFilter[1]);
         v11d.setDepth(2);
         v11d.setEndVertex(PersonId2);
         depthFirstSearch(graph, PersonId1, v11d);
-        target = v11d.getVertexList();
+        target = v11d.getVertexSet();
+        break;
+              }
+
+      case 3: {
+        RecursiveDFSPatternVisitor v11r;
+        v11r.setFilter(tmpFilter[0]);
+        v11r.setFilter(tmpFilter[1]);
+        v11r.setEndVertex(PersonId2);
+        recursiveDepthFirstSearch(graph, PersonId1, v11r);
+        target = v11r.getVertexSet();
         break;
               }
     }
@@ -769,23 +786,23 @@ public:
 class Query12 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
-    std::vector<VertexPointer>  target;
+    std::unordered_set<VertexPointer>  target;
     AdjacencyVisitor v12; 
     traverseThroughTypeAndDirection("FRIENDS", "out", v12.getFilter());
     switch(Traversal) {
       case 1: {
         breadthFirstSearch(graph, PersonId, v12);
-        target = v12.getVertexList();
+        target = v12.getVertexSet();
         break;
               }
       case 2: {
         depthFirstSearch(graph, PersonId, v12);
-        target = v12.getVertexList();
+        target = v12.getVertexSet();
         break;
               }
       case 3:
         recursiveDepthFirstSearch(graph, PersonId, v12);
-        target = v12.getVertexList();
+        target = v12.getVertexSet();
         break;
 
     }

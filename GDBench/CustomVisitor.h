@@ -123,7 +123,7 @@ public:
     DirectionMatch = checkDirection(Second, Edge, Filter);
 
     if (DirectionMatch && TypeMatch ) {
-      VertexList.push_back(Second);
+      VertexSet.insert(Second);
     }
 
     computeDepth(First, Edge, Second, DepthList);
@@ -292,7 +292,6 @@ public:
     FilterList.push_back(f);
   }
 
-
   void setDepth(unsigned int depth) {
     DepthSetting = depth;
   }
@@ -311,7 +310,7 @@ public:
     PrevPath = PathQueue.front();
     PathQueue.pop();
     if (PrevPath.size() > DepthSetting) {
-      if (PrevPath.at(DepthSetting)->getId() == EndVertex){
+      if (PrevPath.at(DepthSetting)->getId() == EndVertex) {
         /// The common friend node is the second one in the path 
         VertexSet.insert(PrevPath.at(1));
       }

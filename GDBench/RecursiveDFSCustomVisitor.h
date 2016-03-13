@@ -276,7 +276,6 @@ public:
                             , EdgePointer Edge
                             , VertexPointer SecondVertex) {
 
-    ///TODO Might be redundant
     if (ExitMatch) {
       return true;;
     }
@@ -317,6 +316,146 @@ protected:
   VertexDescriptor EndVertex;
   PathStackType PathStack;
   VertexPath TargetPath;
+};
+
+class RecursiveDFSPatternVisitor : public Visitor {
+public:
+  typedef std::vector<VertexPath> PathStackType;
+public:
+
+  void setFilter(FilterType & Filter) {
+    FilterList.push_back(Filter);
+  }
+
+  void setEndVertex(VertexDescriptor  EndVertexId) {
+    EndVertex = EndVertexId; 
+  }
+
+  /// We don't revisit the vertex because we only have to visit 
+  /// 2 layers of vertices and we don't want to revisit the StartVertex
+  /// But revisit the endvertex if the endvertex is visited for the second depth first
+  virtual bool discoverVertex(VertexPointer Vertex) {
+    return (Vertex->getId() == EndVertex);
+  }
+
+  virtual bool scheduleEdge(EdgePointer Edge) {
+    return TypeMatch;
+  }
+
+  virtual bool visitDirection(VertexPointer SecondVertex, EdgePointer Edge) {
+    return DirectionMatch;
+  }
+
+  virtual void visitStartVertex(VertexPointer Vertex) {
+    /// If the given vertices are the same,
+    /// return immediately.
+    if (Vertex->getId() == EndVertex) {
+      exit(0);
+    }
+
+    StartVertex = Vertex;
+
+    VertexPath NewPath;
+    NewPath.push_back(Vertex);
+    PathStack.push_back(NewPath);
+  }
+
+  virtual bool visitVertex(VertexPointer Vertex) {
+    auto PrevPath = PathStack.back();
+//    std::cout << "--vertex " << Vertex->getId() + 1 
+//              << " -- depth " << PrevPath.size() -1 << "\n";
+    return (PrevPath.size() > 2);
+  }
+
+  virtual bool scheduleBranch(VertexPointer FirstVertex
+                            , EdgePointer Edge
+                            , VertexPointer SecondVertex) {
+
+    TypeMatch = false;
+    DirectionMatch = false;
+
+    ///Don't pop out until the current branch won't be visited again
+    auto PrevPath = PathStack.back();
+
+    unsigned int FirstDepth = 1000;
+    if (PrevPath.back() == FirstVertex) {
+      FirstDepth = PrevPath.size() - 1; 
+    }
+
+    FilterType Filter;
+    if (FirstDepth >= 0 && FirstDepth < 2) {
+      Filter = FilterList[FirstDepth];
+    }
+    else {
+      Filter.setDefault();
+    }
+
+    if (SecondVertex != StartVertex && FirstDepth < 2) {
+      TypeMatch = checkType(Edge, Filter);
+      DirectionMatch = checkDirection(SecondVertex, Edge, Filter);
+    }
+
+    if (FirstDepth == 1 && SecondVertex->getId() != EndVertex) {
+      TypeMatch = false;
+      DirectionMatch = false;
+    }
+
+//    std::cout << "Last " << PrevPath.back()->getId()  + 1 
+//              << " First " << FirstVertex->getId() + 1
+//              << " Second " << SecondVertex->getId() + 1 
+//              << " Depth " << FirstDepth  + 1
+//              << " TypeMatch " << TypeMatch
+//              << " DirectionMatch " << DirectionMatch << "\n";
+
+    return false;
+  }
+
+  virtual bool scheduleTree(VertexPointer FirstVertex
+                            , EdgePointer Edge
+                            , VertexPointer SecondVertex) {
+
+    /// This is to make sure the same vertex won't be revisited again 
+    /// in the current path --> prevent infinite loop
+    auto PrevPath = PathStack.back();
+    
+    auto SecondDepth = PrevPath.size(); 
+
+    if (SecondDepth == 1) {
+      auto CurrentPath = PrevPath;
+      CurrentPath.push_back(SecondVertex);
+      if (TypeMatch && DirectionMatch) {
+        PathStack.push_back(CurrentPath);
+      }
+      return false;
+    } 
+
+    /// In depth 2 or more
+    if (SecondVertex->getId() == EndVertex) {
+//      std::cout << "First Vertex " << FirstVertex->getId() + 1 
+//                << " EndVertex " << EndVertex + 1 << "\n";
+      if (TypeMatch && DirectionMatch) {
+        VertexSet.insert(FirstVertex);
+      }
+    }
+
+    return false;
+  }
+
+  virtual bool lastVisit(VertexPointer Vertex) {
+    auto LastPath = PathStack.back();
+    if (LastPath.back() == Vertex) {
+      PathStack.pop_back(); 
+    }
+    return false;
+  }
+
+protected:
+  bool TypeMatch;
+  bool DirectionMatch;
+  VertexPointer StartVertex;
+  VertexDescriptor EndVertex;
+  PathStackType PathStack;
+  std::vector<FilterType> FilterList;
 };
 
 #endif /*_RECURSIVE_DFS_CUSTOMVISITOR_H_*/

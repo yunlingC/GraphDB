@@ -67,7 +67,6 @@ void recursiveDFS(GraphType & Graph,
     // Get color and check if false.
     if (VisitedColor.find(TargetVertex) == VisitedColor.end() || RevisitFlag) {
 
-//      GraphVisitor.scheduleTree(CurrentVertex, NextEdge, TargetVertex);
       bool TreeMatch = GraphVisitor.scheduleTree(CurrentVertex, NextEdge, TargetVertex);
       if (TreeMatch) {
         return;
