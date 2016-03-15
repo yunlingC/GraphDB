@@ -245,6 +245,24 @@ protected:
   FilterType RangeFilter;
 };
 
+class JobsVisitor : public PostsCommentsVisitor {
+public:
+  virtual bool scheduleBranch(VertexPointer First
+                            , EdgePointer Edge
+                            , VertexPointer Second) {
+
+    auto equal = false;
+    TypeMatch = checkMultiRelType(Edge, Filter) & checkRange<EdgePointer>(3, Edge, RangeFilter, equal); 
+
+    if (TypeMatch) {
+      VertexSet.insert(Second);
+    }
+
+    computeDepth(First, Edge, Second, DepthList);
+
+    return false;
+  }
+};
 /**
 class LimitedDepthVisitor : public Visitor {
 public:

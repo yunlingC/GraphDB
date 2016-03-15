@@ -371,6 +371,8 @@ public:
 };
 
 */
+
+
 class LdbcRDFSQuery7 : public LdbcQuery {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
@@ -427,16 +429,24 @@ public:
   typedef std::map<VertexPointer, VertexSetType> ReturnMapType;
   typedef std::pair<VertexPointer, VertexSetType> ReturnMapPair;
 public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex ) {
+  
+  virtual VertexSetType getFriendsList(Graph & graph
+                                        , VertexDescriptor startVertex
+                                        , const unsigned int & DepthSetting) {
     FilterType tmpFilter[2];
     traverseThroughTypeAndDirection("KNOWS", "out", tmpFilter[0]);
     traverseThroughTypeAndDirection("KNOWS", "out", tmpFilter[1]);
     FriendsVisitor v9;
     v9.setFilter(tmpFilter[0]);
     v9.setFilter(tmpFilter[1]);
-    v9.setDepth(2);
+    v9.setDepth(DepthSetting);
     recursiveDepthFirstSearch(graph, startVertex, v9);
-    auto target = v9.getFriendList();
+    return v9.getFriendList();
+  }
+
+  void runQuery(Graph & graph, VertexDescriptor startVertex ) {
+    auto target = getFriendsList(graph, startVertex, 2);
+
 #ifdef _PRINTLDBC_
     LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
     LDBCFile << "===============Query 9================\n";
@@ -478,7 +488,102 @@ public:
   }
 };
 
-/**
+class LdbcRDFSQuery2 : public LdbcRDFSQuery9 {
+public:
+  LdbcRDFSQuery2(){}
+
+  void runQuery(Graph & graph, VertexDescriptor startVertex ) {
+    auto target = getFriendsList(graph, startVertex, 1);
+
+#ifdef _PRINTLDBC_
+    LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
+    LDBCFile << "===============Query 2================\n";
+    LDBCFile << startVertex << " is connected with " 
+              << target.size() << " friends and friends of friends" << "\n";
+    for (auto it = target.begin(); it != target.end(); ++it) {
+      LDBCFile << "friend " << (*it)->getId() << "\t" 
+               << (*it)->getPropertyValue("id").first << "\t" 
+               << (*it)->getPropertyValue("firstName").first  << "\n"; 
+    }
+#endif
+
+    FilterType Filters[2];
+    traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR",Filters[0]); 
+    Filters[1].setValueRange("creationDate", "", "2011-07-16T23:59:00.255"); 
+    ReturnMapType VertexMap;
+    for (auto it = target.begin(); it != target.end(); ++it) {
+      PostsCommentsVisitor sv9;
+      sv9.setFilter(Filters[0]);
+      sv9.setRangeFilter(Filters[1]);
+      unsigned int startVertex = (*it)->getId();
+      recursiveDepthFirstSearch(graph, startVertex, sv9);
+      VertexMap.insert(ReturnMapPair(*it, sv9.getVertexSet()));
+   }
+#ifdef _PRINTLDBC_
+    for (auto iter = VertexMap.begin(), iter_end = VertexMap.end(); 
+            iter != iter_end; ++iter) {
+      for (auto it = (*iter).second.begin(), it_end = (*iter).second.end();
+              it != it_end; it++) {
+        LDBCFile << "Friend " << (*iter).first->getPropertyValue("id").first 
+              << "\t" <<  (*iter).first->getPropertyValue("firstName").first 
+              << "\thas posts/comments on " 
+              << (*it)->getPropertyValue("creationDate").first 
+              << "\n";
+      }
+    }
+    LDBCFile.close();
+#endif
+  }
+};
+
+/*
+class LdbcRDFSQuery11 : public LdbcRDFSQuery9 {
+public:
+  typedef std::pair<EdgePointer, VertexPointer> MapPair;
+  typedef std::multimap<VertexPointer, MapPair> MatchMapType; 
+  typedef std::pair<VertexPointer, VertexPointer> ReturnMapPair;
+  typedef std::vector<MatchMapType> ReturnTargetsType;
+public:
+  void runQuery(Graph & graph, VertexDescriptor startVertex ) {
+    FilterType Filters[4];
+    traverseThroughMultiRelType("WORKS_AT",Filters[0]); 
+    traverseThroughMultiRelType("ORGANISATION_IS_LOCATED_IN",Filters[1]); 
+    Filters[2].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
+    Filters[3].setProperty(ParamPair.first, ParamPair.second);  
+
+    MatchMapType TargetsMap;
+    for (auto it = target.begin(); it != target.end(); ++it) {
+#ifdef _PRINTLDBC_
+      LDBCFile <<"friend " << (*it)->getId() << "\t" 
+              << (*it)->getPropertyValue("id").first << "\t" 
+              << (*it)->getPropertyValue("firstName").first  << "\n"; 
+#endif
+   
+    VertexPropertyVisitor sv11;
+    sv11.setFilter(Filters[0]);
+    sv11.setFilter(Filters[1]);
+    sv11.setRangeFilter(Filters[2]);
+    sv11.setVertexFilter(Filters[3]);
+    sv11.setDepth(2);
+    sv11.setDepthToCheckRange(1);
+    sv11.setDepthToCheckVertexProp(2);
+    unsigned int startVertex = (*it)->getId();
+    breadthFirstSearch(graph, startVertex, sv11);
+    auto targets = sv11.getMatchMap();
+    TargetsMap.insert(targets.begin(), targets.end());
+  }
+#ifdef _PRINTLDBC_
+    FixedString key("workFrom");
+    for (auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
+      LDBCFile << (*iter).first->getPropertyValue("firstName").first 
+              << " works at "  << (*iter).second.second->getPropertyValue("id").first 
+              << " from " << (*iter).second.first->getPropertyValue(key).first << "\n";
+      }
+      LDBCFile.close();
+#endif
+  }
+};
+
 class LdbcQuery10 : public LdbcQuery {
 public:
   typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  
@@ -555,67 +660,6 @@ protected:
   SimMapType SimMap;
 };
 
-class LdbcQuery11 : public LdbcQuery {
-public:
-  typedef std::pair<EdgePointer, VertexPointer> MapPair;
-  typedef std::multimap<VertexPointer, MapPair> MatchMapType; 
-  typedef std::pair<VertexPointer, VertexPointer> ReturnMapPair;
-  typedef std::vector<MatchMapType> ReturnTargetsType;
-public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    FilterType tmpFilter;
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter);
-
-    SingleRelTypeVisitor v11;
-    v11.setFilter(tmpFilter);
-    v11.setFilter(tmpFilter);
-    v11.setDepth(2);
-    breadthFirstSearch(graph, startVertex, v11);
-    auto target = v11.getVertexList();
-#ifdef _PRINTLDBC_
-    LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
-    LDBCFile << "===============Query 11================\n";
-    LDBCFile << startVertex << " is connected with " 
-             << target.size() << " friends and friends of friends" << "\n";
-#endif
-    FilterType Filters[4];
-    traverseThroughMultiRelType("WORKS_AT",Filters[0]); 
-    traverseThroughMultiRelType("ORGANISATION_IS_LOCATED_IN",Filters[1]); 
-    Filters[2].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
-    Filters[3].setProperty(ParamPair.first, ParamPair.second);  
-
-    MatchMapType TargetsMap;
-    for (auto it = target.begin(); it != target.end(); ++it) {
-#ifdef _PRINTLDBC_
-      LDBCFile <<"friend " << (*it)->getId() << "\t" 
-              << (*it)->getPropertyValue("id").first << "\t" 
-              << (*it)->getPropertyValue("firstName").first  << "\n"; 
-#endif
-   
-    VertexPropertyVisitor sv11;
-    sv11.setFilter(Filters[0]);
-    sv11.setFilter(Filters[1]);
-    sv11.setRangeFilter(Filters[2]);
-    sv11.setVertexFilter(Filters[3]);
-    sv11.setDepth(2);
-    sv11.setDepthToCheckRange(1);
-    sv11.setDepthToCheckVertexProp(2);
-    unsigned int startVertex = (*it)->getId();
-    breadthFirstSearch(graph, startVertex, sv11);
-    auto targets = sv11.getMatchMap();
-    TargetsMap.insert(targets.begin(), targets.end());
-  }
-#ifdef _PRINTLDBC_
-    FixedString key("workFrom");
-    for (auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
-      LDBCFile << (*iter).first->getPropertyValue("firstName").first 
-              << " works at "  << (*iter).second.second->getPropertyValue("id").first 
-              << " from " << (*iter).second.first->getPropertyValue(key).first << "\n";
-      }
-      LDBCFile.close();
-#endif
-  }
-};
 
 class LdbcQuery12 : public LdbcQuery {
 public:
