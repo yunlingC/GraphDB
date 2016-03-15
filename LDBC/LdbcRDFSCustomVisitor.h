@@ -12,12 +12,141 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef _LDBCCUSTOMVISITOR_H_
-#define _LDBCCUSTOMVISITOR_H_
+#ifndef _LDBCRDFSCUSTOMVISITOR_H_
+#define _LDBCRDFSCUSTOMVISITOR_H_
 
-#include "CustomVisitor.h"
+#include "RecursiveDFSCustomVisitor.h"
 #include "Utils.h"
 
+#include <map>
+
+class SingleShortestPathVisitor : public RecursiveDFSShortestPathVisitor {
+public:
+  virtual bool scheduleEdge(EdgePointer Edge) {
+    return TypeMatch;
+  }
+
+  virtual bool scheduleBranch(VertexPointer FirstVertex
+                            , EdgePointer Edge
+                            , VertexPointer SecondVertex) {
+
+    if (ReturnFlag) {
+      /// Flip back so that recursive functions won't return forever.
+      ReturnFlag = false;
+      return true;;
+    }
+
+    FilterType Filter;
+    traverseThroughType("FRIENDS", Filter);
+    TypeMatch = checkType(Edge, Filter);
+
+    /// This is to make sure the same vertex won't be revisited again 
+    /// in the current path --> prevent infinite loop
+    auto PrevPath = PathStack.back();
+    for (auto it = PrevPath.begin(), it_end = PrevPath.end();
+            it != it_end; it++) {
+      if ((*it) == SecondVertex) {
+        return true;
+      }
+    }
+
+    auto CurrentPath = PrevPath;
+    CurrentPath.push_back(SecondVertex);
+
+    if (SecondVertex->getId() == EndVertex) {
+      ShortestPath = CurrentPath;
+      TmpShortestLength = CurrentPath.size() - 1 ;
+      /// Set to true so that the previous level can exit without 
+      /// visiting more vertices of the same depth
+      ReturnFlag = true;
+    } else {
+      PathStack.push_back(CurrentPath);
+    }
+    return false;
+  }
+
+protected:
+  bool TypeMatch;
+};
+
+class LikesVisitor : public RecursiveDFSReachabilityVisitor {
+public:
+  typedef std::pair<VertexPointer, unsigned int> LikesPair;
+  typedef std::map<VertexPointer, unsigned int> LikesMapType;
+public:
+  LikesVisitor() {}
+
+  LikesMapType & getLikesMap() {
+    return LikesMap;
+  }
+
+  virtual bool discoverVertex(VertexPointer Vertex) {
+    /// No need to revisit vertex.
+    return false;
+  }
+
+  virtual bool visitDirection(VertexPointer Vertex, EdgePointer Edge) {
+    /// In LDBC dataset, most relationships indicate a direction.
+    /// No need to check the direction then.
+    return true;
+  }
+
+  virtual bool scheduleBranch(VertexPointer first
+                            , EdgePointer edge
+                            , VertexPointer second) {
+
+    TypeMatch = false;
+    DirectionMatch = true;
+
+    ///Don't pop out until the current branch won't be visited again
+    auto PrevPath = PathStack.back();
+
+    unsigned int FirstDepth = 1000;
+    if (PrevPath.back() == first) {
+      FirstDepth = PrevPath.size() - 1; 
+    }
+
+    FilterType Filter;
+    if (FirstDepth >= 0 && FirstDepth < DepthSetting) {
+      Filter = FilterList[FirstDepth];
+    }
+    else {
+      Filter.setDefault();
+    }
+
+    if (second != StartVertex) {
+      TypeMatch = checkMultiRelType(edge, Filter);
+    }
+
+//    std::cout << "first " << first->getPropertyValue("id").first
+//              << " -- second " << second->getPropertyValue("id").first
+//              << " depth " << PrevPath.size() 
+//              << " typeMatch " << TypeMatch << "\n";
+    return false;
+  }
+
+  virtual bool lastVisit(VertexPointer Vertex) { 
+    auto LastPath = PathStack.back();
+    if (LastPath[LastPath.size()-1] == Vertex) {
+      PathStack.pop_back();    
+    }
+    if (LastPath.size() ==  DepthSetting + 1) {
+      /// If not in the map, add the entry
+      if (LikesMap.find(LastPath[1]) == LikesMap.end()) {
+        LikesMap.insert(LikesPair(LastPath[1], 1));
+      } else {
+        LikesMap[LastPath[1]]++; 
+      }
+//      VertexSet.insert(LastPath[DepthSetting]);
+    }
+    return false;
+  }
+ 
+protected:
+  LikesMapType LikesMap;
+};
+
+/**
 class LimitedDepthVisitor : public Visitor {
 public:
   typedef std::pair<FixedString, bool> ReturnValueType;
@@ -149,7 +278,6 @@ public:
       while (!PathQueue.empty()) {
         auto path = PathQueue.front(); PathQueue.pop();
         bool unique = true;
-        ///TODO to fix it
         for (auto it = VertexList.begin() ; it != VertexList.end(); ++ it) {/// do not store repeated veretx
           if ( *it == path.at(DepthSetting)) {
             unique = false;
@@ -890,5 +1018,6 @@ protected:
   float Score;
   ///  PostMapType PostMap;
 };
+*/
 
-#endif /*_LDBCCUSTOMVISITOR_H_*/
+#endif /*_LDBCRDFSCUSTOMVISITOR_H_*/

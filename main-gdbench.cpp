@@ -14,8 +14,9 @@ int main(int argc, char *argv[]) {
 
   /// argv[0] ./main-gdbench
   /// argv[1] query number 1:14
-  /// argv[2] param1 0:499
-  /// argv[3] param2 0:499 for shortes path and path only(Q8-Q12)
+  /// argv[2] traversal method
+  /// argv[3] param1 0:499
+  /// argv[4] param2 0:499 for shortes path and path only(Q8-Q12)
  
   typedef GraphType Graph;
 

@@ -5,11 +5,10 @@ Project(graphdb)
 set(Boost_USE_MULTITHREADED OFF)
 #find_package(Boost 1.57 COMPONENTS required)
 
-
 # You need to find these packages for exporting C++ to Python.
-find_package(PythonInterp REQUIRED)
-find_package(PythonLibs REQUIRED)
-find_package(Boost COMPONENTS python)
+#find_package(PythonInterp REQUIRED)
+#find_package(PythonLibs REQUIRED)
+#find_package(Boost COMPONENTS python)
 
 # Set the variables for GROMIT.
 set(READERS_INCLUDE_DIR "readers")
@@ -25,7 +24,7 @@ set(PYBIND_DIR "pybind")
 include_directories(
   # Add all the boost and python includes.
   ${Boost_INCLUDE_DIRS}
-  ${PYTHON_INCLUDE_DIRS}
+  #  ${PYTHON_INCLUDE_DIRS}
   ${INCLUDE_DIRECTORIES}
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${READERS_INCLUDE_DIR}
@@ -47,7 +46,7 @@ link_directories(
 
 
 # You must link the libraries to the boost and python libs.
-link_libraries(${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+#link_libraries(${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 
 
 # Set the release build for all optimizations
@@ -83,9 +82,10 @@ add_subdirectory(storage)
 
 set(TESTS 
   main-gdbench.cpp
-  main-algo.cpp
+  #  main-algo.cpp
   main-ldbc.cpp
-  main-dfs.cpp
+  #  main-dfs.cpp
+  main-rdfs-ldbc.cpp
   )
 
 
@@ -106,6 +106,6 @@ endforeach( testsourcefile ${TESTS} )
 #PYEXPORT(graph_python pybind/graph_python.cpp)
 
 # This works
-python_add_module(graph_python pybind/graph_python.cpp)
-target_link_libraries(graph_python ${STORAGE_LIB})
-file(COPY pybind/graph_python.py DESTINATION .)
+#python_add_module(graph_python pybind/graph_python.cpp)
+#target_link_libraries(graph_python ${STORAGE_LIB})
+#file(COPY pybind/graph_python.py DESTINATION .)
