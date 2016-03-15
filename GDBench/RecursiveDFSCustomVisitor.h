@@ -45,10 +45,13 @@ public:
     VertexPath NewPath;
     NewPath.push_back(Vertex);
     PathStack.push_back(NewPath);
+    StartVertex = Vertex;
   }
 
   virtual bool visitVertex(VertexPointer vertex) {
     auto PrevPath = PathStack.back();
+//    std::cout << "visit vertex " << vertex->getPropertyValue("id").first
+//              << " depth " << PrevPath.size() << "\n";
     return (PrevPath.size() > DepthSetting);
   }
 
@@ -104,7 +107,7 @@ public:
     if (TypeMatch && DirectionMatch) {
       VertexPath NewPath = PathStack.back();
       NewPath.push_back(SecondVertex);
-      PathStack.push_back(NewPath);
+      PathStack.push_back(NewPath); 
     }
     return false;
   }
@@ -172,8 +175,6 @@ public:
   /// Check if the current path is already longer than the current shortest one
   virtual bool visitVertex(VertexPointer Vertex) {
     auto PrevPath = PathStack.back();
-//    std::cout << "--vertex " << Vertex->getId() + 1 
-//              << " -- depth " << PrevPath.size() -1 << "\n";
     return (PrevPath.size() > TmpShortestLength);
   }
 

@@ -62,7 +62,6 @@ int main(int argc, char *argv[]) {
 
   LdbcQuery6 q6;
   q6.runQuery(g, persons[0]);
-*/
 
 //  LdbcQuery7 q7;
 //  q7.runQuery(g, persons[1]);
@@ -73,10 +72,12 @@ int main(int argc, char *argv[]) {
   LdbcRDFSQuery8 q8;
   q8.runQuery(g, persons[4]);
 
-/**
-  LdbcQuery9 q9;
+*/
+
+  LdbcRDFSQuery9 q9;
   q9.runQuery(g, persons[0]);
 
+/**
   LdbcQuery10 q10;
   q10.runQuery(g, persons[0]);
 

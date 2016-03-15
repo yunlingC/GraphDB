@@ -401,15 +401,11 @@ public:
     FilterType Filters[3];
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]); 
     traverseThroughMultiRelType("REPLY_OF_COMMENT+REPLY_OF_POST", Filters[1]); 
-  //  traverseThroughMultiRelType("COMMENT_HAS_CREATOR", Filters[2]); 
 
     RepliesVisitor v8;
     v8.setFilter(Filters[0]);
     v8.setFilter(Filters[1]);
-//    v8.setFilter(Filters[2]);
-//    v8.setDepth(3);
     v8.setDepth(2);
-//    v8.setDepthToCompareTime(2);
     recursiveDepthFirstSearch(graph, startVertex, v8);
 #ifdef _PRINTLDBC_
     LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
@@ -425,62 +421,64 @@ public:
   }
 };
 
-/**
-class LdbcQuery9 : public LdbcQuery {
+class LdbcRDFSQuery9 : public LdbcQuery {
 public:
-  typedef std::map<VertexPointer, VertexPointer> ReturnMapType;
-  typedef std::pair<VertexPointer, VertexPointer> ReturnMapPair;
+  typedef std::unordered_set<VertexPointer> VertexSetType;
+  typedef std::map<VertexPointer, VertexSetType> ReturnMapType;
+  typedef std::pair<VertexPointer, VertexSetType> ReturnMapPair;
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
     FilterType tmpFilter[2];
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
-    SingleRelTypeVisitor v9;
+    traverseThroughTypeAndDirection("KNOWS", "out", tmpFilter[0]);
+    traverseThroughTypeAndDirection("KNOWS", "out", tmpFilter[1]);
+    FriendsVisitor v9;
     v9.setFilter(tmpFilter[0]);
     v9.setFilter(tmpFilter[1]);
     v9.setDepth(2);
-    breadthFirstSearch(graph, startVertex, v9);
-    auto target = v9.getVertexList();
+    recursiveDepthFirstSearch(graph, startVertex, v9);
+    auto target = v9.getFriendList();
 #ifdef _PRINTLDBC_
     LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
     LDBCFile << "===============Query 9================\n";
     LDBCFile << startVertex << " is connected with " 
               << target.size() << " friends and friends of friends" << "\n";
-#endif
-    FilterType Filters[2];
-    traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR",Filters[0]); 
-    Filters[1].setValueRange("creationDate", "", "2011-07-16T23:59:00.255"); 
-          
-    ReturnMapType TargetsMap; 
     for (auto it = target.begin(); it != target.end(); ++it) {
-#ifdef _PRINTLDBC_
       LDBCFile << "friend " << (*it)->getId() << "\t" 
                << (*it)->getPropertyValue("id").first << "\t" 
                << (*it)->getPropertyValue("firstName").first  << "\n"; 
+    }
 #endif
-      MultiRelTypeVisitor sv9;
+
+    FilterType Filters[2];
+    traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR",Filters[0]); 
+    Filters[1].setValueRange("creationDate", "", "2011-07-16T23:59:00.255"); 
+    ReturnMapType VertexMap;
+    for (auto it = target.begin(); it != target.end(); ++it) {
+      PostsCommentsVisitor sv9;
       sv9.setFilter(Filters[0]);
       sv9.setRangeFilter(Filters[1]);
-      sv9.setDepth(1);
-      sv9.setDepthToCheckRange(1);
-      sv9.setPropToCheck(2); //check date 
       unsigned int startVertex = (*it)->getId();
-      breadthFirstSearch(graph, startVertex, sv9);
-      auto targets = sv9.getTargetsMap();
-      TargetsMap.insert(targets.begin(), targets.end());
+      recursiveDepthFirstSearch(graph, startVertex, sv9);
+      VertexMap.insert(ReturnMapPair(*it, sv9.getVertexSet()));
    }
 #ifdef _PRINTLDBC_
-    for (auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
-      LDBCFile << "posts/comments " << (*iter).first->getPropertyValue("id").first 
-              << "\t" << (*iter).first->getPropertyValue("creationDate").first 
-              << " made by person " << (*iter).second->getPropertyValue("id").first 
-              << "\t" <<  (*iter).second->getPropertyValue("firstName").first << "\n";
+    for (auto iter = VertexMap.begin(), iter_end = VertexMap.end(); 
+            iter != iter_end; ++iter) {
+      for (auto it = (*iter).second.begin(), it_end = (*iter).second.end();
+              it != it_end; it++) {
+        LDBCFile << "Friend " << (*iter).first->getPropertyValue("id").first 
+              << "\t" <<  (*iter).first->getPropertyValue("firstName").first 
+              << "\thas posts/comments on " 
+              << (*it)->getPropertyValue("creationDate").first 
+              << "\n";
+      }
     }
     LDBCFile.close();
 #endif
   }
 };
 
+/**
 class LdbcQuery10 : public LdbcQuery {
 public:
   typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  

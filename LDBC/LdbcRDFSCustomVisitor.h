@@ -19,6 +19,7 @@
 #include "Utils.h"
 
 #include <map>
+#include <unordered_set>
 
 class SingleShortestPathVisitor : public RecursiveDFSShortestPathVisitor {
 public:
@@ -175,6 +176,73 @@ public:
   }
 protected:
   CommentMapType ReplyMap;
+};
+
+class FriendsVisitor : public RecursiveDFSReachabilityVisitor {
+public:
+  typedef std::unordered_set<VertexPointer> FriendListType;
+public:
+  FriendsVisitor() {}
+
+  FriendListType & getFriendList() {
+    return FriendList;
+  }
+
+  virtual bool lastVisit(VertexPointer Vertex) {
+    auto LastPath = PathStack.back();
+    if (LastPath[LastPath.size()-1] == Vertex) {
+      PathStack.pop_back();    
+    }
+    if (LastPath.size() ==  DepthSetting + 1) {
+      /// get all the friends within "DepthSetting" 
+      for (unsigned int i = 1; i <= DepthSetting; i++) {
+        FriendList.insert(LastPath[DepthSetting]);
+      }
+    }
+    return false;
+  }
+
+protected:
+  FriendListType FriendList;
+};
+
+class PostsCommentsVisitor : public AdjacencyVisitor {
+public:
+  PostsCommentsVisitor(){}
+
+  void setRangeFilter(FilterType & filter) {
+    RangeFilter = filter;
+  }
+  
+  virtual bool visitDirection(VertexPointer Target, EdgePointer Edge) {
+    return true;
+  }
+
+  virtual bool scheduleEdge(EdgePointer EdgePtr) {
+    return TypeMatch;
+  }
+
+  virtual bool scheduleBranch(VertexPointer First
+                            , EdgePointer Edge
+                            , VertexPointer Second) {
+//    DirectionMatch = true;
+//    TypeMatch = false;
+
+    auto equal = false;
+    TypeMatch = checkMultiRelType(Edge, Filter) & checkRange<VertexPointer>(2, Second, RangeFilter, equal); 
+
+    if (TypeMatch) {
+      VertexSet.insert(Second);
+    }
+
+    computeDepth(First, Edge, Second, DepthList);
+
+    return false;
+  }
+
+protected:
+  bool TypeMatch;
+  FilterType RangeFilter;
 };
 
 /**
