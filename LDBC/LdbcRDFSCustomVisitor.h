@@ -146,6 +146,37 @@ protected:
   LikesMapType LikesMap;
 };
 
+class RepliesVisitor : public LikesVisitor {
+public:
+  typedef std::vector<VertexPointer> CommentListType; 
+  typedef std::unordered_map<VertexPointer, CommentListType> CommentMapType;
+  typedef std::pair<VertexPointer, CommentListType> CommentPairType;
+public:
+  CommentMapType & getReplyMap(){
+    return ReplyMap;
+  }
+
+  virtual bool lastVisit(VertexPointer Vertex) { 
+    auto LastPath = PathStack.back();
+    if (LastPath[LastPath.size()-1] == Vertex) {
+      PathStack.pop_back();    
+    }
+    if (LastPath.size() ==  DepthSetting + 1) {
+      /// If not in the map, add the entry
+      if (ReplyMap.find(LastPath[1]) == ReplyMap.end()) {
+        CommentListType NewCommentList;
+        NewCommentList.push_back(LastPath[2]);
+        ReplyMap.insert(CommentPairType(LastPath[1], NewCommentList));
+      } else {
+        ReplyMap[LastPath[1]].push_back(LastPath[2]); 
+      }
+    }
+    return false;
+  }
+protected:
+  CommentMapType ReplyMap;
+};
+
 /**
 class LimitedDepthVisitor : public Visitor {
 public:

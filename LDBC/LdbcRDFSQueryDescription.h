@@ -395,37 +395,37 @@ public:
   }
 };
 
-/*
-class LdbcQuery8 : public LdbcQuery {
+class LdbcRDFSQuery8 : public LdbcQuery {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex) {
     FilterType Filters[3];
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]); 
     traverseThroughMultiRelType("REPLY_OF_COMMENT+REPLY_OF_POST", Filters[1]); 
-    traverseThroughMultiRelType("COMMENT_HAS_CREATOR", Filters[2]); 
+  //  traverseThroughMultiRelType("COMMENT_HAS_CREATOR", Filters[2]); 
 
-    TimeCompareVisitor v8;
+    RepliesVisitor v8;
     v8.setFilter(Filters[0]);
     v8.setFilter(Filters[1]);
-    v8.setFilter(Filters[2]);
-    v8.setDepth(3);
-    v8.setDepthToCompareTime(2);
-    breadthFirstSearch(graph, startVertex, v8);
+//    v8.setFilter(Filters[2]);
+//    v8.setDepth(3);
+    v8.setDepth(2);
+//    v8.setDepthToCompareTime(2);
+    recursiveDepthFirstSearch(graph, startVertex, v8);
 #ifdef _PRINTLDBC_
     LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
     LDBCFile << "===============Query 8================\n";
-    auto vertexMap = v8.getVertexMap();
+    auto vertexMap = v8.getReplyMap();
     for (auto it = vertexMap.begin(); it != vertexMap.end(); it++) {
-      LDBCFile << "Person " << (*it).second->getPropertyValue("firstName").first 
-                << " made replies " << (*it).first->getPropertyValue("id").first 
-                << " at " << (*it).first->getPropertyValue("creationDate").first 
-                << " to startperson's posts/comments\n";
+      LDBCFile << "Post/Comment " << (*it).first->getPropertyValue("id").first 
+                << " got replies " << (*it).second.size()
+                << "\n";
     }
     LDBCFile.close();
 #endif
   }
 };
 
+/**
 class LdbcQuery9 : public LdbcQuery {
 public:
   typedef std::map<VertexPointer, VertexPointer> ReturnMapType;
