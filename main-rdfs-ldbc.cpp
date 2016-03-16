@@ -40,11 +40,11 @@ int main(int argc, char *argv[]) {
 
   cout << "Finish reading \n";
 
-  /**
-  LdbcQuery1 q1;
-  q1.setParam("firstName", "Peng");
+  LdbcRDFSQuery1 q1;
+  q1.setParam("firstName", "Bruno");
   q1.runQuery(g, persons[0]);
 
+  /**
   LdbcQuery2 q2;
   q2.setRange("creationDate", "", "2012-07-16T10:00:00.255"); 
   q2.runQuery(g, persons[0]);
@@ -73,11 +73,11 @@ int main(int argc, char *argv[]) {
   q8.runQuery(g, persons[4]);
 
 */
-  LdbcRDFSQuery2 q2;
-  q2.runQuery(g, persons[0]);
-
-  LdbcRDFSQuery9 q9;
-  q9.runQuery(g, persons[0]);
+//  LdbcRDFSQuery2 q2;
+//  q2.runQuery(g, persons[0]);
+//
+//  LdbcRDFSQuery9 q9;
+//  q9.runQuery(g, persons[0]);
 
 /**
   LdbcQuery10 q10;

@@ -188,21 +188,38 @@ public:
     return FriendList;
   }
 
+  /// True get all friends within depthsetting
+  /// False only get friends of depthsetting
+  void isGettingAll(bool Setting) {
+    FriendsHopSetting = Setting;
+  }
+
   virtual bool lastVisit(VertexPointer Vertex) {
     auto LastPath = PathStack.back();
     if (LastPath[LastPath.size()-1] == Vertex) {
       PathStack.pop_back();    
     }
     if (LastPath.size() ==  DepthSetting + 1) {
+      switch(FriendsHopSetting) {
+        case false: {
+          /// Only get friends of at certain hops
+          FriendList.insert(LastPath[DepthSetting]);
+          break;
+                    }
+        case true: {
       /// get all the friends within "DepthSetting" 
-      for (unsigned int i = 1; i <= DepthSetting; i++) {
-        FriendList.insert(LastPath[DepthSetting]);
+          for (unsigned int i = 1; i <= DepthSetting; i++) {
+            FriendList.insert(LastPath[i]);
+          }
+          break;
+                   }
       }
     }
     return false;
   }
 
 protected:
+  bool FriendsHopSetting;
   FriendListType FriendList;
 };
 

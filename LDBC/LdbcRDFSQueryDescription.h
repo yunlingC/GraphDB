@@ -432,20 +432,22 @@ public:
   
   virtual VertexSetType getFriendsList(Graph & graph
                                         , VertexDescriptor startVertex
+                                        , const bool & IsGettingAll
                                         , const unsigned int & DepthSetting) {
-    FilterType tmpFilter[2];
-    traverseThroughTypeAndDirection("KNOWS", "out", tmpFilter[0]);
-    traverseThroughTypeAndDirection("KNOWS", "out", tmpFilter[1]);
     FriendsVisitor v9;
-    v9.setFilter(tmpFilter[0]);
-    v9.setFilter(tmpFilter[1]);
+    FilterType tmpFilter;
+    traverseThroughTypeAndDirection("KNOWS", "out", tmpFilter);
+    for (unsigned int i = 0; i < DepthSetting; i++) {
+      v9.setFilter(tmpFilter);
+    }
     v9.setDepth(DepthSetting);
+    v9.isGettingAll(IsGettingAll);
     recursiveDepthFirstSearch(graph, startVertex, v9);
     return v9.getFriendList();
   }
 
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    auto target = getFriendsList(graph, startVertex, 2);
+    auto target = getFriendsList(graph, startVertex, true, 2);
 
 #ifdef _PRINTLDBC_
     LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
@@ -493,7 +495,7 @@ public:
   LdbcRDFSQuery2(){}
 
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    auto target = getFriendsList(graph, startVertex, 1);
+    auto target = getFriendsList(graph, startVertex, false, 1);
 
 #ifdef _PRINTLDBC_
     LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
@@ -536,6 +538,38 @@ public:
   }
 };
 
+class LdbcRDFSQuery1 : public LdbcRDFSQuery9 {
+public:
+  typedef std::pair<FixedString, bool> ReturnValueType;
+public:
+  LdbcRDFSQuery1(){}
+
+  void runQuery(Graph & graph, VertexDescriptor startVertex ) {
+    auto target = getFriendsList(graph, startVertex, true, 3);
+
+    std::vector<VertexPointer> FriendsList;
+    FilterType NameFilter;
+    filtProperty(ParamPair.first, ParamPair.second, NameFilter); 
+
+    for (auto it = target.begin(); it != target.end(); ++it) {
+      if (checkProperty<ReturnValueType>(*it, NameFilter)) {
+        FriendsList.push_back(*it);
+      }
+    }
+#ifdef _PRINTLDBC_
+    LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
+    LDBCFile << "===============Query 1================\n";
+    LDBCFile << startVertex << " is connected with " 
+              << FriendsList.size() << " friends with given name" << "\n";
+    for (auto it = FriendsList.begin(), it_end = FriendsList.end(); 
+                it != it_end; ++it) {
+      LDBCFile << "friend " << (*it)->getId() << "\t" 
+               << (*it)->getPropertyValue("id").first << "\t" 
+               << (*it)->getPropertyValue("firstName").first  << "\n"; 
+    }
+#endif
+  }
+};
 /*
 class LdbcRDFSQuery11 : public LdbcRDFSQuery9 {
 public:
