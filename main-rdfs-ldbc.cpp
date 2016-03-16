@@ -40,9 +40,12 @@ int main(int argc, char *argv[]) {
 
   cout << "Finish reading \n";
 
-  LdbcRDFSQuery1 q1;
-  q1.setParam("firstName", "Bruno");
-  q1.runQuery(g, persons[0]);
+//  LdbcRDFSQuery1 q1;
+//  q1.setParam("firstName", "Bruno");
+//  q1.runQuery(g, persons[0]);
+
+//  LdbcRDFSQuery5 q5;
+//  q5.runQuery(g, persons[0]);
 
   /**
   LdbcQuery2 q2;
@@ -53,10 +56,12 @@ int main(int argc, char *argv[]) {
   q3.setPropertyRange("name", "Austria", "Angola"); 
   q3.setRange("creationDate", "2010-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
   q3.runQuery(g, persons[0]);
-
-  LdbcQuery4 q4;
+*/
+  LdbcRDFSQuery4 q4;
+  q4.setRange("creationDate", "2010-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
   q4.runQuery(g, persons[0]);
 
+/**
   LdbcQuery5 q5;
   q5.runQuery(g, persons[0]);
 

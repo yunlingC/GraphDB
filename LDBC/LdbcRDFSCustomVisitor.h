@@ -202,12 +202,12 @@ public:
     if (LastPath.size() ==  DepthSetting + 1) {
       switch(FriendsHopSetting) {
         case false: {
-          /// Only get friends of at certain hops
+          /// Only get friends of at a certain hop-DepthSetting
           FriendList.insert(LastPath[DepthSetting]);
           break;
                     }
         case true: {
-      /// get all the friends within "DepthSetting" 
+          /// get all the friends within "DepthSetting" 
           for (unsigned int i = 1; i <= DepthSetting; i++) {
             FriendList.insert(LastPath[i]);
           }
@@ -279,6 +279,74 @@ public:
 
     return false;
   }
+};
+
+
+class TagsVisitor : public RecursiveDFSReachabilityVisitor {
+public:
+public:
+  TagsVisitor(){} 
+
+  void setRangeFilter(FilterType & filter) {
+    RangeFilter = filter;
+  }
+
+  virtual bool discoverVertex(VertexPointer Vertex) {
+    /// No need to revisit since the edge Label indicates the direction
+    return false;
+  }
+
+//  virtual bool visitDirection(VertexPointer Vertex){
+//    /// Edge labels indicate the dirction.
+//    return true;
+//  }
+
+  virtual bool scheduleBranch(VertexPointer FirstVertex
+                            , EdgePointer Edge
+                            , VertexPointer SecondVertex ) {
+
+    DirectionMatch = true;
+    TypeMatch = false;
+
+    auto PrevPath = PathStack.back();
+
+    unsigned int FirstDepth = 1000;
+    if (PrevPath.back() == FirstVertex) {
+      FirstDepth = PrevPath.size() - 1; 
+    }
+
+    FilterType Filter;
+    if (FirstDepth >= 0 && FirstDepth < DepthSetting) {
+      Filter = FilterList[FirstDepth];
+    }
+    else {
+      Filter.setDefault();
+    }
+
+    if (SecondVertex != StartVertex) {
+      TypeMatch = checkType(Edge, Filter);
+    }
+
+    if (FirstDepth == 1) {
+      /// 1 indicates checking time
+      /// equal flag is not used here
+      auto equal = false;
+      TypeMatch = TypeMatch & \
+                  checkRange<VertexPointer>(1, SecondVertex, RangeFilter, equal);
+    }
+
+    std::cout << "first " << FirstVertex->getId()
+              << " -- second " << SecondVertex->getId()
+              << " -- Type " << SecondVertex->getType()
+              << " firstDepth " << FirstDepth
+              << " depth " << PrevPath.size() 
+              << " typeMatch " << TypeMatch << "\n";
+
+    return false;
+  }
+  
+protected:
+  FilterType RangeFilter;
 };
 /**
 class LimitedDepthVisitor : public Visitor {

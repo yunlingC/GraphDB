@@ -213,40 +213,41 @@ public:
 #endif
   }
 };
-
-class LdbcQuery4 : public LdbcQuery {
+*/
+class LdbcRDFSQuery4 : public LdbcQuery {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
     FilterType tmpFilter[4];
-    traverseThroughMultiRelType("KNOWS", tmpFilter[0]); 
-    traverseThroughMultiRelType("POST_HAS_CREATOR", tmpFilter[1]); 
-    traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[2]); 
-    tmpFilter[3].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
+    traverseThroughType("KNOWS", tmpFilter[0]);
+    traverseThroughType("POST_HAS_CREATOR", tmpFilter[1]); 
+    traverseThroughType("POST_HAS_TAG", tmpFilter[2]); 
+    tmpFilter[3].setValueRange(ValueRange.first, ValueRange.second.first
+                             , ValueRange.second.second); 
    
-    MultiResultVisitor v4;
+    TagsVisitor v4;
     v4.setFilter(tmpFilter[0]);
     v4.setFilter(tmpFilter[1]);
     v4.setFilter(tmpFilter[2]);
     v4.setRangeFilter(tmpFilter[3]);
     v4.setDepth(3);
-    v4.setDepthToCheckRange(2);
-    v4.setPropToCheck(1); //check time
-    breadthFirstSearch(graph, startVertex, v4);
+    recursiveDepthFirstSearch(graph, startVertex, v4);
 #ifdef _PRINTLDBC_
     LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
     LDBCFile << "===============Query 4================\n";
-    auto targets = v4.getReturnResultMap();
+    auto targets = v4.getTargetSet();
     LDBCFile << startVertex << " has friends made posts of " 
              << targets.size() << " tags\n";
-    for (auto it = targets.begin(); it != targets.end(); ++it) {
-      LDBCFile << "tags " << (*it).first->getPropertyValue("id").first << "\t" 
-              << "num of posts " << (*it).second <<  "\n";
+    for (auto it = targets.begin(), it_end = targets.end(); 
+            it != it_end; ++it) {
+      LDBCFile << "tags " << (*it)->getPropertyValue("id").first << "\t" 
+              <<  "\n";
     }
       LDBCFile.close();
 #endif
   }
 };
 
+/**
 class LdbcQuery5 : public LdbcQuery {
 public:
   typedef std::map<VertexPointer, std::vector<VertexPointer>> PersonListMapType;
@@ -452,13 +453,13 @@ public:
 #ifdef _PRINTLDBC_
     LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
     LDBCFile << "===============Query 9================\n";
-    LDBCFile << startVertex << " is connected with " 
-              << target.size() << " friends and friends of friends" << "\n";
-    for (auto it = target.begin(); it != target.end(); ++it) {
-      LDBCFile << "friend " << (*it)->getId() << "\t" 
-               << (*it)->getPropertyValue("id").first << "\t" 
-               << (*it)->getPropertyValue("firstName").first  << "\n"; 
-    }
+//    LDBCFile << startVertex << " is connected with " 
+//              << target.size() << " friends and friends of friends" << "\n";
+//    for (auto it = target.begin(); it != target.end(); ++it) {
+//      LDBCFile << "friend " << (*it)->getId() << "\t" 
+//               << (*it)->getPropertyValue("id").first << "\t" 
+//               << (*it)->getPropertyValue("firstName").first  << "\n"; 
+//    }
 #endif
 
     FilterType Filters[2];
@@ -567,6 +568,53 @@ public:
                << (*it)->getPropertyValue("id").first << "\t" 
                << (*it)->getPropertyValue("firstName").first  << "\n"; 
     }
+#endif
+  }
+};
+
+class LdbcRDFSQuery5 : public LdbcRDFSQuery9 {
+public:
+
+  void runQuery(Graph & graph, VertexDescriptor startVertex ) {
+    auto target = getFriendsList(graph, startVertex, true, 2);
+
+#ifdef _PRINTLDBC_
+    LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
+    LDBCFile << "===============Query 5================\n";
+    LDBCFile << startVertex << " is connected with " 
+              << target.size() << " friends and friends of friends" << "\n";
+    for (auto it = target.begin(); it != target.end(); ++it) {
+      LDBCFile << "friend " << (*it)->getId() << "\t" 
+               << (*it)->getPropertyValue("id").first << "\t" 
+               << (*it)->getPropertyValue("firstName").first  << "\n"; 
+    }
+#endif
+
+    FilterType Filters[2];
+    traverseThroughMultiRelType("HAS_MEMBER", Filters[0]); 
+    Filters[1].setValueRange("joinDate", "", "2011-07-16T23:59:00.255"); 
+    ReturnMapType VertexMap;
+    for (auto it = target.begin(); it != target.end(); ++it) {
+      PostsCommentsVisitor sv9;
+      sv9.setFilter(Filters[0]);
+      sv9.setRangeFilter(Filters[1]);
+      unsigned int startVertex = (*it)->getId();
+      recursiveDepthFirstSearch(graph, startVertex, sv9);
+      VertexMap.insert(ReturnMapPair(*it, sv9.getVertexSet()));
+   }
+#ifdef _PRINTLDBC_
+    for (auto iter = VertexMap.begin(), iter_end = VertexMap.end(); 
+            iter != iter_end; ++iter) {
+      for (auto it = (*iter).second.begin(), it_end = (*iter).second.end();
+              it != it_end; it++) {
+        LDBCFile << "Friend " << (*iter).first->getPropertyValue("id").first 
+              << "\t" <<  (*iter).first->getPropertyValue("firstName").first 
+              << "\thas posts/comments on " 
+              << (*it)->getPropertyValue("creationDate").first 
+              << "\n";
+      }
+    }
+    LDBCFile.close();
 #endif
   }
 };
