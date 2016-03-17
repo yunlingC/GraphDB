@@ -335,18 +335,125 @@ public:
                   checkRange<VertexPointer>(1, SecondVertex, RangeFilter, equal);
     }
 
-    std::cout << "first " << FirstVertex->getId()
-              << " -- second " << SecondVertex->getId()
-              << " -- Type " << SecondVertex->getType()
-              << " firstDepth " << FirstDepth
-              << " depth " << PrevPath.size() 
-              << " typeMatch " << TypeMatch << "\n";
+//    std::cout << "first " << FirstVertex->getId()
+//              << " -- second " << SecondVertex->getId()
+//              << " -- Type " << SecondVertex->getType()
+//              << " firstDepth " << FirstDepth
+//              << " depth " << PrevPath.size() 
+//              << " typeMatch " << TypeMatch << "\n";
 
     return false;
   }
   
 protected:
   FilterType RangeFilter;
+};
+
+class TagCooccurrenceVisitor : public RecursiveDFSReachabilityVisitor {
+public:
+  typedef std::unordered_set<VertexPointer> TargetSetType;
+  typedef std::unordered_map<VertexPointer, TargetSetType> TargetMapType;
+  typedef std::pair<VertexPointer, TargetSetType> TargetMapPair;
+  typedef std::vector<FilterType> FilterListType;
+  typedef std::unordered_map<VertexPointer, unsigned int> TargetCountMapType;
+  typedef std::pair<VertexPointer, unsigned int> TargetCountPair;
+  typedef std::pair<FixedString, bool> ReturnValueType;
+public:
+  TagCooccurrenceVisitor(){}
+
+  void setPropertyFilter(FilterType & PropFilter) {
+    PropertyFilter = PropFilter;
+  }
+
+  TargetCountMapType & getTargetMap(){
+    return TagsMap;
+  }
+
+  virtual bool scheduleBranch(VertexPointer FirstVertex 
+                            , EdgePointer Edge
+                            , VertexPointer SecondVertex) {
+
+    /// In default, don't go further into the graph.
+    /// Only explore the next hop when :
+    /// 1. The current depth is not further than the depthsetting
+    /// 2. The type and direction of the second vertex matches requirements.
+    TypeMatch = false;
+    DirectionMatch = true;
+
+    ///Don't pop out until the current branch won't be visited again
+    auto PrevPath = PathStack.back();
+
+    unsigned int FirstDepth = 1000;
+    if (PrevPath.back() == FirstVertex) {
+      FirstDepth = PrevPath.size() - 1; 
+    }
+
+    FilterType Filter;
+    if (FirstDepth >= 0 && FirstDepth < DepthSetting) {
+      Filter = FilterList[FirstDepth] ;
+    }
+    else {
+      Filter.setDefault();
+    }
+
+    if (SecondVertex != StartVertex) {
+      TypeMatch = checkType(Edge, Filter);
+    }
+
+    if (TypeMatch && (FirstDepth == 1)) {
+      /// Check if the new tag is one of the given ones
+      auto PropertyMatch = false;
+      PropertyMatch = checkProperty<ReturnValueType>(SecondVertex, PropertyFilter);
+
+      /// Add the post into map so that all the tags can be retrieved
+//      std::cout << " FirstVertex " << FirstVertex->getId() 
+//                << " -- SecondVertex " << SecondVertex->getId() 
+//                << " type " << SecondVertex->getType()
+//                << " PropertyMatch " << PropertyMatch
+//                << "\n";
+
+      if (PropertyMatch) {
+        if (TagsSet.find(FirstVertex) == TagsSet.end()) {
+          TagsSet.insert(FirstVertex);
+        } 
+      } else {
+      /// Insert the new tag into map
+        if (TemTagsMap.find(FirstVertex) == TemTagsMap.end()) {
+          TargetSetType TagSet;
+          TagSet.insert(SecondVertex);
+          TemTagsMap.insert(TargetMapPair(FirstVertex, TagSet));
+        } else {
+          TemTagsMap[FirstVertex].insert(SecondVertex);
+        }
+      }
+    }
+
+    return false;
+  }
+
+  virtual bool finishVisit() {
+    /// Two loops look bad, but it is the only way so far.
+    for (auto it = TemTagsMap.begin(), it_end = TemTagsMap.end();
+            it != it_end; it++) {
+      if (TagsSet.find(it->first) != TagsSet.end()) {
+        for (auto iter = it->second.begin(), iter_end = it->second.end();
+              iter != iter_end; iter++) {
+          if (TagsMap.find(*iter) == TagsMap.end()) {
+            TagsMap.insert(TargetCountPair(*iter, 1));
+          } else {
+            TagsMap[*iter]++;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+protected:
+  FilterType PropertyFilter;
+  TargetCountMapType TagsMap;
+  TargetMapType TemTagsMap;
+  TargetSetType TagsSet;
 };
 /**
 class LimitedDepthVisitor : public Visitor {

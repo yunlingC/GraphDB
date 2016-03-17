@@ -57,17 +57,19 @@ int main(int argc, char *argv[]) {
   q3.setRange("creationDate", "2010-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
   q3.runQuery(g, persons[0]);
 */
-  LdbcRDFSQuery4 q4;
-  q4.setRange("creationDate", "2010-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
-  q4.runQuery(g, persons[0]);
+//  LdbcRDFSQuery4 q4;
+//  q4.setRange("creationDate", "2010-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
+//  q4.runQuery(g, persons[0]);
 
 /**
   LdbcQuery5 q5;
   q5.runQuery(g, persons[0]);
+*/
+  LdbcRDFSQuery6 q6;
+ 
+  q6.runQuery(g, persons[1]);
 
-  LdbcQuery6 q6;
-  q6.runQuery(g, persons[0]);
-
+/*
 //  LdbcQuery7 q7;
 //  q7.runQuery(g, persons[1]);
 

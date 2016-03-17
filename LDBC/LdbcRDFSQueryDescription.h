@@ -309,68 +309,6 @@ public:
   }
 };
 
-class LdbcQuery6 : public LdbcQuery {
-public:
-  typedef std::map<VertexPointer, std::vector<VertexPointer>> PersonListMapType;
-  typedef std::pair<VertexPointer, std::vector<VertexPointer>> PersonListPair;
-public:
-  void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-    FilterType tmpFilter[2];
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[0]);
-    traverseThroughTypeAndDirection("KNOWS", "", tmpFilter[1]);
-
-    SingleRelTypeVisitor v6;
-    v6.setFilter(tmpFilter[0]);
-    v6.setFilter(tmpFilter[1]);
-    v6.setDepth(2);
-    breadthFirstSearch(graph, startVertex, v6);
-    auto target = v6.getVertexList();
-#ifdef _PRINTLDBC_
-    LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
-    LDBCFile << "===============Query 6================\n";
-    LDBCFile << startVertex << " is connected with " 
-            << target.size() << " friends and friends of friends" << "\n";
-#endif
-
-    FilterType Filters[3];
-    traverseThroughMultiRelType("POST_HAS_CREATOR", Filters[0]); 
-    traverseThroughMultiRelType("POST_HAS_TAG", Filters[1]); 
-    Filters[2].setProperty(ParamPair.first, ParamPair.second);
-    
-    std::map<std::string, unsigned int> TagMap; 
-    for (auto it = target.begin(); it != target.end(); it++) {
-      SinglePropertyVisitor  vpv6;
-      vpv6.setFilter(Filters[0]);
-      vpv6.setFilter(Filters[1]);
-      vpv6.setVertexFilter(Filters[2]);
-      vpv6.setDepthToCheckVertexProp(2);
-      vpv6.setDepth(2);
-      unsigned int startVertex = (*it)->getId();
-      breadthFirstSearch(graph, startVertex, vpv6);
-      auto personMap = vpv6.getPersonMap(); 
-      for (auto it = personMap.begin(); it != personMap.end(); it++) {
-        if ((*it).second ) {
-          for (auto iter = vpv6.getResultTargetsMap()[(*it).first].begin(); 
-              iter != vpv6.getResultTargetsMap()[(*it).first].end(); iter++) {
-            // (*iter) --> Tag id (string)
-            if (TagMap.find(*iter) == TagMap.end()) {
-              TagMap.insert(std::pair<std::string, unsigned int>((*iter), 1));
-            } else {
-              TagMap[*iter]++;
-            }
-          }
-        }
-      }
-    }
-#ifdef _PRINTLDBC_
-    for (auto it = TagMap.begin(); it != TagMap.end(); it++)
-      LDBCFile << "Tag " << (*it).first << " has " << (*it).second << " posts\n";
-
-      LDBCFile.close();
-#endif
-  }
-};
-
 */
 
 
@@ -450,18 +388,6 @@ public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
     auto target = getFriendsList(graph, startVertex, true, 2);
 
-#ifdef _PRINTLDBC_
-    LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
-    LDBCFile << "===============Query 9================\n";
-//    LDBCFile << startVertex << " is connected with " 
-//              << target.size() << " friends and friends of friends" << "\n";
-//    for (auto it = target.begin(); it != target.end(); ++it) {
-//      LDBCFile << "friend " << (*it)->getId() << "\t" 
-//               << (*it)->getPropertyValue("id").first << "\t" 
-//               << (*it)->getPropertyValue("firstName").first  << "\n"; 
-//    }
-#endif
-
     FilterType Filters[2];
     traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR",Filters[0]); 
     Filters[1].setValueRange("creationDate", "", "2011-07-16T23:59:00.255"); 
@@ -475,6 +401,8 @@ public:
       VertexMap.insert(ReturnMapPair(*it, sv9.getVertexSet()));
    }
 #ifdef _PRINTLDBC_
+    LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
+    LDBCFile << "===============Query 9================\n";
     for (auto iter = VertexMap.begin(), iter_end = VertexMap.end(); 
             iter != iter_end; ++iter) {
       for (auto it = (*iter).second.begin(), it_end = (*iter).second.end();
@@ -615,6 +543,45 @@ public:
       }
     }
     LDBCFile.close();
+#endif
+  }
+};
+
+class LdbcRDFSQuery6 : public LdbcRDFSQuery9 {
+public:
+  typedef std::map<VertexPointer, std::vector<VertexPointer>> PersonListMapType;
+  typedef std::pair<VertexPointer, std::vector<VertexPointer>> PersonListPair;
+public:
+  void runQuery(Graph & graph, VertexDescriptor startVertex ) {
+    auto target = getFriendsList(graph, startVertex, true, 2);
+#ifdef _PRINTLDBC_
+    LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
+    LDBCFile << "===============Query 6================\n";
+    LDBCFile << startVertex << " is connected with " 
+            << target.size() << " friends and friends of friends" << "\n";
+#endif
+
+    FilterType Filters[3];
+    traverseThroughType("POST_HAS_CREATOR", Filters[0]); 
+    traverseThroughType("POST_HAS_TAG", Filters[1]); 
+    Filters[2].setProperty("id", "62");
+    
+    std::unordered_map<VertexPointer, unsigned int> TagMap;
+    TagCooccurrenceVisitor vpv6;
+    vpv6.setFilter(Filters[0]);
+    vpv6.setFilter(Filters[1]);
+    vpv6.setPropertyFilter(Filters[2]);
+    vpv6.setDepth(2);
+    for (auto it = target.begin(); it != target.end(); it++) {
+      unsigned int startVertex = (*it)->getId();
+      recursiveDepthFirstSearch(graph, startVertex, vpv6);
+    }
+      TagMap = vpv6.getTargetMap(); 
+#ifdef _PRINTLDBC_
+    for (auto it = TagMap.begin(); it != TagMap.end(); it++)
+      LDBCFile << "Tag " << (*it).first->getId() << " has " << (*it).second << " posts\n";
+
+      LDBCFile.close();
 #endif
   }
 };
