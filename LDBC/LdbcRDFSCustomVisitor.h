@@ -223,6 +223,142 @@ protected:
   FriendListType FriendList;
 };
 
+
+class FriendsBirthdayVisitor : public FriendsVisitor {
+public:
+  typedef std::pair<FixedString, bool> ReturnValueType;
+public:
+  FriendsBirthdayVisitor(){}
+
+  void setRangeFilter(FilterType & filter) {
+    RangeFilter = filter;
+  }
+
+  virtual bool lastVisit(VertexPointer Vertex) {
+    auto LastPath = PathStack.back();
+    if (LastPath[LastPath.size()-1] == Vertex) {
+      PathStack.pop_back();    
+    }
+
+    if (LastPath.size() ==  DepthSetting + 1) {
+      auto Friend = LastPath[DepthSetting];
+      /// Equal flag does not matter here
+      auto Equal = false;
+      if (checkBirthdayRange<ReturnValueType, VertexPointer> \
+          (Friend, RangeFilter, Equal)) {
+        FriendList.insert(Friend);
+      }
+    }
+    return false;
+  }
+protected:
+  FilterType RangeFilter;
+};
+
+class FriendsSimilarityVisitor : public RecursiveDFSReachabilityVisitor {
+public:
+  typedef std::unordered_map<VertexPointer, bool> TargetMapType;
+  typedef std::pair<VertexPointer, bool> TargetPairType;
+  typedef std::unordered_map<VertexPointer, int> SimilarityMapType;
+  typedef std::pair<VertexPointer, int> SimilarityPairType;
+  typedef std::pair<FixedString, bool> ReturnValueType;
+public:
+  FriendsSimilarityVisitor(){}
+
+  void setPropertyFilter(FilterType & PropFilter) {
+    PropertyFilter = PropFilter;
+  }
+
+  SimilarityMapType & getTargetMap() {
+    return SimilarityMap;
+  }
+
+  virtual void visitStartVertex(VertexPointer Vertex) { 
+    VertexPath NewPath;
+    NewPath.push_back(Vertex);
+    PathStack.push_back(NewPath);
+    StartVertex = Vertex;
+  
+    PostsMap.clear();
+  }
+
+  virtual bool scheduleBranch(VertexPointer FirstVertex 
+                            , EdgePointer Edge
+                            , VertexPointer SecondVertex) {
+
+    TypeMatch = false;
+    DirectionMatch = true;
+
+    ///Don't pop out until the current branch won't be visited again
+    auto PrevPath = PathStack.back();
+
+    unsigned int FirstDepth = 1000;
+    if (PrevPath.back() == FirstVertex) {
+      FirstDepth = PrevPath.size() - 1; 
+    }
+
+    FilterType Filter;
+    if (FirstDepth >= 0 && FirstDepth < 3) {
+      Filter = FilterList[FirstDepth] ;
+    }
+    else {
+      Filter.setDefault();
+    }
+
+    if (SecondVertex != StartVertex) {
+      TypeMatch = checkType(Edge, Filter);
+    }
+
+    ///TODO check revisit flag
+
+    if (TypeMatch && (FirstDepth == 2)) {
+      auto Post = PrevPath[1];
+      if (PostsMap.find(Post) == PostsMap.end()) {
+        PostsMap.insert(TargetPairType(Post, false));
+      }
+
+      /// Check if the start person is interested in the post with this tag
+      auto PropertyMatch = false;
+      PropertyMatch = checkProperty<ReturnValueType>(SecondVertex, PropertyFilter);
+
+      /// Add the post into map so that all the tags can be retrieved
+      std::cout << " FirstVertex " << FirstVertex->getId() 
+                << " -- SecondVertex " << SecondVertex->getId() 
+                << " type " << SecondVertex->getType()
+                << " PropertyMatch " << PropertyMatch
+                << "\n";
+
+      if (PropertyMatch) {
+        PostsMap[Post] = true;
+      }
+    }
+
+    return false;
+  }
+
+  virtual bool finishVisit() {
+    int Similarity = 0;
+
+    for (auto PostPair : PostsMap) {
+      /// If true, common++; else uncommon ++
+      if (PostPair.second) {
+        Similarity++;
+      } else {
+        Similarity--; 
+      }
+    }
+
+    SimilarityMap.insert(SimilarityPairType(StartVertex, Similarity));
+
+    return false;
+  }
+
+protected:
+  SimilarityMapType SimilarityMap;
+  FilterType PropertyFilter;
+  TargetMapType PostsMap;
+};
+
 class PostsCommentsVisitor : public AdjacencyVisitor {
 public:
   PostsCommentsVisitor(){}

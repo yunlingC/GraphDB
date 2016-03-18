@@ -633,82 +633,131 @@ public:
   }
 };
 
-class LdbcQuery10 : public LdbcQuery {
+*/
+class LdbcRDFSQuery10 : public LdbcRDFSQuery9 {
 public:
   typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
+    /// Only get friends of friends not immediate friends
+    FriendsBirthdayVisitor v9;
+    FilterType tmpFilter;
+    traverseThroughTypeAndDirection("KNOWS", "out", tmpFilter);
+    for (unsigned int i = 0; i < 2; i++) {
+      v9.setFilter(tmpFilter);
+    }
+    FilterType BDFilter;
+//    BDFilter.setValueRange(ValueRange.first, ValueRange.second.first
+//                          , ValueRange.second.second); 
+    BDFilter.setValueRange("birthday", "1981-08-21T", "1981-09-22T"); 
+    v9.setDepth(2);
+    v9.setRangeFilter(BDFilter);
+    recursiveDepthFirstSearch(graph, startVertex, v9);
+    auto Friends = v9.getFriendList();
+
 #ifdef _PRINTLDBC_
     LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
     LDBCFile << "===============Query 10================\n";
+    LDBCFile << startVertex << " is connected with " 
+             << Friends.size() << " friends \n";
+    for (auto Friend : Friends) {
+      LDBCFile << "Friend " << Friend->getId() 
+                << " birthday " << Friend->getPropertyValue("birthday").first
+                << "\n";
+    }
 #endif
-    ///first find start person's friends
-    AdjacencyVisitor av1; 
-    traverseThroughTypeAndDirection("KNOWS", "out", av1.getFilter());
-    breadthFirstSearch(graph, startVertex, av1);
-    auto startId = graph.getVertexPointer(startVertex)->getPropertyValue("id").first.std_str();
+
+    FilterType Filters[4];
+    traverseThroughType("POST_HAS_CREATOR", Filters[0]); 
+    traverseThroughType("POST_HAS_TAG", Filters[1]); 
+    traverseThroughMultiRelType("HAS_INTEREST", Filters[2]); 
+    FriendsSimilarityVisitor  FSV;
+    for (auto i = 0; i < 3; i++){
+      FSV.setFilter(Filters[i]);
+    }
+
+    auto Value = graph.getVertexPointer(startVertex)->getPropertyValue("id").first.getString();
+    std::cout << "value is " << Value << "\n";
+    Filters[3].setProperty("id", Value);
+    FSV.setPropertyFilter(Filters[3]);
+//    FSV.SetDepth(3);
+
+    for (auto Friend : Friends) {
+      recursiveDepthFirstSearch(graph, Friend->getId(), FSV);
+      ///TODO herhe
+    }
+
+#ifdef _PRINTLDBC_
+    auto SimilarityMap = FSV.getTargetMap();
+    for(auto SimilarityPair: FSV.getTargetMap()) {
+      LDBCFile << "Person " << SimilarityPair.first->getId() 
+              << " similarity score " << SimilarityPair.second
+              << "\n";
+    }
+#endif
 
     ///find friends of friends of start person
-    std::vector<VertexPointer> targets;
-    FilterType BDFilter;
-    BDFilter.setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
-    for (VertexPointer StartVertex : av1.getVertexList()) {
-      auto EqualFlag = false; 
-      if (checkRange<VertexPointer>(4, StartVertex, BDFilter, EqualFlag) == true ) {
-        SimMap[StartVertex] = 0;
-        AdjacencyVisitor av2; 
-        traverseThroughTypeAndDirection("KNOWS", "out", av2.getFilter());
-        breadthFirstSearch(graph, StartVertex->getId(), av2);
-        ///concatenate two lists
-        targets.insert(targets.end(), av2.getVertexList().begin(), 
-          av2.getVertexList().end());
-      }
-
-    }
-
-    for (VertexPointer Vertex : targets) {
-      auto EqualFlag = false; 
-      if (checkRange<VertexPointer>(4, Vertex, BDFilter, EqualFlag) == true ) {
-        SimMap[Vertex] = 0;
-      }
-    }
-
-    ///iterate over the friends who satisfy the condition
-    auto itend  = SimMap.end();
-    for (auto it = SimMap.begin(); it != itend; it++ ) {
-      FilterType tmpFilter[4];
-      traverseThroughMultiRelType("POST_HAS_CREATOR", tmpFilter[0]); 
-      traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[1]); 
-      traverseThroughMultiRelType("HAS_INTEREST", tmpFilter[2]); 
-      tmpFilter[3].setProperty("id", startId);
-
-      SimilarityVisitor v10;
-      v10.setDepth(3);
-      v10.setDepthToCheckVertexProp(3);
-      v10.setVertexFilter(tmpFilter[3]);
-      for (unsigned int i = 0; i < 3; i++ ) {
-        v10.setFilter(tmpFilter[i]);
-      }
-      breadthFirstSearch(graph, (*it).first->getId(), v10);
-      auto iterend = v10.getPostMap().end();
-      unsigned int PostItrd = 0;
-      for (auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
-        if ((*iter).second ) { PostItrd++; }
-      }
-
-      SimMap[(*it).first] = 2*PostItrd - v10.getPostMap().size(); 
-#ifdef _PRINTLDBC_
-      LDBCFile << "person: " << (*it).first->getId() 
-              << " similarity score " << (*it).second << "\n";
-
-      LDBCFile.close();
-#endif
-    }
+//    std::vector<VertexPointer> targets;
+//    FilterType BDFilter;
+//    BDFilter.setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
+//    for (VertexPointer StartVertex : av1.getVertexList()) {
+//      auto EqualFlag = false; 
+//      if (checkRange<VertexPointer>(4, StartVertex, BDFilter, EqualFlag) == true ) {
+//        SimMap[StartVertex] = 0;
+//        AdjacencyVisitor av2; 
+//        traverseThroughTypeAndDirection("KNOWS", "out", av2.getFilter());
+//        breadthFirstSearch(graph, StartVertex->getId(), av2);
+//        ///concatenate two lists
+//        targets.insert(targets.end(), av2.getVertexList().begin(), 
+//          av2.getVertexList().end());
+//      }
+//
+//    }
+//
+//    for (VertexPointer Vertex : targets) {
+//      auto EqualFlag = false; 
+//      if (checkRange<VertexPointer>(4, Vertex, BDFilter, EqualFlag) == true ) {
+//        SimMap[Vertex] = 0;
+//      }
+//    }
+//
+//    ///iterate over the friends who satisfy the condition
+//    auto itend  = SimMap.end();
+//    for (auto it = SimMap.begin(); it != itend; it++ ) {
+//      FilterType tmpFilter[4];
+//      traverseThroughMultiRelType("POST_HAS_CREATOR", tmpFilter[0]); 
+//      traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[1]); 
+//      traverseThroughMultiRelType("HAS_INTEREST", tmpFilter[2]); 
+//      tmpFilter[3].setProperty("id", startId);
+//
+//      SimilarityVisitor v10;
+//      v10.setDepth(3);
+//      v10.setDepthToCheckVertexProp(3);
+//      v10.setVertexFilter(tmpFilter[3]);
+//      for (unsigned int i = 0; i < 3; i++ ) {
+//        v10.setFilter(tmpFilter[i]);
+//      }
+//      breadthFirstSearch(graph, (*it).first->getId(), v10);
+//      auto iterend = v10.getPostMap().end();
+//      unsigned int PostItrd = 0;
+//      for (auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
+//        if ((*iter).second ) { PostItrd++; }
+//      }
+//
+//      SimMap[(*it).first] = 2*PostItrd - v10.getPostMap().size(); 
+//#ifdef _PRINTLDBC_
+//      LDBCFile << "person: " << (*it).first->getId() 
+//              << " similarity score " << (*it).second << "\n";
+//
+//      LDBCFile.close();
+//#endif
+//    }
   }
 protected:
   SimMapType SimMap;
 };
 
+/**
 
 class LdbcQuery12 : public LdbcQuery {
 public:
