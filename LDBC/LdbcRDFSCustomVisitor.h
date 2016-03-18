@@ -298,7 +298,7 @@ public:
     }
 
     FilterType Filter;
-    if (FirstDepth >= 0 && FirstDepth < 3) {
+    if (FirstDepth >= 0 && FirstDepth < DepthSetting) {
       Filter = FilterList[FirstDepth] ;
     }
     else {
@@ -308,8 +308,6 @@ public:
     if (SecondVertex != StartVertex) {
       TypeMatch = checkType(Edge, Filter);
     }
-
-    ///TODO check revisit flag
 
     if (TypeMatch && (FirstDepth == 2)) {
       auto Post = PrevPath[1];
@@ -322,11 +320,11 @@ public:
       PropertyMatch = checkProperty<ReturnValueType>(SecondVertex, PropertyFilter);
 
       /// Add the post into map so that all the tags can be retrieved
-      std::cout << " FirstVertex " << FirstVertex->getId() 
-                << " -- SecondVertex " << SecondVertex->getId() 
-                << " type " << SecondVertex->getType()
-                << " PropertyMatch " << PropertyMatch
-                << "\n";
+//      std::cout << " FirstVertex " << FirstVertex->getId() 
+//                << " -- SecondVertex " << SecondVertex->getId() 
+//                << " type " << SecondVertex->getType()
+//                << " PropertyMatch " << PropertyMatch
+//                << "\n";
 
       if (PropertyMatch) {
         PostsMap[Post] = true;

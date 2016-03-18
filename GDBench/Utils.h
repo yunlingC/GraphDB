@@ -490,8 +490,9 @@ bool checkBirthdayRange(GraphElemPointer GraphElem, FilterType &filter, bool & E
     }
   }
   auto timeProp = GraphElem->getPropertyValue(filter.getKey());                          
-  if(timeProp.second == false)
+  if(timeProp.second == false) {
     return false;   /// cannot find time property ;
+  }
   else  {
     struct tm DateToCheck;
     auto dateString = timeProp.first.std_str();

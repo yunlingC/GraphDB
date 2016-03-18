@@ -670,21 +670,19 @@ public:
     FilterType Filters[4];
     traverseThroughType("POST_HAS_CREATOR", Filters[0]); 
     traverseThroughType("POST_HAS_TAG", Filters[1]); 
-    traverseThroughMultiRelType("HAS_INTEREST", Filters[2]); 
+    traverseThroughType("HAS_INTEREST", Filters[2]); 
     FriendsSimilarityVisitor  FSV;
     for (auto i = 0; i < 3; i++){
       FSV.setFilter(Filters[i]);
     }
 
     auto Value = graph.getVertexPointer(startVertex)->getPropertyValue("id").first.getString();
-    std::cout << "value is " << Value << "\n";
     Filters[3].setProperty("id", Value);
     FSV.setPropertyFilter(Filters[3]);
-//    FSV.SetDepth(3);
+    FSV.setDepth(3);
 
     for (auto Friend : Friends) {
       recursiveDepthFirstSearch(graph, Friend->getId(), FSV);
-      ///TODO herhe
     }
 
 #ifdef _PRINTLDBC_
@@ -696,62 +694,6 @@ public:
     }
 #endif
 
-    ///find friends of friends of start person
-//    std::vector<VertexPointer> targets;
-//    FilterType BDFilter;
-//    BDFilter.setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
-//    for (VertexPointer StartVertex : av1.getVertexList()) {
-//      auto EqualFlag = false; 
-//      if (checkRange<VertexPointer>(4, StartVertex, BDFilter, EqualFlag) == true ) {
-//        SimMap[StartVertex] = 0;
-//        AdjacencyVisitor av2; 
-//        traverseThroughTypeAndDirection("KNOWS", "out", av2.getFilter());
-//        breadthFirstSearch(graph, StartVertex->getId(), av2);
-//        ///concatenate two lists
-//        targets.insert(targets.end(), av2.getVertexList().begin(), 
-//          av2.getVertexList().end());
-//      }
-//
-//    }
-//
-//    for (VertexPointer Vertex : targets) {
-//      auto EqualFlag = false; 
-//      if (checkRange<VertexPointer>(4, Vertex, BDFilter, EqualFlag) == true ) {
-//        SimMap[Vertex] = 0;
-//      }
-//    }
-//
-//    ///iterate over the friends who satisfy the condition
-//    auto itend  = SimMap.end();
-//    for (auto it = SimMap.begin(); it != itend; it++ ) {
-//      FilterType tmpFilter[4];
-//      traverseThroughMultiRelType("POST_HAS_CREATOR", tmpFilter[0]); 
-//      traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[1]); 
-//      traverseThroughMultiRelType("HAS_INTEREST", tmpFilter[2]); 
-//      tmpFilter[3].setProperty("id", startId);
-//
-//      SimilarityVisitor v10;
-//      v10.setDepth(3);
-//      v10.setDepthToCheckVertexProp(3);
-//      v10.setVertexFilter(tmpFilter[3]);
-//      for (unsigned int i = 0; i < 3; i++ ) {
-//        v10.setFilter(tmpFilter[i]);
-//      }
-//      breadthFirstSearch(graph, (*it).first->getId(), v10);
-//      auto iterend = v10.getPostMap().end();
-//      unsigned int PostItrd = 0;
-//      for (auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
-//        if ((*iter).second ) { PostItrd++; }
-//      }
-//
-//      SimMap[(*it).first] = 2*PostItrd - v10.getPostMap().size(); 
-//#ifdef _PRINTLDBC_
-//      LDBCFile << "person: " << (*it).first->getId() 
-//              << " similarity score " << (*it).second << "\n";
-//
-//      LDBCFile.close();
-//#endif
-//    }
   }
 protected:
   SimMapType SimMap;
