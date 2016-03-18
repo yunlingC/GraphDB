@@ -585,55 +585,50 @@ public:
 #endif
   }
 };
-/*
+
 class LdbcRDFSQuery11 : public LdbcRDFSQuery9 {
 public:
-  typedef std::pair<EdgePointer, VertexPointer> MapPair;
-  typedef std::multimap<VertexPointer, MapPair> MatchMapType; 
-  typedef std::pair<VertexPointer, VertexPointer> ReturnMapPair;
-  typedef std::vector<MatchMapType> ReturnTargetsType;
-public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
+    /// Get friends and friends of friends
+    auto target = getFriendsList(graph, startVertex, true, 2);
+
     FilterType Filters[4];
-    traverseThroughMultiRelType("WORKS_AT",Filters[0]); 
-    traverseThroughMultiRelType("ORGANISATION_IS_LOCATED_IN",Filters[1]); 
-    Filters[2].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
+    traverseThroughType("WORKS_AT",Filters[0]); 
+    traverseThroughType("ORGANISATION_IS_LOCATED_IN",Filters[1]); 
+    Filters[2].setValueRange(ValueRange.first
+                           , ValueRange.second.first
+                           , ValueRange.second.second); 
     Filters[3].setProperty(ParamPair.first, ParamPair.second);  
 
-    MatchMapType TargetsMap;
-    for (auto it = target.begin(); it != target.end(); ++it) {
-#ifdef _PRINTLDBC_
-      LDBCFile <<"friend " << (*it)->getId() << "\t" 
-              << (*it)->getPropertyValue("id").first << "\t" 
-              << (*it)->getPropertyValue("firstName").first  << "\n"; 
-#endif
-   
-    VertexPropertyVisitor sv11;
+    JobsVisitor sv11;
     sv11.setFilter(Filters[0]);
     sv11.setFilter(Filters[1]);
     sv11.setRangeFilter(Filters[2]);
-    sv11.setVertexFilter(Filters[3]);
+    sv11.setPropertyFilter(Filters[3]);
     sv11.setDepth(2);
-    sv11.setDepthToCheckRange(1);
-    sv11.setDepthToCheckVertexProp(2);
-    unsigned int startVertex = (*it)->getId();
-    breadthFirstSearch(graph, startVertex, sv11);
-    auto targets = sv11.getMatchMap();
-    TargetsMap.insert(targets.begin(), targets.end());
-  }
+    for (auto Person : target) {
+      unsigned int startVertex = Person->getId();
+      recursiveDepthFirstSearch(graph, startVertex, sv11);
+    }
+
 #ifdef _PRINTLDBC_
-    FixedString key("workFrom");
-    for (auto iter = TargetsMap.begin(); iter != TargetsMap.end(); ++iter) {
-      LDBCFile << (*iter).first->getPropertyValue("firstName").first 
-              << " works at "  << (*iter).second.second->getPropertyValue("id").first 
-              << " from " << (*iter).second.first->getPropertyValue(key).first << "\n";
+    LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
+    LDBCFile << "===============Query 11================\n";
+    auto Targets = sv11.getTargetMap();
+    for (auto PersonJob : Targets) {
+      LDBCFile << PersonJob.first->getPropertyValue("firstName").first
+               << " has jobs #" << PersonJob.second.size() << " \n";
+      for (auto Job : PersonJob.second) {
+        LDBCFile << " works at company " << Job.first->getPropertyValue("name").first 
+                << " from " << Job.second
+                << "\n";
       }
-      LDBCFile.close();
+    }
+    LDBCFile.close();
 #endif
   }
 };
 
-*/
 class LdbcRDFSQuery10 : public LdbcRDFSQuery9 {
 public:
   typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  

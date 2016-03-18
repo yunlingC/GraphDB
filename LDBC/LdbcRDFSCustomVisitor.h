@@ -92,7 +92,7 @@ public:
     return true;
   }
 
-  virtual bool scheduleBranch(VertexPointer first
+  virtual bool scheduleBranch(VertexPointer FirstVertex
                             , EdgePointer edge
                             , VertexPointer second) {
 
@@ -103,7 +103,7 @@ public:
     auto PrevPath = PathStack.back();
 
     unsigned int FirstDepth = 1000;
-    if (PrevPath.back() == first) {
+    if (PrevPath.back() == FirstVertex) {
       FirstDepth = PrevPath.size() - 1; 
     }
 
@@ -119,7 +119,7 @@ public:
       TypeMatch = checkMultiRelType(edge, Filter);
     }
 
-//    std::cout << "first " << first->getPropertyValue("id").first
+//    std::cout << "FirstVertex " << FirstVertex->getPropertyValue("id").first
 //              << " -- second " << second->getPropertyValue("id").first
 //              << " depth " << PrevPath.size() 
 //              << " typeMatch " << TypeMatch << "\n";
@@ -357,6 +357,106 @@ protected:
   TargetMapType PostsMap;
 };
 
+class JobsVisitor : public RecursiveDFSReachabilityVisitor {
+public:
+  typedef std::pair<FixedString, bool> ReturnValueType;
+  typedef std::pair<VertexPointer, std::string> JobPairType;
+  typedef std::vector<JobPairType> JobListType;
+  typedef std::unordered_map<VertexPointer, JobListType> TargetMapType;
+  typedef std::pair<VertexPointer, JobListType> TargetPairType;
+public:
+  JobsVisitor() {}
+
+  void setRangeFilter(FilterType & filter) {
+    RangeFilter = filter;
+  }
+
+  void setPropertyFilter(FilterType & PropFilter) {
+    PropertyFilter = PropFilter;
+  }
+
+  TargetMapType & getTargetMap(){
+    return JobsMap;
+  }
+
+//  virtual bool visitStartVertex(VertexPointer StartVertex) {
+//    VertexPath NewPath;
+//    NewPath.push_back(Vertex);
+//    PathStack.push_back(NewPath);
+//    StartVertex = Vertex;
+//  }
+
+  virtual bool scheduleBranch(VertexPointer FirstVertex
+                            , EdgePointer Edge
+                            , VertexPointer SecondVertex) {
+
+    /// In default, don't go further into the graph.
+    /// Only explore the next hop when :
+    /// 1. The current depth is not further than the depthsetting
+    /// 2. The type and direction of the second vertex matches requirements.
+    TypeMatch = false;
+    DirectionMatch = true;
+
+    ///Don't pop out until the current branch won't be visited again
+    auto PrevPath = PathStack.back();
+
+    unsigned int FirstDepth = 1000;
+    if (PrevPath.back() == FirstVertex) {
+      FirstDepth = PrevPath.size() - 1; 
+    }
+
+    FilterType Filter;
+    if (FirstDepth >= 0 && FirstDepth < DepthSetting) {
+      Filter = FilterList[FirstDepth];
+    }
+    else {
+      Filter.setDefault();
+    }
+
+    if (SecondVertex != StartVertex) {
+      TypeMatch = checkType(Edge, Filter);
+    }
+
+    if (TypeMatch && (FirstDepth == 0)) {
+      auto EqualFlag = false;
+      TypeMatch = checkYearRange<EdgePointer>(Edge, RangeFilter, EqualFlag); 
+      StartYear = Edge->getPropertyValue("workFrom").first.getString();
+    }
+
+    if (TypeMatch && (FirstDepth == 1)) {
+      TypeMatch = checkProperty<ReturnValueType>(SecondVertex, PropertyFilter);
+      /// If the time range is satisfied, insert the person node into the map
+      if (TypeMatch) {
+        auto Person = PrevPath[0];
+          /// PrevPath[1] is the company, the string is the start year 
+        JobPairType NewJob (PrevPath[1], StartYear);
+        if (JobsMap.find(Person) == JobsMap.end()) {
+          JobListType JobList;
+          JobList.push_back(NewJob);
+          JobsMap.insert(TargetPairType(Person, JobList));
+        } else {
+          JobsMap[Person].push_back(NewJob);
+        }
+      }
+    }
+
+//    std::cout << "first " << FirstVertex->getId()
+//              << " -- second " << SecondVertex->getId()
+//              << " -- Type " << SecondVertex->getType()
+//              << " firstDepth " << FirstDepth
+//              << " depth " << PrevPath.size() 
+//              << " typeMatch " << TypeMatch << "\n";
+    return false;
+  }
+protected:
+  std::string StartYear;
+  TargetMapType JobsMap;
+  FilterType RangeFilter;
+  FilterType PropertyFilter;
+
+
+};
+
 class PostsCommentsVisitor : public AdjacencyVisitor {
 public:
   PostsCommentsVisitor(){}
@@ -396,6 +496,7 @@ protected:
   FilterType RangeFilter;
 };
 
+/**
 class JobsVisitor : public PostsCommentsVisitor {
 public:
   virtual bool scheduleBranch(VertexPointer First
@@ -415,6 +516,7 @@ public:
   }
 };
 
+*/
 
 class TagsVisitor : public RecursiveDFSReachabilityVisitor {
 public:
