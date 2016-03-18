@@ -629,6 +629,96 @@ public:
   }
 };
 
+
+class LdbcRDFSQuery3 : public LdbcRDFSQuery9 {
+public:
+  void runQuery(Graph & graph, VertexDescriptor startVertex ) {
+    /// Get friends and friends of friends
+    auto target = getFriendsList(graph, startVertex, true, 2);
+
+    FilterType FilterSet[4];
+    traverseThroughType("PERSON_IS_LOCATED_IN", FilterSet[0]); 
+    traverseThroughType("IS_PART_OF", FilterSet[1]); 
+    auto country1 = PropRange.second.first;
+    auto country2 = PropRange.second.second;
+    FilterSet[2].setProperty("name", country1);
+    FilterSet[3].setProperty("name", country2);
+    
+    CountriesVisitor vp3;
+    vp3.setFilter(FilterSet[0]);
+    vp3.setFilter(FilterSet[1]);
+    vp3.setPropertyFilter(FilterSet[2]);
+    vp3.setAnotherPropertyFilter(FilterSet[3]);
+    vp3.setDepth(2);
+
+    auto it = target.begin(); 
+    auto it_prev = it;
+    while (it != target.end()) {
+      auto startVertex = (*it)->getId();
+      recursiveDepthFirstSearch(graph, startVertex, vp3);
+      it_prev = it;
+      it++;
+      if (vp3.isIncluded()) {
+        target.erase(it_prev);
+      }
+      std::cout << target.size() << " friends left \n";
+    }
+
+//#ifdef _PRINTLDBC_
+//    LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
+//    LDBCFile << "===============Query 3================\n";
+//    for (auto Friend : target) {
+//      LDBCFile << "friend " << Friend->getPropertyValue("firstName").first  
+//              << " is not located in " << country1 
+//              << " or " << country2 
+//              << "\n"; 
+//    }
+//    LDBCFile << "\n";
+//#endif
+
+
+    FilterType Filters[5];
+    traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR",Filters[0]); 
+    Filters[1].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second); 
+    traverseThroughMultiRelType("POST_IS_LOCATED_IN+COMMENT_IS_LOCATED_IN",Filters[2]); 
+    Filters[3].setProperty("name", country1); 
+    Filters[4].setProperty("name", country2); 
+    
+    TravellersVisitor vpr3;
+    vpr3.setFilter(Filters[0]);
+    vpr3.setFilter(Filters[2]);
+    vpr3.setRangeFilter(Filters[1]);
+    vpr3.setPropertyFilter(Filters[4]);
+    vpr3.setAnotherPropertyFilter(Filters[3]);
+    vpr3.setDepth(2);
+    for (auto Friend : target) {
+      auto startVertex = Friend->getId();
+      recursiveDepthFirstSearch(graph, startVertex, vpr3);
+    }
+
+#ifdef _PRINTLDBC_
+    LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
+    LDBCFile << "===============Query 3================\n";
+    LDBCFile << startVertex 
+      << " has friends travelling to foreign countries and make post/comment \n";
+    auto TargetMap = vpr3.getTargetMap();
+    LDBCFile << "friend firstName " << "\t" 
+            << country1  << "\t"
+            << country2 << "\n";
+    for (auto PersonPC : TargetMap ) {
+      LDBCFile << PersonPC.first->getPropertyValue("firstName").first  
+              << "\t\t"
+              << PersonPC.second.first
+              << "\t\t"
+              << PersonPC.second.second
+              << "\n"; 
+    }
+      LDBCFile.close();
+#endif
+  }
+};
+
+
 class LdbcRDFSQuery10 : public LdbcRDFSQuery9 {
 public:
   typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  

@@ -379,13 +379,6 @@ public:
     return JobsMap;
   }
 
-//  virtual bool visitStartVertex(VertexPointer StartVertex) {
-//    VertexPath NewPath;
-//    NewPath.push_back(Vertex);
-//    PathStack.push_back(NewPath);
-//    StartVertex = Vertex;
-//  }
-
   virtual bool scheduleBranch(VertexPointer FirstVertex
                             , EdgePointer Edge
                             , VertexPointer SecondVertex) {
@@ -440,6 +433,70 @@ public:
       }
     }
 
+    return false;
+  }
+
+protected:
+  std::string StartYear;
+  TargetMapType JobsMap;
+  FilterType RangeFilter;
+  FilterType PropertyFilter;
+};
+
+class CountriesVisitor : public JobsVisitor {
+public:
+  CountriesVisitor() {}
+
+  void setAnotherPropertyFilter(FilterType & Filter) {
+    PropertyFilter2 = Filter;
+  }
+
+  bool isIncluded() {
+    return IsIncluded;
+  }
+
+  virtual void visitStartVertex(VertexPointer Vertex) { 
+    VertexPath NewPath;
+    NewPath.push_back(Vertex);
+    PathStack.push_back(NewPath);
+    StartVertex = Vertex;
+
+    IsIncluded = false;
+  }
+
+  virtual bool scheduleBranch(VertexPointer FirstVertex
+                            , EdgePointer Edge
+                            , VertexPointer SecondVertex) {
+
+    TypeMatch = false;
+    DirectionMatch = true;
+
+    auto PrevPath = PathStack.back(); 
+    unsigned int FirstDepth = 1000;
+    if (PrevPath.back() == FirstVertex) {
+      FirstDepth = PrevPath.size() - 1; 
+    }
+
+    FilterType Filter;
+    if (FirstDepth >= 0 && FirstDepth < DepthSetting) {
+      Filter = FilterList[FirstDepth];
+    }
+    else {
+      Filter.setDefault();
+    }
+
+    if (SecondVertex != StartVertex) {
+      TypeMatch = checkType(Edge, Filter);
+    }
+
+    if (TypeMatch && (FirstDepth == 1)) {
+      TypeMatch = checkProperty<ReturnValueType>(SecondVertex, PropertyFilter) ||\
+                  checkProperty<ReturnValueType>(SecondVertex, PropertyFilter2);
+      if (TypeMatch) {
+        IsIncluded = true;
+      }
+    }
+
 //    std::cout << "first " << FirstVertex->getId()
 //              << " -- second " << SecondVertex->getId()
 //              << " -- Type " << SecondVertex->getType()
@@ -448,13 +505,95 @@ public:
 //              << " typeMatch " << TypeMatch << "\n";
     return false;
   }
+
 protected:
-  std::string StartYear;
-  TargetMapType JobsMap;
-  FilterType RangeFilter;
-  FilterType PropertyFilter;
+  bool IsIncluded;
+  FilterType PropertyFilter2;
+};
 
+class TravellersVisitor : public CountriesVisitor {
+  typedef std::pair<unsigned int, unsigned int> PCCountPairType;
+  typedef std::pair<VertexPointer, PCCountPairType> PersonPCPairType;
+  typedef std::unordered_map<VertexPointer, PCCountPairType> TargetMapType;
+public:
 
+  TargetMapType & getTargetMap(){
+    return PCMap;
+  }
+
+  virtual void visitStartVertex(VertexPointer Vertex) { 
+    VertexPath NewPath;
+    NewPath.push_back(Vertex);
+    PathStack.push_back(NewPath);
+    StartVertex = Vertex;
+
+    PropMatchX = 0;
+    PropMatchY = 0;
+  }
+
+  virtual bool scheduleBranch(VertexPointer FirstVertex
+                            , EdgePointer Edge
+                            , VertexPointer SecondVertex) {
+
+    TypeMatch = false;
+    DirectionMatch = true;
+
+    auto PrevPath = PathStack.back();
+
+    unsigned int FirstDepth = 1000;
+    if (PrevPath.back() == FirstVertex) {
+      FirstDepth = PrevPath.size() - 1; 
+    }
+
+    FilterType Filter;
+    if (FirstDepth >= 0 && FirstDepth < DepthSetting) {
+      Filter = FilterList[FirstDepth];
+    }
+    else {
+      Filter.setDefault();
+    }
+
+    if (SecondVertex != StartVertex) {
+      TypeMatch = checkMultiRelType(Edge, Filter);
+    }
+
+    if (TypeMatch && (FirstDepth == 0)) {
+      auto EqualFlag = false;
+      TypeMatch = checkDateRange<VertexPointer>(SecondVertex, RangeFilter, EqualFlag);
+    }
+
+    if (TypeMatch && (FirstDepth == 1)) {
+      auto MatchX = checkProperty<ReturnValueType>(SecondVertex, PropertyFilter);
+      auto MatchY = checkProperty<ReturnValueType>(SecondVertex, PropertyFilter2);
+      TypeMatch = MatchX || MatchY;
+
+      if (MatchX) PropMatchX++;
+      if (MatchY) PropMatchY++;
+    }
+
+//    std::cout << "first " << FirstVertex->getId()
+//              << " -- second " << SecondVertex->getId()
+//              << " -- Type " << SecondVertex->getType()
+//              << " firstDepth " << FirstDepth
+//              << " depth " << PrevPath.size() 
+//              << " typeMatch " << TypeMatch << "\n";
+    return false;
+  }
+
+  virtual bool finishVisit() {
+    if (PropMatchX && PropMatchY) {
+      /// Record the person and # of posts in country X and Y
+      PCCountPairType PCCountPair(PropMatchX, PropMatchY);
+      PersonPCPairType  PCPair(StartVertex, PCCountPair); 
+      PCMap.insert(PersonPCPairType(PCPair));
+    }
+    return false;
+  }
+
+protected:
+  unsigned int PropMatchX;
+  unsigned int PropMatchY;
+  TargetMapType PCMap;
 };
 
 class PostsCommentsVisitor : public AdjacencyVisitor {
