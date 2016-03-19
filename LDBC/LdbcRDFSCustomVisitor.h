@@ -830,6 +830,73 @@ protected:
   TargetMapType TemTagsMap;
   TargetSetType TagsSet;
 };
+
+class ExpertSearchVisitor : public RecursiveDFSReachabilityVisitor {
+public: 
+  typedef std::unordered_map<VertexPointer,  unsigned int> TargetMapType;
+  typedef std::pair<VertexPointer, unsigned int> VertexTargetPair;
+  typedef std::unordered_set<VertexPointer> VertexSetType;
+  typedef std::pair<FixedString, bool> ReturnValueType;
+public:
+  ExpertSearchVisitor() {}
+
+  void setPropertyFilter(FilterType & Filter) {
+    PropertyFilter = Filter;
+  }
+  
+  TargetMapType & getTargetMap(){
+    return PersonCommentMap;
+  } 
+
+  virtual bool scheduleBranch(VertexPointer FirstVertex 
+                            , EdgePointer Edge
+                            , VertexPointer SecondVertex) {
+
+    TypeMatch = false;
+    DirectionMatch = true;
+
+    ///Don't pop out until the current branch won't be visited again
+    auto PrevPath = PathStack.back();
+
+    unsigned int FirstDepth = 1000;
+    if (PrevPath.back() == FirstVertex) {
+      FirstDepth = PrevPath.size() - 1; 
+    }
+
+    FilterType Filter;
+    if (FirstDepth >= 0 && FirstDepth < DepthSetting) {
+      Filter = FilterList[FirstDepth];
+    }
+    else {
+      Filter.setDefault();
+    }
+
+    if (SecondVertex != StartVertex) {
+      TypeMatch = checkType(Edge, Filter);
+    }
+
+    if (TypeMatch && (FirstDepth > 4)) {
+      auto PropMatch = checkProperty<ReturnValueType>(SecondVertex, PropertyFilter); 
+      
+      if (PropMatch) {
+        auto Person = PrevPath[1];
+        if (PersonCommentMap.find(Person) == PersonCommentMap.end()) {
+          VertexTargetPair NewPair(Person, 1);
+          PersonCommentMap.insert(NewPair);
+        } else {
+          PersonCommentMap[Person]++;
+        }
+      }
+    }
+
+    return false;
+  }
+
+protected:
+  FilterType PropertyFilter;
+  TargetMapType PersonCommentMap;
+};
+
 /**
 class LimitedDepthVisitor : public Visitor {
 public:

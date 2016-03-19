@@ -54,10 +54,10 @@ int main(int argc, char *argv[]) {
 
 */
 
-  LdbcRDFSQuery3 q3;
-  q3.setPropertyRange("name", "Austria", "Angola"); 
-  q3.setRange("creationDate", "2010-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
-  q3.runQuery(g, persons[2]);
+//  LdbcRDFSQuery3 q3;
+//  q3.setPropertyRange("name", "Austria", "Angola"); 
+//  q3.setRange("creationDate", "2010-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
+//  q3.runQuery(g, persons[2]);
 //  LdbcRDFSQuery4 q4;
 //  q4.setRange("creationDate", "2010-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
 //  q4.runQuery(g, persons[0]);
@@ -98,6 +98,10 @@ int main(int argc, char *argv[]) {
   LdbcQuery11 q11;
   q11.runQuery(g, persons[0]);
 */
+  LdbcRDFSQuery12 q12;
+  q12.setParam("name", "Person");
+  q12.runQuery(g, persons[0]);
+
 //  LdbcRDFSQuery13 Q13;
 //  Q13.runQuery(g, persons[0], persons[8]);
 //

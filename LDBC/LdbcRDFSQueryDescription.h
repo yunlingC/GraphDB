@@ -784,65 +784,49 @@ protected:
   SimMapType SimMap;
 };
 
-/**
 
-class LdbcQuery12 : public LdbcQuery {
+class LdbcRDFSQuery12 : public LdbcQuery {
 public:
   typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;  
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex ) {
-#ifdef _PRINTLDBC_
+
+    FilterType tmpFilter[7];
+    traverseThroughTypeAndDirection("KNOWS", "out", tmpFilter[0]);
+    traverseThroughType("COMMENT_HAS_CREATOR", tmpFilter[1]); 
+    traverseThroughType("REPLY_OF_POST", tmpFilter[2]); 
+    traverseThroughType("POST_HAS_TAG", tmpFilter[3]); 
+    traverseThroughType("HAS_TYPE", tmpFilter[4]); 
+    traverseThroughType("IS_SUBCLASS_OF", tmpFilter[5]); 
+    tmpFilter[6].setProperty(ParamPair.first, ParamPair.second);
+
+
+    ExpertSearchVisitor v10;
+    v10.setDepth(6);
+    v10.setPropertyFilter(tmpFilter[6]);
+
+    for (unsigned int i = 0; i < 6; i++ ) {
+      v10.setFilter(tmpFilter[i]);
+    }
+
+    recursiveDepthFirstSearch(graph, startVertex, v10);
+
+  #ifdef _PRINTLDBC_
     LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
     LDBCFile << "===============Query 12================\n";
-#endif
+    auto PersonMap = v10.getTargetMap();
 
-    ///first find start person's friends
-    AdjacencyVisitor av1; 
-    traverseThroughTypeAndDirection("KNOWS", "out", av1.getFilter());
-    breadthFirstSearch(graph, startVertex, av1);
+    for (auto PersonPCPair: PersonMap) {
+      LDBCFile << "person: " << PersonPCPair.first->getId() 
+              << " expert post " << PersonPCPair.second 
+              << "\n";
+    } 
 
-    ///find friends of friends of start person
-    std::vector<VertexPointer> targets;
-      FilterType tmpFilter[6];
-      traverseThroughMultiRelType("COMMENT_HAS_CREATOR", tmpFilter[0]); 
-      traverseThroughMultiRelType("REPLY_OF_POST", tmpFilter[1]); 
-      traverseThroughMultiRelType("POST_HAS_TAG", tmpFilter[2]); 
-      traverseThroughMultiRelType("HAS_TYPE", tmpFilter[3]); 
-      traverseThroughMultiRelType("IS_SUBCLASS_OF", tmpFilter[4]); 
-      tmpFilter[5].setProperty(ParamPair.first, ParamPair.second);
-
-
-    for (VertexPointer StartVertex : av1.getVertexList()) {
-      SimMap[StartVertex] = 0;
-
-      ExpertVisitor v10;
-      v10.setDepth(5);
-      v10.setDepthToCheckVertexProp(4);
-      v10.setVertexFilter(tmpFilter[5]);
-      for (unsigned int i = 0; i < 5; i++ ) {
-        v10.setFilter(tmpFilter[i]);
-      }
-      breadthFirstSearch(graph, StartVertex->getId(), v10);
-      auto iterend = v10.getPostMap().end();
-      auto PostNum = 0;
-      for (auto iter = v10.getPostMap().begin(); iter != iterend; iter++ ) {
-        if ((*iter).second ) { PostNum++; }
-      }
-
-      SimMap[StartVertex] = PostNum; 
-#ifdef _PRINTLDBC_
-      LDBCFile << "person: " << StartVertex->getId() 
-              << " expert post " << PostNum << "\n";
-  
-      LDBCFile.close();
-#endif
-    }
+    LDBCFile.close();
+  #endif
   }
-protected:
-  SimMapType SimMap;
 };
 
-*/
 
 class LdbcRDFSQuery13 : public LdbcQuery {
 public:
