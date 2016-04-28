@@ -833,7 +833,7 @@ public:
   void runQuery(Graph & graph, VertexDescriptor startVertex, VertexDescriptor endVertex ) {
     SingleShortestPathVisitor v13;
     v13.setEndVertex(endVertex);
-    breadthFirstSearch(graph, startVertex, v13);
+    recursiveDepthFirstSearch(graph, startVertex, v13);
 #ifdef _PRINTLDBC_
     LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
     LDBCFile << "===============Query 13================\n";
@@ -855,8 +855,7 @@ public:
   }
 };
 
-/**
-class LdbcQuery14 : public Query {
+class LdbcRDFSQuery14 : public Query {
 public:
   void runQuery(Graph & graph, VertexDescriptor startVertex, VertexDescriptor endVertex ) {
     SubGraphVisitor v13;
@@ -864,7 +863,7 @@ public:
     FilterType EdgeFilter;
     traverseThroughTypeAndDirection("KNOWS", "out",  EdgeFilter);
     v13.setEdgeFilter(EdgeFilter);
-    breadthFirstSearch(graph, startVertex, v13);
+    recursiveDepthFirstSearch(graph, startVertex, v13);
     auto target = v13.getVertexList();
 #ifdef _PRINTLDBC_
     LDBCFile.open("ldbc_rdfs.log", std::ios::out | std::ios::app);
@@ -914,6 +913,5 @@ public:
 
  }
 };
-*/
 
 #endif /*_LDBCRDFSQUERYDESCRIPTION_H_*/

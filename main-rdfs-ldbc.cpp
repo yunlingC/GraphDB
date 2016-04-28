@@ -98,12 +98,12 @@ int main(int argc, char *argv[]) {
   LdbcQuery11 q11;
   q11.runQuery(g, persons[0]);
 */
-  LdbcRDFSQuery12 q12;
-  q12.setParam("name", "Person");
-  q12.runQuery(g, persons[0]);
-
-//  LdbcRDFSQuery13 Q13;
-//  Q13.runQuery(g, persons[0], persons[8]);
+//  LdbcRDFSQuery12 q12;
+//  q12.setParam("name", "Person");
+//  q12.runQuery(g, persons[0]);
+//
+  LdbcRDFSQuery13 Q13;
+  Q13.runQuery(g, persons[0], persons[1]);
 //
 //  LdbcQuery13 q13;
 //  q13.runQuery(g, persons[0], persons[8]);
