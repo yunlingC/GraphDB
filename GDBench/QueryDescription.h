@@ -80,6 +80,10 @@ public:
         filtProperty(Key, Value, v1.getFilter());
         depthFirstSearch(graph, 0, v1);
         break;
+      case 3:
+        filtProperty(Key, Value, v1.getFilter());
+        recursiveDepthFirstSearch(graph, 0, v1);
+        break;
     }
 
 #ifdef _PRINTGDB_
