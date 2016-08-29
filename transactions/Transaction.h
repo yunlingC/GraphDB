@@ -9,18 +9,20 @@
 ///
 /// \file
 /// \brief This is the main class for managing log records for transactions
-//.
 ///
 //===----------------------------------------------------------------------===//
 
 #ifndef _TRANSACTION_H_
 #define _TRANSACTION_H_
 
+#include "GraphType.h"
+#include "LocksManager.h"
+//#include "TransactionManager.h"
+
 #include <map>
 
-#include "GraphType.h"
-
-enum OperationType { NOOP, READ, UPDATE, INSERT, DELETE };
+/// TODO to be deleted
+//enum OperationType { NOOP, READ, UPDATE, INSERT, DELETE };
 
 class Transaction {
 public:
@@ -36,7 +38,12 @@ public:
   typedef std::vector<EdgePair>   EdgePairListType;
   typedef std::vector<VPropPair> VertexPropPairListType;
   typedef std::vector<EPropPair> EdgePropPairListType;
-  
+
+  typedef pair<VertexPointer, pair<MutexType, LockType> >  VLockPair;
+  typedef pair<EdgePointer, pair<MutexType, LockType> >  ELockPair;
+  typedef vector<VLockPair> VLockListType;
+  typedef vector<ELockPair> ELockListType;
+
 public:
   Transaction () : Commit(false), Abort(false), OpType(NOOP) { }
 
@@ -45,7 +52,8 @@ public:
       OpType = opT; 
   }
 
-  auto setTxId(unsigned int id) 
+//  auto requireTxId(TransactionManager & TxManager, unsigned int id)
+  auto requireTxId(unsigned int id)
     -> void {
       Id = id;
   }
@@ -55,10 +63,10 @@ public:
     return Id;
   }
 
-  auto setVertexPropertyPair(const VPropPair & vp) 
-    -> void {
-      VertexPropList.push_back(vp);
-  }
+ // auto setVertexPropertyPair(const VPropPair & vp)
+ //   -> void {
+ //     VertexPropList.push_back(vp);
+ //   }
 
   auto setCommit() 
     -> void {
@@ -87,18 +95,39 @@ public:
     return OpType;
   }
 
+    auto getVertexLockList(VLockListType & VertexLocks)
+            -> void {
+      VertexLockList  = VertexLocks;
+    }
+
+    auto getEdgeLockList(ELockListType & EdgeLocks)
+            -> void {
+      EdgeLockLis = EdgeLocks;
+    }
+
+    /// In the following functions, ask LockManager for locks and invoke RagManager for deadlock detection
+    /// throw exception if waiting for lock is not a good decision
+	bool getVertexLock(VertexPointer & Vertex, MutexType Mutex, LockType Lock);
+    bool getEdgeLock(EdgePointer & Edge, MutexType Mutex, LockType Lock);
+
+    void registerVertexLock(VertexPointer & Vertex, MutexType Mutex, LockType Lock );
+    void registerEdgeLock(EdgePointer & Edge, MutexType Mutex, LockType Lock);
+
+	bool releaseAll();
+
   ~Transaction() { }
 
 protected:
   unsigned int Id;
   bool Commit ;
   bool Abort ;
-  OperationType  OpType;
-  VertexPairListType VertexList;
-  EdgePairListType   EdgeList;
-  VertexPropPairListType VertexPropList;
-  EdgePropPairListType EdgePropList;
-
+//  OperationType  OpType;
+//  VertexPairListType VertexList;
+//  EdgePairListType   EdgeList;
+//  VertexPropPairListType VertexPropList;
+//  EdgePropPairListType EdgePropList;
+  VLockListType VertexLockList;
+  ELockListType EdgeLockList;
 };
 
-#endif /**_TRANSACTION_H_*/
+#endif /*_TRANSACTION_H_*/

@@ -17,6 +17,8 @@
 
 #include <shared_mutex>
 
+enum Lock {VertexLock, EdgeLock};
+
 class VertexLock {
 public:
   typedef std::shared_timed_mutex Mutex;

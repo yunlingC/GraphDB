@@ -25,7 +25,9 @@ public:
   typedef Transaction *  TransactionPointer;
   typedef std::map<unsigned int, TransactionPointer> TransactionTableType;
 public:
-  TransactionManager() : TransNumber(0) {}
+  TransactionManager() : TransNumber(0) {
+/// TODO create ragmanager
+  }
 
   ///TODO not used yet
   auto initTransaction() 

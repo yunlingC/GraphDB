@@ -85,14 +85,14 @@ set(TESTS
   #  main-algo.cpp
   main-ldbc.cpp
   #  main-dfs.cpp
-  main-rdfs-ldbc.cpp
+  #main-rdfs-ldbc.cpp
   )
 
 
 # This will generate all the executables listed in the TESTS variable
 foreach( testsourcefile ${TESTS} ) 
   string( REPLACE ".cpp" "" testname ${testsourcefile} ) 
-  add_executable( ${testname} ${testsourcefile} ) 
+  add_executable( ${testname} ${testsourcefile} transactions/RagManager.h transactions/TranxBreadthFirstSearch.h LDBC/LDBCTranxQuery.cpp transactions/RagManager.cpp)
   # Make sure YourLib is linked to each app 
   target_link_libraries( ${testname} ${STORAGE_LIB}) 
 endforeach( testsourcefile ${TESTS} )
