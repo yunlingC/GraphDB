@@ -17,9 +17,10 @@
 
 #include "LdbcCustomVisitor.h"
 #include "LdbcUpdateVisitor.h"
-//#include "BreadthFirstSearch.h"
 #include "ConcurrentBFS.h"
+#include "TranxBreadthFirstSearch.h"
 #include "QueryDescription.h"
+#include "Transaction.h"
 
 #include <vector>
 #include <string>
@@ -32,9 +33,11 @@
 /// This is the base class for LdbcQuery
 class LdbcQuery : public Query{
 public:
-  typedef std::pair<std::string, std::string> ParamPairType;
+  typedef std::pair<std::string, std::string> ParamPairType
   typedef std::pair<std::string, pair<std::string, std::string> > RangePairType;
   typedef LocksManager LockManagerType;
+  typedef Transaction TransactionType;
+
 public:
   LdbcQuery(unsigned int Id) : QueryId(Id) {
     LdbcFile.open("ldbc"+std::to_string(Id)+".log", ios_base::out| ios_base::app);
@@ -49,6 +52,12 @@ public:
 
   virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
       VertexDescriptor EndVertex, LockManagerType & LockManager) {}
+
+	virtual void runQuery(Graph & graph
+						, VertexDescriptor StartVertex
+						, TransactionType &tranx
+		);
+
 
   void setParam(const std::string & Key, const std::string & Value) {
     ParamPair.first = Key;

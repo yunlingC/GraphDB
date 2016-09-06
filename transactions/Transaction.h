@@ -17,40 +17,33 @@
 
 #include "GraphType.h"
 #include "LocksManager.h"
-//#include "TransactionManager.h"
-
-#include <map>
 
 /// TODO to be deleted
-//enum OperationType { NOOP, READ, UPDATE, INSERT, DELETE };
+enum OperationType { NOOP, READ, UPDATE, INSERT, DELETE };
 
 class Transaction {
 public:
-  typedef GraphType::VertexPointer Vertex;
-  typedef GraphType::EdgePointer   Edge;
+	typedef GraphType::VertexPointer VertexPointer;
+	typedef GraphType::EdgePointer    EdgePointer;
+	typedef LocksManager::MutexPointer MutexPointer;
   typedef GraphType::VertexPropertyList VProp;
   typedef GraphType::EdgePropertyList EProp;
-  typedef std::pair<Vertex, Vertex> VertexPair;
-  typedef std::pair<Edge,   Edge> EdgePair;
+  typedef std::pair<VertexPointer, VertexPointer> VertexPair;
+  typedef std::pair<EdgePointer,   EdgePointer> EdgePair;
   typedef std::pair<VProp,  VProp> VPropPair;
   typedef std::pair<EProp,  EProp> EPropPair;
-  typedef std::vector<VertexPair> VertexPairListType;
-  typedef std::vector<EdgePair>   EdgePairListType;
-  typedef std::vector<VPropPair> VertexPropPairListType;
-  typedef std::vector<EPropPair> EdgePropPairListType;
+//  typedef std::vector<VertexPair> VertexPairListType;
+//  typedef std::vector<EdgePair>   EdgePairListType;
+//  typedef std::vector<VPropPair> VertexPropPairListType;
+//  typedef std::vector<EPropPair> EdgePropPairListType;
 
-  typedef pair<VertexPointer, pair<MutexType, LockType> >  VLockPair;
-  typedef pair<EdgePointer, pair<MutexType, LockType> >  ELockPair;
-  typedef vector<VLockPair> VLockListType;
-  typedef vector<ELockPair> ELockListType;
+  typedef std::pair<VertexPointer, std::pair<MutexType, LockType> >  VLockPair;
+  typedef std::pair<EdgePointer, std::pair<MutexType, LockType> >  ELockPair;
+  typedef std::vector<VLockPair> VLockListType;
+  typedef std::vector<ELockPair> ELockListType;
 
 public:
-  Transaction () : Commit(false), Abort(false), OpType(NOOP) { }
-
-  auto setOperationType (OperationType opT)
-    -> void {
-      OpType = opT; 
-  }
+  Transaction () : Commit(false), Abort(false) {} //, OperationType(NOOP) { }
 
 //  auto requireTxId(TransactionManager & TxManager, unsigned int id)
   auto requireTxId(unsigned int id)
@@ -62,6 +55,10 @@ public:
     -> unsigned int {
     return Id;
   }
+
+	auto setOperationType();
+
+	auto checkOperationType();
 
  // auto setVertexPropertyPair(const VPropPair & vp)
  //   -> void {
@@ -90,10 +87,6 @@ public:
     return true;
   }
 
-  auto checkOperationType()
-    -> OperationType {
-    return OpType;
-  }
 
     auto getVertexLockList(VLockListType & VertexLocks)
             -> void {
@@ -102,26 +95,25 @@ public:
 
     auto getEdgeLockList(ELockListType & EdgeLocks)
             -> void {
-      EdgeLockLis = EdgeLocks;
+      EdgeLockList = EdgeLocks;
     }
 
     /// In the following functions, ask LockManager for locks and invoke RagManager for deadlock detection
     /// throw exception if waiting for lock is not a good decision
-	bool getVertexLock(VertexPointer & Vertex, MutexType Mutex, LockType Lock);
+    bool getVertexLock(VertexPointer & Vertex, MutexType Mutex, LockType Lock);
     bool getEdgeLock(EdgePointer & Edge, MutexType Mutex, LockType Lock);
 
     void registerVertexLock(VertexPointer & Vertex, MutexType Mutex, LockType Lock );
     void registerEdgeLock(EdgePointer & Edge, MutexType Mutex, LockType Lock);
 
-	bool releaseAll();
+		bool releaseAll();
 
-  ~Transaction() { }
+		~Transaction() { }
 
 protected:
   unsigned int Id;
   bool Commit ;
   bool Abort ;
-//  OperationType  OpType;
 //  VertexPairListType VertexList;
 //  EdgePairListType   EdgeList;
 //  VertexPropPairListType VertexPropList;

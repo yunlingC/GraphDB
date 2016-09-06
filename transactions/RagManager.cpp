@@ -46,4 +46,4 @@ auto RagManager::stopWaitOn() {
 }
 
 
-#endif _RAGMANAGER_CPP_
+#endif /*_RAGMANAGER_CPP_*/
