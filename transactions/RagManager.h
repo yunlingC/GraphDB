@@ -20,11 +20,11 @@
 
 #include <unordered_map>
 
-//enum Lock {VertexLock, EdgeLock};
+enum Lock {VertexLock, EdgeLock};
 
 class RagManager {
 public:
-    typedef unsigned int  Lock;
+//    typedef unsigned int  Lock;
     typedef std::unordered_map<Transaction*, Lock> TransactionResourceMap;
     typedef std::unordered_map<Lock, Transaction*> ResourceTransactionMap;
 
