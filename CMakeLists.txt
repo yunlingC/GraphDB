@@ -19,7 +19,7 @@ set(GDBENCH_DIR "GDBench")
 set(LDBC_DIR "LDBC")
 set(ALGO_DIR "algorithm")
 set(TRANSACTIONS_DIR "transactions")
-set(PYBIND_DIR "pybind")
+#set(PYBIND_DIR "pybind")
 
 include_directories(
   # Add all the boost and python includes.
@@ -37,7 +37,7 @@ include_directories(
   ${TRANSACTIONS_DIR}
   ${LDBC_DIR}
   ${ALGO_DIR}
-  ${PYBIND_DIR}
+  #  ${PYBIND_DIR}
   )
 
 link_directories(
@@ -92,9 +92,9 @@ set(TESTS
 # This will generate all the executables listed in the TESTS variable
 foreach( testsourcefile ${TESTS} ) 
   string( REPLACE ".cpp" "" testname ${testsourcefile} ) 
-  add_executable( ${testname} ${testsourcefile} transactions/RagManager.h transactions/TranxBreadthFirstSearch.h LDBC/LDBCTranxQuery.cpp transactions/RagManager.cpp transactions/Transaction.cpp transactions/TransactionManager.cpp)
+  #  add_executable( ${testname} ${testsourcefile} transactions/RagManager.h transactions/TranxBreadthFirstSearch.h LDBC/LDBCTranxQuery.cpp transactions/RagManager.cpp transactions/Transaction.cpp transactions/TransactionManager.cpp)
   # Make sure YourLib is linked to each app 
-  target_link_libraries( ${testname} ${STORAGE_LIB}) 
+  #  target_link_libraries( ${testname} ${STORAGE_LIB}) 
 endforeach( testsourcefile ${TESTS} )
 
 # macro(PYEXPORT _name pybind/_srccpp)
