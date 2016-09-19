@@ -15,12 +15,13 @@
 #ifndef _LOCKSMANAGER_H_
 #define _LOCKSMANAGER_H_
 
+#include "GraphType.h"
+#include "Lock.h"
+
 ///std=c++14 
 #include <thread>
 #include <map>
-
-#include "GraphType.h"
-#include "Lock.h"
+#include <iostream>
 
 /// TODO full name
 enum MutexType { ID, Pp, LE, NE, FV, SV, FNE, FPE, SNE, SPE, Lb};
@@ -190,8 +191,7 @@ public:
     -> void {
     for (auto it = EdgeLocks.begin(), itend = EdgeLocks.end(); 
           it != itend; ++it) {
-      releaseEdgeLock((*it).first, 
-        (*it).second.first, (*it).second.second);
+      releaseEdgeLock((*it).first, (*it).second.first, (*it).second.second);
     }
   }
 
@@ -274,7 +274,7 @@ public:
       EdgeLockMap.insert(ELockPair(EdgeId, NewEdge)); 
   }
  
-  auto buildLockMap(GraphType & graph) 
+  auto buildLockMap(GraphType & Graph) 
   -> void {
     typedef GraphType::VertexPointer VertexPointer;
     typedef GraphType::EdgePointer EdgePointer;
@@ -452,6 +452,7 @@ public:
     if (Edge == nullptr) {
       exit(0);
     }
+
     MutexPointer MutexPtr = nullptr;
     switch (Mutex) {
       case ID:
@@ -501,7 +502,7 @@ public:
     -> void {
     for (auto it = EdgeLocks.begin(), it_end = EdgeLocks.end();
         it != it_end; ++it) {
-      releaseEdgeLock((*it).first,(*it).second.first, (*it).second.second);
+      releaseEdgeLock((*it).first, (*it).second.first, (*it).second.second);
     }
   }
 
@@ -548,21 +549,21 @@ public:
   -> void {
     typedef GraphType::VertexPointer VertexPointer;
     typedef GraphType::EdgePointer EdgePointer;
-    std::map<unsigned int, VertexPointer> VertexMap;
-    std::map<unsigned int, EdgePointer> EdgeMap;
-    VertexMap = Graph.getVertexMap();
-    EdgeMap = Graph.getEdgeMap();
+    std::vector<VertexPointer> VertexList;
+    std::vector<EdgePointer> EdgeList;
+    VertexList = Graph.getAllVertices();
+    EdgeList = Graph.getAllEdges();
 
-    for (auto iter = VertexMap.begin(), iter_end = VertexMap.end();
+    for (auto iter = VertexList.begin(), iter_end = VertexList.end();
         iter != iter_end; iter++) {
       VertexLock* NewVertexLock = new VertexLock();
-      (*iter).second->setVertexLock(NewVertexLock); 
+      (*iter)->setVertexLock(NewVertexLock); 
     }
 
-    for (auto it = EdgeMap.begin(), it_end = EdgeMap.end();
+    for (auto it = EdgeList.begin(), it_end = EdgeList.end();
         it != it_end; it++) {
       EdgeLock* NewEdgeLock = new EdgeLock();
-      (*it).second->setEdgeLock(NewEdgeLock);
+      (*it)->setEdgeLock(NewEdgeLock);
     }
   }
 #endif

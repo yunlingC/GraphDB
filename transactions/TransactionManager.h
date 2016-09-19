@@ -28,27 +28,27 @@ public:
       TransactionTableType;
 public:
 
-  TransactionManager() : TransNumber(0);
+  TransactionManager();
 
   ///TODO not used yet
-  auto initTransaction();
+  TransactionPointer  initTransaction();
 
-  auto addTransaction(unsigned int tid, TransactionPointer log);
+  bool  addTransaction(unsigned int tid, TransactionPointer log);
 
-  auto addTransaction();
+  TransactionPointer addTransaction();
 
-  auto addTransaction(Query & query);
+  bool  addTransaction(Query & query);
 
-  auto rollBack(GraphType & graph);
+  bool  rollBack(GraphType & graph);
 
   ~TransactionManager();
 
 private:
-  auto undoUpdate(GraphType & graph, TransactionPointer log);
-
-  auto undoInsert(GraphType & graph, TransactionPointer log);
-
-  auto undoDelete(GraphType & graph, TransactionPointer log);
+//  bool  undoUpdate(GraphType & graph, TransactionPointer log);
+//
+//  bool  undoInsert(GraphType & graph, TransactionPointer log);
+//
+//  bool  undoDelete(GraphType & graph, TransactionPointer log);
 
 protected:
   unsigned int TransNumber;

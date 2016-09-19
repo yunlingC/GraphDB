@@ -33,14 +33,14 @@
 /// This is the base class for LdbcQuery
 class LdbcQuery : public Query{
 public:
-  typedef std::pair<std::string, std::string> ParamPairType
-  typedef std::pair<std::string, pair<std::string, std::string> > RangePairType;
+  typedef std::pair<std::string, std::string> ParamPairType;
+  typedef std::pair<std::string, std::pair<std::string, std::string> > RangePairType;
   typedef LocksManager LockManagerType;
   typedef Transaction TransactionType;
 
 public:
   LdbcQuery(unsigned int Id) : QueryId(Id) {
-    LdbcFile.open("ldbc"+std::to_string(Id)+".log", ios_base::out| ios_base::app);
+    LdbcFile.open("ldbc"+std::to_string(Id)+".log", std::ios_base::out| std::ios_base::app);
   }
 
   virtual void runQuery(Graph & graph, VertexDescriptor StartVertex ) { }

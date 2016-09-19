@@ -12,6 +12,9 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#ifndef _LDBCTRANXQUERY_CPP_
+#define _LDBCTRANXQUERY_CPP_
+
 #include "LdbcConcurrentQuery.h"
 
 #include <vector>
@@ -43,7 +46,7 @@ public:
 
 #ifdef _PRINTLOG_
 		auto target = DepthVisitor.getVertexList();
-	    LdbcFile << StartVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< endl;
+	    LdbcFile << StartVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< "\n";
 #endif
 		Tranx.releaseAll();
 		getExecTime();
@@ -79,7 +82,7 @@ public:
     LdbcFile << StartVertex << " has friends made " << target.size() << " comments and posts \n";
     for(auto it = targets.begin(); it != targets.end(); ++it) {
       LdbcFile <<"person " << (*it).first->getId() << " " << (*it).second->getPropertyValue("id").first << "\t" <<"comments/posts " << (*it).first->getPropertyValue("id").first << "\t" << (*it).first->getPropertyValue("creationDate").first ;
-      LdbcFile << endl;
+      LdbcFile << "\n";
     }
 #endif
 
@@ -111,7 +114,7 @@ public:
 		auto target = SingleVisitor.getVertexList();
 
 #ifdef _PRINTLOG_
-		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
 #endif
 
 		FilterType FilterSet[4];
@@ -170,7 +173,7 @@ public:
 #ifdef _PRINTLOG_
 		for(auto it = PersonListMap.begin(), it_end = PersonListMap.begin();
         it != it_end; ++it) {
-      LdbcFile << "friend " << (*it).first->getPropertyValue("firstName").first  << " has " <<(*it).second.size() << " commmets/posts made in " << country1 << " or " << country2 << endl;
+      LdbcFile << "friend " << (*it).first->getPropertyValue("firstName").first  << " has " <<(*it).second.size() << " commmets/posts made in " << country1 << " or " << country2 << "\n";
     }
 #endif
 
@@ -208,7 +211,7 @@ public:
     LdbcFile << StartVertex << " has friends made posts of " << targets.size() << " tags\n";
     for(auto it = targets.begin(), it_end = targets.end();
         it != it_end; ++it) {
-      LdbcFile <<"tags " << (*it).first->getPropertyValue("id").first << "\t" <<"num of posts " << (*it).second <<  endl;
+      LdbcFile <<"tags " << (*it).first->getPropertyValue("id").first << "\t" <<"num of posts " << (*it).second <<  "\n";
     }
 #endif
 
@@ -240,7 +243,7 @@ public:
 
 		auto target = SingleVisitor.getVertexList();
 #ifdef _PRINTLOG_
-		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
 #endif
 
 		FilterType Filters[4];
@@ -279,7 +282,7 @@ public:
 		for (auto it = targetMap.begin(), it_end = targetMap.end();
          it != it_end; ++it) {
       if (!(*it).second)
-        LdbcFile <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< endl;
+        LdbcFile <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< "\n";
     }
 #endif
 		Tranx.releaseAll();
@@ -311,7 +314,7 @@ public:
 		auto target = SingleVisitor.getVertexList();
 
 #ifdef _PRINTLOG_
-		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
 #endif
 
 		FilterType Filters[3];
@@ -385,7 +388,7 @@ public:
 		}
 
 #ifdef _PRINTLOG_
-		LdbcFile << StartVertex << " is connected with " << target.size() << " friends" << endl;
+		LdbcFile << StartVertex << " is connected with " << target.size() << " friends" << "\n";
 #endif
 
 		FilterType Filters[2];
@@ -404,7 +407,7 @@ public:
 		auto targetsMap = MatchVisitor.getTimeMap();
     for (auto it = targetsMap.begin(), it_end = targetsMap.end();
         it != it_end; it++) {
-      LdbcFile << (*it).first->getPropertyValue("firstName").first << "\t" << (*it).first->getPropertyValue("id").first<< " likes comment/posts at " << (*it).second << endl;
+      LdbcFile << (*it).first->getPropertyValue("firstName").first << "\t" << (*it).first->getPropertyValue("id").first<< " likes comment/posts at " << (*it).second << "\n";
     }
     auto personMap = MatchVisitor.getPersonMap();
     for (auto it = personMap.begin(), it_end = personMap.end();
@@ -476,7 +479,7 @@ public:
 		auto target = RelVisitor.getVertexList();
 
 #ifdef _PRINTLOG_
-		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
 #endif
 
 		FilterType Filters[2];
@@ -488,7 +491,7 @@ public:
 		     it != it_end; ++it) {
 
 #ifdef _PRINTLOG_
-			LdbcFile <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << endl;
+			LdbcFile <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << "\n";
 #endif
 
 			MultiRelTypeVisitor RelVisitor;
@@ -506,7 +509,7 @@ public:
 #ifdef _PRINTLOG_
 		for (auto iter = TargetsMap.begin(), iter_end = TargetsMap.end();
         iter != iter_end; ++iter) {
-      LdbcFile << "posts/comments " << (*iter).first->getPropertyValue("id").first << "\t" << (*iter).first->getPropertyValue("creationDate").first << " made by person " << (*iter).second->getPropertyValue("id").first << "\t" <<  (*iter).second->getPropertyValue("firstName").first << endl;
+      LdbcFile << "posts/comments " << (*iter).first->getPropertyValue("id").first << "\t" << (*iter).first->getPropertyValue("creationDate").first << " made by person " << (*iter).second->getPropertyValue("id").first << "\t" <<  (*iter).second->getPropertyValue("firstName").first << "\n";
     }
 #endif
 
@@ -617,7 +620,7 @@ public:
 
 		auto target = RelVisitor.getVertexList();
 #ifdef _PRINTLOG_
-		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << endl;
+		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
 #endif
 
 		FilterType Filters[4];
@@ -631,7 +634,7 @@ public:
 		    it != it_end; ++it) {
 
 #ifdef _PRINTLOG_
-			LdbcFile <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << endl;
+			LdbcFile <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << "\n";
 #endif
 
 			VertexPropertyVisitor VPVisitor;
@@ -652,7 +655,7 @@ public:
 		FixedString key("workFrom");
     for (auto iter = TargetsMap.begin(), iter_end = TargetsMap.end();
         iter != iter_end; ++iter) {
-      LdbcFile << (*iter).first->getPropertyValue("firstName").first << " works at "  << (*iter).second.second->getPropertyValue("id").first << " from " << (*iter).second.first->getPropertyValue(key).first << endl;
+      LdbcFile << (*iter).first->getPropertyValue("firstName").first << " works at "  << (*iter).second.second->getPropertyValue("id").first << " from " << (*iter).second.first->getPropertyValue(key).first << "\n";
       }
 #endif
 
@@ -741,11 +744,11 @@ public:
 #ifdef _PRINTLOG_
 		auto target = PVisitor.getVertexList();
     if (target.empty())
-      LdbcFile << StartVertex << " and " <<  endVertex <<" are not connected" << endl;
+      LdbcFile << StartVertex << " and " <<  endVertex <<" are not connected" << "\n";
     else {
-      LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << StartVertex << " to " << endVertex << endl;
+      LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << StartVertex << " to " << endVertex << "\n";
       for(auto it = target.begin(); it != target.end(); ++it) {
-        LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("firstName").first<< endl;
+        LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("firstName").first<< "\n";
       }
     }
 #endif
@@ -775,11 +778,11 @@ public:
 
 #ifdef _PRINTLOG_
 		if (target.empty())
-      LdbcFile << StartVertex << " and " <<  endVertex <<" are not connected" << endl;
+      LdbcFile << StartVertex << " and " <<  endVertex <<" are not connected" << "\n";
     else {
-      LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << StartVertex << " to " << endVertex << endl;
+      LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << StartVertex << " to " << endVertex << "\n";
       for(auto it = target.begin(); it != target.end(); ++it) {
-        LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first <<"\t" << (*it)->getPropertyValue("firstName").first<< endl;
+        LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first <<"\t" << (*it)->getPropertyValue("firstName").first<< "\n";
       }//for
     }//else
 #endif
@@ -853,3 +856,4 @@ protected:
 	ValueListType ValueList;
 };
 */
+#endif /*_LDBCTRANXQUERY_CPP_*/

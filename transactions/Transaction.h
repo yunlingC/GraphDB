@@ -56,9 +56,9 @@ public:
     return Id;
   }
 
-	auto setOperationType();
-
-	auto checkOperationType();
+//	auto setOperationType();
+//	auto checkOperationType
+//     -> OperationType ();
 
  // auto setVertexPropertyPair(const VPropPair & vp)
  //   -> void {

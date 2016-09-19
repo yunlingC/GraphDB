@@ -15,8 +15,11 @@
 #define _FILTER_TYPE_H_
 
 #include "FixedString.h"
+#include "GraphType.h"
 
 #include <map>
+#include <vector>
+
 
 class FilterType {
 public:

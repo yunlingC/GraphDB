@@ -17,7 +17,7 @@
 
 #include <shared_mutex>
 
-enum Lock {VertexLock, EdgeLock};
+//enum Lock {VertexLock, EdgeLock};
 
 class VertexLock {
 public:

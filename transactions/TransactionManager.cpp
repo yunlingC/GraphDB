@@ -1,4 +1,4 @@
-#include "TransactionManager.h"//===-- transactions/TransactionManager.cpp - Tranx Manager--*- C++-*-===//
+//===-- transactions/TransactionManager.cpp - Tranx Manager--*- C++-*-===//
 //
 //                     CAESR Graph Database
 //
@@ -14,6 +14,8 @@
 
 #ifndef _TRANSACTIONMANAGER_CPP_
 #define _TRANSACTIONMANAGER_CPP_
+
+#include "TransactionManager.h"
 
 		TransactionManager::TransactionManager() : TransNumber(0) {
 			/// TODO create ragmanager
@@ -44,10 +46,12 @@
 				return log;
 		}
 
-		auto TransactionManager::addTransaction(Query & query) {
+		auto TransactionManager::addTransaction(Query & query) 
+      ->  bool  {
 			/// TODO
 		}
 
+/**
 		auto TransactionManager::rollBack(GraphType & graph)
 		-> bool {
 				for (auto it = TransTable.begin();
@@ -72,7 +76,7 @@
 				}
 				return true;
 		}
-
+*/
 		TransactionManager::~TransactionManager() {
 				/// TODO check transaction status before delete the table
 				for(auto it = TransTable.begin();
@@ -81,24 +85,24 @@
 				}
 		}
 
-		auto TransactionManager::undoUpdate(GraphType & graph, TransactionPointer
-		log)
-		-> void {
-				///TODO
-		}
-
-		auto TransactionManager::undoInsert(GraphType & graph, TransactionPointer
-		log)
-		-> void {
-				///TODO
-
-		}
-
-		auto TransactionManager::undoDelete(GraphType & graph, TransactionPointer
-		log)
-		-> void {
-				///TODO
-
-		}
+//		auto TransactionManager::undoUpdate(GraphType & graph, TransactionPointer
+//		log)
+//		->  bool {
+//				///TODO
+//		}
+//
+//		auto TransactionManager::undoInsert(GraphType & graph, TransactionPointer
+//		log)
+//		->  bool  {
+//				///TODO
+//
+//		}
+//
+//		auto TransactionManager::undoDelete(GraphType & graph, TransactionPointer
+//		log)
+//		->  bool  {
+//				///TODO
+//
+//		}
 
 #endif /**_TRANSACTIONMANAGER_CPP_*/

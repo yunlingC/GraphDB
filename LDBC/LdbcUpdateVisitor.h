@@ -17,6 +17,7 @@
 
 #include "ConcurrentVisitor.h"
 #include "Utils.h"
+#include "LocksManager.h"
 
 #include <queue>
 #include <set>
@@ -27,6 +28,7 @@ public:
   typedef std::pair<FixedString, bool> ReturnValueType;
   typedef PropertyList<FixedString, FixedString> PropertyListType;
   typedef std::pair<bool, std::pair<std::string, GraphType::PropertyListType> > ReturnBranchType;
+  typedef LocksManager  LockManagerType;
 protected:
   LockManagerType & LockManager;
   GraphType & Graph;

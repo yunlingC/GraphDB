@@ -11,19 +11,19 @@
 /// \brief This is a breadth first search.
 ///
 //===----------------------------------------------------------------------===//
-#ifndef _BREATHFIRSTSEARCH_H_
-#define _BREATHFIRSTSEARCH_H_
-
-/// Standard includes.
-#include <queue>
-#include <map>
-#include <vector>
+#ifndef _CONCURRENTBFS_H_
+#define _CONCURRENTBFS_H_
 
 /// Local includes.
 //#include "util.h"
 #include "GraphType.h"
 #include "Visitor.h"
 #include "LocksManager.h"
+
+/// Standard includes.
+#include <queue>
+#include <map>
+#include <vector>
 
 //TODO
 /// back-off one by one /read or write - stack
@@ -35,11 +35,11 @@
 class ConcurrentBFS {
 public:
   typedef LocksManager LockManagerType;
-  typedef pair<GraphType::VertexPointer, bool> VisitPair;
-  typedef pair<VertexPointer, pair<MutexType, LockType> >  VLockPair;
-  typedef pair<EdgePointer, pair<MutexType, LockType> >  ELockPair;
-  typedef vector<VLockPair> VLockListType; 
-  typedef vector<ELockPair> ELockListType; 
+  typedef std::pair<GraphType::VertexPointer, bool> VisitPair;
+  typedef std::pair<VertexPointer, std::pair<MutexType, LockType> >  VLockPair;
+  typedef std::pair<EdgePointer, std::pair<MutexType, LockType> >  ELockPair;
+  typedef std::vector<VLockPair> VLockListType; 
+  typedef std::vector<ELockPair> ELockListType; 
 public:
   void releaseAll(LockManagerType & LockManager) {
      LockManager.releaseAll(VertexLocks, EdgeLocks); 
@@ -55,7 +55,7 @@ public:
   
     ///change 1
     if ( ScheduledVertex  == nullptr ) {
-      cerr << "No such vertex in graph \n";
+      std::cerr << "No such vertex in graph \n";
       exit(1); 
     }
     
@@ -84,7 +84,7 @@ public:
 
 #endif
 
-      auto VPpPair = make_pair(ScheduledVertex, make_pair(Pp, SH));
+      auto VPpPair = std::make_pair(ScheduledVertex, std::make_pair(Pp, SH));
       VertexLocks.push_back(VPpPair);
  
       if (GraphVisitor.visitVertex(ScheduledVertex))
@@ -99,7 +99,7 @@ public:
       while (!LockManager.getVertexLock(ScheduledVertex, NE, SH));
 #endif
 
-      auto VNEPair = make_pair(ScheduledVertex, make_pair(NE, SH));
+      auto VNEPair = std::make_pair(ScheduledVertex, std::make_pair(NE, SH));
       VertexLocks.push_back(VNEPair);
   
       auto NextEdge = ScheduledVertex->getNextEdge();
@@ -122,8 +122,8 @@ public:
 #else
         while (!LockManager.getEdgeLock(NextEdge, SV, SH));
 #endif
-        auto EFVPair = make_pair(NextEdge, make_pair(FV, SH));
-        auto ESVPair = make_pair(NextEdge, make_pair(SV, SH));
+        auto EFVPair = std::make_pair(NextEdge, std::make_pair(FV, SH));
+        auto ESVPair = std::make_pair(NextEdge, std::make_pair(SV, SH));
         EdgeLocks.push_back(EFVPair);
         EdgeLocks.push_back(ESVPair);
 
@@ -170,8 +170,8 @@ public:
 #else
         while ( !LockManager.getEdgeLock(NextEdge, SNE, SH));
 #endif
-        auto EFNEPair = make_pair(NextEdge, make_pair(FNE, SH));
-        auto ESNEPair = make_pair(NextEdge, make_pair(SNE, SH));
+        auto EFNEPair = std::make_pair(NextEdge, std::make_pair(FNE, SH));
+        auto ESNEPair = std::make_pair(NextEdge, std::make_pair(SNE, SH));
         EdgeLocks.push_back(EFNEPair);
         EdgeLocks.push_back(ESNEPair);
 
@@ -186,4 +186,4 @@ private:
   ELockListType EdgeLocks;
 };
 
-#endif /* _BREATHFIRSTSEARCH_H_*/
+#endif /* _CONCURRENTBFS_H_*/

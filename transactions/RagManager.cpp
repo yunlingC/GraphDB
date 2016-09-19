@@ -17,31 +17,38 @@
 
 #include "RagManager.h"
 
-auto RagManager::getDeadLockCount() {
+auto RagManager::getDeadLockCount() 
+  ->  unsigned int  {
 	return DeadLockCount;
 }
 
-auto RagManager::getVertxLock() {
+auto RagManager::getVertxLock() 
+  ->  bool {
 
 }
 
-auto RagManager::getEdgeLock() {
+auto RagManager::getEdgeLock() 
+  ->  bool  {
 
 }
 
-auto RagManager::registerVertexLock() {
+auto RagManager::registerVertexLock() 
+  ->  bool  {
 
 }
 
-auto RagManager::registerEdgeLock() {
+auto RagManager::registerEdgeLock() 
+  ->  bool  {
 
 }
 
-auto RagManager::checkWaitOn() {
+auto RagManager::checkWaitOn() 
+  ->  bool  {
 
 }
 
-auto RagManager::stopWaitOn() {
+auto RagManager::stopWaitOn() 
+  ->  bool  {
 
 }
 
