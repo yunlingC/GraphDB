@@ -19,11 +19,11 @@
 #include "GraphType.h"
 #include "Visitor.h"
 #include "Transaction.h"
+//#include <Utils.h>
 
 #include <queue>
 #include <unordered_map>
 #include <vector>
-#include <GDBench/Utils.h>
 
 //TODO
 /// No skip-lock in this tranxBFS

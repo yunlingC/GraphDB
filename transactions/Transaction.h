@@ -100,6 +100,7 @@ public:
 
     /// In the following functions, ask LockManager for locks and invoke RagManager for deadlock detection
     /// throw exception if waiting for lock is not a good decision
+  
     bool getVertexLock(VertexPointer & Vertex, MutexType Mutex, LockType Lock);
     bool getEdgeLock(EdgePointer & Edge, MutexType Mutex, LockType Lock);
 
@@ -118,8 +119,8 @@ protected:
 //  EdgePairListType   EdgeList;
 //  VertexPropPairListType VertexPropList;
 //  EdgePropPairListType EdgePropList;
-  VLockListType VertexLockList;
-  ELockListType EdgeLockList;
+//  VLockListType VertexLockList;
+//  ELockListType EdgeLockList;
 };
 
 #endif /*_TRANSACTION_H_*/

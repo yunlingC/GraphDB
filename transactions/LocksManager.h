@@ -44,7 +44,8 @@ public:
   typedef std::vector<std::pair<VertexPtr, std::pair<MutexType, LockType> > > VLockListType; 
   typedef std::vector<std::pair<EdgePtr, std::pair<MutexType, LockType> > > ELockListType; 
 public:
-
+/// TODO declaration
+  friend class RagManager;
 #ifndef _LOCKING_
 /// locks stored in a map
   LocksManager() {}

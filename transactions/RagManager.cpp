@@ -22,8 +22,16 @@ auto RagManager::getDeadLockCount()
 	return DeadLockCount;
 }
 
-auto RagManager::getVertxLock() 
+auto RagManager::getVertexLock(VertexPtr Vertex, MutexType Mutex, LockType Lock) 
   ->  bool {
+    /// TODO Check if lock exists from LockManager
+    /// If yes, check if this lock has been acquired by others
+    ///     If no, get lock and go on;
+    ///     If yes, check if spining on this lock will result in a deadlock
+    ///         If no, wait for current lock
+    ///         If yes, stop wait on this lock
+    ///            Abort
+    ///            Or other techniques e.g. pick up later
 
 }
 

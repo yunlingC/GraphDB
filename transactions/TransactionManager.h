@@ -24,11 +24,14 @@
 class TransactionManager {
 public:
   typedef Transaction *  TransactionPointer;
+  typedef RagManager  RagManagerType;
   typedef std::unordered_map<unsigned int, TransactionPointer>
       TransactionTableType;
 public:
 
   TransactionManager();
+
+  TransactionManager(RagManagerType & RagM) : RagManager(RagM){};
 
   ///TODO not used yet
   TransactionPointer  initTransaction();
@@ -51,6 +54,7 @@ private:
 //  bool  undoDelete(GraphType & graph, TransactionPointer log);
 
 protected:
+  RagManagerType  & RagManager;
   unsigned int TransNumber;
   TransactionTableType TransTable; 
 };

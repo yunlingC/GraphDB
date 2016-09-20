@@ -24,14 +24,16 @@ enum Lock {VertexLock, EdgeLock};
 
 class RagManager {
 public:
-//    typedef unsigned int  Lock;
-    typedef std::unordered_map<Transaction*, Lock> TransactionResourceMap;
-    typedef std::unordered_map<Lock, Transaction*> ResourceTransactionMap;
+//  typedef unsigned int  Lock;
+  typedef std::unordered_map<Transaction*, Lock> TransactionResourceMap;
+  typedef std::unordered_map<Lock, Transaction*> ResourceTransactionMap;
 
 public:
-	unsigned int getDeadLockCount();
+  RagManager(LocksManager & lockM)  : LockManager(lockM){};
 
-	bool  getVertxLock();
+	unsigned int getDeadLockCount();
+	bool  getVertexLock(VertexPtr Vertex);
+  bool  getVertexLock(VertexPtr , MutexType, LockType);
 	bool  getEdgeLock();
 	bool  registerVertexLock();
 	bool  registerEdgeLock();
@@ -40,11 +42,11 @@ public:
 
 ///TODO declare LockManager and TransactionManager as friends or ...
 private:
-	unsigned int            DeadLockCount;
+  LocksManager & LockManager;
+	unsigned int  DeadLockCount;
 	TransactionResourceMap  TranxMap;
 	ResourceTransactionMap  ResrMap;
 
 };
 
-
-#endif //_RAGMANAGER_H_
+#endif /*_RAGMANAGER_H_ */
