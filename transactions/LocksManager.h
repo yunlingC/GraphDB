@@ -21,6 +21,7 @@
 
 ///std=c++14 
 #include <unordered_map>
+#include <set>
 #include <iostream>
 
 /// TODO full name
@@ -31,6 +32,9 @@ enum LockType { SH, EX };
 /// i.e. in the LockMap we are still use shared_mutex from C++ lib
 /// TODO: support PLock with LockMap
 
+/// TODO waitingmap
+/// resolve deadlock 
+/// 
 class LocksManager {
 public:
   typedef std::shared_timed_mutex Mutex;
@@ -43,15 +47,20 @@ public:
   typedef std::pair<unsigned int, EdgeLock>   ELockPair;
   typedef std::vector<std::pair<VertexPtr, std::pair<MutexType, LockType> > > VLockListType; 
   typedef std::vector<std::pair<EdgePtr, std::pair<MutexType, LockType> > > ELockListType; 
-  typedef std::unordered_map<Transaction*, Lock> TransactionResourceMap;
-  typedef std::unordered_map<Lock, Transaction*> ResourceTransactionMap;
+  typedef std::set<Lock> LockListType;
+  typedef std::unordered_map<Transaction*,  LockType> TransListType;
+  typedef std::unordered_map<Transaction*, LockListType> TransactionResourceMap;
+  typedef std::unordered_map<Lock, TransListType>ResourceTransactionMap;
+  typedef std::unordered_map<Transaction*, Lock> WaitingTransactionMap;
 public:
 /// TODO declaration
-  friend class RagManager;
+//  friend class RagManager;
 #ifndef _LOCKING_
 /// locks stored in a map
   LocksManager() {}
 
+  /// TODO getVertexLock has to do check if current tx has hold this lock
+  /// So does getEdgeLock
   bool  getVertexLock(unsigned int VertexId, MutexType Mutex, LockType Lock); 
 
   bool  releaseVertexLock(unsigned int VertexId, MutexType Mutex, LockType Lock);
@@ -79,6 +88,26 @@ public:
   VertexLockMapType getVertexLockMap(); 
 
   EdgeLockMapType getEdgeLockMap(); 
+
+  /// TODO lock
+  bool  registerWaitingMap(unsigned int TransId,  Lock  LockPtr); 
+
+  /// TODO lock
+  bool  registerTransMap(unsigned int TransId,  Lock  LockPtr);
+
+  /// TODO lock
+  bool  registerLockMap(Lock  LockPtr, unsigned int TransId);
+
+  /// HOW to get lock and avoid deadlock
+  /// TODO Check if lock exists from LockManager
+  /// If yes, check if this lock can be acquired 
+  ///     If no, get lock and go on;
+  ///     If yes, check if spining on this lock will result in a deadlock
+  ///         If no, wait for current lock
+  ///         If yes, stop wait on this lock
+  ///            Abort
+  ///            Or other techniques e.g. pick up later
+  /// getLock --> checkWaitOn --> registerWaitingMap  
 
 #else
   ///locks are encoded in Vertex and Edge
@@ -118,8 +147,10 @@ protected:
 
 #ifdef _DL_DETECTION_
 	unsigned int  DeadLockCount;
-	TransactionResourceMap  TranxMap;
+  /// TODO need lock for transMap, ResrMap, WaitMap separately
+	TransactionResourceMap  TransMap;
 	ResourceTransactionMap  ResrMap;
+  WaitingTransactionMap WaitMap;
 #endif /*_DL_DETECTION_ */
     
 };

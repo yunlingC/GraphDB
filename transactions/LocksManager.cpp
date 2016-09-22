@@ -18,7 +18,9 @@
 #include "LocksManager.h"
 
 #include <iostream>
+#include <stack>
 
+#ifndef _LOCKING_
   auto LocksManager::getVertexLock(unsigned int VertexId, MutexType Mutex, LockType Lock) 
     -> bool {
     if (VertexLockMap.find(VertexId) == VertexLockMap.end()) {
@@ -278,9 +280,80 @@
       return EdgeLockMap;
   }
 
+  auto LocksManager::checkWaitOn(unsigned int TransId, Lock LockPtr, LockType LType) 
+    ->  bool  {
+      typedef std::stack<unsigned int> TransStackType; 
+      /// If current trans is waiting for some other lock, then give up
+      /// Usually it won't happen because this trans must be spining on that lock
+      /// TODO to be deleted
+        if (WaitMap.find(TransId) == WaitMap.end())
+          return false;
+        TransListType TxList = TransMap.find(LockPtr);
+        /// If Lock is free, acquire it and register
+        if (TxList.empty()) {
+          registerTransMap(TransId, LockPtr);
+          registerLockMap(TransId, LockPtr);
+        }
+        /// If lock is acquired by trans, check if deadlock exists.
+        else {
+          TransStackType  TransStack;
+          auto iter = TxList.begin();
+          while (iter != TxList.end())
+            /// Check if current transaction already holds this lock 
+            if (*iter.first == TransId) {
+              /*
+              /// There can be 4 scenarios when one transaction holds a lock 
+              /// and requests it again
+              //  <r, r>, <r, w>, <w, r>, <w, w>
+              /// Since TxList is a set, we can rule out <r, r>
+              //  S1 <r, w> 
+              //      if not r'ed by others
+              //          =>  r -> w
+              //      otherwise
+              //        =>  continue
+              //          {
+              //            =>  unlock_sh
+              //            =>  check deadlock
+              //          }
+              //          
+              //  S2 <w, r> ignore
+              //  S3  <w, w> ignore
+              */
+
+              /// Case S1
+              switch(*iter.second) {
+                case  EX:
+                  return false;
+                  break;
+                case  SH:
+                  if (LType == SH) {
+                    if (TxList.size() == 1) {
+                      /// Unlock_sh
+                      /// try_lock()
+                      releaseLock();
+                    }
+                    else {
+                      ///Unlock it and go on
+                      releaseLock();
+                    }
+                  }
+                  break;
+                  default
+
+              }
+              if (*iter.second == SH) {
+                if (LType == EX)  {
+                  
+                }
+              }
+            }
+            TransStack.push(*iter.first);
+            
+        }
+    }
+
 #else
   ///locks are encoded in Vertex and Edge
-public:
   /// TODO const & g
   LocksManager::LocksManager(GraphType & g) : Graph(g) {};
 
@@ -515,26 +588,26 @@ public:
   }
  
   auto LocksManager::buildLockMap(GraphType & Graph) 
-  -> void {
-    typedef GraphType::VertexPointer VertexPointer;
-    typedef GraphType::EdgePointer EdgePointer;
-    std::vector<VertexPointer> VertexList;
-    std::vector<EdgePointer> EdgeList;
-    VertexList = Graph.getAllVertices();
-    EdgeList = Graph.getAllEdges();
-
-    for (auto iter = VertexList.begin(), iter_end = VertexList.end();
-        iter != iter_end; iter++) {
-      VertexLock* NewVertexLock = new VertexLock();
-      (*iter)->setVertexLock(NewVertexLock); 
+    -> void {
+      typedef GraphType::VertexPointer VertexPointer;
+      typedef GraphType::EdgePointer EdgePointer;
+      std::vector<VertexPointer> VertexList;
+      std::vector<EdgePointer> EdgeList;
+      VertexList = Graph.getAllVertices();
+      EdgeList = Graph.getAllEdges();
+  
+      for (auto iter = VertexList.begin(), iter_end = VertexList.end();
+          iter != iter_end; iter++) {
+        VertexLock* NewVertexLock = new VertexLock();
+        (*iter)->setVertexLock(NewVertexLock); 
+      }
+  
+      for (auto it = EdgeList.begin(), it_end = EdgeList.end();
+          it != it_end; it++) {
+        EdgeLock* NewEdgeLock = new EdgeLock();
+        (*it)->setEdgeLock(NewEdgeLock);
+      }
     }
-
-    for (auto it = EdgeList.begin(), it_end = EdgeList.end();
-        it != it_end; it++) {
-      EdgeLock* NewEdgeLock = new EdgeLock();
-      (*it)->setEdgeLock(NewEdgeLock);
-    }
-  }
 #endif
 
 #endif /*_LOCKSMANAGER_CPP_*/
