@@ -12,9 +12,9 @@
 ///
 //===----------------------------------------------------------------------===//
 
+
 #ifndef _RAGMANAGER_H_
 #define _RAGMANAGER_H_
-
 #include "LocksManager.h"
 #include "Transaction.h"
 
@@ -25,6 +25,8 @@ enum Lock {VertexLock, EdgeLock};
 class RagManager {
 public:
 //  typedef unsigned int  Lock;
+/// Lock also contains information on mutextype locktype
+/// Lock + MutexType + LockType
   typedef std::unordered_map<Transaction*, Lock> TransactionResourceMap;
   typedef std::unordered_map<Lock, Transaction*> ResourceTransactionMap;
 
