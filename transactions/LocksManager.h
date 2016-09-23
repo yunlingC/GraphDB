@@ -27,6 +27,7 @@
 /// TODO full name
 enum MutexType { ID, Pp, LE, NE, FV, SV, FNE, FPE, SNE, SPE, LB};
 enum LockType { SH, EX };
+enum CheckRetType {T_Abort,  T_Ignore,  T_Wait};
 
 /// currently PLock is only supported in _LOCKING_
 /// i.e. in the LockMap we are still use shared_mutex from C++ lib
@@ -41,17 +42,20 @@ public:
   typedef VertexLock::MutexPointer  MutexPointer;
   typedef GraphType::VertexPointer VertexPtr;
   typedef GraphType::EdgePointer EdgePtr;
-  typedef std::unordered_map<unsigned int, VertexLock>  VertexLockMapType;
-  typedef std::unordered_map<unsigned int, EdgeLock>    EdgeLockMapType;
-  typedef std::pair<unsigned int, VertexLock> VLockPair;
-  typedef std::pair<unsigned int, EdgeLock>   ELockPair;
+  typedef std::unordered_map<IdType, VertexLock>  VertexLockMapType;
+  typedef std::unordered_map<IdType, EdgeLock>    EdgeLockMapType;
+  typedef std::pair<IdType, VertexLock> VLockPair;
+  typedef std::pair<IdType, EdgeLock>   ELockPair;
   typedef std::vector<std::pair<VertexPtr, std::pair<MutexType, LockType> > > VLockListType; 
   typedef std::vector<std::pair<EdgePtr, std::pair<MutexType, LockType> > > ELockListType; 
   typedef std::set<Lock> LockListType;
-  typedef std::unordered_map<Transaction*,  LockType> TransListType;
+  typedef unsigned int  IdType;
+  typedef std::unordered_map<Transaction*,  LockType> TransMapType;
   typedef std::unordered_map<Transaction*, LockListType> TransactionResourceMap;
-  typedef std::unordered_map<Lock, TransListType>ResourceTransactionMap;
+  typedef std::unordered_map<Lock, TransMapType>ResourceTransactionMap;
   typedef std::unordered_map<Transaction*, Lock> WaitingTransactionMap;
+  typedef std::stack<IdType> TransStackType; 
+  typedef std::set<IdType> TransSetType;
 public:
 /// TODO declaration
 //  friend class RagManager;
@@ -61,13 +65,13 @@ public:
 
   /// TODO getVertexLock has to do check if current tx has hold this lock
   /// So does getEdgeLock
-  bool  getVertexLock(unsigned int VertexId, MutexType Mutex, LockType Lock); 
+  bool  getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock); 
 
-  bool  releaseVertexLock(unsigned int VertexId, MutexType Mutex, LockType Lock);
+  bool  releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock);
 
-  bool  getEdgeLock(unsigned int EdgeId, MutexType Mutex, LockType Lock); 
+  bool  getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock); 
 
-  bool  releaseEdgeLock(unsigned int EdgeId, MutexType Mutex, LockType Lock);
+  bool  releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock);
 
   void  releaseEdgeAll(ELockListType & EdgeLocks); 
 
@@ -75,29 +79,39 @@ public:
 
   void  releaseAll(VLockListType & VertexLocks, ELockListType & EdgeLocks); 
 
-  void  addToVertexLockMap(unsigned int VertexId); 
+  void  addToVertexLockMap(IdType VertexId); 
 
-  void  addToEdgeLockMap(unsigned int EdgeId); 
+  void  addToEdgeLockMap(IdType EdgeId); 
  
   void  buildLockMap(GraphType & Graph); 
 
-	bool  checkWaitOn();
+  bool getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
 
-	bool  stopWaitOn();
+  bool getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
+
+  bool releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
+
+  bool releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
+
+	CheckRetType  checkWaitOn(IdType, Lock, LockType);
+
+  /// Yes - wait  No - deadlock
+  bool  checkWaitOnRecursive();
 
   VertexLockMapType getVertexLockMap(); 
 
   EdgeLockMapType getEdgeLockMap(); 
 
   /// TODO lock
-  bool  registerWaitingMap(unsigned int TransId,  Lock  LockPtr); 
+  bool  registerWaitingMap(IdType TransId,  Lock  LockPtr); 
 
   /// TODO lock
-  bool  registerTransMap(unsigned int TransId,  Lock  LockPtr);
+  bool  registerTransMap(IdType TransId,  Lock  LockPtr);
 
   /// TODO lock
-  bool  registerLockMap(Lock  LockPtr, unsigned int TransId);
+  bool  registerLockMap(Lock  LockPtr, IdType TransId);
 
+  bool registerToMap(IdType TransId,  Lock  LockPtr);
   /// HOW to get lock and avoid deadlock
   /// TODO Check if lock exists from LockManager
   /// If yes, check if this lock can be acquired 
@@ -129,9 +143,9 @@ public:
 
   void  releaseAll(VLockListType & VertexLocks, ELockListType & EdgeLocks); 
 
-  void  addToVertexLockMap(unsigned int VertexId);
+  void  addToVertexLockMap(IdType VertexId);
 
-  void  addToEdgeLockMap(unsigned int EdgeId);
+  void  addToEdgeLockMap(IdType EdgeId);
  
   void  buildLockMap(GraphType & Graph); 
 
@@ -146,7 +160,7 @@ protected:
 #endif
 
 #ifdef _DL_DETECTION_
-	unsigned int  DeadLockCount;
+//	unsigned int DeadLockCount;
   /// TODO need lock for transMap, ResrMap, WaitMap separately
 	TransactionResourceMap  TransMap;
 	ResourceTransactionMap  ResrMap;

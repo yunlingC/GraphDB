@@ -17,11 +17,12 @@
 
 #include "LocksManager.h"
 
-#include <iostream>
 #include <stack>
+#include <string>
+#include <iostream>
 
 #ifndef _LOCKING_
-  auto LocksManager::getVertexLock(unsigned int VertexId, MutexType Mutex, LockType Lock) 
+  auto LocksManager::getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock) 
     -> bool {
     if (VertexLockMap.find(VertexId) == VertexLockMap.end()) {
       std::cerr  << "Error : No such vertex " << VertexId <<" in map \n";
@@ -67,7 +68,7 @@
     } 
   }
 
-  auto LocksManager::releaseVertexLock(unsigned int VertexId, MutexType Mutex, LockType Lock) 
+  auto LocksManager::releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock) 
     -> bool {
     if(VertexLockMap.find(VertexId) == VertexLockMap.end()) {
       std::cerr << "Error : No such vertex " << VertexId <<" in map \n";
@@ -108,7 +109,7 @@
     return true;
   }
 
-  auto LocksManager::getEdgeLock(unsigned int EdgeId, MutexType Mutex, LockType Lock) 
+  auto LocksManager::getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock) 
     -> bool {
     if (EdgeLockMap.find(EdgeId) == EdgeLockMap.end()) {
       std::cerr << "Error : No such edge" << EdgeId <<" in map \n";
@@ -182,7 +183,7 @@
       releaseEdgeAll(EdgeLocks);
   }
 
-  auto LocksManager::releaseEdgeLock(unsigned int EdgeId, MutexType Mutex, LockType Lock) 
+  auto LocksManager::releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock) 
     -> bool {
     if (EdgeLockMap.find(EdgeId) == EdgeLockMap.end()) {
       exit(0);
@@ -234,13 +235,13 @@
     return true;
   }
 
-  auto LocksManager::addToVertexLockMap(unsigned int VertexId) 
+  auto LocksManager::addToVertexLockMap(IdType VertexId) 
     -> void  {
       VertexLock NewVertex;
       VertexLockMap.insert(VLockPair(VertexId, NewVertex));
   }
 
-  auto LocksManager::addToEdgeLockMap(unsigned int EdgeId) 
+  auto LocksManager::addToEdgeLockMap(IdType EdgeId) 
     -> void  {
       EdgeLock NewEdge;
       EdgeLockMap.insert(ELockPair(EdgeId, NewEdge)); 
@@ -250,8 +251,8 @@
   -> void {
     typedef GraphType::VertexPointer VertexPointer;
     typedef GraphType::EdgePointer EdgePointer;
-    std::map<unsigned int, VertexPointer> VertexMap;
-    std::map<unsigned int, EdgePointer> EdgeMap;
+    std::map<IdType, VertexPointer> VertexMap;
+    std::map<IdType, EdgePointer> EdgeMap;
     VertexMap = Graph.getVertexMap();
     EdgeMap = Graph.getEdgeMap();
 
@@ -280,25 +281,25 @@
       return EdgeLockMap;
   }
 
-  auto LocksManager::checkWaitOn(unsigned int TransId, Lock LockPtr, LockType LType) 
+  auto LocksManager::checkWaitOn(IdType TransId, Lock LockPtr, LockType LType) 
     ->  bool  {
-      typedef std::stack<unsigned int> TransStackType; 
       /// If current trans is waiting for some other lock, then give up
       /// Usually it won't happen because this trans must be spining on that lock
       /// TODO to be deleted
-        if (WaitMap.find(TransId) == WaitMap.end())
-          return false;
-        TransListType TxList = TransMap.find(LockPtr);
-        /// If Lock is free, acquire it and register
-        if (TxList.empty()) {
-          registerTransMap(TransId, LockPtr);
-          registerLockMap(TransId, LockPtr);
-        }
-        /// If lock is acquired by trans, check if deadlock exists.
-        else {
+//        if (WaitMap.find(TransId) == WaitMap.end())
+//          return false;
+//        TransMapType TxList = TransMap.find(LockPtr);
+//        /// If Lock is free, acquire it and register
+//        if (TxList.empty()) {
+//          registerTransMap(TransId, LockPtr);
+//          registerLockMap(TransId, LockPtr);
+//        }
+//        /// If lock is acquired by trans, check if deadlock exists.
+//        else {
           TransStackType  TransStack;
+          TransSetType CheckedTransList;
           auto iter = TxList.begin();
-          while (iter != TxList.end())
+          while (iter != TxList.end()) {
             /// Check if current transaction already holds this lock 
             if (*iter.first == TransId) {
               /*
@@ -317,39 +318,139 @@
               //          }
               //          
               //  S2 <w, r> ignore
-              //  S3  <w, w> ignore
+              //  S3 <w, w> ignore
               */
 
               /// Case S1
               switch(*iter.second) {
                 case  EX:
-                  return false;
+                  /// false means don't wait for it
+                  ///
+                  return T_Ignore;
                   break;
                 case  SH:
-                  if (LType == SH) {
+                  if (LType == EX) {
                     if (TxList.size() == 1) {
                       /// Unlock_sh
                       /// try_lock()
                       releaseLock();
+                      try_lock();
+                      registerLock();
+                      return T_Ignore;
                     }
                     else {
-                      ///Unlock it and go on
+                      /// Unlock it and go on
                       releaseLock();
+                      /// remove itself from list
+                      removeLock();
+                      auto Ret = checkWaitOn(TransId, LockPtr, LType) ? T_Wait : T_Abort;
+                      return Ret;
                     }
                   }
                   break;
                   default
 
-              }
-              if (*iter.second == SH) {
-                if (LType == EX)  {
-                  
-                }
-              }
-            }
+              }// switch
+            } // if 
             TransStack.push(*iter.first);
-            
+//            CheckedTransList.insert(*iter.first);
+            if (!checkWaitOnRecursive(TransId, *iter.first, TransStack, checkedTransList)) {
+              /// There is a potential deadlock
+              return T_Abort;
+            } //if 
+            TransStack.pop();
+          }//while
+
+          registerWaitingMap();
+          return T_Wait;
         }
+            
+    auto LocksManager::checkWaitOnRecursive(TransIdType WaitingTrans
+                                            , TransIdType LockingTrans
+                                            , TransStackType  TransStack
+                                            , TransSetType ChkTransList)
+      ->  bool  {
+        /// Deadlock exists if any of LockingTrans is the waitingTrans
+        /// need return true; True - yes deadlock
+        if (WaitingTrans == LockingTrans) {
+          /// Print out deadlock
+          std::string Circle(itoa(LockingTrans)); 
+          while (!TransStack.empty()) {
+          
+            auto TX = TransStack.top();
+            TransStack.pop();
+            Circle.append("<--" + itoa(TX));
+          }
+          Circle.append("<--" + itoa(WaitingTrans));
+          return false;
+        }
+        /// check further if there is deadlock
+        ChKTransList.push_back(LockingTrans);
+        /// Each transaction waits for one lock only
+        auto LockPtr  = WaitMap.find(LockingTrans);
+        if (LockPtr == WaitMap.end())
+          return true;
+        auto TxList  =  ResrMap.find(*LockPtr);
+        /// This lock is available
+        if (TxList == ResrMap.end()) 
+          return true;
+
+        auto it = (*TxList).begin();
+        while (it != (*TxList).end()) {
+          /// This transaction has NOT been checked
+          if (ChkTransList.find(*it) == ChkTransList.end()) {
+            TransStack.push(*it);
+            checkWaitOnRecursive(WaitingTrans, *it, TransStack, ChkTransList);
+            TransStack.pop();
+          }//if
+        }//while
+      }
+
+    auto LocksManager::getVertexLock(IdType VId, MutexType Mutex, LockType Lock, IdType TxId)
+      ->  bool  {
+       auto getLock = getVertexLock(VId, Mutex, Lock);
+       /// If this lock is available, assign lock to TxId, register to maps(Trans, Lock)
+       if (getLock) {
+         /// TODO separate getting lock from getVertexLock
+         registerToMap(TxId, LockPtr);
+         return true;
+       }
+       switch (checkWaitOn(TxId, LockPtr, Lock))  {
+         /// If there is no potential deadlock, wait for it
+         case T_Wait:
+           while (!getVertexLock(VID, Mutex, Lock));
+           break;
+         case T_Abort:
+           return false;
+         case T_Ignore:
+           return true;
+       }
+    }
+
+    auto LocksManager::getEdgeLock(IdType EId, MutexType Mutex, LockType Lock, IdType TxId)
+      ->  bool  {
+       auto getLock = getEdgeLock(EId, Mutex, Lock);
+       /// If this lock is available, assign lock to TxId, register to maps(Trans, Lock)
+       if (getLock) {
+         /// TODO separate getting lock from getVertexLock
+         registerToMap(TxId, LockPtr);
+         return true;
+       }
+       switch (checkWaitOn(TxId, LockPtr, Lock))  {
+         /// If there is no potential deadlock, wait for it
+         case T_Wait:
+           while (!getEdgeLock(EID, Mutex, Lock));
+           break;
+         case T_Abort:
+           return false;
+         case T_Ignore:
+           return true;
+       }
+    }
+
+    auto LocksManager::registerWaitingMap(IdType TxId, Lock LockPtr)
+      -> bool {
+        
     }
 
 #else
@@ -564,7 +665,7 @@
   }
 
 
-  auto LocksManager::addToVertexLockMap(unsigned int VertexId) 
+  auto LocksManager::addToVertexLockMap(IdType VertexId) 
     -> void  {
       VertexPtr Vertex = Graph.getVertexPointer(VertexId);
       if (Vertex == nullptr) {
@@ -576,7 +677,7 @@
       Vertex->setVertexLock(NewVertexLock);
     }
 
-  auto LocksManager::addToEdgeLockMap(unsigned int EdgeId) 
+  auto LocksManager::addToEdgeLockMap(IdType EdgeId) 
     -> void  {
       EdgePtr Edge = Graph.getEdgePointer(EdgeId);
       if (Edge == nullptr) {
