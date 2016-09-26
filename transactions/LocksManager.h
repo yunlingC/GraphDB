@@ -27,7 +27,7 @@
 /// TODO full name
 enum MutexType { ID, Pp, LE, NE, FV, SV, FNE, FPE, SNE, SPE, LB};
 enum LockType { SH, EX };
-enum CheckRetType {T_Abort,  T_Ignore,  T_Wait};
+enum DLRetType {T_Abort,  T_Ignore,  T_Wait};
 
 /// currently PLock is only supported in _LOCKING_
 /// i.e. in the LockMap we are still use shared_mutex from C++ lib
@@ -103,15 +103,18 @@ public:
   EdgeLockMapType getEdgeLockMap(); 
 
   /// TODO lock
+  bool releaseAll(IdType TxId);
+
+  /// TODO lock
   bool  registerWaitingMap(IdType TransId,  Lock  LockPtr); 
 
   /// TODO lock
   bool  registerTransMap(IdType TransId,  Lock  LockPtr);
 
   /// TODO lock
-  bool  registerLockMap(Lock  LockPtr, IdType TransId);
+  bool  registerLockMap(IdType TransId, Lock  LockPtr,  LockType  LType);
 
-  bool registerToMap(IdType TransId,  Lock  LockPtr);
+  bool registerToMap(IdType TransId,  Lock  LockPtr, LockType LType);
   /// HOW to get lock and avoid deadlock
   /// TODO Check if lock exists from LockManager
   /// If yes, check if this lock can be acquired 

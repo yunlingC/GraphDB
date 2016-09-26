@@ -359,6 +359,7 @@
               return T_Abort;
             } //if 
             TransStack.pop();
+            it++;
           }//while
 
           registerWaitingMap();
@@ -395,15 +396,15 @@
         if (TxList == ResrMap.end()) 
           return true;
 
-        auto it = (*TxList).begin();
-        while (it != (*TxList).end()) {
+        auto it_end = (*TxList).begin();
+        for (auto it  = (*TxList).begin(); it!= it_end; it++) {
           /// This transaction has NOT been checked
           if (ChkTransList.find(*it) == ChkTransList.end()) {
             TransStack.push(*it);
             checkWaitOnRecursive(WaitingTrans, *it, TransStack, ChkTransList);
             TransStack.pop();
           }//if
-        }//while
+        }
       }
 
     auto LocksManager::getVertexLock(IdType VId, MutexType Mutex, LockType Lock, IdType TxId)
@@ -420,7 +421,7 @@
          case T_Wait:
            while (!getVertexLock(VID, Mutex, Lock));
            break;
-         case T_Abort:
+         case T_Abort_:
            return false;
          case T_Ignore:
            return true;
@@ -450,7 +451,91 @@
 
     auto LocksManager::registerWaitingMap(IdType TxId, Lock LockPtr)
       -> bool {
+        auto it = WaitMap.find(TxId);
+        if (it != WaitMap.end())  {
+          std::cerr << "Transaction " << TxId << " is busy\n";
+          return false; 
+        }
+
+        WaitMap.insert(std::make_pair(TxId, LockPtr));
+        return true;
+    }
+
+    auto LocksManager::registerTransMap(IdType TransId, Lock LockPtr)
+      ->  bool  {
+        auto it = TransMap.find(TransId);
+        /// If current transaction never registers itself with any lock
+        if (it == TransMap.end()) {
+          LockListType LockList{LockPtr}; 
+          TransMap.insert(std::make_pair(TransId, LockList));
+          return true;
+        }
+        /// If current lock exists in list 
+        if ((*it).find(LockPtr) != (*it).end()) {
+          /// TODO do something ?
+          /// So far there is no need to update transMap, which means no lock 
+          /// Update ResrMap only 
+          return true;
+        }
+
+        (*it).insert(std::make_pair(TransId, LockList));
+        return true;
+    }
+
+    auto LocksManager::registerLockMap(IdType TransId, Lock LockPtr, LockType LType)
+      ->  bool  {
+        auto it = ResrMap.find(LockPtr);
+        if (it == ResrMap.end())  {
+          TransactionMapType TxMap{TransId, LType};
+          ResrMap.insert(std::make_pair(LockPtr, TxMap)); 
+          return true;
+        }
+        auto TxRec  = (*it).find(TransId);
+        /// If this transaction never registers itself with this lock, register
+        if (TxRec == (*it).end()) {
+          (*it).insert(std::make_pair(TransId, LType));
+          return true;
+        }
+        /// If this transaction already holds the lock with same LockType
+        ///   Ignore it
+        if (((*TxRec).second == SH) && (LType == EX)) {
+          (*TxRec).second = EX;
+//          return true;
+        }
+        return true;
+    }
+
+    auto LocksManager::registerToMap(IdType TransId, Lock LockPtr, LockType LType)
+      ->  bool  {
+        return LocksManager::registerTransMap(TransId, LockPtr) && LocksManager::registerLockMap(TransId, LockPtr, LType);
+
+    }
+
+    auto releaseAll(IdType TxId)
+      ->  bool  {
+      auto AcqLocks  = TransMap.find(TxId);
+      auto WaitLocks  = WaitMap.find(TxId);
+      /// Remove entry <TxId, Lock> in WaitMap if it exists
+      if (WaitLocks != WaitMap.end()) {
+        WaitMap.erase(TxId);
+      }
+      /// This transaction does NOT have any lock
+      if (AcqLocks == TransMap.end())  {
+        return true;
+      }
+
+      /// AcqLocks is a set
+      /// it is a iterator to this set
+      auto it_end = (*AcqLocks).begin();
+      for (auto it = (*AcqLocks).begin(); it!= it_end; it++){
+        /// Remove entries from ResrMap one by one
         
+        ///  TODO work till here
+
+        
+      }
+
+
     }
 
 #else
