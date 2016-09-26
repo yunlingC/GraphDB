@@ -27,7 +27,7 @@
 /// TODO full name
 enum MutexType { ID, Pp, LE, NE, FV, SV, FNE, FPE, SNE, SPE, LB};
 enum LockType { SH, EX };
-enum DLRetType {T_Abort,  T_Ignore,  T_Wait};
+enum DLRetType {T_Abort,  T_Ignore,  T_Upgrade, T_Wait};
 
 /// currently PLock is only supported in _LOCKING_
 /// i.e. in the LockMap we are still use shared_mutex from C++ lib
@@ -40,6 +40,7 @@ class LocksManager {
 public:
   typedef std::shared_timed_mutex Mutex;
   typedef VertexLock::MutexPointer  MutexPointer;
+  typedef MutexPointer  LockPointer;
   typedef GraphType::VertexPointer VertexPtr;
   typedef GraphType::EdgePointer EdgePtr;
   typedef std::unordered_map<IdType, VertexLock>  VertexLockMapType;
@@ -48,19 +49,18 @@ public:
   typedef std::pair<IdType, EdgeLock>   ELockPair;
   typedef std::vector<std::pair<VertexPtr, std::pair<MutexType, LockType> > > VLockListType; 
   typedef std::vector<std::pair<EdgePtr, std::pair<MutexType, LockType> > > ELockListType; 
-  typedef std::set<Lock> LockListType;
+  typedef std::set<LockPointer> LockListType;
   typedef unsigned int  IdType;
-  typedef std::unordered_map<Transaction*,  LockType> TransMapType;
-  typedef std::unordered_map<Transaction*, LockListType> TransactionResourceMap;
-  typedef std::unordered_map<Lock, TransMapType>ResourceTransactionMap;
-  typedef std::unordered_map<Transaction*, Lock> WaitingTransactionMap;
+  typedef std::unordered_map<IdType,  LockType> TransMapType;
+  typedef std::unordered_map<IdType, LockListType> TransactionResourceMap;
+  typedef std::unordered_map<LockPointer, TransMapType>ResourceTransactionMap;
+  typedef std::unordered_map<IdType, LockPointer> WaitingTransactionMap;
   typedef std::stack<IdType> TransStackType; 
   typedef std::set<IdType> TransSetType;
 public:
-/// TODO declaration
-//  friend class RagManager;
+
 #ifndef _LOCKING_
-/// locks stored in a map
+/// locks stored in a map 
   LocksManager() {}
 
   /// TODO getVertexLock has to do check if current tx has hold this lock
@@ -84,42 +84,43 @@ public:
   void  addToEdgeLockMap(IdType EdgeId); 
  
   void  buildLockMap(GraphType & Graph); 
-
-  bool getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
-
-  bool getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
-
-  bool releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
-
-  bool releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
-
-	CheckRetType  checkWaitOn(IdType, Lock, LockType);
-
-  /// Yes - wait  No - deadlock
-  bool  checkWaitOnRecursive();
-
+  
   VertexLockMapType getVertexLockMap(); 
 
   EdgeLockMapType getEdgeLockMap(); 
 
-  /// TODO lock
-  bool releaseAll(IdType TxId);
+  /*  New functions added to support deadlock detection */
+  bool getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
+
+  bool getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
+
+//  bool releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
+
+//  bool releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
+
+	DLRetType  checkWaitOn(IdType, LockPointer, LockType);
+
+  /// Yes - wait  No - deadlock
+  bool  checkWaitOnRecursive(TransIdType, TransIdType, TransStackType, TransSetType);
 
   /// TODO lock
-  bool  registerWaitingMap(IdType TransId,  Lock  LockPtr); 
+  bool  releaseAll(IdType TxId);
 
   /// TODO lock
-  bool  registerTransMap(IdType TransId,  Lock  LockPtr);
+  bool  registerWaitingMap(IdType TransId,  LockPointer  LockPtr); 
 
   /// TODO lock
-  bool  registerLockMap(IdType TransId, Lock  LockPtr,  LockType  LType);
+  bool  registerTransMap(IdType TransId,  LockPointer  LockPtr);
 
-  bool registerToMap(IdType TransId,  Lock  LockPtr, LockType LType);
+  /// TODO lock
+  bool  registerLockMap(IdType TransId, LockPointer  LockPtr,  LockType  LType);
+
+  bool  registerToMap(IdType TransId,  LockPointer  LockPtr, LockType LType);
   /// HOW to get lock and avoid deadlock
   /// TODO Check if lock exists from LockManager
   /// If yes, check if this lock can be acquired 
-  ///     If no, get lock and go on;
-  ///     If yes, check if spining on this lock will result in a deadlock
+  ///     If yes, get lock and go on;
+  ///     If no, check if spining on this lock will result in a deadlock
   ///         If no, wait for current lock
   ///         If yes, stop wait on this lock
   ///            Abort

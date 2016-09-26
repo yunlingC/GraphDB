@@ -21,6 +21,8 @@
 #include <string>
 #include <iostream>
 
+#define _DEBUG_ENABLE_ true
+
 #ifndef _LOCKING_
   auto LocksManager::getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock) 
     -> bool {
@@ -281,8 +283,8 @@
       return EdgeLockMap;
   }
 
-  auto LocksManager::checkWaitOn(IdType TransId, Lock LockPtr, LockType LType) 
-    ->  bool  {
+  auto LocksManager::checkWaitOn(IdType TransId, LockPointer LockPtr, LockType LType) 
+    ->  DLRetType  {
       /// If current trans is waiting for some other lock, then give up
       /// Usually it won't happen because this trans must be spining on that lock
       /// TODO to be deleted
@@ -298,45 +300,54 @@
 //        else {
           TransStackType  TransStack;
           TransSetType CheckedTransList;
-          auto iter = TxList.begin();
-          while (iter != TxList.end()) {
+          TransMapType TxList = ResrMap.find(LockPtr);
+          /// TxList should NOT be empty, otherwise getLock should work
+#if _DEBUG_ENABLE_
+          if (TxList == ResrMap.end()) {
+            std::cerr << "Error : Lock is not available but no record found\n";
+            exit(0);
+          }
+#endif
+          auto iter = (*TxList).begin();
+          while (iter != (*TxList).end()) {
             /// Check if current transaction already holds this lock 
-            if (*iter.first == TransId) {
+            if ((*iter).first == TransId) {
               /*
-              /// There can be 4 scenarios when one transaction holds a lock 
-              /// and requests it again
-              //  <r, r>, <r, w>, <w, r>, <w, w>
-              /// Since TxList is a set, we can rule out <r, r>
-              //  S1 <r, w> 
-              //      if not r'ed by others
-              //          =>  r -> w
-              //      otherwise
-              //        =>  continue
-              //          {
-              //            =>  unlock_sh
-              //            =>  check deadlock
-              //          }
-              //          
-              //  S2 <w, r> ignore
-              //  S3 <w, w> ignore
+              There can be 4 scenarios when one transaction holds a lock 
+              and requests it again
+              <r, r>, <r, w>, <w, r>, <w, w>
+              Since TxList is a set, we can rule out <r, r>
+                S1 <r, w> 
+                    if not r'ed by others
+                        =>  r -> w
+                    otherwise
+                      =>  continue
+                        {
+                          =>  unlock_sh
+                          =>  check deadlock
+                        }
+                        
+                S2 <w, r> ignore
+                S3 <w, w> ignore
               */
 
-              /// Case S1
-              switch(*iter.second) {
+              /// TODO problem with this
+              /// might come into this situation
+              /// T1 has lock <L1, SH> and requests <L1, EX> with sucess 
+              /// BUT without registering!
+              /// This is possible because in STL thread with shared_timed_mutex:
+              /// Undefined behavior might happen when one thread requests
+              /// the same mutex again
+              switch((*iter).second) {
+                /// <w, *>
                 case  EX:
-                  /// false means don't wait for it
-                  ///
                   return T_Ignore;
-                  break;
                 case  SH:
+                  /// <r, w>
                   if (LType == EX) {
+                    /// No other transaction is holding this lock
                     if (TxList.size() == 1) {
-                      /// Unlock_sh
-                      /// try_lock()
-                      releaseLock();
-                      try_lock();
-                      registerLock();
-                      return T_Ignore;
+                      return T_Upgrade;
                     }
                     else {
                       /// Unlock it and go on
@@ -347,9 +358,6 @@
                       return Ret;
                     }
                   }
-                  break;
-                  default
-
               }// switch
             } // if 
             TransStack.push(*iter.first);
@@ -359,7 +367,7 @@
               return T_Abort;
             } //if 
             TransStack.pop();
-            it++;
+            iter++;
           }//while
 
           registerWaitingMap();
@@ -449,7 +457,7 @@
        }
     }
 
-    auto LocksManager::registerWaitingMap(IdType TxId, Lock LockPtr)
+    auto LocksManager::registerWaitingMap(IdType TxId, LockPoiner LockPtr)
       -> bool {
         auto it = WaitMap.find(TxId);
         if (it != WaitMap.end())  {
@@ -461,7 +469,7 @@
         return true;
     }
 
-    auto LocksManager::registerTransMap(IdType TransId, Lock LockPtr)
+    auto LocksManager::registerTransMap(IdType TransId, LockPointer LockPtr)
       ->  bool  {
         auto it = TransMap.find(TransId);
         /// If current transaction never registers itself with any lock
@@ -482,7 +490,7 @@
         return true;
     }
 
-    auto LocksManager::registerLockMap(IdType TransId, Lock LockPtr, LockType LType)
+    auto LocksManager::registerLockMap(IdType TransId, LockPointer LockPtr, LockType LType)
       ->  bool  {
         auto it = ResrMap.find(LockPtr);
         if (it == ResrMap.end())  {
@@ -505,7 +513,7 @@
         return true;
     }
 
-    auto LocksManager::registerToMap(IdType TransId, Lock LockPtr, LockType LType)
+    auto LocksManager::registerToMap(IdType TransId, LockPointer LockPtr, LockType LType)
       ->  bool  {
         return LocksManager::registerTransMap(TransId, LockPtr) && LocksManager::registerLockMap(TransId, LockPtr, LType);
 
@@ -526,16 +534,27 @@
 
       /// AcqLocks is a set
       /// it is a iterator to this set
-      auto it_end = (*AcqLocks).begin();
-      for (auto it = (*AcqLocks).begin(); it!= it_end; it++){
+      auto it_end = (*AcqLocks).end();
+      for (auto it = (*AcqLocks).begin(); it!= it_end; it++) {
         /// Remove entries from ResrMap one by one
-        
-        ///  TODO work till here
-
-        
+        /// If this lock is not found in ResrMap, there is an error
+        auto TransRec = ResrMap.find(*it);
+        if (TransRec == ResrMap.end()) {
+          std::cerr << "Error: Lock not found\n";
+          return false;
+          /// TODO shoud be exit?
+        }
+        /// If this transaction is not found with this lock, there is an error
+        auto Tx = (*TransRec).find(TxId);
+        if (Tx  == (*TransRec).end()) {
+          std::cerr << "Error: Transaction " << TxId << " not found \n"; 
+          return false;
+        }
+        (*TransRec).erase(TxId);
       }
-
-
+      /// Now remove records of TxId from TransMap
+      TransMap.erase(TxId);
+      return true;
     }
 
 #else
