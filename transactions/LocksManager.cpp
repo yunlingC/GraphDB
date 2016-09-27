@@ -26,48 +26,41 @@
 #ifndef _LOCKING_
   auto LocksManager::getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock) 
     -> bool {
+#if _DEBUG_ENABLE_
     if (VertexLockMap.find(VertexId) == VertexLockMap.end()) {
       std::cerr  << "Error : No such vertex " << VertexId <<" in map \n";
-      ///TODO: shoould be exception here and roll back, need to be fixed.
-      /**
-      *exiting process would give out ownership of this mutex automatically,
-      * no need to release it before exiting
-      * but consistency state?
-      * anyway, it won't happen if we don't delete any lock from manager
-      */
       exit(0);
     }
-    else {
-      MutexPointer MutexPtr = nullptr;
-      switch (Mutex) {
-        case Pp:
-          MutexPtr = VertexLockMap[VertexId].getPpMutex();
-          break;
-        case LE:
-          MutexPtr = VertexLockMap[VertexId].getLEMutex();
-          break;
-        case NE:
-          MutexPtr = VertexLockMap[VertexId].getNEMutex();
-          break;
-        case ID:
-          MutexPtr = VertexLockMap[VertexId].getIdMutex();
-          break;
-        default:
-          std::cerr << "ERROR: No such Mutex in VertexLock\n";
-          exit(0);
-      }
-      switch (Lock) {   
-        ///Shared lock
-        case SH:
-          return MutexPtr->try_lock_shared();
-        ///Exclusive lock
-        case EX:
-          return MutexPtr->try_lock(); 
-        default:
-          std::cerr << "ERROR: No such Mutex in VertexLock\n";
-          exit(0);
-      }
-    } 
+#endif
+    MutexPointer MutexPtr = nullptr;
+    switch (Mutex) {
+      case Pp:
+        MutexPtr = VertexLockMap[VertexId].getPpMutex();
+        break;
+      case LE:
+        MutexPtr = VertexLockMap[VertexId].getLEMutex();
+        break;
+      case NE:
+        MutexPtr = VertexLockMap[VertexId].getNEMutex();
+        break;
+      case ID:
+        MutexPtr = VertexLockMap[VertexId].getIdMutex();
+        break;
+      default:
+        std::cerr << "ERROR: No such Mutex in VertexLock\n";
+        exit(0);
+    }
+    switch (Lock) {   
+      ///Shared lock
+      case SH:
+        return MutexPtr->try_lock_shared();
+      ///Exclusive lock
+      case EX:
+        return MutexPtr->try_lock(); 
+      default:
+        std::cerr << "ERROR: No such Mutex in VertexLock\n";
+        exit(0);
+    }
   }
 
   auto LocksManager::releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock) 
@@ -278,9 +271,113 @@
     -> VertexLockMapType {
       return VertexLockMap;
   }
+
   auto LocksManager::getEdgeLockMap() 
     -> EdgeLockMapType {
       return EdgeLockMap;
+  }
+
+  auto LocksManager::getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock) 
+    -> LockRetPairType  {
+#if _DEBUG_ENABLE_
+    if (VertexLockMap.find(VertexId) == VertexLockMap.end()) {
+      std::cerr  << "Error : No such vertex " << VertexId <<" in map \n";
+      exit(0);
+    }
+#endif
+    MutexPointer MutexPtr = nullptr;
+    switch (Mutex) {
+      case Pp:
+        MutexPtr = VertexLockMap[VertexId].getPpMutex();
+        break;
+      case LE:
+        MutexPtr = VertexLockMap[VertexId].getLEMutex();
+        break;
+      case NE:
+        MutexPtr = VertexLockMap[VertexId].getNEMutex();
+        break;
+      case ID:
+        MutexPtr = VertexLockMap[VertexId].getIdMutex();
+        break;
+      default:
+        std::cerr << "ERROR: No such Mutex in VertexLock\n";
+        exit(0);
+    }
+    bool  RetValue  = false;
+    switch (Lock) {   
+      ///Shared lock
+      case SH:
+        RetValue = MutexPtr->try_lock_shared();
+        break;
+      ///Exclusive lock
+      case EX:
+        RetValue = MutexPtr->try_lock(); 
+        break;
+#if _DEBUG_ENABLE_
+      default:
+        std::cerr << "ERROR: No such Mutex in VertexLock\n";
+        exit(0);
+#endif
+    }
+    return std::make_pair(LockRetPairType(RetValue, MutexPtr));
+  }
+
+  auto LocksManager::getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock) 
+    -> LockRetPairType  {
+#if _DEBUG_ENABLE_
+    if (EdgeLockMap.find(EdgeId) == EdgeLockMap.end()) {
+      std::cerr << "Error : No such edge" << EdgeId <<" in map \n";
+      exit(0);
+    }
+#endif
+    MutexPointer MutexPtr = nullptr;
+    switch (Mutex) {
+      case ID:
+        MutexPtr = EdgeLockMap[EdgeId].getIdMutex();
+        break;
+      case Pp:
+        MutexPtr = EdgeLockMap[EdgeId].getPpMutex();
+        break;
+      case FV:
+        MutexPtr = EdgeLockMap[EdgeId].getFVMutex();
+        break;
+      case SV:
+        MutexPtr = EdgeLockMap[EdgeId].getSVMutex();
+        break;
+      case FNE:
+        MutexPtr = EdgeLockMap[EdgeId].getFNEMutex();
+        break;
+      case FPE:
+        MutexPtr = EdgeLockMap[EdgeId].getFPEMutex();
+        break;
+      case SNE:
+        MutexPtr = EdgeLockMap[EdgeId].getSNEMutex();
+        break;
+      case SPE:
+        MutexPtr = EdgeLockMap[EdgeId].getSPEMutex();
+        break;
+#if _DEBUG_ENABLE_
+      default:
+        std::cerr << "ERROR: No such Mutex in EdgeLock\n";
+        exit(0);
+#endif
+    }
+
+    bool RetValue = false;
+    switch (Lock) {   
+      case SH:
+        RetValue  = MutexPtr->try_lock_shared();
+        break;
+      case EX:
+        RetValue  = MutexPtr->try_lock(); 
+        break;
+#if _DEBUG_ENABLE_
+      default:
+        std::cerr  << "ERROR: No such Mutex in EdgeLock\n";
+        exit(0);
+#endif
+    }
+    return std::make_pair(LockRetPairType(RetValue, MutexPtr));
   }
 
   auto LocksManager::checkWaitOn(IdType TransId, LockPointer LockPtr, LockType LType) 
@@ -417,35 +514,44 @@
 
     auto LocksManager::getVertexLock(IdType VId, MutexType Mutex, LockType Lock, IdType TxId)
       ->  bool  {
-       auto getLock = getVertexLock(VId, Mutex, Lock);
+       LockRetPairType getLock = LocksManager::getVertexLock(VId, Mutex, Lock);
+      
+       
+       std::lock_guard<std::mutex> Lock(DeadlockDetector);
        /// If this lock is available, assign lock to TxId, register to maps(Trans, Lock)
-       if (getLock) {
+       if (getLock.first) {
          /// TODO separate getting lock from getVertexLock
-         registerToMap(TxId, LockPtr);
+         LocksManager::registerToMap(TxId, getLock.second, Lock);
          return true;
        }
-       switch (checkWaitOn(TxId, LockPtr, Lock))  {
+       switch (LocksManager::checkWaitOn(TxId, getLock.second, Lock))  {
          /// If there is no potential deadlock, wait for it
          case T_Wait:
-           while (!getVertexLock(VID, Mutex, Lock));
-           break;
-         case T_Abort_:
+           while (!(LocksManager::getVertexLock(VID, Mutex, Lock).first));
+           return true;
+         case T_Abort:
+           LocksManager::releaseAll(TxId);
            return false;
          case T_Ignore:
            return true;
+         case T_Upgrade:
+           /// Release SH Lock on data and then request EX Lock
+           /// If lock can be acquired, return true
+           /// else return false and then restart
+           break;
        }
     }
 
     auto LocksManager::getEdgeLock(IdType EId, MutexType Mutex, LockType Lock, IdType TxId)
       ->  bool  {
-       auto getLock = getEdgeLock(EId, Mutex, Lock);
+       LockRetPairType  getLock = getEdgeLock(EId, Mutex, Lock);
        /// If this lock is available, assign lock to TxId, register to maps(Trans, Lock)
-       if (getLock) {
+       if (getLock.first) {
          /// TODO separate getting lock from getVertexLock
-         registerToMap(TxId, LockPtr);
+         LocksManager::registerToMap(TxId, getLock.second, Lock);
          return true;
        }
-       switch (checkWaitOn(TxId, LockPtr, Lock))  {
+       switch (checkWaitOn(TxId, getLock.second, Lock))  {
          /// If there is no potential deadlock, wait for it
          case T_Wait:
            while (!getEdgeLock(EID, Mutex, Lock));
@@ -456,6 +562,25 @@
            return true;
        }
     }
+
+//    auto LocksManager::getLock(IdType Id, MutexType Mutex, LockType Lock, IdType TxId)
+//      ->  bool  {
+//       if (getLock) {
+//         /// TODO separate getting lock from getVertexLock
+//         registerToMap(TxId, LockPtr);
+//         return true;
+//       }
+//       switch (checkWaitOn(TxId, LockPtr, Lock))  {
+//         /// If there is no potential deadlock, wait for it
+//         case T_Wait:
+//           while (!getEdgeLock(EID, Mutex, Lock));
+//           break;
+//         case T_Abort:
+//           return false;
+//         case T_Ignore:
+//           return true;
+//       }
+//      }
 
     auto LocksManager::registerWaitingMap(IdType TxId, LockPoiner LockPtr)
       -> bool {
@@ -557,6 +682,12 @@
       return true;
     }
 
+    auto LocksManager::upgradeLock(IdType TransId, LockPointer LockPtr)
+      ->  bool  {
+       /// TODO work till here
+       /// unlock sh(), try_ex(), update table
+       /// return false if exclusive lock cannot be acquired
+      }
 #else
   ///locks are encoded in Vertex and Edge
   /// TODO const & g

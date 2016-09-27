@@ -57,6 +57,7 @@ public:
   typedef std::unordered_map<IdType, LockPointer> WaitingTransactionMap;
   typedef std::stack<IdType> TransStackType; 
   typedef std::set<IdType> TransSetType;
+  typedef std::pair<bool, LockPointer> LockRetPairType;
 public:
 
 #ifndef _LOCKING_
@@ -90,10 +91,15 @@ public:
   EdgeLockMapType getEdgeLockMap(); 
 
   /*  New functions added to support deadlock detection */
+  bool getLock(IdType ObjectId, MutexType Mutex, LockType Lock, IdType TxId);
+
   bool getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
 
   bool getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
 
+  LockRetPairType getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock);
+
+  LockRetPairType getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock);
 //  bool releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
 
 //  bool releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
@@ -116,6 +122,8 @@ public:
   bool  registerLockMap(IdType TransId, LockPointer  LockPtr,  LockType  LType);
 
   bool  registerToMap(IdType TransId,  LockPointer  LockPtr, LockType LType);
+
+  bool  upgradeLock(IdType TransId, LockPointer LockPtr);
   /// HOW to get lock and avoid deadlock
   /// TODO Check if lock exists from LockManager
   /// If yes, check if this lock can be acquired 
@@ -166,6 +174,7 @@ protected:
 #ifdef _DL_DETECTION_
 //	unsigned int DeadLockCount;
   /// TODO need lock for transMap, ResrMap, WaitMap separately
+  std::mutex  DeadlockDetector;
 	TransactionResourceMap  TransMap;
 	ResourceTransactionMap  ResrMap;
   WaitingTransactionMap WaitMap;
