@@ -65,19 +65,21 @@ public:
  //     VertexPropList.push_back(vp);
  //   }
 
-  auto setCommit() 
+  auto commit() 
     -> void {
       Commit = true;
   }
 
-  auto setAbort() 
+  auto abort() 
     -> void {
       Abort = true;
+      exit(0);
   }
 
   auto checkStatus() 
     -> bool {
     /// no need to rollback
+    /// TODO change
     if(Commit)  
       return true;
     /// must rollback

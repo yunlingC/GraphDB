@@ -25,8 +25,8 @@
 #include <iostream>
 
 /// TODO full name
-enum MutexType { ID, Pp, LE, NE, FV, SV, FNE, FPE, SNE, SPE, LB};
-enum LockType { SH, EX };
+enum MutexType { T_ID, T_Property, T_LastEdge, T_NextEdge, T_FirstVertex, T_SecondVertex, T_FristNextEdge, T_FirstPrevEdge, T_SecondNextEdge, T_SecondPrevEdge, T_Label};
+enum LockType { T_SH, T_EX };
 enum DLRetType {T_Abort,  T_Ignore,  T_Upgrade, T_Wait};
 
 /// currently PLock is only supported in _LOCKING_
@@ -91,7 +91,7 @@ public:
   EdgeLockMapType getEdgeLockMap(); 
 
   /*  New functions added to support deadlock detection */
-  bool getLock(IdType ObjectId, MutexType Mutex, LockType Lock, IdType TxId);
+//  bool getLock(IdType ObjectId, MutexType Mutex, LockType Lock, IdType TxId);
 
   bool getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
 

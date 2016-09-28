@@ -26,55 +26,55 @@
 #include <vector>
 
 //TODO
-/// No skip-lock in this tranxBFS
-/// back-off one by one /read or write - stack
 /// update graph->add/delete nodes/edges
-/// remove std
 /// Macros of spinning on locks
-/// add comments
 
-	typedef std::pair<GraphType::VertexPointer, bool> VisitPair;
+  typedef GraphType::VertexPointer  VertexPointer;
+  typedef GraphType::VertexDescriptor VertexDescriptor;
+	typedef std::pair<VertexPointer, bool> VisitPair;
 	typedef Transaction TransactionType;
+  typedef LocksManager  LockManagerType;
 
+  /// TODO but why?
+  /// back-off one by one /read or write - stack
 	/// get read locks one by one and store in locklists,
 	/// then release locks in reverse order one by one before return.
+  
 	void tranxBreadthFirstSearch(GraphType & Graph,
-	                        const GraphType::VertexDescriptor & StartVertex,
+	                        const VertexDescriptor & StartVertex,
 	                        Visitor & GraphVisitor,
 	                        TransactionType & Tranx
+                          LockManagerType & LockManager
 							) {
-		auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
 
-		///change 1
-		if ( ScheduledVertex  == nullptr ) {
-			std::cerr << "No such vertex in graph \n";
+		auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
+    auto TxId = Tranx->getId();
+
+#if _DEBUG_ENABLE_
+		if (ScheduledVertex  == nullptr) {
+			std::cerr << "Error: No such vertex in graph \n";
 			exit(1);
 		}
-
+#endif
 		// Start traversing the graph from here.
-		std::queue<GraphType::VertexPointer> VertexQueue;
+		std::queue<VertexPointer> VertexQueue;
 		/// True means visited and false means not visited.
-		std::map<GraphType::VertexPointer, bool> ColorMap;
+		std::map<VisitPair> ColorMap;
 
 		VertexQueue.push(ScheduledVertex);
 		GraphVisitor.visitStartVertex(ScheduledVertex);
 
 		ColorMap.insert(VisitPair(ScheduledVertex, false));
 
-		GraphType::VertexPointer TargetVertex = nullptr;
+		VertexPointer TargetVertex = nullptr;
 
 		while ( !VertexQueue.empty() ) {
 			ScheduledVertex = VertexQueue.front();  VertexQueue.pop();
 
-			/// spin on it unless get the lock or checkOn() return false by RagManager
-
-			if ( !Tranx.getVertexLock(ScheduledVertex, Pp, SH)) {
-				/// TODO
-			}
-
-			}
-
-			Tranx.registerVertexLock(ScheduledVertex, Pp, SH);
+      /// If false, this lock canNOT be acquired and transaction aborts
+			if (!LockManager.getVertexLock(ScheduledVertex->getId(), T_Property, T_SH, TxId)) {
+        Tranx.abort();
+      }
 
 			if (GraphVisitor.visitVertex(ScheduledVertex))
 				return;
@@ -82,24 +82,19 @@
 			/// Set to visited.
 			ColorMap[ScheduledVertex] = true;
 
-			if (!Tranx.getVertexLock(ScheduledVertex, NE, SH)){/// TODO }
-
-			Tranx.registerVertexLock(ScheduledVertex, NE, SH);
+			if (!LockManager.getVertexLock(ScheduledVertex->getId(), T_NextEdge, T_SH, TxId))  {
+        Tranx.abort();
+      }
 
 			auto NextEdge = ScheduledVertex->getNextEdge();
 			while ( NextEdge != nullptr ) {
-				/// Get the target node.
-
-				if (!Tranx.getEdgeLock(NextEdge, FV, SH)) {
-					/// TODO
+				/// Get locks on the target node.
+				if (!LockManager.getEdgeLock(NextEdge->getId, T_FirstVertex, T_SH, TxId)) {
+          Tranx.abort();
 				}
-
-				if (!Tranx.getEdgeLock(NextEdge, SV, SH)) {
-					/// TODO
+				if (!LockManager.getEdgeLock(NextEdge->getId, T_SecondVertex, T_SH, TxId)) {
+          Tranx.abort();
 				}
-
-				Tranx.registerEdgeLock(NextEdge, FV, SH);
-				Tranx.registerEdgeLock(NextEdge, SV, SH);
 
 				TargetVertex = NextEdge->getTarget(ScheduledVertex);
 				bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);
@@ -114,26 +109,22 @@
 					/// queue the target for visitation
 					GraphVisitor.scheduleTree(ScheduledVertex, NextEdge, TargetVertex);
 
-					if( TypeMatch && DirectionMatch )   {
+					if ( TypeMatch && DirectionMatch )   {
 						///control the vertex to be visited filtered by type
 						VertexQueue.push(TargetVertex);
-
 						ColorMap.insert(VisitPair(TargetVertex,false));
 					}
 				} else {
 					GraphVisitor.revisitVertex( TargetVertex );
 				}
 
-				if (!Tranx.getEdgeLock(NextEdge, FNE, SH)) {
-					/// TODO
+        /// Get shared locks on next edge
+				if (!LockManager.getEdgeLock(NextEdge->getId(), T_FirstNextEdge, T_SH, TxId)) {
+          Tranx.abort();
 				}
-
-				if ( !Tranx.getEdgeLock(NextEdge, SNE, SH)) {
-					/// TODO
+				if ( !LockManager.getEdgeLock(NextEdge->getId(), T_SecondNextEdge, T_SH, TxId)) {
+          Tranx.abort();
 				}
-
-				Tranx.registerEdgeLock(NextEdge, FNE, SH);
-				Tranx.registerEdgeLock(NextEdge, SNE, SH);
 
 				/// Get the next edge from the scheduled vertex.
 				NextEdge = NextEdge->getNextEdge(ScheduledVertex);

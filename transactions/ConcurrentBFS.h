@@ -76,15 +76,15 @@ public:
 
 #ifdef _SKIP_
       /// couldn't get the lock, skip it and visit the next one from queue
-      if (!LockManager.getVertexLock(ScheduledVertex, Pp, SH))
+      if (!LockManager.getVertexLock(ScheduledVertex, T_Property, T_SH))
         break;
 #else 
       /// spin on it till it is available
-      while ( !LockManager.getVertexLock(ScheduledVertex, Pp, SH));
+      while ( !LockManager.getVertexLock(ScheduledVertex, T_Property, T_SH));
 
 #endif
 
-      auto VPpPair = std::make_pair(ScheduledVertex, std::make_pair(Pp, SH));
+      auto VT_PropertyPair = std::make_pair(ScheduledVertex, std::make_pair(T_Property, T_SH));
       VertexLocks.push_back(VPpPair);
  
       if (GraphVisitor.visitVertex(ScheduledVertex))
@@ -93,13 +93,13 @@ public:
       /// Set to visited.    
       ColorMap[ScheduledVertex] = true;
 #ifdef _SKIP_
-      if (!LockManager.getVertexLock(ScheduledVertex, NE, SH))
+      if (!LockManager.getVertexLock(ScheduledVertex, T_NextEdge, T_SH))
         break;
 #else
-      while (!LockManager.getVertexLock(ScheduledVertex, NE, SH));
+      while (!LockManager.getVertexLock(ScheduledVertex, T_NextEdge, T_SH));
 #endif
 
-      auto VNEPair = std::make_pair(ScheduledVertex, std::make_pair(NE, SH));
+      auto VT_NextEdgePair = std::make_pair(ScheduledVertex, std::make_pair(T_NextEdge, T_SH));
       VertexLocks.push_back(VNEPair);
   
       auto NextEdge = ScheduledVertex->getNextEdge();
@@ -107,23 +107,23 @@ public:
         /// Get the target node.
 
 #ifdef _SKIP_
-        if (!LockManager.getEdgeLock(NextEdge, FV, SH)) {
+        if (!LockManager.getEdgeLock(NextEdge, T_FirstVertex, T_SH)) {
           break;
         }
 #else
-        while (!LockManager.getEdgeLock(NextEdge, FV, SH));
+        while (!LockManager.getEdgeLock(NextEdge, T_FirstVertex, T_SH));
 #endif
 
 #ifdef _SKIP_
-        if (!LockManager.getEdgeLock(NextEdge, SV, SH)) {
-          LockManager.releaseEdgeLock(NextEdge, FV, SH);
+        if (!LockManager.getEdgeLock(NextEdge, T_SecondVertex, T_SH)) {
+          LockManager.releaseEdgeLock(NextEdge, T_FirstVertex, T_SH);
           break;
         }
 #else
-        while (!LockManager.getEdgeLock(NextEdge, SV, SH));
+        while (!LockManager.getEdgeLock(NextEdge, T_SecondVertex, T_SH));
 #endif
-        auto EFVPair = std::make_pair(NextEdge, std::make_pair(FV, SH));
-        auto ESVPair = std::make_pair(NextEdge, std::make_pair(SV, SH));
+        auto ET_FirstVertexPair = std::make_pair(NextEdge, std::make_pair(T_FirstVertex, T_SH));
+        auto ET_SecondVertexPair = std::make_pair(NextEdge, std::make_pair(T_SecondVertex, T_SH));
         EdgeLocks.push_back(EFVPair);
         EdgeLocks.push_back(ESVPair);
 
@@ -151,27 +151,27 @@ public:
         }
         
 #ifdef _SKIP_
-        if (!LockManager.getEdgeLock(NextEdge, FNE, SH)) {
-          LockManager.releaseEdgeLock(NextEdge, FV, SH);
-          LockManager.releaseEdgeLock(NextEdge, SV, SH);
+        if (!LockManager.getEdgeLock(NextEdge, T_FirstNextEdge, T_SH)) {
+          LockManager.releaseEdgeLock(NextEdge, T_FirstVertex, T_SH);
+          LockManager.releaseEdgeLock(NextEdge, T_SecondVertex, T_SH);
           break;
         }
 #else
-        while (!LockManager.getEdgeLock(NextEdge, FNE, SH));
+        while (!LockManager.getEdgeLock(NextEdge, T_FirstNextEdge, T_SH));
 #endif
 
 #ifdef _SKIP_
-        if ( !LockManager.getEdgeLock(NextEdge, SNE, SH)) {
-          LockManager.releaseEdgeLock(NextEdge, FV, SH);
-          LockManager.releaseEdgeLock(NextEdge, SV, SH);
-          LockManager.releaseEdgeLock(NextEdge, FNE, SH);
+        if (!LockManager.getEdgeLock(NextEdge, T_SecondNextEdge, T_SH)) {
+          LockManager.releaseEdgeLock(NextEdge, T_FirstVertex, T_SH);
+          LockManager.releaseEdgeLock(NextEdge, T_SecondVertex, T_SH);
+          LockManager.releaseEdgeLock(NextEdge, T_FirstNextEdge, T_SH);
           break;
         }
 #else
-        while ( !LockManager.getEdgeLock(NextEdge, SNE, SH));
+        while (!LockManager.getEdgeLock(NextEdge, T_SecondNextEdge, T_SH));
 #endif
-        auto EFNEPair = std::make_pair(NextEdge, std::make_pair(FNE, SH));
-        auto ESNEPair = std::make_pair(NextEdge, std::make_pair(SNE, SH));
+        auto ET_FirstNextEdgePair = std::make_pair(NextEdge, std::make_pair(T_FirstNextEdge, T_SH));
+        auto ET_SecondNextEdgePair = std::make_pair(NextEdge, std::make_pair(T_SecondNextEdge, T_SH));
         EdgeLocks.push_back(EFNEPair);
         EdgeLocks.push_back(ESNEPair);
 
