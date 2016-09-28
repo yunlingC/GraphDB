@@ -28,6 +28,7 @@ public:
 	typedef LocksManager::MutexPointer MutexPointer;
   typedef GraphType::VertexPropertyList VProp;
   typedef GraphType::EdgePropertyList EProp;
+  typedef unsigned int IdType;
   typedef std::pair<VertexPointer, VertexPointer> VertexPair;
   typedef std::pair<EdgePointer,   EdgePointer> EdgePair;
   typedef std::pair<VProp,  VProp> VPropPair;
@@ -43,7 +44,7 @@ public:
   typedef std::vector<ELockPair> ELockListType;
 
 public:
-  Transaction () : Commit(false), Abort(false) {} //, OperationType(NOOP) { }
+  Transaction (IdType id) : Commit(false), Abort(false), Id(id) {} 
 
 //  auto requireTxId(TransactionManager & TxManager, unsigned int id)
   auto requireTxId(unsigned int id)
@@ -51,8 +52,8 @@ public:
       Id = id;
   }
 
-  auto getTxId() 
-    -> unsigned int {
+  auto getId() 
+    -> IdType {
     return Id;
   }
 
@@ -90,33 +91,33 @@ public:
   }
 
 
-    auto getVertexLockList(VLockListType & VertexLocks)
-            -> void {
-      VertexLockList  = VertexLocks;
-    }
-
-    auto getEdgeLockList(ELockListType & EdgeLocks)
-            -> void {
-      EdgeLockList = EdgeLocks;
-    }
+//    auto getVertexLockList(VLockListType & VertexLocks)
+//            -> void {
+//      VertexLockList  = VertexLocks;
+//    }
+//
+//    auto getEdgeLockList(ELockListType & EdgeLocks)
+//            -> void {
+//      EdgeLockList = EdgeLocks;
+//    }
 
     /// In the following functions, ask LockManager for locks and invoke RagManager for deadlock detection
     /// throw exception if waiting for lock is not a good decision
   
-    bool getVertexLock(VertexPointer & Vertex, MutexType Mutex, LockType Lock);
-    bool getEdgeLock(EdgePointer & Edge, MutexType Mutex, LockType Lock);
-
-    void registerVertexLock(VertexPointer & Vertex, MutexType Mutex, LockType Lock );
-    void registerEdgeLock(EdgePointer & Edge, MutexType Mutex, LockType Lock);
-
-		bool releaseAll();
+//    bool getVertexLock(VertexPointer & Vertex, MutexType Mutex, LockType Lock);
+//    bool getEdgeLock(EdgePointer & Edge, MutexType Mutex, LockType Lock);
+//
+//    void registerVertexLock(VertexPointer & Vertex, MutexType Mutex, LockType Lock );
+//    void registerEdgeLock(EdgePointer & Edge, MutexType Mutex, LockType Lock);
+//
+//		bool releaseAll();
 
 		~Transaction() { }
 
 protected:
-  unsigned int Id;
   bool Commit ;
   bool Abort ;
+  IdType  Id;
 //  VertexPairListType VertexList;
 //  EdgePairListType   EdgeList;
 //  VertexPropPairListType VertexPropList;

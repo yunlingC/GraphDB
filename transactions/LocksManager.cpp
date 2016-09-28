@@ -277,7 +277,7 @@
       return EdgeLockMap;
   }
 
-  auto LocksManager::getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock) 
+  auto LocksManager::requireVertexLock(IdType VertexId, MutexType Mutex, LockType Lock) 
     -> LockRetPairType  {
 #if _DEBUG_ENABLE_
     if (VertexLockMap.find(VertexId) == VertexLockMap.end()) {
@@ -322,7 +322,7 @@
     return std::make_pair(LockRetPairType(RetValue, MutexPtr));
   }
 
-  auto LocksManager::getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock) 
+  auto LocksManager::requireEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock) 
     -> LockRetPairType  {
 #if _DEBUG_ENABLE_
     if (EdgeLockMap.find(EdgeId) == EdgeLockMap.end()) {
@@ -512,9 +512,10 @@
         }
       }
 
-    auto LocksManager::getVertexLock(IdType VId, MutexType Mutex, LockType Lock, IdType TxId)
-      ->  bool  {
-        LockRetPairType getLock = LocksManager::getVertexLock(VId, Mutex, Lock);
+    bool LocksManager::getVertexLock(IdType VId, MutexType Mutex, LockType Lock, IdType TxId)
+//      ->  bool  {
+    {
+        LockRetPairType getLock = LocksManager::requireVertexLock(VId, Mutex, Lock);
         
         std::lock_guard<std::mutex> Lock(DeadlockDetector);
         /// If lock available, assign lock to TxId, register to maps(Trans, Lock)
@@ -543,7 +544,7 @@
 
   auto LocksManager::getEdgeLock(IdType EId, MutexType Mutex, LockType Lock, IdType TxId)
     ->  bool  {
-      LockRetPairType  getLock = LocksManager::getEdgeLock(EId, Mutex, Lock);
+      LockRetPairType  getLock = LocksManager::requireEdgeLock(EId, Mutex, Lock);
       std::lock_guard<std::mutex> Lock(DeadlockDetector);
       /// If this lock is available, assign lock to TxId, register to maps(Trans, Lock)
       if (getLock.first) {

@@ -17,39 +17,46 @@
 
 #include "TransactionManager.h"
 
-		TransactionManager::TransactionManager() : TransNumber(0) {
+//  TransactionManager::TransactionManager() {}
+
+  TransactionManager::TransactionManager() : TransNumber(0) {
 			/// TODO create ragmanager
-		}
+	}
 
 		///TODO not used yet
-		auto TransactionManager::initTransaction()
-		-> TransactionPointer {
-				TransactionPointer log = new Transaction;
-				return log;
-		}
+  auto TransactionManager::initTransaction()
+  -> TransactionPointer {
+  		TransactionPointer log = new Transaction;
+  		return log;
+  }
+  
+  auto TransactionManager::addTransaction(IdType tid,
+                                          TransactionPointer log)
+  -> bool  {
+  		if(TransTable.find(tid) != TransTable.end()) return false;
+  		TransTable.insert(std::pair<IdType, TransactionPointer>(tid, log));
+  		return true;
+  }
+  
+  auto TransactionManager::addTransaction()
+  -> TransactionPointer {
+  		TransactionPointer log = new Transaction;
+  		log->requireTxId(TransNumber);
+  		TransTable.insert(std::pair<IdType, TransactionPointer>(TransNumber, log));
+  		TransNumber++;
+  		return log;
+  }
+  
+  auto TransactionManager::getTransaction(IdType TxId)
+    -> TransactionPointer {
+  		if(TransTable.find(TxId) != TransTable.end()) return nullptr;
+      return TransTable.at(TxId);
+  }
 
-		auto TransactionManager::addTransaction(unsigned int tid,
-		                                        TransactionPointer log)
-		-> bool  {
-				if(TransTable.find(tid) != TransTable.end())
-						return false;
-				TransTable.insert(std::pair<unsigned int, TransactionPointer>(tid, log));
-				return true;
-		}
-
-		auto TransactionManager::addTransaction()
-		-> TransactionPointer {
-				TransactionPointer log = new Transaction;
-				log->requireTxId(TransNumber);
-				TransTable.insert(std::pair<unsigned int, TransactionPointer>(TransNumber, log));
-				TransNumber++;
-				return log;
-		}
-
-		auto TransactionManager::addTransaction(Query & query) 
-      ->  bool  {
-			/// TODO
-		}
+  auto TransactionManager::addTransaction(Query & query) 
+    ->  bool  {
+  	/// TODO
+  }
 
 /**
 		auto TransactionManager::rollBack(GraphType & graph)
@@ -77,7 +84,7 @@
 				return true;
 		}
 */
-		TransactionManager::~TransactionManager() {
+		~TransactionManager::TransactionManager() {
 				/// TODO check transaction status before delete the table
 				for(auto it = TransTable.begin();
 				    it != TransTable.end(); it++) {

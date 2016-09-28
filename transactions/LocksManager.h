@@ -22,20 +22,18 @@
 ///std=c++14 
 #include <unordered_map>
 #include <set>
+#include <stack>
 #include <iostream>
 
-/// TODO full name
-enum MutexType { T_ID, T_Property, T_LastEdge, T_NextEdge, T_FirstVertex, T_SecondVertex, T_FristNextEdge, T_FirstPrevEdge, T_SecondNextEdge, T_SecondPrevEdge, T_Label};
+enum MutexType { T_ID, T_Property, T_LastEdge, T_NextEdge, T_FirstVertex, T_SecondVertex, T_FirstNextEdge, T_FirstPrevEdge, T_SecondNextEdge, T_SecondPrevEdge, T_Label};
 enum LockType { T_SH, T_EX };
-enum DLRetType {T_Abort,  T_Ignore,  T_Upgrade, T_Wait};
+enum DLRetType { T_Abort,  T_Ignore,  T_Upgrade, T_Wait};
 
 /// currently PLock is only supported in _LOCKING_
 /// i.e. in the LockMap we are still use shared_mutex from C++ lib
-/// TODO: support PLock with LockMap
+/// TODO: support PLock with LockMap 
+/// but why?
 
-/// TODO waitingmap
-/// resolve deadlock 
-/// 
 class LocksManager {
 public:
   typedef std::shared_timed_mutex Mutex;
@@ -43,6 +41,7 @@ public:
   typedef MutexPointer  LockPointer;
   typedef GraphType::VertexPointer VertexPtr;
   typedef GraphType::EdgePointer EdgePtr;
+  typedef unsigned int  IdType;
   typedef std::unordered_map<IdType, VertexLock>  VertexLockMapType;
   typedef std::unordered_map<IdType, EdgeLock>    EdgeLockMapType;
   typedef std::pair<IdType, VertexLock> VLockPair;
@@ -50,7 +49,6 @@ public:
   typedef std::vector<std::pair<VertexPtr, std::pair<MutexType, LockType> > > VLockListType; 
   typedef std::vector<std::pair<EdgePtr, std::pair<MutexType, LockType> > > ELockListType; 
   typedef std::set<LockPointer> LockListType;
-  typedef unsigned int  IdType;
   typedef std::unordered_map<IdType,  LockType> TransMapType;
   typedef std::unordered_map<IdType, LockListType> TransactionResourceMap;
   typedef std::unordered_map<LockPointer, TransMapType>ResourceTransactionMap;
@@ -97,9 +95,10 @@ public:
 
   bool getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
 
-  LockRetPairType getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock);
+  LockRetPairType requireVertexLock(IdType VertexId, MutexType Mutex, LockType Lock);
 
-  LockRetPairType getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock);
+  LockRetPairType requireEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock);
+
 //  bool releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
 
 //  bool releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
@@ -107,7 +106,7 @@ public:
 	DLRetType  checkWaitOn(IdType, LockPointer, LockType);
 
   /// Yes - wait  No - deadlock
-  bool  checkWaitOnRecursive(TransIdType, TransIdType, TransStackType, TransSetType);
+  bool  checkWaitOnRecursive(IdType, IdType, TransStackType, TransSetType);
 
   /// TODO lock
   bool  releaseAll(IdType TxId);

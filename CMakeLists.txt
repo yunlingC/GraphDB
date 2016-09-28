@@ -57,7 +57,7 @@ set(TARGET t)
 
 # Set additional flags and parameters
 set(STORAGE_LIB storage)
-set(GDB_LD_FLAGS storage) 
+#set(GDB_LD_FLAGS storage) 
 
 # Compiler flags
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
@@ -82,20 +82,21 @@ add_subdirectory(storage)
 #add_subdirectory(pybind)
 
 set(TESTS 
-  main-gdbench.cpp
+  #  main-gdbench.cpp
   #  main-algo.cpp
-  main-ldbc.cpp
+  #  main-ldbc.cpp
   #  main-dfs.cpp
   #main-rdfs-ldbc.cpp
+  main-txbfs.cpp
   )
 
 
 # This will generate all the executables listed in the TESTS variable
 foreach( testsourcefile ${TESTS} ) 
   string( REPLACE ".cpp" "" testname ${testsourcefile} ) 
-  #  add_executable( ${testname} ${testsourcefile} transactions/RagManager.h transactions/TranxBreadthFirstSearch.h LDBC/LDBCTranxQuery.cpp transactions/RagManager.cpp transactions/Transaction.cpp transactions/TransactionManager.cpp)
+    add_executable( ${testname} ${testsourcefile} )
   # Make sure YourLib is linked to each app 
-  #  target_link_libraries( ${testname} ${STORAGE_LIB}) 
+   target_link_libraries( ${testname} ${STORAGE_LIB}) 
 endforeach( testsourcefile ${TESTS} )
 
 # macro(PYEXPORT _name pybind/_srccpp)

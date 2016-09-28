@@ -24,23 +24,35 @@
 class TransactionManager {
 public:
   typedef Transaction *  TransactionPointer;
-  typedef RagManager  RagManagerType;
-  typedef std::unordered_map<unsigned int, TransactionPointer>
+  typedef unsigned int IdType;
+//  typedef RagManager  RagManagerType;
+  typedef std::unordered_map<IdType, TransactionPointer>
       TransactionTableType;
 public:
 
   TransactionManager();
 
-  TransactionManager(RagManagerType & RagM) : RagManager(RagM){};
+//  TransactionManager(RagManagerType & RagM) : RagManager(RagM){};
 
   ///TODO not used yet
   TransactionPointer  initTransaction();
 
-  bool  addTransaction(unsigned int tid, TransactionPointer log);
+  bool  addTransaction(IdType TxId, TransactionPointer log);
 
-  TransactionPointer addTransaction();
+  TransactionPointer addTransaction(IdType Id){};
 
   bool  addTransaction(Query & query);
+
+  IdType  addTransaction();
+
+  TransactionPointer getTransaction(IdType TxId){};
+
+//  void  addTransaction(void (*TranxBreadthFirstSearch)(
+//                      GraphType & graph
+//                      , const GraphType::VertexDescriptor & StartVertex
+//                      , Visitor & GraphVisitor
+//                      , LocksManager & LockManager
+//                      ));
 
   bool  rollBack(GraphType & graph);
 
@@ -54,7 +66,7 @@ private:
 //  bool  undoDelete(GraphType & graph, TransactionPointer log);
 
 protected:
-  RagManagerType  & RagManager;
+//  RagManagerType  & RagManager;
   unsigned int TransNumber;
   TransactionTableType TransTable; 
 };
