@@ -23,7 +23,6 @@
 #include <set>
 #include <stack>
 #include <iostream>
-//#include <string>
 
 #define _DL_DETECTION_
 
@@ -175,7 +174,7 @@ protected:
 #ifdef _DL_DETECTION_
 //	unsigned int DeadLockCount;
   /// TODO need lock for transMap, ResrMap, WaitMap separately
-  std::mutex  DeadlockDetector;
+  std::shared_ptr<std::mutex> DeadlockDetector;
 	TransactionResourceMap  TransMap;
 	ResourceTransactionMap  ResrMap;
   WaitingTransactionMap WaitMap;

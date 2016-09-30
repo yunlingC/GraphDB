@@ -43,12 +43,7 @@
 	/// get read locks one by one and store in locklists,
 	/// then release locks in reverse order one by one before return.
   
-	void tranxBreadthFirstSearch(GraphType & Graph
-	                            , const VertexDescriptor & StartVertex
-	                            , Visitor & GraphVisitor
-	                            , TransactionType  Tranx
-                              , LockManagerType  LockManager
-							) {
+	void tranxBreadthFirstSearch(GraphType & Graph, const VertexDescriptor & StartVertex, Visitor & GraphVisitor, TransactionType  Tranx, LockManagerType  LockManager) {
 
 		auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
     IdType TxId = Tranx->getId();

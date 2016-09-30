@@ -1,4 +1,4 @@
-//===-- transaction/RagManager.cpp - RAG class type -------------*- C++ -*-===//
+//===-- transactions/Transaction.cpp - RAG class type -----------*- C++ -*-===//
 //
 //                     CAESR Graph Database
 //

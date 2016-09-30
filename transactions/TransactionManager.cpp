@@ -1,4 +1,4 @@
-//===-- transactions/TransactionManager.cpp - Tranx Manager--*- C++-*-===//
+//===-- transactions/TransactionManager.cpp - TransactionManager--*- C++-*-===//
 //
 //                     CAESR Graph Database
 //
@@ -17,13 +17,9 @@
 
 #include "TransactionManager.h"
 
-//  TransactionManager::TransactionManager() {}
+  TransactionManager::TransactionManager() : TransNumber(0) {}
 
-  TransactionManager::TransactionManager() : TransNumber(0) {
-			/// TODO create ragmanager
-	}
-
-		///TODO not used yet
+  ///TODO not used yet
   auto TransactionManager::initTransaction()
   -> TransactionPointer {
   		TransactionPointer log = new Transaction();

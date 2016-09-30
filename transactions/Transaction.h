@@ -21,6 +21,8 @@
 /// TODO to be deleted
 enum OperationType { NOOP, READ, UPDATE, INSERT, DELETE };
 
+class GraphType;
+
 class Transaction {
 public:
 	typedef GraphType::VertexPointer VertexPointer;

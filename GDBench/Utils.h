@@ -1,4 +1,4 @@
-//===-- traversals/Utilities.h - functions to custom visitors---*- C++ -*-===//
+//===-- traversals/Utils.h - functions to custom visitors--------*- C++ -*-===//
 //
 //                     CAESR Graph Database 
 //

@@ -25,7 +25,7 @@
 
 #ifndef _LOCKING_
   LocksManager::LocksManager() {
-
+    DeadlockDetector = std::shared_ptr<std::mutex>(new std::mutex) ;
   }
 
   auto LocksManager::getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock) 
@@ -522,7 +522,7 @@
     {
         LockRetPairType getLock = LocksManager::requireVertexLock(VId, Mutex, Lock);
         
-        std::lock_guard<std::mutex> Lock(DeadlockDetector);
+        std::lock_guard<std::mutex> DlLock(*DeadlockDetector);
         /// If lock available, assign lock to TxId, register to maps(Trans, Lock)
         if (getLock.first) {
           /// TODO separate getting lock from getVertexLock
@@ -532,7 +532,7 @@
         switch (LocksManager::checkWaitOn(TxId, getLock.second, Lock))  {
           /// If there is no potential deadlock, wait for it
           case T_Wait:
-            while (!(LocksManager::getVertexLock(VID, Mutex, Lock).first));
+            while (!LocksManager::getVertexLock(VId, Mutex, Lock));
             return true;
           case T_Abort:
             LocksManager::releaseAll(TxId);
@@ -543,14 +543,15 @@
             /// If lock can be acquired, return true
             /// else return false and then restart
           case T_Upgrade:
-            return LocksManager::upgradeLock(TxId, Mutex);
+            return LocksManager::upgradeLock(TxId, getLock.second);
       }//switch
   }
 
   auto LocksManager::getEdgeLock(IdType EId, MutexType Mutex, LockType Lock, IdType TxId)
     ->  bool  {
       LockRetPairType  getLock = LocksManager::requireEdgeLock(EId, Mutex, Lock);
-      std::lock_guard<std::mutex> Lock(DeadlockDetector);
+
+      std::lock_guard<std::mutex> DlLock(*DeadlockDetector);
       /// If this lock is available, assign lock to TxId, register to maps(Trans, Lock)
       if (getLock.first) {
         /// TODO separate getting lock from getVertexLock
@@ -560,7 +561,7 @@
       switch (LocksManager::checkWaitOn(TxId, getLock.second, Lock))  {
         /// If there is no potential deadlock, wait for it
         case T_Wait:
-          while (!(LocksManager::getEdgeLock(EID, Mutex, Lock)));
+          while (!(LocksManager::getEdgeLock(EId, Mutex, Lock)));
           return true;
         case T_Abort:
           LocksManager::releaseAll(TxId);
@@ -568,13 +569,13 @@
         case T_Ignore:
           return true;
         case T_Upgrade:
-          if (LocksManager::upgradeLock(TxId, Mutex)) return true;
+          if (LocksManager::upgradeLock(TxId, getLock.second)) return true;
           LocksManager::releaseAll(TxId);
           return false;
       }
     }
 
-  auto LocksManager::registerWaitingMap(IdType TxId, LockPoiner LockPtr)
+  auto LocksManager::registerWaitingMap(IdType TxId, LockPointer LockPtr)
     -> bool {
       auto it = WaitMap.find(TxId);
       if (it != WaitMap.end())  {
@@ -596,14 +597,14 @@
         return true;
       }
       /// If current lock exists in list 
-      if ((*it).find(LockPtr) != (*it).end()) {
+      if ((it->second).find(LockPtr) != (it->second).end()) {
         /// TODO do something ?
         /// So far there is no need to update transMap, which means no lock 
         /// Update ResrMap only 
         return true;
       }
 
-      (*it).insert(std::make_pair(TransId, LockList));
+      (it->second).insert(LockPtr);
       return true;
   }
 
@@ -611,20 +612,20 @@
     ->  bool  {
       auto it = ResrMap.find(LockPtr);
       if (it == ResrMap.end())  {
-        TransactionMapType TxMap{TransId, LType};
+        TransMapType TxMap{{TransId, LType}};
         ResrMap.insert(std::make_pair(LockPtr, TxMap)); 
         return true;
       }
-      auto TxRec  = (*it).find(TransId);
+      auto TxRec  = (it->second).find(TransId);
       /// If this transaction never registers itself with this lock, register
-      if (TxRec == (*it).end()) {
-        (*it).insert(std::make_pair(TransId, LType));
+      if (TxRec == (it->second).end()) {
+        (it->second).insert(std::make_pair(TransId, LType));
         return true;
       }
       /// If this transaction already holds the lock with same LockType
       ///   Ignore it
-      if (((*TxRec).second == T_SH) && (LType == T_EX)) {
-        (*TxRec).second = T_EX;
+      if ((TxRec->second == T_SH) && (LType == T_EX)) {
+        TxRec->second = T_EX;
 //          return true;
       }
       return true;
@@ -636,7 +637,7 @@
 
   }
 
-  auto releaseAll(IdType TxId)
+  auto LocksManager::releaseAll(IdType TxId)
     ->  bool  {
     auto AcqLocks  = TransMap.find(TxId);
     auto WaitLocks  = WaitMap.find(TxId);
@@ -651,8 +652,8 @@
 
     /// AcqLocks is a set
     /// it is a iterator to this set
-    auto it_end = (*AcqLocks).end();
-    for (auto it = (*AcqLocks).begin(); it!= it_end; it++) {
+    auto it_end = (AcqLocks->second).end();
+    for (auto it = (AcqLocks->second).begin(); it!= it_end; it++) {
       /// Remove entries from ResrMap one by one
       /// If this lock is not found in ResrMap, there is an error
       auto TransRec = ResrMap.find(*it);
@@ -662,12 +663,12 @@
         /// TODO shoud be exit?
       }
       /// If this transaction is not found with this lock, there is an error
-      auto Tx = (*TransRec).find(TxId);
-      if (Tx  == (*TransRec).end()) {
+      auto Tx = (TransRec->second).find(TxId);
+      if (Tx  == (TransRec->second).end()) {
         std::cerr << "Error: Transaction " << TxId << " not found \n"; 
         return false;
       }
-      (*TransRec).erase(TxId);
+      (TransRec->second).erase(TxId);
     }
     /// Now remove records of TxId from TransMap
     TransMap.erase(TxId);
@@ -682,15 +683,15 @@
         auto getEXLock = LockPtr->try_lock();
         if (!getEXLock) return false;
 
-        TxMap = ResrMap.find(LockPtr);
+        auto TxMap = ResrMap.find(LockPtr);
 #if _DEBUG_ENABLE_
         if (TxMap == ResrMap.end()) {
           std::cerr << "Error: lock not found in Resource Map\n";
           exit(0);
         }
 #endif  
-        auto TxRec = (*TxMap).find(TransId);
-        (*TxRec).second = T_EX;
+        auto TxRec = (TxMap->second).find(TransId);
+        TxRec->second = T_EX;
         return true;
       }
 #else
