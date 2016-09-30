@@ -42,7 +42,17 @@ auto GraphType::getAllEdges()
   return Edges;
 }
 
-/// TODO: attention nullptr
+auto GraphType::getVertexMap()
+  ->  VertexMapType {
+  return VertexMap;
+}
+
+auto GraphType::getEdgeMap()
+  ->  EdgeMapType {
+  return EdgeMap;
+}
+
+/// TODO attention nullptr
 auto GraphType::getOutEdges(VertexDescriptor VertexId) 
 -> EdgeList {
   auto CurrentVertex = GraphType::getVertexPointer(VertexId);

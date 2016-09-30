@@ -17,6 +17,16 @@
 
 #include "Transaction.h"
 
+  Transaction::Transaction() {
+
+  }
+
+  Transaction::~Transaction() {
+
+  }
+
+/** Not needed so far
+ * TODO delete
 auto Transaction::getVertexLock(VertexPointer &Vertex, MutexType Mutex,
                                 LockType Lock) 
   ->  bool  {
@@ -46,6 +56,7 @@ auto  Transaction::releaseAll()
     ->  bool  {
     
 }
+*/
 
 
 

@@ -17,13 +17,15 @@
 
 #include "GraphType.h"
 #include "Lock.h"
-#include "Transaction.h"
 
 ///std=c++14 
 #include <unordered_map>
 #include <set>
 #include <stack>
 #include <iostream>
+//#include <string>
+
+#define _DL_DETECTION_
 
 enum MutexType { T_ID, T_Property, T_LastEdge, T_NextEdge, T_FirstVertex, T_SecondVertex, T_FirstNextEdge, T_FirstPrevEdge, T_SecondNextEdge, T_SecondPrevEdge, T_Label};
 enum LockType { T_SH, T_EX };
@@ -60,7 +62,7 @@ public:
 
 #ifndef _LOCKING_
 /// locks stored in a map 
-  LocksManager() {}
+  LocksManager();
 
   /// TODO getVertexLock has to do check if current tx has hold this lock
   /// So does getEdgeLock
@@ -72,11 +74,11 @@ public:
 
   bool  releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock);
 
-  void  releaseEdgeAll(ELockListType & EdgeLocks); 
+//  void  releaseEdgeAll(ELockListType & EdgeLocks); 
 
   void  releaseVertexAll(VLockListType & VertexLocks); 
 
-  void  releaseAll(VLockListType & VertexLocks, ELockListType & EdgeLocks); 
+//  void  releaseAll(VLockListType & VertexLocks, ELockListType & EdgeLocks); 
 
   void  addToVertexLockMap(IdType VertexId); 
 

@@ -24,6 +24,10 @@
 #define _DEBUG_ENABLE_ true
 
 #ifndef _LOCKING_
+  LocksManager::LocksManager() {
+
+  }
+
   auto LocksManager::getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock) 
     -> bool {
 #if _DEBUG_ENABLE_
@@ -34,16 +38,16 @@
 #endif
     MutexPointer MutexPtr = nullptr;
     switch (Mutex) {
-      case Pp:
+      case T_Property:
         MutexPtr = VertexLockMap[VertexId].getPpMutex();
         break;
-      case LE:
+      case T_LastEdge:
         MutexPtr = VertexLockMap[VertexId].getLEMutex();
         break;
-      case NE:
+      case T_NextEdge:
         MutexPtr = VertexLockMap[VertexId].getNEMutex();
         break;
-      case ID:
+      case T_ID:
         MutexPtr = VertexLockMap[VertexId].getIdMutex();
         break;
       default:
@@ -52,10 +56,10 @@
     }
     switch (Lock) {   
       ///Shared lock
-      case SH:
+      case T_SH:
         return MutexPtr->try_lock_shared();
       ///Exclusive lock
-      case EX:
+      case T_EX:
         return MutexPtr->try_lock(); 
       default:
         std::cerr << "ERROR: No such Mutex in VertexLock\n";
@@ -72,16 +76,16 @@
     else {
       MutexPointer MutexPtr = nullptr;
       switch (Mutex) {
-        case Pp:
+        case T_Property:
           MutexPtr = VertexLockMap[VertexId].getPpMutex();
           break;
-        case LE:
+        case T_LastEdge:
           MutexPtr = VertexLockMap[VertexId].getLEMutex();
           break;
-        case NE:
+        case T_NextEdge:
           MutexPtr = VertexLockMap[VertexId].getNEMutex();
           break;
-        case ID:
+        case T_ID:
           MutexPtr = VertexLockMap[VertexId].getIdMutex();
           break;
         default:
@@ -90,10 +94,10 @@
       }
 
       switch (Lock) {   
-        case SH:
+        case T_SH:
           MutexPtr->unlock_shared();
           break;
-        case EX:
+        case T_EX:
           MutexPtr->unlock(); 
           break;
         default:
@@ -114,28 +118,28 @@
     else {
       MutexPointer MutexPtr = nullptr;
       switch (Mutex) {
-        case ID:
+        case T_ID:
           MutexPtr = EdgeLockMap[EdgeId].getIdMutex();
           break;
-        case Pp:
+        case T_Property:
           MutexPtr = EdgeLockMap[EdgeId].getPpMutex();
           break;
-        case FV:
+        case T_FirstVertex:
           MutexPtr = EdgeLockMap[EdgeId].getFVMutex();
           break;
-        case SV:
+        case T_SecondVertex:
           MutexPtr = EdgeLockMap[EdgeId].getSVMutex();
           break;
-        case FNE:
+        case T_FirstNextEdge:
           MutexPtr = EdgeLockMap[EdgeId].getFNEMutex();
           break;
-        case FPE:
+        case T_FirstPrevEdge:
           MutexPtr = EdgeLockMap[EdgeId].getFPEMutex();
           break;
-        case SNE:
+        case T_SecondNextEdge:
           MutexPtr = EdgeLockMap[EdgeId].getSNEMutex();
           break;
-        case SPE:
+        case T_SecondPrevEdge:
           MutexPtr = EdgeLockMap[EdgeId].getSPEMutex();
           break;
         default:
@@ -144,9 +148,9 @@
       }
 
       switch (Lock) {   
-        case SH:
+        case T_SH:
           return MutexPtr->try_lock_shared();
-        case EX:
+        case T_EX:
           return MutexPtr->try_lock(); 
         default:
           std::cerr  << "ERROR: No such Mutex in EdgeLock\n";
@@ -155,6 +159,7 @@
     }
   }
 
+/**
   auto LocksManager::releaseEdgeAll(ELockListType & EdgeLocks) 
     -> void {
     for (auto it = EdgeLocks.begin(), itend = EdgeLocks.end(); 
@@ -177,6 +182,7 @@
       releaseVertexAll(VertexLocks);
       releaseEdgeAll(EdgeLocks);
   }
+  */
 
   auto LocksManager::releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock) 
     -> bool {
@@ -186,28 +192,28 @@
     else {
       MutexPointer MutexPtr(nullptr);
       switch (Mutex) {
-        case ID:
+        case T_ID:
           MutexPtr = EdgeLockMap[EdgeId].getIdMutex();
           break;
-        case Pp:
+        case T_Property:
           MutexPtr = EdgeLockMap[EdgeId].getPpMutex();
           break;
-        case FV:
+        case T_FirstVertex:
           MutexPtr = EdgeLockMap[EdgeId].getFVMutex();
           break;
-        case SV:
+        case T_SecondVertex:
           MutexPtr = EdgeLockMap[EdgeId].getSVMutex();
           break;
-        case FNE:
+        case T_FirstNextEdge:
           MutexPtr = EdgeLockMap[EdgeId].getFNEMutex();
           break;
-        case FPE:
+        case T_FirstPrevEdge:
           MutexPtr = EdgeLockMap[EdgeId].getFPEMutex();
           break;
-        case SNE:
+        case T_SecondNextEdge:
           MutexPtr = EdgeLockMap[EdgeId].getSNEMutex();
           break;
-        case SPE:
+        case T_SecondPrevEdge:
           MutexPtr = EdgeLockMap[EdgeId].getSPEMutex();
           break;
         default:
@@ -216,10 +222,10 @@
       }
 
       switch (Lock) {   
-        case SH:
+        case T_SH:
           MutexPtr->unlock_shared();
           break;
-        case EX:
+        case T_EX:
           MutexPtr->unlock(); 
           break;
         default:
@@ -246,8 +252,8 @@
   -> void {
     typedef GraphType::VertexPointer VertexPointer;
     typedef GraphType::EdgePointer EdgePointer;
-    std::map<IdType, VertexPointer> VertexMap;
-    std::map<IdType, EdgePointer> EdgeMap;
+    std::unordered_map<IdType, VertexPointer> VertexMap;
+    std::unordered_map<IdType, EdgePointer> EdgeMap;
     VertexMap = Graph.getVertexMap();
     EdgeMap = Graph.getEdgeMap();
 
@@ -255,17 +261,16 @@
         iter != iter_end; iter++) {
       VertexLock* NewVertexLock = new VertexLock();
       VertexLockMap.insert(VLockPair((*iter).first, *NewVertexLock));
-      (*iter).second->setVertexLock(NewVertexLock); 
+//      (*iter).second->setVertexLock(NewVertexLock); 
     }
 
     for (auto it = EdgeMap.begin(), it_end = EdgeMap.end();
         it != it_end; it++) {
       EdgeLock* NewEdgeLock = new EdgeLock();
       EdgeLockMap.insert(ELockPair((*it).first, *NewEdgeLock));
-      (*it).second->setEdgeLock(NewEdgeLock);
+//      (*it).second->setEdgeLock(NewEdgeLock);
     }
   }
- 
 
   auto LocksManager::getVertexLockMap() 
     -> VertexLockMapType {
@@ -287,16 +292,16 @@
 #endif
     MutexPointer MutexPtr = nullptr;
     switch (Mutex) {
-      case Pp:
+      case T_Property:
         MutexPtr = VertexLockMap[VertexId].getPpMutex();
         break;
-      case LE:
+      case T_LastEdge:
         MutexPtr = VertexLockMap[VertexId].getLEMutex();
         break;
-      case NE:
+      case T_NextEdge:
         MutexPtr = VertexLockMap[VertexId].getNEMutex();
         break;
-      case ID:
+      case T_ID:
         MutexPtr = VertexLockMap[VertexId].getIdMutex();
         break;
       default:
@@ -306,11 +311,11 @@
     bool  RetValue  = false;
     switch (Lock) {   
       ///Shared lock
-      case SH:
+      case T_SH:
         RetValue = MutexPtr->try_lock_shared();
         break;
       ///Exclusive lock
-      case EX:
+      case T_EX:
         RetValue = MutexPtr->try_lock(); 
         break;
 #if _DEBUG_ENABLE_
@@ -319,7 +324,7 @@
         exit(0);
 #endif
     }
-    return std::make_pair(LockRetPairType(RetValue, MutexPtr));
+    return LockRetPairType(RetValue, MutexPtr);
   }
 
   auto LocksManager::requireEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock) 
@@ -332,28 +337,28 @@
 #endif
     MutexPointer MutexPtr = nullptr;
     switch (Mutex) {
-      case ID:
+      case T_ID:
         MutexPtr = EdgeLockMap[EdgeId].getIdMutex();
         break;
-      case Pp:
+      case T_Property:
         MutexPtr = EdgeLockMap[EdgeId].getPpMutex();
         break;
-      case FV:
+      case T_FirstVertex:
         MutexPtr = EdgeLockMap[EdgeId].getFVMutex();
         break;
-      case SV:
+      case T_SecondVertex:
         MutexPtr = EdgeLockMap[EdgeId].getSVMutex();
         break;
-      case FNE:
+      case T_FirstNextEdge:
         MutexPtr = EdgeLockMap[EdgeId].getFNEMutex();
         break;
-      case FPE:
+      case T_FirstPrevEdge:
         MutexPtr = EdgeLockMap[EdgeId].getFPEMutex();
         break;
-      case SNE:
+      case T_SecondNextEdge:
         MutexPtr = EdgeLockMap[EdgeId].getSNEMutex();
         break;
-      case SPE:
+      case T_SecondPrevEdge:
         MutexPtr = EdgeLockMap[EdgeId].getSPEMutex();
         break;
 #if _DEBUG_ENABLE_
@@ -365,10 +370,10 @@
 
     bool RetValue = false;
     switch (Lock) {   
-      case SH:
+      case T_SH:
         RetValue  = MutexPtr->try_lock_shared();
         break;
-      case EX:
+      case T_EX:
         RetValue  = MutexPtr->try_lock(); 
         break;
 #if _DEBUG_ENABLE_
@@ -377,7 +382,7 @@
         exit(0);
 #endif
     }
-    return std::make_pair(LockRetPairType(RetValue, MutexPtr));
+    return LockRetPairType(RetValue, MutexPtr);
   }
 
   auto LocksManager::checkWaitOn(IdType TransId, LockPointer LockPtr, LockType LType) 
@@ -397,7 +402,7 @@
 //        else {
           TransStackType  TransStack;
           TransSetType CheckedTransList;
-          TransMapType TxList = ResrMap.find(LockPtr);
+          auto TxList = ResrMap.find(LockPtr);
           /// TxList should NOT be empty, otherwise getLock should work
 #if _DEBUG_ENABLE_
           if (TxList == ResrMap.end()) {
@@ -405,8 +410,8 @@
             exit(0);
           }
 #endif
-          auto iter = (*TxList).begin();
-          while (iter != (*TxList).end()) {
+          auto iter = (*TxList).second.begin();
+          while (iter != (*TxList).second.end()) {
             /// Check if current transaction already holds this lock 
             if ((*iter).first == TransId) {
               /*
@@ -437,29 +442,29 @@
               /// the same mutex again
               switch((*iter).second) {
                 /// <w, *>
-                case  EX:
+                case  T_EX:
                   return T_Ignore;
-                case  SH:
+                case  T_SH:
                   /// <r, w>
-                  if (LType == EX) {
+                  if (LType == T_EX) {
                     /// No other transaction is holding this lock
-                    if (TxList.size() == 1) {
+                    if ((*TxList).second.size() == 1) {
                       return T_Upgrade;
                     }
                     else {
                       /// Unlock it and go on
-                      releaseLock();
+//                      releaseLock();
                       /// remove itself from list
-                      removeLock();
+//                      removeLock();
                       auto Ret = checkWaitOn(TransId, LockPtr, LType) ? T_Wait : T_Abort;
                       return Ret;
                     }
                   }
               }// switch
             } // if 
-            TransStack.push(*iter.first);
+            TransStack.push((*iter).first);
 //            CheckedTransList.insert(*iter.first);
-            if (!checkWaitOnRecursive(TransId, *iter.first, TransStack, checkedTransList)) {
+            if (!checkWaitOnRecursive(TransId, (*iter).first, TransStack, CheckedTransList)) {
               /// There is a potential deadlock
               return T_Abort;
             } //if 
@@ -467,12 +472,12 @@
             iter++;
           }//while
 
-          registerWaitingMap();
+//          registerWaitingMap();
           return T_Wait;
         }
             
-    auto LocksManager::checkWaitOnRecursive(TransIdType WaitingTrans
-                                            , TransIdType LockingTrans
+    auto LocksManager::checkWaitOnRecursive(IdType WaitingTrans
+                                            , IdType LockingTrans
                                             , TransStackType  TransStack
                                             , TransSetType ChkTransList)
       ->  bool  {
@@ -480,33 +485,33 @@
         /// need return true; True - yes deadlock
         if (WaitingTrans == LockingTrans) {
           /// Print out deadlock
-          std::string Circle(itoa(LockingTrans)); 
+          std::string Circle(std::to_string(LockingTrans)); 
           while (!TransStack.empty()) {
           
             auto TX = TransStack.top();
             TransStack.pop();
-            Circle.append("<--" + itoa(TX));
+            Circle.append("<--" + std::to_string(TX));
           }
-          Circle.append("<--" + itoa(WaitingTrans));
+          Circle.append("<--" + std::to_string(WaitingTrans));
           return false;
         }
         /// check further if there is deadlock
-        ChKTransList.push_back(LockingTrans);
+        ChkTransList.insert(LockingTrans);
         /// Each transaction waits for one lock only
         auto LockPtr  = WaitMap.find(LockingTrans);
         if (LockPtr == WaitMap.end())
           return true;
-        auto TxList  =  ResrMap.find(*LockPtr);
+        auto TxList  =  ResrMap.find((*LockPtr).second);
         /// This lock is available
         if (TxList == ResrMap.end()) 
           return true;
 
-        auto it_end = (*TxList).begin();
-        for (auto it  = (*TxList).begin(); it!= it_end; it++) {
+        auto it_end = (*TxList).second.begin();
+        for (auto it  = (*TxList).second.begin(); it!= it_end; it++) {
           /// This transaction has NOT been checked
-          if (ChkTransList.find(*it) == ChkTransList.end()) {
-            TransStack.push(*it);
-            checkWaitOnRecursive(WaitingTrans, *it, TransStack, ChkTransList);
+          if (ChkTransList.find(it->first) == ChkTransList.end()) {
+            TransStack.push(it->first);
+            checkWaitOnRecursive(WaitingTrans, it->first, TransStack, ChkTransList);
             TransStack.pop();
           }//if
         }
@@ -618,8 +623,8 @@
       }
       /// If this transaction already holds the lock with same LockType
       ///   Ignore it
-      if (((*TxRec).second == SH) && (LType == EX)) {
-        (*TxRec).second = EX;
+      if (((*TxRec).second == T_SH) && (LType == T_EX)) {
+        (*TxRec).second = T_EX;
 //          return true;
       }
       return true;
@@ -685,7 +690,7 @@
         }
 #endif  
         auto TxRec = (*TxMap).find(TransId);
-        (*TxRec).second = EX;
+        (*TxRec).second = T_EX;
         return true;
       }
 #else
@@ -709,16 +714,16 @@
     }
     MutexPointer MutexPtr = nullptr;
     switch (Mutex) {
-      case Pp:
+      case T_Property:
         MutexPtr = Vertex->getVertexLock()->getPpMutex();
         break;
-      case LE:
+      case T_LastEdge:
         MutexPtr = Vertex->getVertexLock()->getLEMutex();
         break;
-      case NE:
+      case T_NextEdge:
         MutexPtr = Vertex->getVertexLock()->getNEMutex();
         break;
-      case ID:
+      case T_ID:
         MutexPtr = Vertex->getVertexLock()->getIdMutex();
         break;
       default:
@@ -727,9 +732,9 @@
     }
     switch (Lock) {   
       ///Shared lock
-      case SH:
+      case T_SH:
         return MutexPtr->try_lock_shared();
-      case EX:
+      case T_EX:
         return MutexPtr->try_lock(); 
       default:
         std::cerr << "ERROR: No such Mutex in VertexLock\n";
@@ -746,16 +751,16 @@
 
     MutexPointer MutexPtr = nullptr;
     switch (Mutex) {
-      case Pp:
+      case T_Property:
         MutexPtr = Vertex->getVertexLock()->getPpMutex();
         break;
-      case LE:
+      case T_LastEdge:
         MutexPtr = Vertex->getVertexLock()->getLEMutex();
         break;
-      case NE:
+      case T_NextEdge:
         MutexPtr = Vertex->getVertexLock()->getNEMutex();
         break;
-      case ID:
+      case T_ID:
         MutexPtr = Vertex->getVertexLock()->getIdMutex();
         break;
       default:
@@ -765,10 +770,10 @@
 
     switch (Lock) {   
       ///Shared lock
-      case SH:
+      case T_SH:
         MutexPtr->unlock_shared();
         break;
-      case EX:
+      case T_EX:
         MutexPtr->unlock(); 
         break;
       default:
@@ -786,28 +791,28 @@
     }
     MutexPointer MutexPtr = nullptr;
     switch (Mutex) {
-      case ID:
+      case T_ID:
         MutexPtr = Edge->getEdgeLock()->getIdMutex();
         break;
-      case Pp:
+      case T_Property:
         MutexPtr = Edge->getEdgeLock()->getPpMutex();
         break;
-      case FV:
+      case T_FirstVertex:
         MutexPtr = Edge->getEdgeLock()->getFVMutex();
         break;
-      case SV:
+      case T_SecondVertex:
         MutexPtr = Edge->getEdgeLock()->getSVMutex();
         break;
-      case FNE:
+      case T_FirstNextEdge:
         MutexPtr = Edge->getEdgeLock()->getFNEMutex();
         break;
-      case FPE:
+      case T_FirstPrevEdge:
         MutexPtr = Edge->getEdgeLock()->getFPEMutex();
         break;
-      case SNE:
+      case T_SecondNextEdge:
         MutexPtr = Edge->getEdgeLock()->getSNEMutex();
         break;
-      case SPE:
+      case T_SecondPrevEdge:
         MutexPtr = Edge->getEdgeLock()->getSPEMutex();
         break;
       default:
@@ -815,9 +820,9 @@
         exit(0);
     }
     switch (Lock) {   
-      case SH:
+      case T_SH:
         return MutexPtr->try_lock_shared();
-      case EX:
+      case T_EX:
         return MutexPtr->try_lock(); 
       default:
         std::cerr  << "ERROR: No such Mutex in EdgeLock\n";
@@ -833,28 +838,28 @@
 
     MutexPointer MutexPtr = nullptr;
     switch (Mutex) {
-      case ID:
+      case T_ID:
         MutexPtr = Edge->getEdgeLock()->getIdMutex();
         break;
-      case Pp:
+      case T_Property:
         MutexPtr = Edge->getEdgeLock()->getPpMutex();
         break;
-      case FV:
+      case T_FirstVertex:
         MutexPtr = Edge->getEdgeLock()->getFVMutex();
         break;
-      case SV:
+      case T_SecondVertex:
         MutexPtr = Edge->getEdgeLock()->getSVMutex();
         break;
-      case FNE:
+      case T_FirstNextEdge:
         MutexPtr = Edge->getEdgeLock()->getFNEMutex();
         break;
-      case FPE:
+      case T_FirstPrevEdge:
         MutexPtr = Edge->getEdgeLock()->getFPEMutex();
         break;
-      case SNE:
+      case T_SecondNextEdge:
         MutexPtr = Edge->getEdgeLock()->getSNEMutex();
         break;
-      case SPE:
+      case T_SecondPrevEdge:
         MutexPtr = Edge->getEdgeLock()->getSPEMutex();
         break;
       default:
@@ -863,10 +868,10 @@
     }
 
     switch (Lock) {   
-      case SH:
+      case T_SH:
         MutexPtr->unlock_shared();
         break;
-      case EX:
+      case T_EX:
         MutexPtr->unlock(); 
         break;
       default:

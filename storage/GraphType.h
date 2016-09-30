@@ -49,6 +49,11 @@ public:
 
   EdgeList getAllEdges();
 
+  /// Vertex map and edge map
+  VertexMapType getVertexMap();
+  
+  EdgeMapType getEdgeMap();
+  
   /// OutEdges and InEdges
   EdgeList getOutEdges(VertexDescriptor VertexId);
 
@@ -134,6 +139,7 @@ protected:
   std::vector<EdgePointer> Edges;
   /// Keep a count of vertices and edges.
   unsigned int NumberOfVertices;
+
   unsigned int NumberOfEdges;
 
 #ifdef _FIXALLOC_

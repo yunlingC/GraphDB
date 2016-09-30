@@ -24,9 +24,9 @@ int main() {
   TransactionManager TmManager;
   VisitorType Visitor;
 
-  auto TxId = TmManager.addTransaction();
+//  auto TxId = TmManager.addTransaction();
 
-  auto TxPtr = TmManager.getTransaction(TxId);
+  auto TxPtr = TmManager.addTransaction();
 
   tranxBreadthFirstSearch(g, 0, Visitor, TxPtr, LkManager);
 

@@ -44,6 +44,7 @@ public:
   typedef std::vector<ELockPair> ELockListType;
 
 public:
+  Transaction();
   Transaction (IdType id) : Commit(false), Abort(false), Id(id) {} 
 
 //  auto requireTxId(TransactionManager & TxManager, unsigned int id)
@@ -112,7 +113,7 @@ public:
 //
 //		bool releaseAll();
 
-		~Transaction() { }
+		~Transaction();
 
 protected:
   bool Commit ;

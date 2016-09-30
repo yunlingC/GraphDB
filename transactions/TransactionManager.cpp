@@ -26,7 +26,7 @@
 		///TODO not used yet
   auto TransactionManager::initTransaction()
   -> TransactionPointer {
-  		TransactionPointer log = new Transaction;
+  		TransactionPointer log = new Transaction();
   		return log;
   }
   
@@ -40,7 +40,7 @@
   
   auto TransactionManager::addTransaction()
   -> TransactionPointer {
-  		TransactionPointer log = new Transaction;
+  		TransactionPointer log = new Transaction();
   		log->requireTxId(TransNumber);
   		TransTable.insert(std::pair<IdType, TransactionPointer>(TransNumber, log));
   		TransNumber++;
@@ -53,10 +53,10 @@
       return TransTable.at(TxId);
   }
 
-  auto TransactionManager::addTransaction(Query & query) 
-    ->  bool  {
-  	/// TODO
-  }
+//  auto TransactionManager::addTransaction(Query & query) 
+//    ->  bool  {
+//  	/// TODO
+//  }
 
 /**
 		auto TransactionManager::rollBack(GraphType & graph)
@@ -84,7 +84,7 @@
 				return true;
 		}
 */
-		~TransactionManager::TransactionManager() {
+		TransactionManager::~TransactionManager() {
 				/// TODO check transaction status before delete the table
 				for(auto it = TransTable.begin();
 				    it != TransTable.end(); it++) {

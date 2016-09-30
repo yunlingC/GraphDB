@@ -39,13 +39,15 @@ public:
 
   bool  addTransaction(IdType TxId, TransactionPointer log);
 
-  TransactionPointer addTransaction(IdType Id){};
+  TransactionPointer addTransaction(IdType Id);
 
-  bool  addTransaction(Query & query);
+//  bool  addTransaction(Query & query);
 
-  IdType  addTransaction();
+//  IdType  addTransaction();
 
-  TransactionPointer getTransaction(IdType TxId){};
+  TransactionPointer  addTransaction();
+
+  TransactionPointer getTransaction(IdType TxId);
 
 //  void  addTransaction(void (*TranxBreadthFirstSearch)(
 //                      GraphType & graph
