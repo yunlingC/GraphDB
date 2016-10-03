@@ -261,14 +261,12 @@
         iter != iter_end; iter++) {
       VertexLock* NewVertexLock = new VertexLock();
       VertexLockMap.insert(VLockPair((*iter).first, *NewVertexLock));
-//      (*iter).second->setVertexLock(NewVertexLock); 
     }
 
     for (auto it = EdgeMap.begin(), it_end = EdgeMap.end();
         it != it_end; it++) {
       EdgeLock* NewEdgeLock = new EdgeLock();
       EdgeLockMap.insert(ELockPair((*it).first, *NewEdgeLock));
-//      (*it).second->setEdgeLock(NewEdgeLock);
     }
   }
 
@@ -390,91 +388,81 @@
       /// If current trans is waiting for some other lock, then give up
       /// Usually it won't happen because this trans must be spining on that lock
       /// TODO to be deleted
-//        if (WaitMap.find(TransId) == WaitMap.end())
-//          return false;
-//        TransMapType TxList = TransMap.find(LockPtr);
-//        /// If Lock is free, acquire it and register
-//        if (TxList.empty()) {
-//          registerTransMap(TransId, LockPtr);
-//          registerLockMap(TransId, LockPtr);
-//        }
-//        /// If lock is acquired by trans, check if deadlock exists.
-//        else {
-          TransStackType  TransStack;
-          TransSetType CheckedTransList;
-          auto TxList = ResrMap.find(LockPtr);
-          /// TxList should NOT be empty, otherwise getLock should work
 #if _DEBUG_ENABLE_
-          if (TxList == ResrMap.end()) {
-            std::cerr << "Error : Lock is not available but no record found\n";
-            exit(0);
-          }
+      if (WaitMap.find(TransId) != WaitMap.end()) {
+        std::cerr << "Error : Transaction " << TransId << " is waiting for a lock\n";
+        return T_Abort;
+      }
 #endif
-          auto iter = (*TxList).second.begin();
-          while (iter != (*TxList).second.end()) {
-            /// Check if current transaction already holds this lock 
-            if ((*iter).first == TransId) {
-              /*
-              There can be 4 scenarios when one transaction holds a lock 
-              and requests it again
-              <r, r>, <r, w>, <w, r>, <w, w>
-              Since TxList is a set, we can rule out <r, r>
-                S1 <r, w> 
-                    if not r'ed by others
-                        =>  r -> w
-                    otherwise
-                      =>  continue
-                        {
-                          =>  unlock_sh
-                          =>  check deadlock
-                        }
-                        
-                S2 <w, r> ignore
-                S3 <w, w> ignore
-              */
+      TransStackType  TransStack;
+      TransSetType CheckedTransList;
+      auto TxList = ResrMap.find(LockPtr);
+      /// TxList should NOT be empty, otherwise getLock should work
+#if _DEBUG_ENABLE_
+      if (TxList == ResrMap.end()) {
+        std::cerr << "Error : Lock is not available but no record found\n";
+        exit(0);
+      }
+#endif
+      for (auto iter = (*TxList).second.begin(), iter_end = (*TxList).second.end();
+           iter != iter_end; iter++) {
+        /// Check if current transaction already holds this lock 
+        if ((*iter).first == TransId) {
+          /*
+          There can be 4 cases when one transaction holds a lock 
+          and requests it again
+          <r, r>, <r, w>, <w, r>, <w, w>
+          Since TxList is a set, we can rule out <r, r>
+            S1 <r, w> 
+                if not r'ed by others
+                    =>  upgrade r -> w
+                otherwise
+                    => abort
+            S2 <w, r> ignore
+            S3 <w, w> ignore
+          */
+          /// might come into this situation
+          /// T1 has lock <L1, SH> and requests <L1, EX> with sucess 
+          /// BUT without registering!
+          /// This is possible because in STL thread with shared_timed_mutex:
+          /// Undefined behavior might happen when one thread requests
+          /// the same mutex again
+          /// Solved with upgradeLock()
+          switch ((*iter).second) {
+            /// <w, *>
+            case  T_EX:
+              return T_Ignore;
+            case  T_SH:
+              /// <r, w>
+              if (LType == T_EX) {
+                /// No other transactions are holding this lock
+                return (*TxList).second.size() == 1 ? T_Upgrade : T_Abort;
+              }
+#if _DEBUG_ENABLE_
+              else {
+                std::cerr <<"Error : Transaction " << TransId << " requests the same shared lock again\n";
+                  exit(0);
+              }
+#endif
+          }// switch
+        } // if 
+        TransStack.push((*iter).first);
+        CheckedTransList.insert(*iter.first);
+        if (!checkWaitOnRecursive(TransId, (*iter).first, TransStack, CheckedTransList)) {
+          /// There is a potential deadlock
+          return T_Abort;
+        } //if 
+        TransStack.pop();
+      } //for
+      
+      /// If there is no deadlock, wait for this lock
+      registerWaitingMap(TransId, LockPtr);
+      return T_Wait;
+    }
 
-              /// TODO problem with this
-              /// might come into this situation
-              /// T1 has lock <L1, SH> and requests <L1, EX> with sucess 
-              /// BUT without registering!
-              /// This is possible because in STL thread with shared_timed_mutex:
-              /// Undefined behavior might happen when one thread requests
-              /// the same mutex again
-              switch((*iter).second) {
-                /// <w, *>
-                case  T_EX:
-                  return T_Ignore;
-                case  T_SH:
-                  /// <r, w>
-                  if (LType == T_EX) {
-                    /// No other transaction is holding this lock
-                    if ((*TxList).second.size() == 1) {
-                      return T_Upgrade;
-                    }
-                    else {
-                      /// Unlock it and go on
-//                      releaseLock();
-                      /// remove itself from list
-//                      removeLock();
-                      auto Ret = checkWaitOn(TransId, LockPtr, LType) ? T_Wait : T_Abort;
-                      return Ret;
-                    }
-                  }
-              }// switch
-            } // if 
-            TransStack.push((*iter).first);
-//            CheckedTransList.insert(*iter.first);
-            if (!checkWaitOnRecursive(TransId, (*iter).first, TransStack, CheckedTransList)) {
-              /// There is a potential deadlock
-              return T_Abort;
-            } //if 
-            TransStack.pop();
-            iter++;
-          }//while
-
-//          registerWaitingMap();
-          return T_Wait;
-        }
+/// TODO problem here
+/// If T_Wait is returned, lock for checkWaitOn() can be released
+/// If T_Abort is returned, lock should be held
             
     auto LocksManager::checkWaitOnRecursive(IdType WaitingTrans
                                             , IdType LockingTrans

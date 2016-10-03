@@ -2,6 +2,7 @@
 #include "TranxBreadthFirstSearch.h"
 #include "TransactionManager.h"
 
+#include <thread>
 #include <iostream>
 
 using namespace std;
@@ -21,6 +22,7 @@ int main() {
   cout << "Finish reading \n";
 
   LocksManager LkManager;
+  LkManager.buildLockMap(g);
   TransactionManager TmManager;
   VisitorType Visitor;
 
@@ -28,7 +30,16 @@ int main() {
 
   auto TxPtr = TmManager.addTransaction();
 
-  tranxBreadthFirstSearch(g, 0, Visitor, TxPtr, LkManager);
+  vector<std::thread> threads;
+  for (auto i= 0; i < 10; i++) {
+    threads.push_back(std::thread(tranxBreadthFirstSearch, std::ref(g), 0, std::ref(Visitor), TxPtr, LkManager));
+  }
+  
+  for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
+
+  cout <<"finish testing\n";
+  fflush(stdout);
+//  tranxBreadthFirstSearch(g, 0, Visitor, TxPtr, LkManager);
 
 }
 

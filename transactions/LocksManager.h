@@ -24,7 +24,7 @@
 #include <stack>
 #include <iostream>
 
-#define _DL_DETECTION_
+#define _DL_DETECTION_ true
 
 enum MutexType { T_ID, T_Property, T_LastEdge, T_NextEdge, T_FirstVertex, T_SecondVertex, T_FirstNextEdge, T_FirstPrevEdge, T_SecondNextEdge, T_SecondPrevEdge, T_Label};
 enum LockType { T_SH, T_EX };
@@ -73,11 +73,11 @@ public:
 
   bool  releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock);
 
-//  void  releaseEdgeAll(ELockListType & EdgeLocks); 
+  void  releaseEdgeAll(ELockListType & EdgeLocks); 
 
   void  releaseVertexAll(VLockListType & VertexLocks); 
 
-//  void  releaseAll(VLockListType & VertexLocks, ELockListType & EdgeLocks); 
+  void  releaseAll(VLockListType & VertexLocks, ELockListType & EdgeLocks); 
 
   void  addToVertexLockMap(IdType VertexId); 
 
@@ -171,6 +171,10 @@ protected:
   GraphType & Graph;
 #endif
 
+#ifdef _NO_WAIT_
+
+#endif 
+
 #ifdef _DL_DETECTION_
 //	unsigned int DeadLockCount;
   /// TODO need lock for transMap, ResrMap, WaitMap separately
@@ -178,6 +182,8 @@ protected:
 	TransactionResourceMap  TransMap;
 	ResourceTransactionMap  ResrMap;
   WaitingTransactionMap WaitMap;
+#else 
+
 #endif /*_DL_DETECTION_ */
     
 };

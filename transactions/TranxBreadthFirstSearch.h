@@ -27,6 +27,8 @@
 #include <unordered_map>
 #include <vector>
 
+#define _DEBUG_ENABLE_ true
+
 //TODO
 /// update graph->add/delete nodes/edges
 /// Macros of spinning on locks
