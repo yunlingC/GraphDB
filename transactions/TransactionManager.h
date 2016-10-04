@@ -18,34 +18,27 @@
 #include "Transaction.h"
 
 #include <unordered_map>
+#include <shared_mutex>
 
 class TransactionManager {
 public:
   typedef Transaction *  TransactionPointer;
   typedef unsigned int IdType;
+  typedef std::pair<IdType, TransactionPointer> TransactionEntryType;
   typedef std::unordered_map<IdType, TransactionPointer> TransactionTableType;
 public:
 
   TransactionManager();
 
-  ///TODO not used yet
-  TransactionPointer  initTransaction();
-
-  bool  addTransaction(IdType TxId, TransactionPointer log);
-
-  TransactionPointer addTransaction(IdType Id);
-
-//  IdType  addTransaction();
-
-  TransactionPointer  addTransaction();
+  TransactionEntryType  addTransaction();
 
   TransactionPointer getTransaction(IdType TxId);
-
-  bool  rollBack(GraphType & graph);
 
   ~TransactionManager();
 
 private:
+  IdType assignTransId();
+
 //  bool  undoUpdate(GraphType & graph, TransactionPointer log);
 //
 //  bool  undoInsert(GraphType & graph, TransactionPointer log);
@@ -53,7 +46,8 @@ private:
 //  bool  undoDelete(GraphType & graph, TransactionPointer log);
 
 protected:
-  unsigned int TransNumber;
+  std::shared_ptr<std::mutex> TransIdGuard;
+  IdType TransNumber;
   TransactionTableType TransTable; 
 };
 

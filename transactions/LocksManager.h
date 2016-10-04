@@ -52,7 +52,7 @@ public:
   typedef std::set<LockPointer> LockListType;
   typedef std::unordered_map<IdType,  LockType> TransMapType;
   typedef std::unordered_map<IdType, LockListType> TransactionResourceMap;
-  typedef std::unordered_map<LockPointer, TransMapType>ResourceTransactionMap;
+  typedef std::unordered_map<LockPointer, TransMapType> ResourceTransactionMap;
   typedef std::unordered_map<IdType, LockPointer> WaitingTransactionMap;
   typedef std::stack<IdType> TransStackType; 
   typedef std::set<IdType> TransSetType;

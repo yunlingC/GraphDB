@@ -17,42 +17,38 @@
 
 #include "TransactionManager.h"
 
-  TransactionManager::TransactionManager() : TransNumber(0) {}
+#include <iostream>
 
-  ///TODO not used yet
-  auto TransactionManager::initTransaction()
-  -> TransactionPointer {
-  		TransactionPointer log = new Transaction();
-  		return log;
+  TransactionManager::TransactionManager() : TransNumber(0) {
+    TransIdGuard = std::shared_ptr<std::mutex>(new std::mutex);
   }
-  
-  auto TransactionManager::addTransaction(IdType tid,
-                                          TransactionPointer log)
-  -> bool  {
-  		if(TransTable.find(tid) != TransTable.end()) return false;
-  		TransTable.insert(std::pair<IdType, TransactionPointer>(tid, log));
-  		return true;
+
+  auto TransactionManager::assignTransId()  
+    -> IdType {
+      IdType id = 0;
+      TransIdGuard->lock();
+      id = TransNumber;
+      TransNumber++;
+      TransIdGuard->unlock();
+      return id;
   }
-  
+
   auto TransactionManager::addTransaction()
-  -> TransactionPointer {
-  		TransactionPointer log = new Transaction();
-  		log->requireTxId(TransNumber);
-  		TransTable.insert(std::pair<IdType, TransactionPointer>(TransNumber, log));
-  		TransNumber++;
-  		return log;
+  -> TransactionEntryType {
+      auto Id = assignTransId();
+      std::cout <<"add transaction " << Id << std::endl;
+  		TransactionPointer TxPtr = new Transaction(Id);
+  		TransTable.insert(std::pair<IdType, TransactionPointer>(Id, TxPtr));
+  		return TransactionEntryType(Id, TxPtr);
   }
   
+/// TODO exception 
   auto TransactionManager::getTransaction(IdType TxId)
     -> TransactionPointer {
-  		if(TransTable.find(TxId) != TransTable.end()) return nullptr;
+      TransactionPointer TxPtr = nullptr;
+  		if (TransTable.find(TxId) == TransTable.end()) return TxPtr;
       return TransTable.at(TxId);
   }
-
-//  auto TransactionManager::addTransaction(Query & query) 
-//    ->  bool  {
-//  	/// TODO
-//  }
 
 /**
 		auto TransactionManager::rollBack(GraphType & graph)

@@ -440,16 +440,17 @@
               }
 #if _DEBUG_ENABLE_
               else {
-                std::cerr <<"Error : Transaction " << TransId << " requests the same shared lock again\n";
+                std::cerr <<"Error : Transaction " << TransId << " requests the same shared lock again, ptr\t" << LockPtr << "\n";
                   exit(0);
               }
 #endif
           }// switch
-        } // if 
+        }// if 
+
         TransStack.push((*iter).first);
-        CheckedTransList.insert(*iter.first);
         if (!checkWaitOnRecursive(TransId, (*iter).first, TransStack, CheckedTransList)) {
-          /// There is a potential deadlock
+          /// checkWaitOnRecursive returns false in case of deadlock
+          //TransStack.pop();
           return T_Abort;
         } //if 
         TransStack.pop();
@@ -484,12 +485,13 @@
           return false;
         }
         /// check further if there is deadlock
+        /// TODO delete this?
         ChkTransList.insert(LockingTrans);
         /// Each transaction waits for one lock only
         auto LockPtr  = WaitMap.find(LockingTrans);
         if (LockPtr == WaitMap.end())
           return true;
-        auto TxList  =  ResrMap.find((*LockPtr).second);
+        auto TxList  =  ResrMap.find(LockPtr->second);
         /// This lock is available
         if (TxList == ResrMap.end()) 
           return true;
@@ -499,28 +501,36 @@
           /// This transaction has NOT been checked
           if (ChkTransList.find(it->first) == ChkTransList.end()) {
             TransStack.push(it->first);
-            checkWaitOnRecursive(WaitingTrans, it->first, TransStack, ChkTransList);
+            auto WaitOn = checkWaitOnRecursive(WaitingTrans, it->first, TransStack, ChkTransList);
             TransStack.pop();
+            /// If a deadlock is found, return cotrol  
+            if (!WaitOn)  {
+              return false;
+            }
           }//if
         }
       }
 
     bool LocksManager::getVertexLock(IdType VId, MutexType Mutex, LockType Lock, IdType TxId)
-//      ->  bool  {
     {
         LockRetPairType getLock = LocksManager::requireVertexLock(VId, Mutex, Lock);
         
         std::lock_guard<std::mutex> DlLock(*DeadlockDetector);
+//        *DeadlockDetector->lock();
         /// If lock available, assign lock to TxId, register to maps(Trans, Lock)
         if (getLock.first) {
           /// TODO separate getting lock from getVertexLock
           LocksManager::registerToMap(TxId, getLock.second, Lock);
           return true;
         }
+        std::cout <<"Transaction " << TxId << " cannot get lock " << VId << " Type " << Lock << "\n";
         switch (LocksManager::checkWaitOn(TxId, getLock.second, Lock))  {
           /// If there is no potential deadlock, wait for it
           case T_Wait:
+            /// Release lock
             while (!LocksManager::getVertexLock(VId, Mutex, Lock));
+            /// Acquire lock again for registration
+            LocksManager::registerToMap(TxId, getLock.second, Lock);
             return true;
           case T_Abort:
             LocksManager::releaseAll(TxId);
@@ -546,10 +556,13 @@
         LocksManager::registerToMap(TxId, getLock.second, Lock);
         return true;
       }
+        std::cout <<"Transaction " << TxId << " cannot get lock " << EId 
+                  << " Ptr " << getLock.second << " Type " << Lock << "\n";
       switch (LocksManager::checkWaitOn(TxId, getLock.second, Lock))  {
         /// If there is no potential deadlock, wait for it
         case T_Wait:
           while (!(LocksManager::getEdgeLock(EId, Mutex, Lock)));
+          LocksManager::registerToMap(TxId, getLock.second, Lock);
           return true;
         case T_Abort:
           LocksManager::releaseAll(TxId);
@@ -682,6 +695,7 @@
         TxRec->second = T_EX;
         return true;
       }
+
 #else
   ///locks are encoded in Vertex and Edge
   /// TODO const & g

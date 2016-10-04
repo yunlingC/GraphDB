@@ -17,47 +17,38 @@
 
 #include "Transaction.h"
 
-  Transaction::Transaction() {
+  Transaction::Transaction() : TransId(0), TransStatus(T_PROCESS) {} 
 
+  Transaction::Transaction(IdType id) : TransId(id), TransStatus(T_PROCESS){} 
+
+  auto Transaction::getId() 
+    -> IdType {
+    return TransId;
   }
 
-  Transaction::~Transaction() {
-
+  auto Transaction::commit() 
+    -> void {
+      TransStatus = T_COMMIT;
   }
 
-/** Not needed so far
- * TODO delete
-auto Transaction::getVertexLock(VertexPointer &Vertex, MutexType Mutex,
-                                LockType Lock) 
-  ->  bool  {
-	///TODO
+  auto Transaction::abort() 
+    -> void {
+      TransStatus = T_ABORT;
+      exit(0);
+  }
 
-}
+  auto Transaction::rollBack()
+    -> bool {
+      TransStatus = T_ROLLBACK;
+      ///TODO roll back
+      return true;
+  }
 
-auto Transaction::getEdgeLock(EdgePointer &Edge, MutexType Mutex,
-                              LockType Lock) 
-  ->  bool  {
-	/// TODO
-}
+  auto Transaction::checkStatus() 
+    -> TransStatusType  {
+      return TransStatus;
+  }
 
-auto Transaction::registerVertexLock(VertexPointer &Vertex, MutexType Mutex,
-                                     LockType Lock) 
-  ->  void  {
-	/// TODO
-}
-
-auto Transaction::registerEdgeLock(EdgePointer &Edge, MutexType Mutex,
-                                   LockType Lock) 
-  ->  void  {
-	/// TODO
-}
-
-auto  Transaction::releaseAll()  
-    ->  bool  {
-    
-}
-*/
-
-
-
+  Transaction::~Transaction(){}
+ 
 #endif /*_TRANSACTION_CPP_*/

@@ -28,10 +28,13 @@ int main() {
 
 //  auto TxId = TmManager.addTransaction();
 
-  auto TxPtr = TmManager.addTransaction();
+//  auto TxEntryPtr = TmManager.addTransaction();
+//  auto TxPtr = TxEntryPtr.second;
 
   vector<std::thread> threads;
   for (auto i= 0; i < 10; i++) {
+    auto TxEntryPtr = TmManager.addTransaction();
+    auto TxPtr = TxEntryPtr.second;
     threads.push_back(std::thread(tranxBreadthFirstSearch, std::ref(g), 0, std::ref(Visitor), TxPtr, LkManager));
   }
   
