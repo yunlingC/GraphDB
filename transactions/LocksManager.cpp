@@ -383,6 +383,7 @@
     return LockRetPairType(RetValue, MutexPtr);
   }
 
+/// Need to figure out all circles 
   auto LocksManager::checkWaitOn(IdType TransId, LockPointer LockPtr, LockType LType) 
     ->  DLRetType  {
       /// If current trans is waiting for some other lock, then give up
@@ -509,12 +510,23 @@
             }
           }//if
         }
+        return true;
       }
 
     bool LocksManager::getVertexLock(IdType VId, MutexType Mutex, LockType Lock, IdType TxId)
     {
         LockRetPairType getLock = LocksManager::requireVertexLock(VId, Mutex, Lock);
-        
+        if (!getLock.first) {
+          registerWaitingMap(TxId, getLock.second);
+          while (!requireVertexLock(VId, Mutex, Lock).first){
+            std::cout <<"Transaction " << TxId << " is spinning on lock " << getLock.second << "\n";  
+          }
+          retireFromWaitingMap(TxId, getLock.second);
+        }
+        registerToMap(TxId, getLock.second, Lock);
+        return true;
+        /// TODO no case of returning false so far
+       /**
         std::lock_guard<std::mutex> DlLock(*DeadlockDetector);
 //        *DeadlockDetector->lock();
         /// If lock available, assign lock to TxId, register to maps(Trans, Lock)
@@ -543,12 +555,20 @@
           case T_Upgrade:
             return LocksManager::upgradeLock(TxId, getLock.second);
       }//switch
+      */
   }
 
   auto LocksManager::getEdgeLock(IdType EId, MutexType Mutex, LockType Lock, IdType TxId)
     ->  bool  {
       LockRetPairType  getLock = LocksManager::requireEdgeLock(EId, Mutex, Lock);
+      if (!getLock.first) {
+        registerWaitingMap(TxId, getLock.second);
+        while (!requireEdgeLock(EId, Mutex, Lock).first);
+      }
+      registerToMap(TxId, getLock.second, Lock);
+      return true;
 
+      /**
       std::lock_guard<std::mutex> DlLock(*DeadlockDetector);
       /// If this lock is available, assign lock to TxId, register to maps(Trans, Lock)
       if (getLock.first) {
@@ -574,7 +594,9 @@
           LocksManager::releaseAll(TxId);
           return false;
       }
+      */
     }
+
 
   auto LocksManager::registerWaitingMap(IdType TxId, LockPointer LockPtr)
     -> bool {
@@ -591,6 +613,10 @@
   auto LocksManager::registerTransMap(IdType TransId, LockPointer LockPtr)
     ->  bool  {
       auto it = TransMap.find(TransId);
+#ifdef _DEBUG_PRINT_
+//      std::cout << "Transaction " << TransId << " registers lock " << LockPtr << "\n";
+//      fflush(stdout);
+#endif
       /// If current transaction never registers itself with any lock
       if (it == TransMap.end()) {
         LockListType LockList{LockPtr}; 
@@ -636,6 +662,66 @@
     ->  bool  {
       return LocksManager::registerTransMap(TransId, LockPtr) && LocksManager::registerLockMap(TransId, LockPtr, LType);
 
+  }
+
+  auto LocksManager::retireFromWaitingMap(IdType TxId, LockPointer LockPtr)
+    -> bool {
+      /// TODO to be done
+      auto it = WaitMap.find(TxId);
+#if _DEBUG_ENABLE_
+      if (it == WaitMap.end()) {
+        std::cout <<"Error : Transaction " << TxId << " is not waiting for any lock\n";
+        return false;
+      }
+      if (it->second != LockPtr)  {
+        std::cout <<"Error : Transaction " << TxId << " is waiting for " << it->second << " not " << LockPtr <<"\n";
+        return false;
+      }
+#endif
+      WaitMap.erase(it);
+      return true;
+  }
+
+  auto LocksManager::retireFromTransMap(IdType TxId, LockPointer LockPtr)
+    -> bool {
+    auto it = TransMap.find(TxId); 
+#if _DEBUG_ENABLE_
+    if (it == TransMap.end()) {
+      std::cout <<"Error : Transaction " << TxId << " is not holding any lock\n";
+      return false;
+    }
+    /// it->second is a set holding all lock pointers
+    auto iter = it->second.find(LockPtr);
+    if (iter == it->second.end()) {
+      std::cout <<"Error : Transaction " << TxId << " does NOT have this lock\n";
+      return false;
+    }
+#endif
+    it->second.erase(LockPtr);
+    return true;
+  }
+
+  auto LocksManager::retireFromResrMap(IdType TxId, LockPointer LockPtr, LockType LType)
+    -> bool {
+    auto it = ResrMap.find(LockPtr);
+#if _DEBUG_ENABLE_
+    if (it == ResrMap.end())  {
+      std::cout <<"Error : Lock " << LockPtr << " is not holding by any transaction\n";
+      return false;
+    }
+    auto iter = it->second.find(TxId);
+    if (iter == it->second.end()) {
+      std::cout <<"Error : Lock " << LockPtr << " is not holding by transaction " << TxId << "\n";
+      return false;
+    }
+    if ((*iter).second != LType) {
+      std::cout <<"Error : Lock " << LockPtr << " is not holding by transaction " << TxId << " with " << LType <<"\n";
+      return false;
+    }
+#endif 
+    /// Remove the entry created by TxId
+    it->second.erase(TxId);
+    return true;
   }
 
   auto LocksManager::releaseAll(IdType TxId)
@@ -695,6 +781,39 @@
         TxRec->second = T_EX;
         return true;
       }
+
+#ifdef _DEBUG_PRINT_
+  void LocksManager::dumpMaps() {
+    std::cout << "** Dump lock information **\n";
+    dumpTransMap();
+    dumpResrMap();
+  }
+
+  void LocksManager::dumpTransMap()  {
+    std::cout <<"+++ TransMap +++ \n";
+    for (auto it = TransMap.begin(), it_end = TransMap.end();
+         it != it_end; it++)  {
+      std::cout <<"TxId\t" << it->first << "\tLock number\t" << it->second.size() <<"\n";
+      for (auto iter = it->second.begin(), iter_end = it->second.end();
+          iter != iter_end; iter++) {
+        std::cout << *iter  <<"\t";
+      }
+    }
+
+  }
+
+  void LocksManager::dumpResrMap()  {
+    std::cout <<"+++ LockMap +++ \n";
+    for (auto it = ResrMap.begin(), it_end = ResrMap.end();
+         it != it_end; it++)  {
+      std::cout <<"Lock\t" << it->first << "\tTrans number\t" << it->second.size() <<"\n";
+      for (auto iter = it->second.begin(), iter_end = it->second.end();
+          iter != iter_end; iter++) {
+        std::cout << (*iter).first  <<"\t" << (*iter).second << "\n";
+      }
+    }
+  }
+#endif
 
 #else
   ///locks are encoded in Vertex and Edge

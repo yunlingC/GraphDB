@@ -32,7 +32,7 @@ int main() {
 //  auto TxPtr = TxEntryPtr.second;
 
   vector<std::thread> threads;
-  for (auto i= 0; i < 10; i++) {
+  for (auto i= 0; i < 2; i++) {
     auto TxEntryPtr = TmManager.addTransaction();
     auto TxPtr = TxEntryPtr.second;
     threads.push_back(std::thread(tranxBreadthFirstSearch, std::ref(g), 0, std::ref(Visitor), TxPtr, LkManager));
@@ -40,9 +40,10 @@ int main() {
   
   for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
 
+  LkManager.dumpMaps();
+
   cout <<"finish testing\n";
   fflush(stdout);
-//  tranxBreadthFirstSearch(g, 0, Visitor, TxPtr, LkManager);
 
 }
 

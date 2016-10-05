@@ -21,8 +21,6 @@
 #include "Transaction.h"
 #include "LocksManager.h"
 
-//#include <Utils.h>
-
 #include <queue>
 #include <unordered_map>
 #include <vector>
@@ -102,7 +100,7 @@
 				bool TypeMatch =  GraphVisitor.scheduleEdge(NextEdge);
 				bool DirectionMatch = GraphVisitor.visitDirection(TargetVertex, NextEdge);
 
-				if( BranchMatch )
+				if ( BranchMatch )
 					return;
 
 				if ( ColorMap.find(TargetVertex ) == ColorMap.end() || RevisitFlag ) {
@@ -130,6 +128,8 @@
 				NextEdge = NextEdge->getNextEdge(ScheduledVertex);
 			}
 		}
+    std::cout <<"Transactional BFS done\n";
+    LockManager.dumpResrMap();
 		GraphVisitor.finishVisit();
 	}
 

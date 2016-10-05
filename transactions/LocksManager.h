@@ -104,6 +104,8 @@ public:
 
 //  bool releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
 
+  bool detectDeadlock();
+
 	DLRetType  checkWaitOn(IdType, LockPointer, LockType);
 
   /// Yes - wait  No - deadlock
@@ -115,15 +117,30 @@ public:
   /// TODO lock
   bool  registerWaitingMap(IdType TransId,  LockPointer  LockPtr); 
 
+  bool  retireFromWaitingMap(IdType TransId, LockPointer LockPtr);
+
   /// TODO lock
   bool  registerTransMap(IdType TransId,  LockPointer  LockPtr);
+
+  bool  retireFromTransMap(IdType TransId,  LockPointer  LockPtr);
 
   /// TODO lock
   bool  registerLockMap(IdType TransId, LockPointer  LockPtr,  LockType  LType);
 
+  bool  retireFromResrMap(IdType TransId, LockPointer  LockPtr,  LockType  LType);
+
   bool  registerToMap(IdType TransId,  LockPointer  LockPtr, LockType LType);
 
+  bool  retireFromMap(IdType TransId,  LockPointer  LockPtr, LockType LType);
+
   bool  upgradeLock(IdType TransId, LockPointer LockPtr);
+
+#ifdef _DEBUG_PRINT_
+  void  dumpMaps();
+  void  dumpTransMap();
+  void  dumpResrMap();
+#endif
+
   /// HOW to get lock and avoid deadlock
   /// TODO Check if lock exists from LockManager
   /// If yes, check if this lock can be acquired 
