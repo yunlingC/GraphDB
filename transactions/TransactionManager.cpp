@@ -84,6 +84,7 @@
 				}
 		}
 
+
 //		auto TransactionManager::undoUpdate(GraphType & graph, TransactionPointer
 //		log)
 //		->  bool {
@@ -94,14 +95,12 @@
 //		log)
 //		->  bool  {
 //				///TODO
-//
 //		}
 //
 //		auto TransactionManager::undoDelete(GraphType & graph, TransactionPointer
 //		log)
 //		->  bool  {
 //				///TODO
-//
 //		}
 
 #endif /**_TRANSACTIONMANAGER_CPP_*/

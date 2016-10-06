@@ -20,6 +20,7 @@
 /// TODO to be deleted
 enum OperationType { NOOP, READ, UPDATE, INSERT, DELETE };
 
+/// TODO need T_WAITING ?
 enum TransStatusType {T_COMMIT, T_ABORT, T_ROLLBACK, T_PROCESS};
 
 class Transaction {

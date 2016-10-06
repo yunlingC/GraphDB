@@ -384,6 +384,23 @@
   }
 
 /// Need to figure out all circles 
+/// TODO need to chect transaction status before aborting any transaction
+  auto LocksManager::detectDeadlock()
+    -> bool {
+      /* WaitMap
+       * TxId --  LockPointer
+       * 0    --  L1
+       * 2    --  L2
+       * */
+      unsigned int DeadlockCount = 0;
+      /// TODO problem here? what if WaitMap.end() changes? It will never end...
+      /// TODO work till here
+      for (auto it = WaitMap.begin(), it_end = WaitMap.end(); 
+            it != it_end; it ++) {
+        
+      }
+  }
+
   auto LocksManager::checkWaitOn(IdType TransId, LockPointer LockPtr, LockType LType) 
     ->  DLRetType  {
       /// If current trans is waiting for some other lock, then give up
