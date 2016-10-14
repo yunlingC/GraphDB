@@ -86,7 +86,7 @@ protected:
   PropertyListType VertexPropertyList;
 
 #ifdef _LOCKING_STORAGE_
-  VertexLockPointer  VLock; 
+  VertexLockPointer  VertexLock; 
 #endif 
 
 };

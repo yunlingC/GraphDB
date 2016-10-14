@@ -8,7 +8,7 @@
 //===----------------------------------------------------------------------===//
 ///
 /// \file
-/// \brief This is the main class for locks structure.
+/// \brief This is the main class for lock structure.
 ///
 //===----------------------------------------------------------------------===//
 
@@ -16,8 +16,6 @@
 #define _LOCK_H_
 
 #include <shared_mutex>
-
-//enum Lock {VertexLock, EdgeLock};
 
 class VertexLock {
 public:
@@ -57,13 +55,14 @@ public:
 
 
 protected:
-///No mutex for label or id
-/// won't be changed anyway;
   MutexPointer IdMutex;
   MutexPointer NEMutex;
   MutexPointer LEMutex;
   MutexPointer LbMutex;
   MutexPointer PpMutex;
+#ifdef _DEADLOCK_DETECTION_
+  /// TODO Mutex tables 
+#endif 
 };
 
 class EdgeLock {
@@ -135,7 +134,9 @@ protected:
   /// Lb mutex for prefetching convenience(temporal)
   MutexPointer LbMutex;
   MutexPointer PpMutex;
-
+#ifdef _DEADLOCK_DETECTION_
+  /// TODO a mutex table <mutexPointer, <transaction_ptr, type> >
+#endif 
 };
 
 #endif /**_LOCK_H_*/

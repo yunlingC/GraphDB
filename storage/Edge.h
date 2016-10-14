@@ -112,7 +112,7 @@ protected:
   PropertyListType EdgePropertyList;
 
 #ifdef _LOCKING_STORAGE_
-  EdgeLockPointer ELock;
+  EdgeLockPointer EdgeLock;
 #endif 
 
 };

@@ -17,12 +17,6 @@
 
 #include <stdlib.h>
 
-/// TODO to be deleted
-enum OperationType { NOOP, READ, UPDATE, INSERT, DELETE };
-
-/// TODO need T_WAITING ?
-enum TransStatusType {T_COMMIT, T_ABORT, T_ROLLBACK, T_SHRINKING, T_EXPANDING};
-
 class Transaction {
 public:
   typedef unsigned int IdType;
@@ -46,6 +40,9 @@ public:
 protected:
   IdType  TransId;
   TransStatusType TransStatus;
+#ifdef _DEADLOCK_DETECTION_
+  /// TODO dependency list <transaction_ptr>
+#endif
 };
 
 #endif /*_TRANSACTION_H_*/
