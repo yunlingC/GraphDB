@@ -17,18 +17,13 @@
 
 #include "GraphType.h"
 #include "Lock.h"
+#include "Concurrency_control_config.h"
 
 ///std=c++14 
 #include <unordered_map>
 #include <set>
 #include <stack>
 #include <iostream>
-
-#define _DEADLOCKL_DETECTION_ true
-
-enum MutexType { T_ID, T_Property, T_LastEdge, T_NextEdge, T_FirstVertex, T_SecondVertex, T_FirstNextEdge, T_FirstPrevEdge, T_SecondNextEdge, T_SecondPrevEdge, T_Label};
-enum LockType { T_SH, T_EX };
-enum LockRequestRetType { T_Abort,  T_Ignore,  T_Upgrade, T_Wait};
 
 /// currently PLock is only supported in _LOCKING_STORAGE_
 /// i.e. in the LockMap we are still use shared_mutex from C++ lib
@@ -181,6 +176,15 @@ public:
 #endif
 
 protected:
+  MutexPointer  getVertexLockPointer(IdType, VertexId, MutexType Mutex);
+
+  MutexPointer  getEdgeLockPointer(IdType, VertexId, MutexType Mutex);
+
+  // LockType can be either SH or EX
+  bool  tryLock(MutexPointer MutexPtr, LockType LType);
+
+  bool  tryUnlock(MutexPointer MutexPtr, LockType LType);
+
 #ifndef _LOCKING_STORAGE_
   VertexLockMapType VertexLockMap;
   EdgeLockMapType EdgeLockMap;

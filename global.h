@@ -1,4 +1,6 @@
-#define _DEADLOCK_DETECTION_
+#define _DEADLOCK_DETECTION_  true
+
+#define _DEBUG_ENABLE_ true
 
 #define _LOCKING_STORAGE_
 
