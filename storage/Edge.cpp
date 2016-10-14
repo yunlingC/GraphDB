@@ -247,7 +247,7 @@ auto Edge::getId()
   return EdgeId;
 }
 
-#ifdef _LOCKING_
+#ifdef _LOCKING_STORAGE_
 auto Edge::getEdgeLock() -> EdgeLockPointer {
   return ELock;
 }

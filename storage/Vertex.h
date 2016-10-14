@@ -20,7 +20,7 @@
 #include <vector>
 
 /// Forward declaration.
-#ifdef _LOCKING_
+#ifdef _LOCKING_STORAGE_
 class VertexLock;
 #endif
 
@@ -33,7 +33,7 @@ public:
   typedef FixedString KeyType;
   typedef FixedString ValueType;
   typedef FixedString LabelType;
-#ifdef _LOCKING_
+#ifdef _LOCKING_STORAGE_
   typedef VertexLock* VertexLockPointer;
 #endif
 
@@ -62,7 +62,7 @@ public:
   bool updateProperty(std::string Key, std::string Value);
   PropertyListType &  getPropertyList();
 
-#ifdef _LOCKING_
+#ifdef _LOCKING_STORAGE_
   void setVertexLock(VertexLockPointer NewLock);
   VertexLockPointer getVertexLock();
 #endif
@@ -85,7 +85,7 @@ protected:
 
   PropertyListType VertexPropertyList;
 
-#ifdef _LOCKING_
+#ifdef _LOCKING_STORAGE_
   VertexLockPointer  VLock; 
 #endif 
 

@@ -30,7 +30,7 @@ enum MutexType { T_ID, T_Property, T_LastEdge, T_NextEdge, T_FirstVertex, T_Seco
 enum LockType { T_SH, T_EX };
 enum LockRequestRetType { T_Abort,  T_Ignore,  T_Upgrade, T_Wait};
 
-/// currently PLock is only supported in _LOCKING_
+/// currently PLock is only supported in _LOCKING_STORAGE_
 /// i.e. in the LockMap we are still use shared_mutex from C++ lib
 /// TODO: support PLock with LockMap 
 /// but why?
@@ -59,7 +59,7 @@ public:
   typedef std::pair<bool, LockPointer> LockRetPairType;
 public:
 
-#ifndef _LOCKING_
+#ifndef _LOCKING_STORAGE_
 /// locks stored in a map 
   LocksManager();
 
@@ -181,7 +181,7 @@ public:
 #endif
 
 protected:
-#ifndef _LOCKING_
+#ifndef _LOCKING_STORAGE_
   VertexLockMapType VertexLockMap;
   EdgeLockMapType EdgeLockMap;
 #else 

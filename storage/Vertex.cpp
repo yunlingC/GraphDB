@@ -101,7 +101,7 @@ auto Vertex::getLastEdge() -> EdgePtr {
   return LastEdge;
 }
 
-#ifdef _LOCKING_
+#ifdef _LOCKING_STORAGE_
 auto Vertex::getVertexLock() ->VertexLockPointer {
   return VLock;
 }

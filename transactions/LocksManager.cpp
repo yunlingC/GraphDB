@@ -23,7 +23,7 @@
 
 #define _DEBUG_ENABLE_ true
 
-#ifndef _LOCKING_
+#ifndef _LOCKING_STORAGE_
   LocksManager::LocksManager() {
     DeadlockDetector = std::shared_ptr<std::mutex>(new std::mutex) ;
   }

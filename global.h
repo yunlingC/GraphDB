@@ -1,2 +1,4 @@
 #define _DEADLOCK_DETECTION_
 
+#define _LOCKING_STORAGE_
+
