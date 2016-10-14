@@ -402,7 +402,7 @@
   }
 
   auto LocksManager::checkWaitOn(IdType TransId, LockPointer LockPtr, LockType LType) 
-    ->  DLRetType  {
+    ->  LockRequestRetType {
       /// If current trans is waiting for some other lock, then give up
       /// Usually it won't happen because this trans must be spining on that lock
       /// TODO to be deleted
@@ -410,7 +410,7 @@
       if (WaitMap.find(TransId) != WaitMap.end()) {
         std::cerr << "Error : Transaction " << TransId << " is waiting for a lock\n";
         return T_Abort;
-      }
+      _}
 #endif
       TransStackType  TransStack;
       TransSetType CheckedTransList;

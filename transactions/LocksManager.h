@@ -24,11 +24,11 @@
 #include <stack>
 #include <iostream>
 
-#define _DL_DETECTION_ true
+#define _DEADLOCKL_DETECTION_ true
 
 enum MutexType { T_ID, T_Property, T_LastEdge, T_NextEdge, T_FirstVertex, T_SecondVertex, T_FirstNextEdge, T_FirstPrevEdge, T_SecondNextEdge, T_SecondPrevEdge, T_Label};
 enum LockType { T_SH, T_EX };
-enum DLRetType { T_Abort,  T_Ignore,  T_Upgrade, T_Wait};
+enum LockRequestRetType { T_Abort,  T_Ignore,  T_Upgrade, T_Wait};
 
 /// currently PLock is only supported in _LOCKING_
 /// i.e. in the LockMap we are still use shared_mutex from C++ lib
@@ -106,7 +106,7 @@ public:
 
   bool detectDeadlock();
 
-	DLRetType  checkWaitOn(IdType, LockPointer, LockType);
+	LockRequestRetType  checkWaitOn(IdType, LockPointer, LockType);
 
   /// Yes - wait  No - deadlock
   bool  checkWaitOnRecursive(IdType, IdType, TransStackType, TransSetType);
@@ -192,7 +192,7 @@ protected:
 
 #endif 
 
-#ifdef _DL_DETECTION_
+#ifdef _DEADLOCK_DETECTION_
 //	unsigned int DeadLockCount;
   /// TODO need lock for transMap, ResrMap, WaitMap separately
   std::shared_ptr<std::mutex> DeadlockDetector;
@@ -201,7 +201,7 @@ protected:
   WaitingTransactionMap WaitMap;
 #else 
 
-#endif /*_DL_DETECTION_ */
+#endif /*_DEADLOCK_DETECTION_ */
     
 };
 
