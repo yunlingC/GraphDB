@@ -120,6 +120,10 @@ public:
     return SPEMutex;
   }
 
+  auto getLbMutex() 
+    -> MutexPointer {
+    return LbMutex;
+  }
 
 protected:
   ///No mutex for label

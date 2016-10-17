@@ -15,6 +15,8 @@
 #ifndef _TRANSACTION_H_
 #define _TRANSACTION_H_
 
+#include "Concurrency_control_config.h"
+
 #include <stdlib.h>
 
 class Transaction {

@@ -22,7 +22,7 @@
 #include <iostream>
 
   auto LocksManager::getVertexLockPointer(IdType VertexId, MutexType Mutex) 
-    -> bool {
+    -> MutexPointer {
 #if _DEBUG_ENABLE_
       if (VertexLockMap.find(VertexId) == VertexLockMap.end()) {
         std::cerr  << "Error : No such vertex " << VertexId <<" in map \n";
@@ -38,6 +38,8 @@
           return VertexLockMap[VertexId].getNEMutex();
         case T_ID:
           return VertexLockMap[VertexId].getIdMutex();
+        case T_Label:
+          return VertexLockMap[VertexId].getLbMutex();
         default:
           // assert(false);
           std::cerr << "ERROR: No such Mutex in VertexLock\n";
@@ -70,14 +72,15 @@
           return EdgeLockMap[EdgeId].getSNEMutex();
         case T_SecondPrevEdge:
           return EdgeLockMap[EdgeId].getSPEMutex();
+        case T_Label:
+          return EdgeLockMap[EdgeId].getLbMutex();
 #if _DEBUG_ENABLE_
           // assert("ERROR: No such Mutex in EdgeLock" && false);
         default:
           std::cerr << "ERROR: No such Mutex in EdgeLock\n";
           exit(0);
-      }
 #endif
-      return true;
+      }
   }
 
   auto LocksManager::tryLock(MutexPointer MutexPtr, LockType LType)
@@ -100,8 +103,8 @@
       }
     }
 
-  auto tryUnlock(MutexPointer MutexPtr, LockType LType)
-    -> bool {
+  auto LocksManager::tryUnlock(MutexPointer MutexPtr, LockType LType)
+    -> void {
       switch (LType) {   
         case T_SH:
           return MutexPtr->unlock_shared();
@@ -117,7 +120,9 @@
 
 #ifndef _LOCKING_STORAGE_
   LocksManager::LocksManager() {
+#ifdef _DEADLOCK_DETECTION_
     DeadlockDetector = std::shared_ptr<std::mutex>(new std::mutex) ;
+#endif
   }
 
   auto LocksManager::getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock) 
@@ -127,7 +132,7 @@
   }
 
   auto LocksManager::releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock) 
-    -> bool {
+    -> void {
       auto MutexPtr = getVertexLockPointer(VertexId, Mutex);
       return tryUnlock(MutexPtr, Lock);
   }
@@ -166,7 +171,7 @@
   */
 
   auto LocksManager::releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock) 
-    -> bool {
+    -> void {
       auto MutexPtr = getEdgeLockPointer(EdgeId, Mutex);
       return tryUnlock(MutexPtr, Lock);
     }
@@ -229,6 +234,7 @@
       return LockRetPairType(RetValue, MutexPtr);
     }
 
+#ifdef _DEADLOCK_DETECTION_
 /// Need to figure out all circles 
 /// TODO need to chect transaction status before aborting any transaction
   auto LocksManager::detectDeadlock()
@@ -238,15 +244,17 @@
        * 0    --  L1
        * 2    --  L2
        * */
-      unsigned int DeadlockCount = 0;
+//      unsigned int DeadlockCount = 0;
       /// TODO problem here? what if WaitMap.end() changes? It will never end...
       /// TODO work till here
       for (auto it = WaitMap.begin(), it_end = WaitMap.end(); 
             it != it_end; it ++) {
-      _  
+        
       }
   }
+#endif /*_DEADLOCK_DETECTION_*/
 
+#ifdef _DEADLOCK_DETECTION_
   auto LocksManager::checkWaitOn(IdType TransId, LockPointer LockPtr, LockType LType) 
     ->  LockRequestRetType {
       /// If current trans is waiting for some other lock, then give up
@@ -256,7 +264,7 @@
       if (WaitMap.find(TransId) != WaitMap.end()) {
         std::cerr << "Error : Transaction " << TransId << " is waiting for a lock\n";
         return T_Abort;
-      _}
+      }
 #endif
       TransStackType  TransStack;
       TransSetType CheckedTransList;
@@ -324,11 +332,12 @@
       registerWaitingMap(TransId, LockPtr);
       return T_Wait;
     }
+#endif 
 
+#ifdef _DEADLOCK_DETECTION_
 /// TODO problem here
 /// If T_Wait is returned, lock for checkWaitOn() can be released
 /// If T_Abort is returned, lock should be held
-            
     auto LocksManager::checkWaitOnRecursive(IdType WaitingTrans
                                             , IdType LockingTrans
                                             , TransStackType  TransStack
@@ -375,63 +384,65 @@
         }
         return true;
       }
+#endif
 
-
+#ifdef _DEADLOCK_DETECTION_
     bool LocksManager::getVertexLock(IdType VId, MutexType Mutex, LockType Lock, IdType TxId)
     {
-        registerLockMap(TxId, ,Lock)
-        LockRetPairType getLock = LocksManager::requireVertexLock(VId, Mutex, Lock);
-        if (!getLock.first) {
-          registerWaitingMap(TxId, getLock.second);
-          while (!requireVertexLock(VId, Mutex, Lock).first){
-            std::cout <<"Transaction " << TxId << " is spinning on lock " << getLock.second << "\n";  
-          }
-          retireFromWaitingMap(TxId, getLock.second);
-        }
-        registerToMap(TxId, getLock.second, Lock);
-        return true;
-        /// TODO no case of returning false so far
-       /**
-        std::lock_guard<std::mutex> DlLock(*DeadlockDetector);
-//        *DeadlockDetector->lock();
-        /// If lock available, assign lock to TxId, register to maps(Trans, Lock)
-        if (getLock.first) {
-          /// TODO separate getting lock from getVertexLock
-          LocksManager::registerToMap(TxId, getLock.second, Lock);
+        auto MutexPtr = getVertexLockPointer(VId, Mutex);
+        DeadlockDetector->lock();
+        registerLockMap(TxId, MutexPtr, Lock);
+        auto getLock = tryLock(MutexPtr, Lock);
+
+        if (getLock) {
+          registerTransMap(TxId, MutexPtr);
+          DeadlockDetector->unlock();
           return true;
         }
+
+        retireFromLockMap(TxId, MutexPtr, Lock);
+        registerWaitingMap(TxId, MutexPtr);
+
         std::cout <<"Transaction " << TxId << " cannot get lock " << VId << " Type " << Lock << "\n";
-        switch (LocksManager::checkWaitOn(TxId, getLock.second, Lock))  {
+        switch (LocksManager::checkWaitOn(TxId, MutexPtr, Lock))  {
           /// If there is no potential deadlock, wait for it
           case T_Wait:
             /// Release lock
             while (!LocksManager::getVertexLock(VId, Mutex, Lock));
             /// Acquire lock again for registration
-            LocksManager::registerToMap(TxId, getLock.second, Lock);
+            LocksManager::registerToMap(TxId, MutexPtr, Lock);
+            DeadlockDetector->unlock();
             return true;
           case T_Abort:
             LocksManager::releaseAll(TxId);
+            DeadlockDetector->unlock();
             return false;
           case T_Ignore:
+            DeadlockDetector->unlock();
             return true;
             /// Release SH Lock on data and then request EX Lock
             /// If lock can be acquired, return true
             /// else return false and then restart
           case T_Upgrade:
-            return LocksManager::upgradeLock(TxId, getLock.second);
+            auto isUpgraded = upgradeLock(TxId, MutexPtr);
+            DeadlockDetector->unlock();
+            return isUpgraded;
       }//switch
-      */
   }
 
   auto LocksManager::getEdgeLock(IdType EId, MutexType Mutex, LockType Lock, IdType TxId)
     ->  bool  {
-      LockRetPairType  getLock = LocksManager::requireEdgeLock(EId, Mutex, Lock);
-      if (!getLock.first) {
-        registerWaitingMap(TxId, getLock.second);
-        while (!requireEdgeLock(EId, Mutex, Lock).first);
+      auto MutexPtr = getEdgeLockPointer(EId, Mutex);
+      DeadlockDetector->lock();
+      registerLockMap(TxId, MutexPtr, Lock);
+      auto getLock =  tryLock(MutexPtr, Lock);
+      if (getLock) {
+        registerTransMap(TxId, MutexPtr);
+        DeadlockDetector->unlock();
+        return true;
       }
-      registerToMap(TxId, getLock.second, Lock);
-      return true;
+      retireFromLockMap(TxId, MutexPtr, Lock);
+      registerWaitingMap(TxId, MutexPtr);
 
       /**
       std::lock_guard<std::mutex> DlLock(*DeadlockDetector);
@@ -441,28 +452,34 @@
         LocksManager::registerToMap(TxId, getLock.second, Lock);
         return true;
       }
-        std::cout <<"Transaction " << TxId << " cannot get lock " << EId 
-                  << " Ptr " << getLock.second << " Type " << Lock << "\n";
-      switch (LocksManager::checkWaitOn(TxId, getLock.second, Lock))  {
+      */
+      std::cout <<"Transaction " << TxId << " cannot get lock " << EId 
+                  << " Ptr " << MutexPtr << " Type " << Lock << "\n";
+
+      switch (LocksManager::checkWaitOn(TxId, MutexPtr, Lock))  {
         /// If there is no potential deadlock, wait for it
         case T_Wait:
           while (!(LocksManager::getEdgeLock(EId, Mutex, Lock)));
-          LocksManager::registerToMap(TxId, getLock.second, Lock);
+          LocksManager::registerToMap(TxId, MutexPtr, Lock);
+            DeadlockDetector->unlock();
           return true;
         case T_Abort:
           LocksManager::releaseAll(TxId);
+            DeadlockDetector->unlock();
           return false;
         case T_Ignore:
+            DeadlockDetector->unlock();
           return true;
         case T_Upgrade:
-          if (LocksManager::upgradeLock(TxId, getLock.second)) return true;
+          if (LocksManager::upgradeLock(TxId, MutexPtr)) return true;
           LocksManager::releaseAll(TxId);
+            DeadlockDetector->unlock();
           return false;
       }
-      */
     }
+#endif /*_DEADLOCK_DETECTION_*/
 
-
+///#ifdef _DEADLOCK_DETECTION_
   auto LocksManager::registerWaitingMap(IdType TxId, LockPointer LockPtr)
     -> bool {
       auto it = WaitMap.find(TxId);
@@ -566,7 +583,7 @@
     return true;
   }
 
-  auto LocksManager::retireFromResrMap(IdType TxId, LockPointer LockPtr, LockType LType)
+  auto LocksManager::retireFromLockMap(IdType TxId, LockPointer LockPtr, LockType LType)
     -> bool {
     auto it = ResrMap.find(LockPtr);
 #if _DEBUG_ENABLE_
@@ -678,7 +695,8 @@
       }
     }
   }
-#endif
+#endif /*_DEBUG_PRINT_*/
+//#endif /*_DEADLOCK_DETECTION_*/
 
 #else
   ///locks are encoded in Vertex and Edge

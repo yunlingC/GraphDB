@@ -1,13 +1,12 @@
 #include "LDBCReader.h"
 #include "TranxBreadthFirstSearch.h"
 #include "TransactionManager.h"
+#include "global.h"
 
 #include <thread>
 #include <iostream>
 
 using namespace std;
-
-#define _DEBUG_ENABLE_  true
 
 int main() {
 

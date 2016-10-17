@@ -1,5 +1,5 @@
 add_library (transactions
-  LocksManager.cpp
   Transaction.cpp
+  LocksManager.cpp
   TransactionManager.cpp
   )

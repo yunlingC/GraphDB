@@ -1,3 +1,5 @@
+#ifndef _CONCURRENCY_CONTROL_CONFIG_H_
+#define _CONCURRENCY_CONTROL_CONFIG_H_
 /// TODO  to be delete
 enum OperationType { NOOP, READ, UPDATE, INSERT, DELETE };
 
@@ -11,3 +13,4 @@ enum LockType { T_SH, T_EX };
 enum LockRequestRetType { T_Abort,  T_Ignore,  T_Upgrade, T_Wait};
 
 
+#endif /*_CONCURRENCY_CONTROL_CONFIG_H_*/

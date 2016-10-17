@@ -18,6 +18,7 @@
 #include "GraphType.h"
 #include "Lock.h"
 #include "Concurrency_control_config.h"
+#include "global.h"
 
 ///std=c++14 
 #include <unordered_map>
@@ -62,11 +63,11 @@ public:
   /// So does getEdgeLock
   bool  getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock); 
 
-  bool  releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock);
+  void  releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock);
 
   bool  getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock); 
 
-  bool  releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock);
+  void  releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock);
 
   void  releaseEdgeAll(ELockListType & EdgeLocks); 
 
@@ -84,16 +85,17 @@ public:
 
   EdgeLockMapType getEdgeLockMap(); 
 
-  /*  New functions added to support deadlock detection */
-//  bool getLock(IdType ObjectId, MutexType Mutex, LockType Lock, IdType TxId);
-
-  bool getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
-
-  bool getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
-
   LockRetPairType requireVertexLock(IdType VertexId, MutexType Mutex, LockType Lock);
 
   LockRetPairType requireEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock);
+
+  /*  New functions added to support deadlock detection */
+//  bool getLock(IdType ObjectId, MutexType Mutex, LockType Lock, IdType TxId);
+
+#ifdef _DEADLOCK_DETECTION_
+  bool getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
+
+  bool getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
 
 //  bool releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
 
@@ -122,7 +124,7 @@ public:
   /// TODO lock
   bool  registerLockMap(IdType TransId, LockPointer  LockPtr,  LockType  LType);
 
-  bool  retireFromResrMap(IdType TransId, LockPointer  LockPtr,  LockType  LType);
+  bool  retireFromLockMap(IdType TransId, LockPointer  LockPtr,  LockType  LType);
 
   bool  registerToMap(IdType TransId,  LockPointer  LockPtr, LockType LType);
 
@@ -135,6 +137,7 @@ public:
   void  dumpTransMap();
   void  dumpResrMap();
 #endif
+#endif /*_DEADLOCK_DETECTION_*/
 
   /// HOW to get lock and avoid deadlock
   /// TODO Check if lock exists from LockManager
@@ -155,11 +158,11 @@ public:
 
   bool  getVertexLock(VertexPtr Vertex, MutexType Mutex, LockType Lock);
 
-  bool  releaseVertexLock(VertexPtr Vertex, MutexType Mutex, LockType Lock);
+  void  releaseVertexLock(VertexPtr Vertex, MutexType Mutex, LockType Lock);
 
   bool  getEdgeLock(EdgePtr Edge, MutexType Mutex, LockType Lock); 
 
-  bool  releaseEdgeLock(EdgePtr Edge, MutexType Mutex, LockType Lock); 
+  void  releaseEdgeLock(EdgePtr Edge, MutexType Mutex, LockType Lock); 
 
   void  releaseEdgeAll(ELockListType & EdgeLocks); 
 
@@ -176,14 +179,14 @@ public:
 #endif
 
 protected:
-  MutexPointer  getVertexLockPointer(IdType, VertexId, MutexType Mutex);
+  MutexPointer  getVertexLockPointer(IdType VertexId, MutexType Mutex);
 
-  MutexPointer  getEdgeLockPointer(IdType, VertexId, MutexType Mutex);
+  MutexPointer  getEdgeLockPointer(IdType VertexId, MutexType Mutex);
 
   // LockType can be either SH or EX
   bool  tryLock(MutexPointer MutexPtr, LockType LType);
 
-  bool  tryUnlock(MutexPointer MutexPtr, LockType LType);
+  void  tryUnlock(MutexPointer MutexPtr, LockType LType);
 
 #ifndef _LOCKING_STORAGE_
   VertexLockMapType VertexLockMap;

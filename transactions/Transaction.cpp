@@ -17,35 +17,35 @@
 
 #include "Transaction.h"
 
-  Transaction::Transaction() : TransId(0), TransStatus(T_PROCESS) {} 
+  Transaction::Transaction() : TransId(0), TransStatus(T_EXPANDING) {} 
 
-  Transaction::Transaction(IdType id) : TransId(id), TransStatus(T_PROCESS){} 
+  Transaction::Transaction(IdType id) : TransId(id), TransStatus(T_EXPANDING){} 
 
-  auto Transaction::getId() 
-    -> IdType {
+  Transaction::IdType Transaction::getId() 
+  {
     return TransId;
   }
 
-  auto Transaction::commit() 
-    -> void {
+  void Transaction::commit() 
+  {
       TransStatus = T_COMMIT;
   }
 
-  auto Transaction::abort() 
-    -> void {
+  void Transaction::abort() 
+  {
       TransStatus = T_ABORT;
       exit(0);
   }
 
-  auto Transaction::rollBack()
-    -> bool {
+  bool Transaction::rollBack()
+  {
       TransStatus = T_ROLLBACK;
       ///TODO roll back
       return true;
   }
 
-  auto Transaction::checkStatus() 
-    -> TransStatusType  {
+  TransStatusType Transaction::checkStatus() 
+  {
       return TransStatus;
   }
 

@@ -20,12 +20,12 @@
 #include "Visitor.h"
 #include "Transaction.h"
 #include "LocksManager.h"
+#include "global.h"
 
 #include <queue>
 #include <unordered_map>
 #include <vector>
 
-#define _DEBUG_ENABLE_ true
 
 //TODO
 /// update graph->add/delete nodes/edges
