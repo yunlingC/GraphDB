@@ -34,7 +34,7 @@
   void Transaction::abort() 
   {
       TransStatus = T_ABORT;
-      exit(0);
+//      exit(0);
   }
 
   bool Transaction::rollBack()

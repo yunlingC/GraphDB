@@ -40,6 +40,7 @@ public:
   typedef std::pair<EdgePointer, std::pair<MutexType, LockType> >  ELockPair;
   typedef std::vector<VLockPair> VLockListType; 
   typedef std::vector<ELockPair> ELockListType; 
+
 public:
   void releaseAll(LockManagerType & LockManager) {
      LockManager.releaseAll(VertexLocks, EdgeLocks); 

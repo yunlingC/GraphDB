@@ -18,9 +18,7 @@
 #include "LdbcCustomVisitor.h"
 #include "LdbcUpdateVisitor.h"
 #include "ConcurrentBFS.h"
-#include "TranxBreadthFirstSearch.h"
 #include "QueryDescription.h"
-#include "Transaction.h"
 
 #include <vector>
 #include <string>
@@ -30,6 +28,7 @@
 #define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
 #define MILLION 100000
 
+class Transaction;
 /// This is the base class for LdbcQuery
 class LdbcQuery : public Query{
 public:

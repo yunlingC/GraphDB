@@ -1,4 +1,4 @@
-//===-- LDBC/LDBCTranxQuerry.cpp - Query class ----------*- C++ -*-===//
+//===-- LDBC/LDBCTransactionalQuery.cpp - Query class ----------*- C++ -*-===//
 //
 //                     CAESR Graph Database
 //
@@ -12,10 +12,11 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef _LDBCTRANXQUERY_CPP_
-#define _LDBCTRANXQUERY_CPP_
+#ifndef _LDBCTRANSACTIONALQUERY_CPP_
+#define _LDBCTRANSACTIONALQUERY_CPP_
 
 #include "LdbcConcurrentQuery.h"
+#include "TransactionalBFS.h"
 
 #include <vector>
 #include <string>
@@ -42,7 +43,8 @@ public:
 		}
 		DepthVisitor.setNameFilter(NameFilter);
 		DepthVisitor.setDepth(3);
-		tranxBreadthFirstSearch(Graph, StartVertex, DepthVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, DepthVisitor, Tranx);
 
 #ifdef _PRINTLOG_
 		auto target = DepthVisitor.getVertexList();
@@ -74,7 +76,8 @@ public:
 		TypeVisitor.setDepthToCheckRange(2);
 		//check date
 		TypeVisitor.setPropToCheck(2);
-		tranxBreadthFirstSearch(Graph, StartVertex, TypeVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, TypeVisitor, Tranx);
 
 #ifdef _PRINTLOG_
 		auto target = TypeVisitor.getVertexList();
@@ -110,7 +113,8 @@ public:
 		///Do NOT delete
 		SingleVisitor.setFilter(TmpFilter);
 		SingleVisitor.setDepth(2);
-		tranxBreadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx);
 		auto target = SingleVisitor.getVertexList();
 
 #ifdef _PRINTLOG_
@@ -135,7 +139,8 @@ public:
 			RangeVisitor.setDepth(2);
 			RangeVisitor.setDepthToCheckVertexProp(2);
 			auto StartVertex = (*it)->getId();
-			tranxBreadthFirstSearch(Graph, StartVertex, RangeVisitor, Tranx);
+      TransactionalBFS txBFS;
+			txBFS.breadthFirstSearch(Graph, StartVertex, RangeVisitor, Tranx);
 			if (RangeVisitor.getIncludeState() == false) {
 				target.erase(it);
 			}
@@ -165,7 +170,8 @@ public:
 			RangeVisitor.setPropToCheck(2);
 			RangeVisitor.setDepthToCheckVertexProp(2);
 			auto StartVertex = (*it)->getId();
-			tranxBreadthFirstSearch(Graph, StartVertex, RangeVisitor, Tranx);
+      TransactionalBFS txBFS;
+			txBFS.breadthFirstSearch(Graph, StartVertex, RangeVisitor, Tranx);
 			auto targetList = RangeVisitor.getVertexList();
 			PersonListMap.insert(PersonListPair((*it), targetList));
 		}
@@ -204,7 +210,8 @@ public:
 		ResultsVisitor.setDepth(3);
 		ResultsVisitor.setDepthToCheckRange(2);
 		ResultsVisitor.setPropToCheck(1); //check time
-		tranxBreadthFirstSearch(Graph, StartVertex, ResultsVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, ResultsVisitor, Tranx);
 
 #ifdef _PRINTLOG_
 		auto targets = ResultsVisitor.getReturnResultMap();
@@ -239,7 +246,8 @@ public:
 		SingleVisitor.setFilter(TmpFilter[0]);
 		SingleVisitor.setFilter(TmpFilter[1]);
 		SingleVisitor.setDepth(2);
-		tranxBreadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx);
 
 		auto target = SingleVisitor.getVertexList();
 #ifdef _PRINTLOG_
@@ -273,7 +281,8 @@ public:
 			PropertiesVisitor.setDepthToCheckRange(1);
 			PropertiesVisitor.setPropToCheck(2); //check date
 			auto StartVertex = (*it)->getId();
-			tranxBreadthFirstSearch(Graph, StartVertex, PropertiesVisitor, Tranx);
+      TransactionalBFS txBFS;
+			txBFS.breadthFirstSearch(Graph, StartVertex, PropertiesVisitor, Tranx);
 			targetMap.insert(PropertiesVisitor.getResultMap().begin(),
 			                 PropertiesVisitor.getResultMap().end());
 		}
@@ -309,7 +318,8 @@ public:
 		SingleVisitor.setFilter(TmpFilter[0]);
 		SingleVisitor.setFilter(TmpFilter[1]);
 		SingleVisitor.setDepth(2);
-		tranxBreadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx);
 
 		auto target = SingleVisitor.getVertexList();
 
@@ -331,7 +341,8 @@ public:
 			SPVisitor.setDepthToCheckVertexProp(2);
 			SPVisitor.setDepth(2);
 			unsigned int StartVertex = (*it)->getId();
-			tranxBreadthFirstSearch(Graph, StartVertex, SPVisitor, Tranx);
+      TransactionalBFS txBFS;
+			txBFS.breadthFirstSearch(Graph, StartVertex, SPVisitor, Tranx);
 			auto personMap = SPVisitor.getPersonMap();
 
 			for (auto it = personMap.begin(), it_end = personMap.end();
@@ -378,7 +389,8 @@ public:
 		SingleRelTypeVisitor RelVisitor;
 		RelVisitor.setFilter(TmpFilter[0]);
 		RelVisitor.setDepth(1);
-		tranxBreadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx);
 		auto target = RelVisitor.getVertexList();
 		std::vector<FilterType> VertexFilter;
 		for (auto iter = target.begin(); iter != target.end(); iter++) {
@@ -401,7 +413,8 @@ public:
 		MatchVisitor.setVertexFilterList(VertexFilter);
 		MatchVisitor.setDepthToCheckVertexProp(2);
 		MatchVisitor.setDepthToCompareTime(2);
-		tranxBreadthFirstSearch(Graph, StartVertex, MatchVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, MatchVisitor, Tranx);
 
 #ifdef _PRINTLOG_
 		auto targetsMap = MatchVisitor.getTimeMap();
@@ -441,7 +454,8 @@ public:
 		TimeVisitor.setFilter(Filters[2]);
 		TimeVisitor.setDepth(3);
 		TimeVisitor.setDepthToCompareTime(2);
-		tranxBreadthFirstSearch(Graph, StartVertex, TimeVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, TimeVisitor, Tranx);
 
 #ifdef _PRINTLOG_
 		auto vertexMap = TimeVisitor.getVertexMap();
@@ -474,7 +488,8 @@ public:
 		RelVisitor.setFilter(TmpFilter[0]);
 		RelVisitor.setFilter(TmpFilter[1]);
 		RelVisitor.setDepth(2);
-		tranxBreadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx);
 
 		auto target = RelVisitor.getVertexList();
 
@@ -501,7 +516,8 @@ public:
 			RelVisitor.setDepthToCheckRange(1);
 			RelVisitor.setPropToCheck(2); //check date
 			unsigned int StartVertex = (*it)->getId();
-			tranxBreadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx);
+      TransactionalBFS txBFS;
+			txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx);
 			auto targets = RelVisitor.getTargetsMap();
 			TargetsMap.insert(targets.begin(), targets.end());
 		}
@@ -531,7 +547,8 @@ public:
 		///first find start person's friends
 		AdjacencyVisitor AdjVisitor;
 		traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
-		tranxBreadthFirstSearch(Graph, StartVertex, AdjVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, AdjVisitor, Tranx);
 		auto startId = Graph.getVertexPointer(StartVertex)->getPropertyValue("id").first.std_str();
 
 		///find friends of friends of start person
@@ -544,7 +561,8 @@ public:
 				SimMap[StartVertex] = 0;
 				AdjacencyVisitor AdjVisitor;
 				traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
-				tranxBreadthFirstSearch(Graph, StartVertex->getId(), AdjVisitor, Tranx);
+        TransactionalBFS txBFS;
+				txBFS.breadthFirstSearch(Graph, StartVertex->getId(), AdjVisitor, Tranx);
 				///concatenate two lists
 				targets.insert(targets.end(),AdjVisitor.getVertexList().begin(),
 				               AdjVisitor.getVertexList().end());
@@ -575,7 +593,8 @@ public:
 			for ( unsigned int i = 0; i < 3; i++ ) {
 				SimVisitor.setFilter(TmpFilter[i]);
 			}
-			tranxBreadthFirstSearch(Graph, (*it).first->getId(), SimVisitor, Tranx);
+      TransactionalBFS txBFS;
+			txBFS.breadthFirstSearch(Graph, (*it).first->getId(), SimVisitor, Tranx);
 			auto iterend = SimVisitor.getPostMap().end();
 			unsigned int PostItrd = 0;
 			for ( auto iter = SimVisitor.getPostMap().begin();
@@ -616,7 +635,8 @@ public:
 		RelVisitor.setFilter(TmpFilter);
 		RelVisitor.setFilter(TmpFilter);
 		RelVisitor.setDepth(2);
-		tranxBreadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx);
 
 		auto target = RelVisitor.getVertexList();
 #ifdef _PRINTLOG_
@@ -646,7 +666,8 @@ public:
 			VPVisitor.setDepthToCheckRange(1);
 			VPVisitor.setDepthToCheckVertexProp(2);
 			unsigned int StartVertex = (*it)->getId();
-			tranxBreadthFirstSearch(Graph, StartVertex, VPVisitor, Tranx);
+      TransactionalBFS txBFS;
+			txBFS.breadthFirstSearch(Graph, StartVertex, VPVisitor, Tranx);
 			auto targets = VPVisitor.getMatchMap();
 			TargetsMap.insert(targets.begin(), targets.end());
 		}
@@ -677,7 +698,8 @@ public:
 		///first find start person's friends
 		AdjacencyVisitor AdjVisitor;
 		traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
-		tranxBreadthFirstSearch(Graph, StartVertex, AdjVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, AdjVisitor, Tranx);
 
 		///find friends of friends of start person
 		std::vector<VertexPointer> targets;
@@ -701,7 +723,8 @@ public:
 				ExpertVisitor.setFilter(TmpFilter[i]);
 			}
 
-			tranxBreadthFirstSearch(Graph, StartVertex->getId(),
+      TransactionalBFS txBFS;
+			txBFS.breadthFirstSearch(Graph, StartVertex->getId(),
 			                         ExpertVisitor, Tranx);
 			auto iterend = ExpertVisitor.getPostMap().end();
 			auto PostNum = 0;
@@ -739,7 +762,8 @@ public:
 
 		PathVisitor PVisitor;
 		PVisitor.setEndVertex(endVertex);
-		tranxBreadthFirstSearch(Graph, StartVertex, PVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, PVisitor, Tranx);
 
 #ifdef _PRINTLOG_
 		auto target = PVisitor.getVertexList();
@@ -772,7 +796,8 @@ public:
 		FilterType EdgeFilter;
 		traverseThroughTypeAndDirection("KNOWS", "out",  EdgeFilter);
 		SubgVisitor.setEdgeFilter(EdgeFilter);
-		tranxBreadthFirstSearch(Graph, StartVertex, SubgVisitor, Tranx);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, StartVertex, SubgVisitor, Tranx);
 
 		auto target = SubgVisitor.getVertexList();
 
@@ -806,7 +831,8 @@ public:
 			TmpFilter[3].setProperty("id",(*it2)->getPropertyValue("id").first.std_str());
 			WPathVisitor.setVertexFilter(TmpFilter[3]);
 			WPathVisitor.setDepth(3);
-			tranxBreadthFirstSearch(Graph, (*it)->getId(), WPathVisitor, Tranx);
+      TransactionalBFS txBFS;
+			txBFS.breadthFirstSearch(Graph, (*it)->getId(), WPathVisitor, Tranx);
 			Weight += WPathVisitor.getScore();
 		}
 
@@ -845,7 +871,8 @@ public:
 		AddVisitor AdVisitor(Tranx, Graph);
 		AdVisitor.setVertexProperty(VertexPropertyList);
 		AdVisitor.getFilter().setBranchMap(BranchMap);
-		tranxBreadthFirstSearch(Graph, 0, AdVisitor);
+    TransactionalBFS txBFS;
+		txBFS.breadthFirstSearch(Graph, 0, AdVisitor);
 
 		getExecTime();
 		LdbcFile << "Add one more node into network \n";
@@ -856,4 +883,4 @@ protected:
 	ValueListType ValueList;
 };
 */
-#endif /*_LDBCTRANXQUERY_CPP_*/
+#endif /*_LDBCTRANSACTIONALQUERY_CPP_*/

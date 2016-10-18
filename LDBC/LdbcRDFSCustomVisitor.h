@@ -517,8 +517,7 @@ class TravellersVisitor : public CountriesVisitor {
   typedef std::unordered_map<VertexPointer, PCCountPairType> TargetMapType;
 public:
 
-  TargetMapType & getTargetMap(){
-    return PCMap;
+  TargetMapType & getTargetMap(){ return PCMap;
   }
 
   virtual void visitStartVertex(VertexPointer Vertex) { 

@@ -13,4 +13,6 @@
 
 #define _DEBUG_PRINT_ true
 
+#define _PRINTLDBC_ 1
+
 #endif /*_GLOBAL_H_*/

@@ -17,8 +17,8 @@
 
 #include "LdbcCustomVisitor.h"
 #include "QueryDescription.h"
+#include "global.h"
 
-#define _PRINTLDBC_ 1
 #ifdef _PRINTLDBC_
 #include <fstream>
 std::ofstream LdbcFile;

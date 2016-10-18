@@ -30,24 +30,26 @@
 //TODO
 /// update graph->add/delete nodes/edges
 /// Macros of spinning on locks
-
+class TransactionalBFS {
+public:
   typedef GraphType::VertexPointer  VertexPointer;
   typedef GraphType::VertexDescriptor VertexDescriptor;
   typedef unsigned int IdType;
 	typedef std::pair<VertexPointer, bool> VisitPair;
 	typedef Transaction* TransactionType;
-  typedef LocksManager  LockManagerType;
+  typedef LocksManager   LockManagerType;
 
   /// TODO but why?
   /// back-off one by one /read or write - stack
 	/// get read locks one by one and store in locklists,
 	/// then release locks in reverse order one by one before return.
   
-	void transactionalBFS(GraphType & Graph
+public:
+	void breadthFirstSearch(GraphType & Graph
                         , const VertexDescriptor & StartVertex
                         , Visitor & GraphVisitor
                         , TransactionType  Tranx
-                        , LockManagerType  LockManager
+                        , LockManagerType & LockManager
                         ) {
 
 		auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
@@ -77,6 +79,7 @@
       /// If false, this lock canNOT be acquired and transaction aborts
 			if (!(LockManager.getVertexLock(ScheduledVertex->getId(), T_Property, T_SH, TxId))) {
         Tranx->abort();
+        return;
       }
 
 			if (GraphVisitor.visitVertex(ScheduledVertex))
@@ -87,6 +90,7 @@
 
 			if (!(LockManager.getVertexLock(ScheduledVertex->getId(), T_NextEdge, T_SH, TxId))  ){
         Tranx->abort();
+        return;
       }
 
 			auto NextEdge = ScheduledVertex->getNextEdge();
@@ -94,9 +98,10 @@
 				/// Get locks on the target node.
 				if (!LockManager.getEdgeLock(NextEdge->getId(), T_FirstVertex, T_SH, TxId)) {
           Tranx->abort();
+          return;
 				}
-				if (!LockManager.getEdgeLock(NextEdge->getId(), T_SecondVertex, T_SH, TxId)) {
-          Tranx->abort();
+				if (!LockManager.getEdgeLock(NextEdge->getId(), T_SecondVertex, T_SH, TxId)) { Tranx->abort();
+          return;
 				}
 
 				TargetVertex = NextEdge->getTarget(ScheduledVertex);
@@ -124,18 +129,20 @@
         /// Get shared locks on next edge
 				if (!LockManager.getEdgeLock(NextEdge->getId(), T_FirstNextEdge, T_SH, TxId)) {
           Tranx->abort();
+          return;
 				}
 				if ( !LockManager.getEdgeLock(NextEdge->getId(), T_SecondNextEdge, T_SH, TxId)) {
           Tranx->abort();
+          return;
 				}
 
 				/// Get the next edge from the scheduled vertex.
 				NextEdge = NextEdge->getNextEdge(ScheduledVertex);
 			}
 		}
-    std::cout <<"Transactional BFS done\n";
-//    LockManager.dumpResrMap();
 		GraphVisitor.finishVisit();
+    std::cout <<"Transactional BFS done\n";
 	}
+};
 
 #endif /*_TRANSACTIONAL_BFS_H */

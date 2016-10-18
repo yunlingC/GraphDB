@@ -145,12 +145,11 @@
     }
   
 
-/**
   auto LocksManager::releaseEdgeAll(ELockListType & EdgeLocks) 
     -> void {
     for (auto it = EdgeLocks.begin(), itend = EdgeLocks.end(); 
           it != itend; ++it) {
-      releaseEdgeLock((*it).first, (*it).second.first, (*it).second.second);
+      releaseEdgeLock((*it).first->getId(), (*it).second.first, (*it).second.second);
     }
   }
 
@@ -158,7 +157,7 @@
     -> void {
     for (auto it = VertexLocks.begin(), itend = VertexLocks.end(); 
         it != itend; ++it) {
-      releaseVertexLock((*it).first, 
+      releaseVertexLock((*it).first->getId(), 
           (*it).second.first, (*it).second.second);
     }
   }
@@ -168,7 +167,6 @@
       releaseVertexAll(VertexLocks);
       releaseEdgeAll(EdgeLocks);
   }
-  */
 
   auto LocksManager::releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock) 
     -> void {
