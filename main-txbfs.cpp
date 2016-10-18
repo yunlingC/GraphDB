@@ -39,7 +39,7 @@ int main() {
   
   for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
 
-  LkManager.dumpMaps();
+//  LkManager.dumpMaps();
 
   cout <<"finish testing\n";
   fflush(stdout);
