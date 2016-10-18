@@ -1,4 +1,4 @@
-//===-- transactions/TranxBreadthFirstSearch.h - BFS class --*- C++ -*-===//
+//===-- transactions/TransactionalBFS.h - BFS class --*- C++ -*-===//
 //
 //                     CAESR Graph Database
 //
@@ -12,8 +12,8 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#ifndef _TRANX_BREADTHFIRSTSEARCH_H_
-#define _TRANX_BREADTHFIRSTSEARCH_H_
+#ifndef _TRANSACTIONAL_BFS_H_
+#define _TRANSACTIONAL_BFS_H_
 
 /// Local includes.
 #include "GraphType.h"
@@ -43,7 +43,12 @@
 	/// get read locks one by one and store in locklists,
 	/// then release locks in reverse order one by one before return.
   
-	void tranxBreadthFirstSearch(GraphType & Graph, const VertexDescriptor & StartVertex, Visitor & GraphVisitor, TransactionType  Tranx, LockManagerType  LockManager) {
+	void transactionalBFS(GraphType & Graph
+                        , const VertexDescriptor & StartVertex
+                        , Visitor & GraphVisitor
+                        , TransactionType  Tranx
+                        , LockManagerType  LockManager
+                        ) {
 
 		auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
     IdType TxId = Tranx->getId();
@@ -129,8 +134,8 @@
 			}
 		}
     std::cout <<"Transactional BFS done\n";
-    LockManager.dumpResrMap();
+//    LockManager.dumpResrMap();
 		GraphVisitor.finishVisit();
 	}
 
-#endif /*_TRANX_BREADTHFIRSTSEARCH_H */
+#endif /*_TRANSACTIONAL_BFS_H */
