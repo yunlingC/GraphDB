@@ -15,6 +15,15 @@
 #ifndef _FILETYPES_H_
 #define _FILETYPES_H_
 
+enum VertexLabel {COMMENT, POST, PERSON, FORUM, TAG, TAGCLASS, ORGANISATION, PLACE}
+
+enum EdgeLabel {REPLY_OF_COMMENT, REPLY_OF_POST, COMMENT_IS_LOCATED_IN, IS_PART_OF,
+                KNOWS, STUDY_AT, COMMENT_HAS_CREATOR, POST_HAS_CREATOR, 
+                HAS_MODERATOR, WORKS_AT, PERSON_IS_LOCATED_IN, HAS_INTEREST, 
+                POST_HAS_TAG, LIKES_POST, POST_IS_LOCATED_IN, HAS_MEMBER,
+                FORUM_HAS_TAG, HAS_TYPE, IS_SUBCLASS_OF, ORGANASACTION_IS_LOCATED_IN,
+                LIKES_COMMENT, COMMENT_HAS_TAG, CONTAINER_OF}
+
 class RelLabel {
 public:
   RelLabel ( ) : First(""), Second(""), Edge("") {}
@@ -213,6 +222,8 @@ public:
     }
   }
 
+  /// FileTypeNum is, basically, the create order of different objects in graph
+  /// Vertices first, then edges, then property 
   auto getFileTypeNum() 
     -> unsigned int {
     return _FileTypeNum;
