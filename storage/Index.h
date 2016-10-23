@@ -16,6 +16,8 @@
 #define _INDEX_H_
 
 #include "FileTypes.h"
+#include "PropertyList.h"
+#include "GraphType.h"
 
 #include <unordered_map>
 #include <vector>
@@ -31,26 +33,42 @@ enum EdgeLabel {REPLY_OF_COMMENT, REPLY_OF_POST, COMMENT_IS_LOCATED_IN, IS_PART_
                 FORUM_HAS_TAG, HAS_TYPE, IS_SUBCLASS_OF, ORGANASACTION_IS_LOCATED_IN,
                 LIKES_COMMENT, COMMENT_HAS_TAG, CONTAINER_OF}
 
-template<typename KeyType>
+///template<typename KeyType, ValueType>
 class Index {
 public:
-///  typedef std::string KeyType;
+  typedef std::string KeyType;
+  typedef std::string ValueType;
   typedef GraphType::VertexPointer VertexPointer;
   typedef GraphType::EdgePointer EdgePointer;
   typedef std::pair<KeyType, VertexPointer> VertexIndexEntryType;
   typedef std::pair<KeyType, EdgePointer> EdgeIndexEntryType;
   typedef std::unordered_map<KeyType, VertexPointer> LabeledVertexIndexMapType;
   typedef std::unordered_map<KeyType, EdgePointer> LabeledEdgeIndexMapType;
-  typedef std::unordered_map<VertexLabel, LabeledVertexIndexMapType> VertexIndexMapType;
+  typedef std::unordered_map<VertexLabel, LabeledVertexIndexMapType> VertexIndexMapType; 
   typedef std::unordered_map<EdgeLabel, LabeledEdgeIndexMapType> VertexIndexMapType;
 
 public:
+  Index(const GraphType & graph) : _Graph(graph);
+
   /// Build index on vertex and edge on key
-  bool  buildVertexIndex(KeyType key) {
+  bool  buildVertexIndex(const KeyType & key) {
+    /// Return vertex list
+    auto Vertices = getAllVertices();
+    
+    for  (unsigned int i = 0; i < Vertices.size(); i++) {
+      auto retValue = getPropertyValue(key);
+        if (!retValue.second) {
+            
+        }
+    }
+    
+    
+  }
+
+  bool  buildEdgeIndex(KeyType key) {
 
   }
 
-  bool  buildEdgeIndex(KeyType key);
   bool  buildIndex(KeyType key);
 
   /// The following three functions are to build index on Vertex/Edge with Label=label
@@ -59,6 +77,7 @@ public:
   bool  buildEdgeIndex(KeyType key, LabelType label);
 
 private:
+  GraphType & _Graph;
   
 };
 
