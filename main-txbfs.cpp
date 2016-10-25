@@ -32,6 +32,8 @@ int main() {
   auto NumIndices =  Index.buildVertexIndex("id");
   cout <<"Indexing vertex " << NumIndices << "\n";
 
+  auto EdgeIndices =  Index.buildEdgeIndex("Person.id");
+  cout <<"Indexing edge " << EdgeIndices << "\n";
 //  VisitorType Visitor;
 
 //  auto TxId = TmManager.addTransaction();

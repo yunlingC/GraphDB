@@ -49,6 +49,7 @@ public:
   typedef std::pair<LabelType, LabeledIndexMapType> MapEntryType;
   typedef std::unordered_map<LabelType, LabeledIndexMapType> IndexMapType;
 public:
+  IndexMap() :  _NumIndices (0){}
   bool  buildIndex(KeyType key, ObjectType Object) {
     assert(Object != nullptr);
     auto retValue = Object->getPropertyValue(key);
