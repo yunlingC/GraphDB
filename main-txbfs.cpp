@@ -14,6 +14,7 @@ using namespace std;
 int main() {
 
 //  typedef Visitor VisitorType;
+  typedef Index IndexType;
   GraphType g;
 
   cout << "Begin testing\n"; 
@@ -28,7 +29,8 @@ int main() {
   TransactionManager TmManager;
   
   IndexType Index(g);
-  Index.buildVertexIndex("id");
+  auto NumIndices =  Index.buildVertexIndex("id");
+  cout <<"Indexing vertex " << NumIndices << "\n";
 
 //  VisitorType Visitor;
 
