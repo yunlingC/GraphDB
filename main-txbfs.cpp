@@ -32,8 +32,13 @@ int main() {
   auto NumIndices =  Index.buildVertexIndex("id");
   cout <<"Indexing vertex " << NumIndices << "\n";
 
-  auto EdgeIndices =  Index.buildEdgeIndex("Person.id");
-  cout <<"Indexing edge " << EdgeIndices << "\n";
+  auto IndexEntry = Index.getVertexIndex( "420","PERSON" );
+  if (IndexEntry.second)  {
+    cout << (IndexEntry.first)->getPropertyValue("firstName").first
+          << "\t" << (IndexEntry.first)->getId() << endl;
+  }
+  else 
+    cout <<"Vertex Not found\n";
 //  VisitorType Visitor;
 
 //  auto TxId = TmManager.addTransaction();

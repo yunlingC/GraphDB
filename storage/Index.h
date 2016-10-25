@@ -48,6 +48,7 @@ public:
   typedef std::unordered_map<ValueType, ObjectType> LabeledIndexMapType;
   typedef std::pair<LabelType, LabeledIndexMapType> MapEntryType;
   typedef std::unordered_map<LabelType, LabeledIndexMapType> IndexMapType;
+  typedef std::pair<ObjectType, bool> ReturnIndexType;
 public:
   IndexMap() :  _NumIndices (0){}
   bool  buildIndex(KeyType key, ObjectType Object) {
@@ -75,6 +76,19 @@ public:
 
   unsigned int getNumIndices()  {
     return _NumIndices;
+  }
+
+  /// Property Value is the key for indexed graph object (vertex, edge)
+  ReturnIndexType getIndex(LabelType Label, ValueType Key) {
+    std::pair<ObjectType, bool> retValue(nullptr, false);
+    auto MapEntry = _IndexMap.find(Label);
+    if  (MapEntry != _IndexMap.end()) {
+      if ((*MapEntry).second.find(Key) != (*MapEntry).second.end()) {
+        retValue.first = (*MapEntry).second[Key];
+        retValue.second = true;
+      }
+    }
+    return retValue;
   }
 
 private:
@@ -165,8 +179,13 @@ public:
 
   /// The following three functions are to build index on Vertex/Edge with Label=label
 ///  template<typename LabelType>
-  bool  buildVertexIndex(KeyType key, LabelType label);
-  bool  buildEdgeIndex(KeyType key, LabelType label);
+  IndexMap<VertexPointer>::ReturnIndexType getVertexIndex(ValueType key, LabelType label)  {
+    return VertexIndexMap.getIndex(label, key); 
+  }
+
+  IndexMap<EdgePointer>::ReturnIndexType getEdgeIndex(ValueType key, LabelType label)  {
+    return EdgeIndexMap.getIndex(label, key); 
+  }
 
 private:
   GraphType & _Graph;

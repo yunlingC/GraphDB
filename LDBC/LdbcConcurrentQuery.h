@@ -19,6 +19,9 @@
 #include "LdbcUpdateVisitor.h"
 #include "ConcurrentBFS.h"
 #include "QueryDescription.h"
+#ifdef _INDEXING_
+#include "Index.h"
+#endif
 
 #include <vector>
 #include <string>
@@ -127,9 +130,32 @@ protected:
 };
 
 
+#ifdef _INDEXING_
+class LdbcAddVertexQuery : public LdbcQuery {
+  using LdbcQuery::LdbcQuery;
+public:
+
+protected:
+
+};
+
+class LdbcAddEdgeQuery : public LdbcQuery {
+  using LdbcQuery::LdbcQuery;
+public:
+  insertEdge(FirstVertex,);
+  runQuery();
+private:
+  VertexPointer _FirstVertex;
+  VertexPointer _SecondVertex;
+  PropertyListType PropertyList;
+  LabelType Label;
+  
+};
+#endif
 /// to return function pointer to pthread_create();
 /// pointer to non-static functions could NOT be functor for "this" pointer
 /// in member functions of class
+
 class QueryHelper {
 public:
   typedef GraphType::VertexDescriptor Vertex;

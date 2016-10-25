@@ -13,6 +13,9 @@
 
 #define _DEBUG_PRINT_ true
 
-#define _PRINTLDBC_ 1
+#define _PRINTLDBC_ true
+
+#define _INDEXING_ true
+
 
 #endif /*_GLOBAL_H_*/
