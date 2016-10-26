@@ -19,9 +19,9 @@
 #include "LdbcUpdateVisitor.h"
 #include "ConcurrentBFS.h"
 #include "QueryDescription.h"
-#ifdef _INDEXING_
-#include "Index.h"
-#endif
+//#ifdef _INDEXING_
+//#include "Index.h"
+//#endif
 
 #include <vector>
 #include <string>
@@ -130,25 +130,11 @@ protected:
 };
 
 
-#ifdef _INDEXING_
-class LdbcAddVertexQuery : public LDBCQuery {
-  using LDBCQuery::LDBCQuery;
-public:
-//  typedef std::pair<std::string, std::string> VertexPairType;
-//  typedef std::vector<VertexPairType>  EdgeListType;
-  typedef std::vector<EdgePointer> EdgeListType;
-  typedef std::string LabelType;
-public:
-  bool runQuery();
-
-protected:
-  LabelType VertexLabel;
-};
-
 class LdbcAddEdgeQuery : public LdbcQuery {
   using LdbcQuery::LdbcQuery;
 public:
   typedef std::string LabelType;
+  typedef std::string KeyType;
   typedef std::string ValueType;
 public:
   void initEdge(LabelType label) {
@@ -167,6 +153,16 @@ public:
     initEdge(label, PropList);
   }
 
+  void getVertexId(ValueType firstId
+                  , LabelType firstLabel
+                  , ValueType secondId
+                  , LabelType secondLabel)  {
+    FirstId = firstId;
+    FirstLabel = firstLabel;
+    SecondId = secondId;
+    SecondLabel = secondLabel;
+  }
+
   virtual void runQuery(Graph & graph
 	  					, VertexDescriptor StartVertex
 	  					, TransactionType &tranx
@@ -174,12 +170,51 @@ public:
 
 protected:
   EdgePointer NewEdge;
-#ifdef _INDEXING_
+//#ifdef _INDEXING_
   VertexDescriptor FirstId;
   VertexDescriptor SecondId;
-#endif
+  LabelType   FirstLabel;
+  LabelType   SecondLabel;
+//#endif
 };
-#endif
+
+
+class LdbcAddVertexQuery : public LdbcAddEdgeQuery {
+  using LdbcAddEdgeQuery::LdbcAddEdgeQuery;
+public:
+//  typedef std::pair<std::string, std::string> VertexPairType;
+//  typedef std::vector<VertexPairType>  EdgeListType;
+  typedef std::vector<EdgePointer> EdgeListType;
+  typedef std::string LabelType;
+public:
+  void initVertex(LabelType label, PropertyListType PropList) {
+    NewVertex = new Vertex();  
+    NewVertex->setType(label);
+    NewVertex->setPropertyList(PropList);
+  }
+
+//  void initEdge(ValueType first
+//              , ValueType second
+//              , LabelType label
+//              , std::string Key
+//              , std::string Value)  {
+//
+//    EdgePointer NewEdge;
+//    PropertyListType PropList;
+//    PropertyList.set(Key, Value);
+//    initEdge(label, PropList);
+//  }
+
+  virtual void runQuery(Graph & graph
+	  					, VertexDescriptor StartVertex
+	  					, TransactionType &tranx
+  );
+
+protected:
+  VertexPointer NewVertex;
+  EdgeListType EdgeList;
+};
+
 
 /// to return function pointer to pthread_create();
 /// pointer to non-static functions could NOT be functor for "this" pointer

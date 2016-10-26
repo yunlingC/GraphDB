@@ -179,11 +179,11 @@ public:
 
   /// The following three functions are to build index on Vertex/Edge with Label=label
 ///  template<typename LabelType>
-  IndexMap<VertexPointer>::ReturnIndexType getVertexIndex(ValueType key, LabelType label)  {
+  IndexMap<VertexPointer>::ReturnIndexType getVertexIndex(LabelType label, ValueType key)  {
     return VertexIndexMap.getIndex(label, key); 
   }
 
-  IndexMap<EdgePointer>::ReturnIndexType getEdgeIndex(ValueType key, LabelType label)  {
+  IndexMap<EdgePointer>::ReturnIndexType getEdgeIndex(LabelType label, ValueType key)  {
     return EdgeIndexMap.getIndex(label, key); 
   }
 
