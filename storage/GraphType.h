@@ -79,6 +79,7 @@ public:
 
   VertexDescriptor addVertex(PropertyListType & InitialPropertyList);
 
+  VertexDescriptor addVertex(VertexPointer NewVertex);
 
   /// TODO Delete this function if we have LastEdge field 
   /// or insert edge to the head of the list
@@ -103,6 +104,8 @@ public:
                          VertexDescriptor EndVertex, 
                          const std::string & Label, 
                          PropertyListType & InitialPropertyList);
+
+  EdgeDescriptor addEdge(EdgePointer NewEdge);
 
 /// Allocate memory for vertices and edges
 #ifdef _FIXALLOC_

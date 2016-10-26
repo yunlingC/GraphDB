@@ -121,37 +121,66 @@ public:
   typedef PropertyList< KeyType, ValueType > PropertyListType;
   typedef PropertyListType & PropertyListTypeReference;
 public:
-  auto setPropertyList(PropertyListTypeReference PropertyList) 
+  auto setPropertyList(PropertyListTypeReference PropList) 
     -> void {
-    VertexPropertyList = PropertyList; 
+    PropertyList = PropList; 
   }
 protected:
-  PropertyListType VertexPropertyList;
+  PropertyListType PropertyList;
 };
 
 
 #ifdef _INDEXING_
-class LdbcAddVertexQuery : public LdbcQuery {
-  using LdbcQuery::LdbcQuery;
+class LdbcAddVertexQuery : public LDBCQuery {
+  using LDBCQuery::LDBCQuery;
 public:
+//  typedef std::pair<std::string, std::string> VertexPairType;
+//  typedef std::vector<VertexPairType>  EdgeListType;
+  typedef std::vector<EdgePointer> EdgeListType;
+  typedef std::string LabelType;
+public:
+  bool runQuery();
 
 protected:
-
+  LabelType VertexLabel;
 };
 
 class LdbcAddEdgeQuery : public LdbcQuery {
   using LdbcQuery::LdbcQuery;
 public:
-  insertEdge(FirstVertex,);
-  runQuery();
-private:
-  VertexPointer _FirstVertex;
-  VertexPointer _SecondVertex;
-  PropertyListType PropertyList;
-  LabelType Label;
-  
+  typedef std::string LabelType;
+  typedef std::string ValueType;
+public:
+  void initEdge(LabelType label) {
+    NewEdge = new Edge(); 
+    NewEdge->setType(label);
+  }
+
+  void initEdge(LabelType label, PropertyListType PropList) {
+    initEdge(label);
+    NewEdge->setPropertyList(PropList);
+  }
+
+  void initEdge(LabelType label, std::string Key, std::string Value)  {
+    PropertyListType PropList;
+    PropertyList.set(Key, Value);
+    initEdge(label, PropList);
+  }
+
+  virtual void runQuery(Graph & graph
+	  					, VertexDescriptor StartVertex
+	  					, TransactionType &tranx
+	  	);
+
+protected:
+  EdgePointer NewEdge;
+#ifdef _INDEXING_
+  VertexDescriptor FirstId;
+  VertexDescriptor SecondId;
+#endif
 };
 #endif
+
 /// to return function pointer to pthread_create();
 /// pointer to non-static functions could NOT be functor for "this" pointer
 /// in member functions of class

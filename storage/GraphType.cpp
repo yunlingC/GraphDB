@@ -225,6 +225,15 @@ auto GraphType::addVertex(PropertyListType & InitialPropertyList)
   return NewVertex->getId();
 }
 
+auto GraphType::addVertex(VertexPointer NewVertex) 
+  ->  VertexDescriptor {
+  NewVertex->setId(NumberOfVertices); 
+  VertexMap.insert(VertexEntryType(NumberOfVertices, NewVertex));
+  ++NumberOfVertices;
+  Vertices.push_back(NewVertex);
+  return NewVertex->getId();
+}
+
 auto GraphType::chainEdges(VertexPointer Vertex, EdgePointer FirstNextEdge, EdgePointer NewEdge) 
   -> void {
 
@@ -377,6 +386,17 @@ auto GraphType::addEdge(VertexDescriptor StartVertex,
   Edges.push_back(NewEdge);
   return NewEdge->getId();
 }
+
+auto GraphType::addEdge(EdgePointer NewEdge) 
+  -> EdgeDescriptor {
+  NewEdge->setId(NumberOfEdges);    
+  assignPointers(NewEdge->getFirstId(), NewEdge->getSecondId(), NewEdge);
+  EdgeMap.insert(EdgeEntryType(NumberOfEdges, NewEdge));
+  ++NumberOfEdges;
+  Edges.push_back(NewEdge);
+  return NewEdge->getId();
+
+  }
 
 #ifdef _DEBUG_
 auto GraphType::dump() 
