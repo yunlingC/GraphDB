@@ -38,7 +38,7 @@ public:
   typedef std::pair<std::string, std::string> ParamPairType;
   typedef std::pair<std::string, std::pair<std::string, std::string> > RangePairType;
   typedef LocksManager LockManagerType;
-  typedef Transaction TransactionType;
+  typedef Transaction* TransactionType;
 
 public:
   LdbcQuery(unsigned int Id) : QueryId(Id) {
@@ -60,6 +60,12 @@ public:
 						, TransactionType &tranx
 		);
 
+	virtual void runQuery(Graph & graph
+						, VertexDescriptor StartVertex
+            , Visitor  & GraphVisitor
+						, TransactionType &tranx
+            , LOcksManagerType & LockManager
+		);
 
   void setParam(const std::string & Key, const std::string & Value) {
     ParamPair.first = Key;

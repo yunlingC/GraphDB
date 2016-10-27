@@ -31,7 +31,7 @@ class LdbcQuery1 : public LdbcQuery {
 	using LdbcQuery::LdbcQuery;
 public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType & Tranx) {
+	              TransactionType  Tranx) {
 		getStartTime();
 		FilterType TmpFilter;
 		FilterType NameFilter;
@@ -61,7 +61,7 @@ class LdbcQuery2 : public LdbcQuery {
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType & Tranx) {
+	              TransactionType Tranx) {
 		getStartTime();
 		FilterType TmpFilter[3];
 		traverseThroughMultiRelType("KNOWS", TmpFilter[0]);
@@ -103,7 +103,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType & Tranx) {
+	              TransactionType Tranx) {
 		getStartTime();
 		FilterType TmpFilter;
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
@@ -194,7 +194,7 @@ class LdbcQuery4 : public LdbcQuery {
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType & Tranx) {
+	              TransactionType Tranx) {
 		getStartTime();
 		FilterType TmpFilter[4];
 		traverseThroughMultiRelType("KNOWS", TmpFilter[0]);
@@ -236,7 +236,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType & Tranx) {
+	              TransactionType Tranx) {
 		getStartTime();
 		FilterType TmpFilter[2];
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
@@ -308,7 +308,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType & Tranx) {
+	              TransactionType Tranx) {
 		getStartTime();
 		FilterType TmpFilter[2];
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
@@ -381,7 +381,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType & Tranx) {
+	              TransactionType Tranx) {
 		getStartTime();
 		FilterType TmpFilter[2];
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
@@ -441,7 +441,7 @@ class LdbcQuery8 : public LdbcQuery {
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType & Tranx) {
+	              TransactionType Tranx) {
 		getStartTime();
 		FilterType Filters[3];
 		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]);
@@ -479,7 +479,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType & Tranx) {
+	              TransactionType Tranx) {
 		getStartTime();
 		FilterType TmpFilter[2];
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
@@ -542,7 +542,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType & Tranx) {
+	              TransactionType Tranx) {
 		getStartTime();
 		///first find start person's friends
 		AdjacencyVisitor AdjVisitor;
@@ -626,7 +626,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType & Tranx) {
+	              TransactionType Tranx) {
 		getStartTime();
 		FilterType TmpFilter;
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
@@ -693,7 +693,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType & Tranx) {
+	              TransactionType Tranx) {
 		getStartTime();
 		///first find start person's friends
 		AdjacencyVisitor AdjVisitor;
@@ -751,7 +751,7 @@ class LdbcQuery13 : public LdbcQuery {
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              VertexDescriptor endVertex, TransactionType & Tranx) {
+	              VertexDescriptor endVertex, TransactionType Tranx) {
 
 		getStartTime();
 
@@ -789,7 +789,7 @@ class LdbcQuery14 : public LdbcQuery {
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              VertexDescriptor endVertex, TransactionType & Tranx ) {
+	              VertexDescriptor endVertex, TransactionType Tranx ) {
 		getStartTime();
 		SubGraphVisitor SubgVisitor;
 		SubgVisitor.setEndVertex(endVertex);
@@ -845,6 +845,63 @@ public:
 	}
 };
 
+class Query15 : public LdbcAddVertexQuery {
+  using LdbcAddVertexQuery::LdbcAddVertexQuery;
+public:
+
+	void runQuery(GraphType & Graph
+                , VertexDescriptor StartVertex
+                , Visitor  & GraphVisitor
+                , TransactionType Tranx 
+                , LockManagerType & LockManager) {
+
+  }
+
+protected:
+
+};
+
+class Query16 : public LdbcAddEdgeQuery {
+public:
+	void runQuery(GraphType & Graph
+                , VertexDescriptor StartVertex
+                , Visitor  & GraphVisitor
+                , TransactionType Tranx
+                , LockManagerType & LockManager) {
+
+    auto FirstIndex = getVertexIndex(FirstLabel, FirstId);
+    auto SecondIndex = getVertexIndex(SecondLabel, SecondId);
+    /// If both end vertices are retrievable, get locks on both vertex pointers
+    if (FirstIndex.second && SecondIndex.second) {
+      /// Switch here
+      if (!LockManager.getVertexLock(FirstIndex.first->getId(), T_NEXTEDGE, T_EX, Tranx->getId())) {
+        Tranx->abort();
+      }
+      if (!LockManager.getVertexLock(SecondIndex.first->getId(), T_NEXTEDGE, T_EX, Tranx->getId()))  {
+        Tranx->abort();
+      }
+      auto FNEdge = FirstIndex.first->getNextEdge();
+      if (FNEdge) {
+        if (FNEdge->getFirstVertexPtr() == FirstIndex.first) {
+          if (!LockManager.getVertexLock(FNEdge->getId(), T_FIRSTPREVIOUSEDGE, T_EX, Tranx->getId()))  {
+            Tranx->abort();
+          }
+        } else {
+          if (!LockManager.getVertexLock(SecondIndex.first->getId(), T_NEXTEDGE, T_EX, Tranx->getId()))  {
+            Tranx->abort();
+          }
+        }
+      }
+
+      auto SNEdge = SecondIndex.first->getNextEdge();
+    }
+
+  }
+
+protected:
+
+};
+
 /*
 class Query17 : public LDBCQuery {
 	using LDBCQuery::LDBCQuery;
@@ -864,7 +921,7 @@ public:
 		BranchMap = bm;
 	}
 
-	virtual void runQuery(GraphType & Graph, TransactionType & Tranx) {
+	virtual void runQuery(GraphType & Graph, TransactionType Tranx) {
 		getStartTime();
 		//a new vertex vs
 		//need new propertylist for vertex and branchmap (criteria) for searching neighbor
