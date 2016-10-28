@@ -146,6 +146,8 @@ public:
   void initEdge(LabelType label) {
     NewEdge = new Edge(); 
     NewEdge->setType(label);
+    NewEdge->setFirstPreviousEdge(nullptr);
+    NewEdge->setSecondPreviousEdge(nullptr);
   }
 
   void initEdge(LabelType label, PropertyListType PropList) {
