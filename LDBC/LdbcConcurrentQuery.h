@@ -146,8 +146,6 @@ public:
   void initEdge(LabelType label) {
     NewEdge = new Edge(); 
     NewEdge->setType(label);
-    NewEdge->setFirstPreviousEdge(nullptr);
-    NewEdge->setSecondPreviousEdge(nullptr);
   }
 
   void initEdge(LabelType label, PropertyListType PropList) {
@@ -173,17 +171,17 @@ public:
 
   virtual void runQuery(Graph & graph
 	  					, VertexDescriptor StartVertex
+              , Visitor & GraphVisitor
 	  					, TransactionType &tranx
+              , LockManagerType LockManager
 	  	);
 
 protected:
   EdgePointer NewEdge;
-//#ifdef _INDEXING_
   VertexDescriptor FirstId;
   VertexDescriptor SecondId;
   LabelType   FirstLabel;
   LabelType   SecondLabel;
-//#endif
 };
 
 
@@ -194,6 +192,8 @@ public:
 //  typedef std::vector<VertexPairType>  EdgeListType;
   typedef std::vector<EdgePointer> EdgeListType;
   typedef std::string LabelType;
+//  typedef std::pair<ValueType, ValueType, LabelType, std::string, std::string> EdgeInitPairType;
+//  typedef std::vector<EdgeInitPairType> EdgeListType;
 public:
   void initVertex(LabelType label, PropertyListType PropList) {
     NewVertex = new Vertex();  
@@ -201,17 +201,19 @@ public:
     NewVertex->setPropertyList(PropList);
   }
 
-//  void initEdge(ValueType first
-//              , ValueType second
-//              , LabelType label
-//              , std::string Key
-//              , std::string Value)  {
-//
-//    EdgePointer NewEdge;
-//    PropertyListType PropList;
-//    PropertyList.set(Key, Value);
-//    initEdge(label, PropList);
-//  }
+  void initEdge(ValueType first
+              , ValueType second
+              , LabelType label
+              , std::string Key
+              , std::string Value)  {
+
+    EdgePointer NewEdge = new Edge(); 
+    NewEdge->setType(label);
+    PropertyListType PropList;
+    PropertyList.set(Key, Value);
+    NewEdge->setPropertyList(PropList);
+    EdgeList.push_back(NewEdge);
+  }
 
   virtual void runQuery(Graph & graph
 	  					, VertexDescriptor StartVertex
@@ -219,6 +221,7 @@ public:
   );
 
 protected:
+  ValueType NewVertexIndex;
   VertexPointer NewVertex;
   EdgeListType EdgeList;
 };

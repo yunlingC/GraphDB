@@ -848,13 +848,23 @@ public:
 class Query15 : public LdbcAddVertexQuery {
   using LdbcAddVertexQuery::LdbcAddVertexQuery;
 public:
+  /// This function is a simplified function of chainEdges in Edge class
+  /// We simplify it because we know more information about how/what edges are created
+  /// We don't need to query the whole graph to chain edges as in Edge class
+  /// Basically the newly created edges will be chained first
+  /// Edges involved with existing vertices won't be chained in this function
+  void chainEdges();
 
+  /// Get locks only on exisiting edges and vertices
 	void runQuery(GraphType & Graph
                 , VertexDescriptor StartVertex
                 , Visitor  & GraphVisitor
                 , TransactionType Tranx 
                 , LockManagerType & LockManager) {
 
+    for (auto EdgePtr : EdgeList) {
+///      if EdgePtr->getfirst
+    }
   }
 
 protected:
@@ -882,23 +892,40 @@ public:
       }
       auto FNEdge = FirstIndex.first->getNextEdge();
       if (FNEdge) {
-        if (FNEdge->getFirstVertexPtr() == FirstIndex.first) {
-          if (!LockManager.getVertexLock(FNEdge->getId(), T_FIRSTPREVIOUSEDGE, T_EX, Tranx->getId()))  {
-            Tranx->abort();
-          }
-        } else {
-          if (!LockManager.getVertexLock(SecondIndex.first->getId(), T_NEXTEDGE, T_EX, Tranx->getId()))  {
-            Tranx->abort();
-          }
+        if (!LockManager.getVertexLock(FNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+          Tranx->abort();
+        }
+        if (!LockManager.getVertexLock(FNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+          Tranx->abort();
         }
       }
 
       auto SNEdge = SecondIndex.first->getNextEdge();
+      if (SNEdge) {
+        if (!LockManager.getVertexLock(SNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+          Tranx->abort();
+        }
+        if (!LockManager.getVertexLock(SNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+          Tranx->abort();
+        }
+      }
+
+      FirstIndex.first->setNextEdge(NewEdge);
+      SecondIndex.first->setNextEdge(NewEdge);
+      NewEdge->setFirstVertexPtr(FirstIndex.first);
+      NewEdge->setSecondVertexPtr(SecondIndex.first);
+ 
+      if (FNEdge) {
+        FNEdge->setFirstPreviousEdge(NewEdge);
+        FNEdge->setSecondPreviousEdge(NewEdge);
+      }
+      if (SNEdge) {
+        SNEdge->setFirstPreviousEdge(NewEdge);
+        SNEdge->setSecondPreviousEdge(NewEdge);
+      }
     }
 
   }
-
-protected:
 
 };
 
