@@ -862,12 +862,27 @@ public:
                 , TransactionType Tranx 
                 , LockManagerType & LockManager) {
 
-    for (auto EdgePtr : EdgeList) {
-///      if EdgePtr->getfirst
+    for (auto EdgeEntry : EdgeMap) {
+      /// Search for Vertex
+      EdgePointer NewEdge = EdgeEntry->first;
+      ValueType existVertexId = EdgeEntry->second;
+      auto ExistIndex = getVertexIndex(existVertexId);
+      if (ExistIndex.second) {
+        if (NewEdge->getFirstVertexPtr() == NewVertex) {
+
+//          if (!LockManager.getEdgeLock(NewEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+//            Tranx->abort();
+//          }
+            
+          ///TODO work till here
+          NewEdge->setSecondVertexPtr(ExistIndex.first);
+        }
+      }
     }
   }
 
 protected:
+  ValueType NewVertexId;
 
 };
 
@@ -884,28 +899,28 @@ public:
     /// If both end vertices are retrievable, get locks on both vertex pointers
     if (FirstIndex.second && SecondIndex.second) {
       /// Switch here
-      if (!LockManager.getVertexLock(FirstIndex.first->getId(), T_NEXTEDGE, T_EX, Tranx->getId())) {
+      if (!LockManager.getVertexLock(FirstIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId())) {
         Tranx->abort();
       }
-      if (!LockManager.getVertexLock(SecondIndex.first->getId(), T_NEXTEDGE, T_EX, Tranx->getId()))  {
+      if (!LockManager.getVertexLock(SecondIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId()))  {
         Tranx->abort();
       }
       auto FNEdge = FirstIndex.first->getNextEdge();
       if (FNEdge) {
-        if (!LockManager.getVertexLock(FNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+        if (!LockManager.getEdgeLock(FNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
           Tranx->abort();
         }
-        if (!LockManager.getVertexLock(FNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+        if (!LockManager.getEdgeLock(FNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
           Tranx->abort();
         }
       }
 
       auto SNEdge = SecondIndex.first->getNextEdge();
       if (SNEdge) {
-        if (!LockManager.getVertexLock(SNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+        if (!LockManager.getEdgeLock(SNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
           Tranx->abort();
         }
-        if (!LockManager.getVertexLock(SNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+        if (!LockManager.getEdgeLock(SNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
           Tranx->abort();
         }
       }

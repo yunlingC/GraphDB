@@ -190,7 +190,8 @@ class LdbcAddVertexQuery : public LdbcAddEdgeQuery {
 public:
 //  typedef std::pair<std::string, std::string> VertexPairType;
 //  typedef std::vector<VertexPairType>  EdgeListType;
-  typedef std::vector<EdgePointer> EdgeListType;
+  typedef std::string ValueType;
+  typedef std::unordered_map<EdgePointer, ValueType> EdgeMapType;
   typedef std::string LabelType;
 //  typedef std::pair<ValueType, ValueType, LabelType, std::string, std::string> EdgeInitPairType;
 //  typedef std::vector<EdgeInitPairType> EdgeListType;
@@ -201,8 +202,8 @@ public:
     NewVertex->setPropertyList(PropList);
   }
 
-  void initEdge(ValueType first
-              , ValueType second
+  void initEdge(bool isNewVertexFirst
+              , ValueType existVertexId
               , LabelType label
               , std::string Key
               , std::string Value)  {
@@ -212,7 +213,13 @@ public:
     PropertyListType PropList;
     PropertyList.set(Key, Value);
     NewEdge->setPropertyList(PropList);
-    EdgeList.push_back(NewEdge);
+    if (isNewVertexFirst) {
+      NewEdge->setFirstVertexPtr(NewVertex);
+   
+    else {
+      NewEdge->setSecondVertexPtr(NewVertex);
+    }
+    EdgeMap.insert(NewEdge, existVertexId);
   }
 
   virtual void runQuery(Graph & graph
@@ -223,7 +230,7 @@ public:
 protected:
   ValueType NewVertexIndex;
   VertexPointer NewVertex;
-  EdgeListType EdgeList;
+  EdgeMapType EdgeMap;
 };
 
 
