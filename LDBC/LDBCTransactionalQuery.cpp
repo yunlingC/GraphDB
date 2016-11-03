@@ -867,18 +867,74 @@ public:
       EdgePointer NewEdge = EdgeEntry->first;
       ValueType existVertexId = EdgeEntry->second;
       auto ExistIndex = getVertexIndex(existVertexId);
-      if (ExistIndex.second) {
-        if (NewEdge->getFirstVertexPtr() == NewVertex) {
 
-//          if (!LockManager.getEdgeLock(NewEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
-//            Tranx->abort();
-//          }
-            
-          ///TODO work till here
-          NewEdge->setSecondVertexPtr(ExistIndex.first);
+      /// FirstVertex of NewEdge is existed
+      bool isFirstExisted = false;
+      /// The NextEdge of existed vertex has this vertex as FirstVertex
+      bool isExistedFirst = true;
+
+      if (!ExistIndex.second) {
+///       assert(); 
+        exit(0);
+      }
+      if (NewEdge->getFirstVertexPtr() == NewVertex) {
+
+        NewEdge->setSecondVertexPtr(ExistIndex.first);
+      } else  {
+        isFirstExisted = true;
+        NewEdge->setFirstVertexPtr(ExistIndex.first);
+      } ///IF_FIRST_EXISTED
+
+      /// Get locks on existing vertex and edge
+      if (!LockManager.getVertexLock(ExistIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId())) {
+        Tranx->abort();
+      }
+
+      auto ExistNextEdge = !ExistIndex.first->getNextEdge();
+      if (ExistNextEdge && ExistNextEdge->getFirstVertexPtr() == ExistIndex.first) {
+        if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+          Tranx->abort();
+        }
+      } else (ExistNextEdge && ExistNextEdge->getSecondVertexPtr() == ExistIndex.first) {
+        isExistedFirst = false;
+        if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+          Tranx->abort();
+        }
+      } ///IF_EXISTED_FIRST
+
+      /// /***************
+      ///  Chain edges
+      /// ****************/
+
+      /// NewEdge -> FirstNextEdge,SecondNextEdge
+      if (isFirstExisted) {
+        NewEdge->setFirstNextEdge(ExistNextEdge);
+      } else {
+        NewEdge->setSecondNextEdge(NewVertex-NextEdge);
+      }
+
+      /// ExistVertex's NextEdge -> FirstPreviousEdge/SecondPreviousEdge
+      if (isExistedFirst) {
+        ExistedNextEdge->setFirstPreviousEdge(NewEdge);
+      } else {
+        ExistedNextEdge->setSecondPreviousEdge(NewEdge);
+      }
+
+      ///NewVertex's NextEdge -> FirstPreviousEdge/SecondPreviousEdge
+      auto NewVertexNextEdge = NewVertex->getNextEdge();
+      if (NewVertexNextEdge)  {
+        if (NewVertexNextEdge->getFirstVertexPtr() == NewVertex)  {
+          NewVertexNextEdge->setFirstPreviousEdge(NewEdge);  
+        } else {
+          NewVertexNextEdge->setSecondPreviousEdge(NewEdge);  
         }
       }
-    }
+      
+      /// ExistedVertex & NewVertex -> NextEdge
+      NewVertex->setNextEdge(NewEdge);
+      ExistIndex.first->setNextEdge(NewEdge);
+
+    }/// FOR 
   }
 
 protected:
