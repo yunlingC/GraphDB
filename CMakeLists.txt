@@ -78,7 +78,8 @@ set(TESTS
   #  main-ldbc.cpp
   #  main-dfs.cpp
   #  main-rdfs-ldbc.cpp
-  main-txbfs.cpp
+  #  main-txbfs.cpp
+  main-multithread.cpp
   )
 
 

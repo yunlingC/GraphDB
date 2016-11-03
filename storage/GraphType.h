@@ -31,6 +31,7 @@ public:
   typedef std::vector<VertexPointer> VertexList;
   typedef std::vector<VertexDescriptor> VertexIDList;
   typedef PropertyList<FixedString, FixedString> PropertyListType;
+//  typedef PropertyList<std::string, std::string> PropertyListType;
   typedef PropertyListType VertexPropertyList;
   typedef PropertyListType EdgePropertyList;
   typedef std::pair<VertexDescriptor, VertexPointer> VertexEntryType;

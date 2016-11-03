@@ -1,3 +1,7 @@
+#include "GDBReader.h"
+#include "QueryDescription.h"
+#include "QueryRandomizer.h"
+
 #include <stdlib.h>
 #include <algorithm>
 #include <iostream>
@@ -6,9 +10,7 @@
 #include <string>
 #include <time.h>
 
-#include "LinkedList.h"
-#include "QueryDescription.h"
-#include "QueryRandomizer.h"
+using namespace std;
 
 int main(int argc, char *argv[]) {
   
@@ -24,10 +26,10 @@ int main(int argc, char *argv[]) {
     exit(1);
   } else {
     InputSize = std::stoi(argv[1]);
-    if ( (InputSize != 1000) && (InputSize != 5000) ) {
-      std::cout <<"Arg error : should be: 1000 or 5000\n";
-      exit(1);
-    }
+//    if ( (InputSize != 1000) && (InputSize != 5000) ) {
+//      std::cout <<"Arg error : should be: 1000 or 5000\n";
+//      exit(1);
+//    }
   }
   
 #ifdef _FIXALLOC_
@@ -35,7 +37,7 @@ int main(int argc, char *argv[]) {
   g.allocEdgeMemory(InputSize*20);
 #endif /* _FIXALLOC */
  
-  GDReader reader(g);
+  GDBReader reader(g);
   std::string FileName = "../tests/gd/sndata" +std::to_string(InputSize)+".gd";
   std::cout <<"Read file name " << FileName <<"\n";
   reader.readFile(FileName);
@@ -44,16 +46,16 @@ int main(int argc, char *argv[]) {
 
   QueryRandomizer rander(reader);
 
-    string name, pid;
-    VertexDescriptor webId, personId1, personId2, personId3;
+  string name, pid;
+  VertexDescriptor webId, personId1, personId2, personId3;
 
-    auto id = 1;
-    name = rander.getName(id);
-    pid  = rander.getPid(id);
-    webId = rander.getAWebpageIndex(id);
-    personId1 = rander.getAPersonIndex(id);
-    personId2 = rander.getAPersonIndex(id);
-    personId3 = 0;
+  auto id = 1;
+//    name = rander.getName(id);
+//    pid  = rander.getPid(id);
+//    webId = rander.getAWebpageIndex(id);
+//    personId1 = rander.getAPersonIndex(id);
+//    personId2 = rander.getAPersonIndex(id);
+//    personId3 = 0;
 
     Query1 Q1;
     Query2 Q2;
@@ -75,6 +77,7 @@ int main(int argc, char *argv[]) {
                         95, 0, 42, 0, 60, 
                         0, 0, 50, 11          //15-18
                       };
+
 
     id = InputId[0];
     name = rander.getName(id);
@@ -140,7 +143,6 @@ int main(int argc, char *argv[]) {
     name = rander.getName(id);
     Q14.setPersonProperty("name", name);
 
-
   vector<thread> threads;
 
   threads.push_back( thread([&]{Q1.runQuery(g, 1);}));
@@ -162,6 +164,6 @@ int main(int argc, char *argv[]) {
            std::mem_fn(&thread::join));
 
   cout << "finish testing\n";
-  myfile.close();
+///  myfile.close();
   return 0;
 }

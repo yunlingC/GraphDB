@@ -57,7 +57,7 @@ public:
         if (_GDfile.fail())
           throw 1;
        
-        while (getline(_GDfile, Str_Line) != NULL){
+        while (getline(_GDfile, Str_Line)){
           switch(String2Int(Str_Line)) {
           
             case DL_People:
@@ -138,7 +138,7 @@ private:
     _People = 0;
     std::vector<std::string> attributes;
 
-    while (getline(_GDfile, Str_Line) != NULL){
+    while (getline(_GDfile, Str_Line)){
 
       VertexPropertyList PeopleProp;
 
@@ -177,7 +177,7 @@ private:
     VertexPropertyList WebpagesProp;
     std::vector<std::string> attributes;
 
-    while (getline(_GDfile, Str_Line) != NULL){
+    while (getline(_GDfile, Str_Line)){
       VertexPropertyList WebpagesProp;
       if (Str_Line == "</WEBPAGES>"){
         return;
@@ -209,7 +209,7 @@ private:
     std::string to   = "";
     std::vector<std::string> attributes;
 
-    while (getline(_GDfile, Str_Line) != NULL){
+    while (getline(_GDfile, Str_Line)){
       EdgePropertyList FriendProp;
       if (Str_Line == "</FRIENDS>"){
         return;
@@ -242,7 +242,7 @@ private:
     std::string to   = "";
     std::vector<std::string> attributes;
     
-    while (getline(_GDfile, Str_Line) != NULL){
+    while (getline(_GDfile, Str_Line)){
       EdgePropertyList LikesProp;
       if (Str_Line == "</LIKES>"){
         return;
