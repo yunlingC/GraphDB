@@ -420,22 +420,22 @@ GraphType::~GraphType() {
   /// Thus, Vertices and Edges contain all newly created objects.
 
   
-  for ( size_t i= 0; i < Vertices.size(); i++ ) {
-    VertexMap[i]->deleteVertex();
-    delete VertexMap[i];
-  }
-
-
-  for ( size_t i=0; i < Edges.size(); i++ ) {
-    EdgeMap[i]->deleteEdge();
-    delete EdgeMap[i];
-  }
-
-  #ifdef _FIXALLOC_
-    ///    Delete the memory spaces.
-    delete NodeMemory;
-    delete EdgeMemory;
-  #endif /* _FIXALLOC_ */
+//  for ( size_t i= 0; i < Vertices.size(); i++ ) {
+//    VertexMap[i]->deleteVertex();
+//    delete VertexMap[i];
+//  }
+//
+//
+//  for ( size_t i=0; i < Edges.size(); i++ ) {
+//    EdgeMap[i]->deleteEdge();
+//    delete EdgeMap[i];
+//  }
+//
+//  #ifdef _FIXALLOC_
+//    ///    Delete the memory spaces.
+//    delete NodeMemory;
+//    delete EdgeMemory;
+//  #endif /* _FIXALLOC_ */
 
 }
 

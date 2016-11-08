@@ -45,7 +45,7 @@ set(TARGET t)
 
 # Set additional flags and parameters
 set(STORAGE_LIB storage)
-set(TRANSACTION_LIB transactions)
+##set(TRANSACTION_LIB transactions)
 #set(GDB_LD_FLAGS storage) 
 
 # Compiler flags
@@ -56,7 +56,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++14  -Wall -
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++14 -D_FIXALLOC_ -D_SKIP_ -Wall")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++11 -Wall")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_PRINTLOG_  -Wall -fPIC")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14   -Wall -fPIC")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_PRINTLOG_ -D_LOCKING_ -Wall -fPIC")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_FIXALLOC_  -D_SKIP_ -Wall")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
@@ -70,7 +70,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_P
 
 # Storage sub directory
 add_subdirectory(storage)
-add_subdirectory(transactions)
+##add_subdirectory(transactions)
 
 set(TESTS 
   #  main-gdbench.cpp
@@ -88,7 +88,7 @@ foreach( testsourcefile ${TESTS} )
   string( REPLACE ".cpp" "" testname ${testsourcefile} ) 
   add_executable( ${testname} ${testsourcefile} )
   # Make sure YourLib is linked to each app 
-  target_link_libraries( ${testname} ${STORAGE_LIB} ${TRANSACTION_LIB}) 
+  target_link_libraries( ${testname} ${STORAGE_LIB} ) #${TRANSACTION_LIB}) 
 endforeach( testsourcefile ${TESTS} )
 
 # macro(PYEXPORT _name pybind/_srccpp)

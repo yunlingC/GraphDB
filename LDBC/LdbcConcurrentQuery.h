@@ -29,7 +29,7 @@
 #include <unordered_map>
 
 #define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
-#define MILLION 100000
+#define MILLION 1000000
 
 class Transaction;
 /// This is the base class for LdbcQuery
