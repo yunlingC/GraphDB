@@ -10,7 +10,21 @@
 #include <string>
 #include <time.h>
 
+#define SCALE 1000
+#define NANO 1000000000
+
 using namespace std;
+
+uint64_t get_clock()  {
+  timespec tp = (struct timespec) {0};
+  clock_gettime(CLOCK_THREAD_CPUTIME_ID, &tp);
+  uint64_t ret = tp.tv_sec * NANO + tp.tv_nsec;
+  return ret;
+}
+
+uint64_t diff_clock(uint64_t  start, uint64_t end) {
+  return (end - start) / SCALE;
+}
 
 int main(int argc, char *argv[]) {
   
@@ -49,6 +63,8 @@ int main(int argc, char *argv[]) {
   string name, pid;
   VertexDescriptor webId, personId1, personId2, personId3;
 
+  int traversal = 1;
+
   auto id = 1;
 //    name = rander.getName(id);
 //    pid  = rander.getPid(id);
@@ -72,6 +88,7 @@ int main(int argc, char *argv[]) {
     Query13 Q13;
     Query14 Q14;
 
+    
     int InputId[19] = {46, 0, 0, 28, 0, 
                         0, 0, 0, 54, 0, 
                         95, 0, 42, 0, 60, 
@@ -143,25 +160,46 @@ int main(int argc, char *argv[]) {
     name = rander.getName(id);
     Q14.setPersonProperty("name", name);
 
+    auto startTime = get_clock();
+
+//    Q1.runQuery(g, 1);
+//    Q2.runQuery(g, 1);
+//    Q3.runQuery(g, 1);
+//    Q4.runQuery(g, 1);
+//    Q5.runQuery(g, 1);
+//    Q6.runQuery(g, 1);
+//    Q7.runQuery(g, 1);
+//    Q8.runQuery(g, 1);
+//    Q9.runQuery(g, 1);
+//    Q10.runQuery(g, 1);
+//    Q11.runQuery(g, 1);
+//    Q12.runQuery(g, 1);
+//    Q13.runQuery(g, 1);
+//    Q14.runQuery(g, 1);
+
   vector<thread> threads;
 
-  threads.push_back( thread([&]{Q1.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q2.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q3.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q4.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q5.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q6.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q7.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q8.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q9.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q10.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q11.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q12.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q13.runQuery(g, 1);}));
-  threads.push_back( thread([&]{Q14.runQuery(g, 1);}));
+  threads.push_back( thread([&]{Q1.runQuery(g, traversal );}));
+  threads.push_back( thread([&]{Q2.runQuery(g, traversal );}));
+  threads.push_back( thread([&]{Q3.runQuery(g, traversal );}));
+  threads.push_back( thread([&]{Q4.runQuery(g, traversal );}));
+  threads.push_back( thread([&]{Q5.runQuery(g, traversal );}));
+  threads.push_back( thread([&]{Q6.runQuery(g, traversal );}));
+  threads.push_back( thread([&]{Q7.runQuery(g, traversal );}));
+  threads.push_back( thread([&]{Q8.runQuery(g, traversal );}));
+  threads.push_back( thread([&]{Q9.runQuery(g, traversal );}));
+  threads.push_back( thread([&]{Q10.runQuery(g, traversal);}));
+  threads.push_back( thread([&]{Q11.runQuery(g, traversal);}));
+  threads.push_back( thread([&]{Q12.runQuery(g, traversal);}));
+  threads.push_back( thread([&]{Q13.runQuery(g, traversal);}));
+  threads.push_back( thread([&]{Q14.runQuery(g, traversal);}));
 
   for_each(threads.begin(), threads.end(),
            std::mem_fn(&thread::join));
+
+  auto endTime = get_clock();
+
+  cout << "Processing time " << diff_clock(startTime, endTime) << "\n";
 
   cout << "finish testing\n";
 ///  myfile.close();
