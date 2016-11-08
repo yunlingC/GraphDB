@@ -168,7 +168,7 @@ public:
     PathStack.push_back(NewPath);
 
     /// Initialize the tmpShortestlength to be a big number
-    TmpShortestLength = 1000;
+    TmpShortestLength = 100;
     ReturnFlag = false;
   }
 
