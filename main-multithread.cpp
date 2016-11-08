@@ -1,3 +1,4 @@
+#include "global.h"
 #include "GDBReader.h"
 #include "QueryDescription.h"
 #include "QueryRandomizer.h"

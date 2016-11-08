@@ -19,7 +19,6 @@
 #include <queue>
 #include <set>
 
-#define _PRINTGDB_ 1
 
 #ifdef _PRINTGDB_
 #include <iostream>

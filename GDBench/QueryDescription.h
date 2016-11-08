@@ -21,7 +21,7 @@
 #include "RecursiveDFSCustomVisitor.h"
 #include "RecursiveDepthFirstSearch.h"
 
-#define _PRINTGDB_ 1
+//#define _PRINTGDB_  true
 
 #ifdef _PRINTGDB_
 #include <fstream>
