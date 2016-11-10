@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
   string name, pid;
   VertexDescriptor webId, personId1, personId2, personId3;
 
-  int traversal = 3;
+  int traversal = 1;
 
   auto id = 1;
 //    name = rander.getName(id);
