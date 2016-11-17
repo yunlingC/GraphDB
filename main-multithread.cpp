@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
 //    auto Time14 = get_clock();
 //    cout << "Processing time Q14\t" << diff_clock(Time8, Time14) << "\n";
 
-//    Q9.runQuery(g, traversal);
+    Q9.runQuery(g, traversal);
 
 
 //  vector<thread> threads;
