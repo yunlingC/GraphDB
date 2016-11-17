@@ -19,5 +19,7 @@
 
 #define _INDEXING_ true
 
+#define _TIME_QUERY_ true
+
 
 #endif /*_GLOBAL_H_*/

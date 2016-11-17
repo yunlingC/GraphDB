@@ -23,9 +23,9 @@
 #include <map>
 #include <dirent.h>
 
-#define _DEBUG_ 0
+#define _DEBUG_ 1
 
-#ifdef _DEBUG_ 
+#if _DEBUG_ 
 #include <iostream>
 #endif
 
@@ -44,6 +44,11 @@ private:
   std::ifstream _LDBCFile;
   std::map<std::string, std::map<std::string, VertexDescriptor> > _VertexLabelMap;
   std::vector<VertexDescriptor> _PersonList;
+#if _DEBUG_
+  unsigned int _NodeNum;
+  unsigned int _EdgeNum;
+#endif 
+
 public:
   LDBCReader(GraphType & graph) : _Graph( graph ) { }
 
@@ -55,7 +60,7 @@ public:
 
     _DirPointer = opendir( DirName.c_str() );
     if (_DirPointer == NULL) {
-#ifdef _DEBUG_
+#if _DEBUG_
       std::cerr << "Error " << errno << " Cannot open " << DirName << "\n";
 #endif
       exit(errno);
@@ -89,7 +94,7 @@ public:
         case 0:
           break;
         default:
-#ifdef _DEBUG_
+#if _DEBUG_
           std::cerr << "Error : Cannot recognize file type "
                     << _DirEntry->d_name << "\n";
 #endif
@@ -98,6 +103,9 @@ public:
     } //END_FOR
 
     closedir(_DirPointer);
+    std::cout << "\n+++++++++ Summary ++++++++++\n";
+    std::cout << _NodeNum << " Nodes are read in total\n";
+    std::cout << _EdgeNum << " Edges are read in total\n";
     return 0;
   }
 
@@ -145,12 +153,13 @@ private:
 
         counter++;
       } //END_WHILE
-#ifdef _DEBUG_
+#if  _DEBUG_
       std::cout << counter << " Nodes are read in this file\n";
+      _NodeNum += counter;
 #endif
     }//END_TRY
     catch (int i){
-#ifdef  _DEBUG_
+#if  _DEBUG_
       std::cerr << "Error:"<< i <<"\tFailed to open file" <<"\n";
 #endif
       exit(0);
@@ -185,14 +194,14 @@ private:
 
         if ((_VertexLabelMap.find(EdgeLabel.First) == _VertexLabelMap.end()) ||
             (_VertexLabelMap.find(EdgeLabel.Second) == _VertexLabelMap.end()) ) {
-#ifdef  _DEBUG_
+#if  _DEBUG_
           std::cerr << "Error: Cannot recognize vertex label\n";
 #endif
           exit(0);
         }
          if ((_VertexLabelMap[EdgeLabel.First].find(attributes[0]) == _VertexLabelMap[EdgeLabel.First].end()) ||
              (_VertexLabelMap[EdgeLabel.Second].find(attributes[1]) == _VertexLabelMap[EdgeLabel.First].end())) {
-#ifdef  _DEBUG_
+#if  _DEBUG_
            std::cerr << "Error: Cannot find vertex " 
                       << attributes[0] 
                       << attributes[1]  << "\n";
@@ -205,12 +214,13 @@ private:
         _Graph.addEdge(vs,vd, EdgeLabel.Edge, PropertyList);
         counter++;
       } //END_WHILE
-#ifdef _DEBUG_
+#if _DEBUG_
       std::cout << counter << " Rels are read in this file\n";
+      _EdgeNum += counter;
 #endif
     }//END_TRY
     catch (int i){
-#ifdef _DEBUG_
+#if _DEBUG_
       std::cerr << "Error:"<< i <<"\tFailed to open file" <<"\n";
 #endif
       exit(0);
@@ -240,7 +250,7 @@ private:
       while (!getline(_LDBCFile, line)){ 
         boost::split(attributes, line, boost::is_any_of("|"));
         if (_VertexLabelMap.find(PropertyLabel.First) == _VertexLabelMap.end()) {
-#ifdef _DEBUG_
+#if _DEBUG_
           std::cerr << "Error: Cannot recognize label " 
                     << PropertyLabel.First << "\n";
 #endif
@@ -248,7 +258,7 @@ private:
         }
 
         if (_VertexLabelMap[PropertyLabel.First].find(attributes[0]) == _VertexLabelMap[PropertyLabel.First].end() ) {
-#ifdef _DEBUG_
+#if _DEBUG_
           std::cerr << "Error: Cannot find vertex " << attributes[0] << "\n";
 #endif
           exit(0); // should not break
@@ -262,12 +272,12 @@ private:
           counter++;
         }
       } //END_WHILE
-#ifdef _DEBUG_
+#if _DEBUG_
       std::cout << counter << " new properties are read in this file\n";
 #endif
     }//END_TRY
     catch (int i){
-#ifdef  _DEBUG_
+#if  _DEBUG_
       std::cerr << "Error:"<< i <<"\tFailed to open file" <<"\n";
       exit(0);
 #endif 

@@ -33,11 +33,13 @@ int main(int argc, char *argv[]) {
   typedef Graph::VertexDescriptor VertexDescriptor;
 
   Graph g;
-  cout << "Begin testing\n";
+//  cout << "Begin testing\n";
+
+  ///arg: 0-main-multithread 1- filesize 2-traversal 3-Q1_startVertex 4-Q2_startVertex
 
   unsigned int InputSize;
   if ( argc < 2) {
-    std::cout <<"Need one more arg: 1000 or 5000\n";
+//    std::cout <<"Need one more arg: 1000 or 5000 or 10000 or 100000\n";
     exit(1);
   } else {
     InputSize = std::stoi(argv[1]);
@@ -54,19 +56,23 @@ int main(int argc, char *argv[]) {
  
   GDBReader reader(g);
   std::string FileName = "../tests/gd/sndata" +std::to_string(InputSize)+".gd";
-  std::cout <<"Read file name " << FileName <<"\n";
+//  std::cout <<"Read file name " << FileName <<"\n";
   reader.readFile(FileName);
 
-  cout << "Finish reading\n";
+//  cout << "Finish reading\n";
 
   QueryRandomizer rander(reader);
 
   string name, pid;
   VertexDescriptor webId, personId1, personId2, personId3;
 
-  int traversal = 1;
+  int traversal = std::stoi(argv[2]);
 
   auto id = 1;
+  auto id2 = 1;
+  auto id3 = 1;
+//  auto id4 = 1;
+//  auto id5 = 1;
 //    name = rander.getName(id);
 //    pid  = rander.getPid(id);
 //    webId = rander.getAWebpageIndex(id);
@@ -96,68 +102,74 @@ int main(int argc, char *argv[]) {
                         0, 0, 50, 11          //15-18
                       };
 
-
-    id = InputId[0];
+    id = std::stoi(argv[3]);
+    id2 = std::stoi(argv[4]);
+    id3 = std::stoi(argv[5]);
+//    for (int i = 0; i < 18; i++) {
+//      InputId[i] = std::stoi(argv[i+2]);
+//    }
+//
+    //	id = InputId[0];
     name = rander.getName(id);
     Q1.setPersonProperty("name", name);
 
-    id = InputId[1];
+    //	id = InputId[1];
     webId = rander.getAWebpageIndex(id);
     Q2.setWebId(webId);
 
-    id = InputId[2];
+    //	id = InputId[2];
     personId1 = rander.getAPersonIndex(id);
     Q3.setPersonId(personId1);
 
-    id = InputId[3];
+    //	id = InputId[3];
     pid  = rander.getPid(id);
     Q4.setPersonProperty("pid", pid);
 
-    id = InputId[4];
+    //	id = InputId[4];
     personId1 = rander.getAPersonIndex(id);
     Q5.setPersonId(personId1);
 
-    id = InputId[5];
+    //	id = InputId[5];
     personId1 = rander.getAPersonIndex(id);
     Q6.setPersonId(personId1);
 
-    id = InputId[6];
+    //	id = InputId[6];
     personId1 = rander.getAPersonIndex(id);
     Q7.setPersonId(personId1);
 
-    id = InputId[7];
+    //	id = InputId[7];
     personId3 = rander.getAPersonIndex(id);
-    id = InputId[8];
-    personId2 = rander.getAPersonIndex(id);
+    //	id = InputId[8];
+    personId2 = rander.getAPersonIndex(id2);
     Q8.setEndPoints(personId2, personId3);
 
-    id = InputId[9];
+    //	id = InputId[9];
     personId2 = rander.getAPersonIndex(id);
-    id = InputId[10];
-    personId3 = rander.getAPersonIndex(id);
+    //	id = InputId[10];
+    personId3 = rander.getAPersonIndex(id2);
     Q9.setEndPoints(personId2, personId3);
 
-    id = InputId[11];
+    //	id = InputId[11];
     personId2 = rander.getAPersonIndex(id);
-    id = InputId[12];
-    personId3 = rander.getAPersonIndex(id);
+    //	id = InputId[12];
+    personId3 = rander.getAPersonIndex(id3);
     Q10.setEndPoints(personId2, personId3);
 
-    id = InputId[13];
+    //	id = InputId[13];
     personId2 = rander.getAPersonIndex(id);
-    id = InputId[14];
-    personId3 = rander.getAPersonIndex(id);
+    //	id = InputId[14];
+    personId3 = rander.getAPersonIndex(id3);
     Q11.setEndPoints(personId2, personId3);
 
-    id = InputId[15];
+    //	id = InputId[15];
     personId1 = rander.getAPersonIndex(id);
     Q12.setPersonId(personId1);
 
-    id = InputId[16];
+    //	id = InputId[16];
     personId1 = rander.getAPersonIndex(id);
     Q13.setPersonId(personId1);
 
-    id = InputId[17];
+    //	id = InputId[17];
     name = rander.getName(id);
     Q14.setPersonProperty("name", name);
 
@@ -165,53 +177,53 @@ int main(int argc, char *argv[]) {
 
     Q1.runQuery(g, traversal);
 
-    auto Time1 = get_clock();
-    cout << "Processing time Q1\t" << diff_clock(startTime, Time1) << "\n";
+//    auto Time1 = get_clock();
+//    cout << "Processing time Q1\t" << diff_clock(startTime, Time1) << "\n";
 
     Q2.runQuery(g, traversal);
 
-    auto Time2 = get_clock();
-    cout << "Processing time Q2\t" << diff_clock(Time1, Time2) << "\n";
+//    auto Time2 = get_clock();
+//    cout << "Processing time Q2\t" << diff_clock(Time1, Time2) << "\n";
 
     Q3.runQuery(g, traversal);
 
-    auto Time3 = get_clock();
-    cout << "Processing time Q3\t" << diff_clock(Time2, Time3) << "\n";
+//    auto Time3 = get_clock();
+//    cout << "Processing time Q3\t" << diff_clock(Time2, Time3) << "\n";
 
     Q4.runQuery(g, traversal);
 
-    auto Time4 = get_clock();
-    cout << "Processing time Q4\t" << diff_clock(Time3, Time4) << "\n";
+//    auto Time4 = get_clock();
+//    cout << "Processing time Q4\t" << diff_clock(Time3, Time4) << "\n";
 
     Q5.runQuery(g, traversal);
     Q6.runQuery(g, traversal);
 
-    auto Time6 = get_clock();
-    cout << "Processing time Q6\t" << diff_clock(Time4, Time6) << "\n";
+//    auto Time6 = get_clock();
+//    cout << "Processing time Q6\t" << diff_clock(Time4, Time6) << "\n";
 
     Q7.runQuery(g, traversal);
 
     Q8.runQuery(g, traversal);
 
-    auto Time8 = get_clock();
-    cout << "Processing time Q8\t" << diff_clock(Time6, Time8) << "\n";
+//    auto Time8 = get_clock();
+//    cout << "Processing time Q8\t" << diff_clock(Time6, Time8) << "\n";
 
     Q10.runQuery(g, traversal);
     Q11.runQuery(g, traversal);
     Q12.runQuery(g, traversal);
 
-    auto Time12 = get_clock();
-    cout << "Processing time Q12\t" << diff_clock(Time8, Time12) << "\n";
+//    auto Time12 = get_clock();
+//    cout << "Processing time Q12\t" << diff_clock(Time8, Time12) << "\n";
 
     Q13.runQuery(g, traversal);
 
-    auto Time13 = get_clock();
-    cout << "Processing time Q13\t" << diff_clock(Time12, Time13) << "\n";
+//    auto Time13 = get_clock();
+//    cout << "Processing time Q13\t" << diff_clock(Time12, Time13) << "\n";
 
     Q14.runQuery(g, traversal);
 
-    auto Time14 = get_clock();
-    cout << "Processing time Q14\t" << diff_clock(Time8, Time14) << "\n";
+//    auto Time14 = get_clock();
+//    cout << "Processing time Q14\t" << diff_clock(Time8, Time14) << "\n";
 
 //    Q9.runQuery(g, traversal);
 
@@ -240,7 +252,7 @@ int main(int argc, char *argv[]) {
 
   cout << "Processing time " << diff_clock(startTime, endTime) << "\n";
 
-  cout << "finish testing\n";
+//  cout << "finish testing\n";
 ///  myfile.close();
   return 0;
 }

@@ -23,6 +23,13 @@
 
 //#define _PRINTGDB_  true
 
+#if _TIME_QUERY_
+#define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
+#define NANO 1000000000 
+#define MILLION 1000000
+#define SCALE 1000
+#endif
+
 #ifdef _PRINTGDB_
 #include <fstream>
 std::ofstream GDFile;
@@ -38,6 +45,7 @@ public:
   typedef GraphType::VertexDescriptor VertexDescriptor;
 public:
   Query() { }
+  Query(unsigned int Id) : QueryId(Id) { }
   
   virtual void runQuery(Graph & graph, TraversalType Traversal) { }
 
@@ -58,6 +66,33 @@ public:
   void setWebId(VertexDescriptor webId) {
     WebId = webId;
   }
+
+#if _TIME_QUERY_
+  void getExecTime() {
+    End = (struct timespec){ 0 };
+    if ( clock_gettime( CLOCK_ID, &End) == -1) {
+      std::cout << "Query\t" << QueryId << "\tCould NOT get exec time\n"; 
+      exit(0);
+    }
+
+    uint64_t execTime = ( (End.tv_sec - Start.tv_sec) * NANO
+                  + ( End.tv_nsec - Start.tv_nsec) )/ SCALE;
+
+    std::cout << "Query\t" << QueryId << "\t" << execTime << "\n"; 
+  }
+
+  void getStartTime() { 
+    Start = (struct timespec){ 0 };
+    if ( clock_gettime( CLOCK_ID, &Start ) == -1 ) {
+      std::cout  << "Fail to get start time\n";
+      exit(0);
+    } 
+  }
+#endif 
+  void getQueryId(unsigned int QId) {
+    QueryId = QId;
+  }
+
 protected:
   KeyType   Key;
   ValueType Value;
@@ -65,11 +100,20 @@ protected:
   VertexDescriptor PersonId;
   VertexDescriptor PersonId1;
   VertexDescriptor PersonId2;
+  unsigned int QueryId;
+#if _TIME_QUERY_
+  struct timespec Start;
+  struct timespec End;
+#endif 
 };
 
 class Query14 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
+    getQueryId(14);
+#if _TIME_QUERY_
+    getStartTime();
+#endif
     Visitor v1;
     switch(Traversal) {
       case 1:
@@ -85,6 +129,9 @@ public:
         recursiveDepthFirstSearch(graph, 0, v1);
         break;
     }
+#if _TIME_QUERY_
+    getExecTime();
+#endif
 
 #ifdef _PRINTGDB_
   GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
@@ -106,6 +153,10 @@ public:
 class Query1 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
+    getQueryId(1);
+#if _TIME_QUERY_
+    getStartTime();
+#endif
     SelectionVisitor v1;
     filtProperty(Key, Value, v1.getFilter());
     traverseThroughType("FRIENDS", v1.getFilter());
@@ -119,6 +170,10 @@ public:
       case 3:
         recursiveDepthFirstSearch(graph, 0, v1);
     }
+
+#if _TIME_QUERY_
+    getExecTime();
+#endif
 
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
@@ -147,6 +202,10 @@ public:
 class Query2 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
+    getQueryId(2);
+#if _TIME_QUERY_
+    getStartTime();
+#endif
     AdjacencyVisitor v2; 
     traverseThroughTypeAndDirection("LIKES","in", v2.getFilter());
     switch(Traversal) {
@@ -160,6 +219,10 @@ public:
         recursiveDepthFirstSearch(graph,WebId, v2);
         break;
     }
+
+#if _TIME_QUERY_
+    getExecTime();
+#endif
 
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
@@ -190,6 +253,11 @@ public:
 class Query3 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
+    getQueryId(3);
+#if _TIME_QUERY_
+    getStartTime();
+#endif
+
     AdjacencyVisitor v3; 
     traverseThroughType("LIKES", v3.getFilter());
     switch(Traversal) {
@@ -203,6 +271,9 @@ public:
         recursiveDepthFirstSearch(graph, PersonId, v3);
         break;
     }
+#if _TIME_QUERY_
+    getExecTime();
+#endif
 
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
@@ -232,6 +303,10 @@ public:
 class Query4 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
+    getQueryId(4);
+#if _TIME_QUERY_
+    getStartTime();
+#endif
     SelectionVisitor  v4;
     filtProperty(Key, Value, v4.getFilter());
     traverseThroughType("FRIENDS", v4.getFilter());
@@ -246,6 +321,9 @@ public:
         recursiveDepthFirstSearch(graph, 0, v4);
         break;
     }
+#if _TIME_QUERY_
+    getExecTime();
+#endif
 
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
@@ -272,7 +350,7 @@ public:
 class Query5 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
-
+    getQueryId(5);
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 5\n";
@@ -283,6 +361,11 @@ public:
     else
        GDFile << "-----------------recursiveDFS-----------------\n";
 #endif
+
+#if _TIME_QUERY_
+    getStartTime();
+#endif
+
     FilterType tmpFilter[2];
     std::string key("name");
     std::vector<VertexPointer> target;
@@ -347,13 +430,17 @@ public:
               }
     }
 
+#if _TIME_QUERY_
+    getExecTime();
+#endif
+
   }
 };
 
 class Query6: public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
-
+    getQueryId(6);
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 6\n";
@@ -363,6 +450,10 @@ public:
       GDFile << "---------------------DFS---------------------\n";
     else
       GDFile << "----------------recursiveDFS-----------------\n";
+#endif
+
+#if _TIME_QUERY_
+    getStartTime();
 #endif
     std::string key("URL");
     FilterType tmpFilter[2];
@@ -430,13 +521,16 @@ public:
         break;
               }
     }
+#if _TIME_QUERY_
+    getExecTime();
+#endif
   }
 };
 
 class Query7: public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
-
+    getQueryId(7);
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 7\n";
@@ -446,6 +540,10 @@ public:
        GDFile << "---------------------DFS---------------------\n";
     else
        GDFile << "----------------recursiveDFS-----------------\n";
+#endif
+
+#if _TIME_QUERY_
+    getStartTime();
 #endif
 
     FilterType tmpFilter[2];
@@ -517,13 +615,17 @@ public:
               }
     }
 
+#if _TIME_QUERY_
+    getExecTime();
+#endif
+
   }
 };
 
 class Query8 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
-
+    getQueryId(8);
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 8\n";
@@ -534,6 +636,11 @@ public:
     else
         GDFile << "----------------recursiveDFS-----------------\n";
 #endif
+
+#if _TIME_QUERY_
+    getStartTime();
+#endif
+
     switch(Traversal) {
       case 1: {
         PathVisitor v8b;
@@ -581,12 +688,17 @@ public:
         break;
               }
     }
+#if _TIME_QUERY_
+    getExecTime();
+#endif
   }
 };
 
 class Query9: public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
+    getQueryId(9);
+
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 9\n";
@@ -599,6 +711,10 @@ public:
 #endif
     //PathVisitor v9;
     //v9.setEndVertex(PersonId2);
+    //
+#if _TIME_QUERY_
+    getStartTime();
+#endif
     switch(Traversal) {
       case 1: {
         PathVisitor v9b;
@@ -659,12 +775,20 @@ public:
         break;
               }
     }
+#if _TIME_QUERY_
+    getExecTime();
+#endif
   }
 };
 
 class Query10 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) { 
+    getQueryId(10);
+
+#if _TIME_QUERY_
+    getStartTime();
+#endif
     FilterType tmpFilter[2];
     std::string key("name");
     std::unordered_set<VertexPointer> TargetSet;
@@ -702,6 +826,11 @@ public:
               }
 
     }
+
+#if _TIME_QUERY_
+    getExecTime();
+#endif
+
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 10\n";
@@ -727,6 +856,11 @@ public:
 class Query11: public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
+    getQueryId(11);
+#if _TIME_QUERY_
+    getStartTime();
+#endif
+
     FilterType tmpFilter[2];
     std::string key("name");
     std::unordered_set<VertexPointer> target;
@@ -764,6 +898,11 @@ public:
         break;
               }
     }
+
+#if _TIME_QUERY_
+    getExecTime();
+#endif
+
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 11\n";
@@ -790,6 +929,11 @@ public:
 class Query12 : public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
+
+    getQueryId(12);
+#if _TIME_QUERY_
+    getStartTime();
+#endif
     std::unordered_set<VertexPointer>  target;
     AdjacencyVisitor v12; 
     traverseThroughTypeAndDirection("FRIENDS", "out", v12.getFilter());
@@ -810,6 +954,11 @@ public:
         break;
 
     }
+
+#if _TIME_QUERY_
+    getExecTime();
+#endif
+
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 12\n";
@@ -835,6 +984,7 @@ public:
 class Query13: public Query {
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
+    getQueryId(13);
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution.log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 13\n";
@@ -845,6 +995,11 @@ public:
     else
         GDFile << "----------------recursiveDFS-----------------\n";
 #endif
+
+#if _TIME_QUERY_
+    getStartTime();
+#endif
+
     FilterType tmpFilter[3];
     std::string key("name");
     traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
@@ -919,6 +1074,10 @@ public:
         break;
               }
     }
+
+#if _TIME_QUERY_
+    getExecTime();
+#endif
   }
 };
 
