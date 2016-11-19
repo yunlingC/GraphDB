@@ -16,8 +16,7 @@ int main(int argc, char *argv[]) {
   cout << "Begin testing\n";
 
   unsigned int InputSize;
-  unsigned int Path = 0;
-
+  unsigned int Path = 0; 
 //  string GDBPath = "../tests/gd/sndata";
 //  string LDBCPath = "../tests/ldbc/social_network_";
 //  string Path = "";
@@ -93,13 +92,27 @@ int main(int argc, char *argv[]) {
     totalInDeg += InDegree;
   }
 
+  int lastNum = 0;
   for (auto OutEntry : OutDegreeMap)  {
+    /// This while loop is for plotting purpose
+    while (OutEntry.first > lastNum)  {
+      InputFile << lastNum++ << "\t" << "?"<< "\n";
+    }
+    lastNum = OutEntry.first+1;
     InputFile << OutEntry.first << "\t" << OutEntry.second << "\n";
   }
 
   InputFile << "Indgree\n";
 
+  lastNum = 0;
+
   for (auto InEntry : InDegreeMap)  {
+    while (InEntry.first > lastNum)  {
+      InputFile << lastNum++ << "\t" << "?"<< "\n";
+    }
+
+    lastNum = InEntry.first + 1;
+
     InputFile << InEntry.first << "\t" << InEntry.second << "\n";
   }
 
