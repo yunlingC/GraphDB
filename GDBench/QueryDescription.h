@@ -134,7 +134,7 @@ public:
 #endif
 
 #ifdef _PRINTGDB_
-  GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+  GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
   GDFile << "Query 14\n";
   if(Traversal == 1)
       GDFile << "---------------------BFS---------------------\n";
@@ -176,7 +176,7 @@ public:
 #endif
 
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 1\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -225,7 +225,7 @@ public:
 #endif
 
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 2\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -276,7 +276,7 @@ public:
 #endif
 
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 3\n";
     if (Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -326,7 +326,7 @@ public:
 #endif
 
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 4\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -352,7 +352,7 @@ public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
     getQueryId(5);
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 5\n";
     if (Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -442,7 +442,7 @@ public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
     getQueryId(6);
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 6\n";
     if(Traversal == 1)
       GDFile << "---------------------BFS---------------------\n";
@@ -532,7 +532,7 @@ public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
     getQueryId(7);
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 7\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -627,7 +627,7 @@ public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
     getQueryId(8);
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 8\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -700,7 +700,7 @@ public:
     getQueryId(9);
 
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 9\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -832,7 +832,7 @@ public:
 #endif
 
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 10\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -904,7 +904,7 @@ public:
 #endif
 
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 11\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -960,7 +960,7 @@ public:
 #endif
 
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 12\n";
     if (Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";
@@ -986,7 +986,7 @@ public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
     getQueryId(13);
 #ifdef _PRINTGDB_
-    GDFile.open("gd_execution_"std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 13\n";
     if(Traversal == 1)
         GDFile << "---------------------BFS---------------------\n";

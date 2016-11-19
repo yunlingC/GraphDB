@@ -182,13 +182,13 @@ public:
                             , EdgePointer Edge
                             , VertexPointer SecondVertex) {
 
-    if (ReturnFlag) {
-      /// Flip back so that recursive functions won't return forever.
-      ReturnFlag = false;
-      return true;;
-    }
-
-    /// This is to make sure the same vertex won't be revisited again 
+//    if (ReturnFlag) {
+//      /// Flip back so that recursive functions won't return forever.
+//      ReturnFlag = false;
+//      return true;
+//    }
+//
+    /// This is to make sure the same vertex won't be visited again 
     /// in the current path --> prevent infinite loop
     auto PrevPath = PathStack.back();
     for (auto it = PrevPath.begin(), it_end = PrevPath.end();
@@ -222,11 +222,11 @@ public:
   }
 
 protected:
- bool ReturnFlag;
- unsigned int TmpShortestLength;
- VertexDescriptor EndVertex;
- PathStackType PathStack;
- VertexPath ShortestPath;
+  bool ReturnFlag;
+  unsigned int TmpShortestLength;
+  VertexDescriptor EndVertex;
+  PathStackType PathStack;
+  VertexPath ShortestPath;
 };
 
 
@@ -243,7 +243,7 @@ public:
   }
 
   /// We don't revisit the vertex if we cannot find a 
-  /// connection the first time we viist it
+  /// connection the first time we visit it
   virtual bool discoverVertex(VertexPointer Vertex) {
     return false;
   }
