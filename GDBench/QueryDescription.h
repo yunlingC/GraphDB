@@ -28,11 +28,12 @@
 #define NANO 1000000000 
 #define MILLION 1000000
 #define SCALE 1000
+#include <fstream>
+std::ofstream GDFile;
 #endif
 
 #ifdef _PRINTGDB_
 #include <fstream>
-std::ofstream GDFile;
 #endif
 
 class Query {
@@ -45,7 +46,9 @@ public:
   typedef GraphType::VertexDescriptor VertexDescriptor;
 public:
   Query() { }
-  Query(unsigned int Id) : QueryId(Id) { }
+  Query(unsigned int Id) : QueryId(Id) { 
+    GDFile.open("gd_time_"+std::to_string(QueryId)+".dat", std::ios_base::out | std::ios_base::app);
+  }
   
   virtual void runQuery(Graph & graph, TraversalType Traversal) { }
 
@@ -68,7 +71,7 @@ public:
   }
 
 #if _TIME_QUERY_
-  void getExecTime() {
+  uint64_t getExecTime() {
     End = (struct timespec){ 0 };
     if ( clock_gettime( CLOCK_ID, &End) == -1) {
       std::cout << "Query\t" << QueryId << "\tCould NOT get exec time\n"; 
@@ -78,7 +81,8 @@ public:
     uint64_t execTime = ( (End.tv_sec - Start.tv_sec) * NANO
                   + ( End.tv_nsec - Start.tv_nsec) )/ SCALE;
 
-    std::cout << "Query\t" << QueryId << "\t" << execTime << "\n"; 
+//    std::cout << "Query\t" << QueryId << "\t" << execTime << "\n"; 
+    return execTime;
   }
 
   void getStartTime() { 
@@ -104,13 +108,14 @@ protected:
 #if _TIME_QUERY_
   struct timespec Start;
   struct timespec End;
+  std::ofstream GDFile;
 #endif 
 };
 
 class Query14 : public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
-    getQueryId(14);
 #if _TIME_QUERY_
     getStartTime();
 #endif
@@ -130,7 +135,9 @@ public:
         break;
     }
 #if _TIME_QUERY_
-    getExecTime();
+  auto ExecTime = getExecTime();
+  GDFile << QueryId << "\t" << ExecTime << "\n";
+  GDFile.close();
 #endif
 
 #ifdef _PRINTGDB_
@@ -151,9 +158,9 @@ public:
 
 
 class Query1 : public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
-    getQueryId(1);
 #if _TIME_QUERY_
     getStartTime();
 #endif
@@ -172,7 +179,9 @@ public:
     }
 
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
 
 #ifdef _PRINTGDB_
@@ -200,9 +209,9 @@ public:
 
 
 class Query2 : public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
-    getQueryId(2);
 #if _TIME_QUERY_
     getStartTime();
 #endif
@@ -221,7 +230,9 @@ public:
     }
 
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
 
 #ifdef _PRINTGDB_
@@ -251,9 +262,9 @@ public:
 
 
 class Query3 : public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
-    getQueryId(3);
 #if _TIME_QUERY_
     getStartTime();
 #endif
@@ -272,7 +283,9 @@ public:
         break;
     }
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
 
 #ifdef _PRINTGDB_
@@ -301,9 +314,9 @@ public:
 };
 
 class Query4 : public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
-    getQueryId(4);
 #if _TIME_QUERY_
     getStartTime();
 #endif
@@ -322,7 +335,9 @@ public:
         break;
     }
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
 
 #ifdef _PRINTGDB_
@@ -348,9 +363,9 @@ public:
 };
 
 class Query5 : public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
-    getQueryId(5);
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 5\n";
@@ -431,16 +446,18 @@ public:
     }
 
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
 
   }
 };
 
 class Query6: public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
-    getQueryId(6);
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 6\n";
@@ -522,15 +539,17 @@ public:
               }
     }
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
   }
 };
 
 class Query7: public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
-    getQueryId(7);
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 7\n";
@@ -616,16 +635,18 @@ public:
     }
 
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
 
   }
 };
 
 class Query8 : public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
-    getQueryId(8);
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 8\n";
@@ -689,15 +710,17 @@ public:
               }
     }
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
   }
 };
 
 class Query9: public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
-    getQueryId(9);
 
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
@@ -776,15 +799,17 @@ public:
               }
     }
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
   }
 };
 
 class Query10 : public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) { 
-    getQueryId(10);
 
 #if _TIME_QUERY_
     getStartTime();
@@ -828,7 +853,9 @@ public:
     }
 
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
 
 #ifdef _PRINTGDB_
@@ -854,9 +881,9 @@ public:
 
 
 class Query11: public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal) {
-    getQueryId(11);
 #if _TIME_QUERY_
     getStartTime();
 #endif
@@ -900,7 +927,9 @@ public:
     }
 
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
 
 #ifdef _PRINTGDB_
@@ -927,10 +956,10 @@ public:
 };
 
 class Query12 : public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
 
-    getQueryId(12);
 #if _TIME_QUERY_
     getStartTime();
 #endif
@@ -956,7 +985,9 @@ public:
     }
 
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
 
 #ifdef _PRINTGDB_
@@ -982,9 +1013,9 @@ public:
 };
 
 class Query13: public Query {
+  using Query::Query;
 public:
   virtual void runQuery(Graph & graph, TraversalType Traversal ) {
-    getQueryId(13);
 #ifdef _PRINTGDB_
     GDFile.open("gd_execution_"+std::to_string(QueryId)+".log", std::ios_base::out | std::ios_base::app);
     GDFile << "Query 13\n";
@@ -1076,7 +1107,9 @@ public:
     }
 
 #if _TIME_QUERY_
-    getExecTime();
+//    getExecTime();
+    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    GDFile.close();
 #endif
   }
 };

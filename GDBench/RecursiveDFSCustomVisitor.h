@@ -153,7 +153,7 @@ public:
   /// Set to true to allow revisit to vertices 
   /// that show up in different depths
   virtual bool discoverVertex(VertexPointer Vertex) {
-    return true;
+    return TmpShortestLength != 100;
   }
 
   virtual void visitStartVertex(VertexPointer Vertex) {

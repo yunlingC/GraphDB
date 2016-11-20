@@ -83,20 +83,20 @@ int main(int argc, char *argv[]) {
 //    personId2 = rander.getAPersonIndex(id);
 //    personId3 = 0;
 
-    Query1 Q1;
-    Query2 Q2;
-    Query3 Q3;
-    Query4 Q4;
-    Query5 Q5;
-    Query6 Q6;
-    Query7 Q7;
-    Query8 Q8;
-    Query9 Q9;
-    Query10 Q10;
-    Query11 Q11;
-    Query12 Q12;
-    Query13 Q13;
-    Query14 Q14;
+    Query1 Q1(1);
+    Query2 Q2(2);
+    Query3 Q3(3);
+    Query4 Q4(4);
+    Query5 Q5(5);
+    Query6 Q6(6);
+    Query7 Q7(7);
+    Query8 Q8(8);
+    Query9 Q9(9);
+    Query10 Q10(10);
+    Query11 Q11(11);
+    Query12 Q12(12);
+    Query13 Q13(13);
+    Query14 Q14(14);
 
     
 //    int InputId[19] = {46, 0, 0, 28, 0, 

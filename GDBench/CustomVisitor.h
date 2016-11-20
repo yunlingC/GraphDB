@@ -590,7 +590,7 @@ public:
   virtual void visitStartVertex(VertexPointer startVertex ) {
     StartVertex = startVertex;
     /// Initialize it with a large value
-    TempMinDepth = 500;
+    TempMinDepth = 100;
     TurnFlag = false;
     VertexPath NewPath;
     NewPath.push_back(startVertex);
@@ -610,7 +610,7 @@ public:
   }
 
   virtual bool discoverVertex(VertexPointer vertex) {
-    return true; 
+    return TempMinDepth != 100; 
   }
 
   virtual bool visitDirection(VertexPointer target, EdgePointer edge) {
