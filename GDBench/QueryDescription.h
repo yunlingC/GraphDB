@@ -29,7 +29,6 @@
 #define MILLION 1000000
 #define SCALE 1000
 #include <fstream>
-std::ofstream GDFile;
 #endif
 
 #ifdef _PRINTGDB_
@@ -47,7 +46,7 @@ public:
 public:
   Query() { }
   Query(unsigned int Id) : QueryId(Id) { 
-    GDFile.open("gd_time_"+std::to_string(QueryId)+".dat", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd-time-"+std::to_string(QueryId)+".dat", std::ios_base::out | std::ios_base::app);
   }
   
   virtual void runQuery(Graph & graph, TraversalType Traversal) { }
