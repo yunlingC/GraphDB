@@ -50,7 +50,7 @@ private:
 #endif 
 
 public:
-  LDBCReader(GraphType & graph) : _Graph( graph ) { }
+  LDBCReader(GraphType & graph) : _Graph( graph ), _NodeNum(0), _EdgeNum(0) { }
 
   auto readDirectory(std::string  DirName) 
     -> int {

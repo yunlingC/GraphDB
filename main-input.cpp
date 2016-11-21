@@ -30,9 +30,9 @@ int main(int argc, char *argv[]) {
     exit(1);
   } else {
     Path = std::stoi(argv[1]);
+    InputSize = std::stoi(argv[2]);
     /// GDBench 
     if (Path == 1) {
-      InputSize = std::stoi(argv[2]);
       GDBReader reader(g);
       FileName =  "sndata" + std::to_string(InputSize)+".gd";
       string File =  "../tests/gd/" + FileName;
@@ -41,10 +41,10 @@ int main(int argc, char *argv[]) {
     } 
     /// LDBC
     else if (Path == 2) {
-      FileName = "social_network_100";
+      FileName = "social_network_"+std::to_string(InputSize);
       std::cout <<"Read file name " << FileName <<"\n";
       LDBCReader reader(g);
-      reader.readDirectory("../tests/ldbc/social_network_100");
+      reader.readDirectory("../tests/ldbc/"+FileName);
     }
   }
   
@@ -96,11 +96,11 @@ int main(int argc, char *argv[]) {
 
     VertexDegMap.insert(std::pair<int, int>(OutDegree+InDegree, VertexPtr->getId()));
 
-    if (VertexPtr->getId() > InputSize/2 -1 ) {
-      if (WebDegMap.find(InDegree) == WebDegMap.end()) {
-        WebDegMap.insert(std::pair<int, int>(InDegree, 0));
+    if (VertexPtr->getType().std_str() == "PERSON" ) {
+      if (WebDegMap.find(InDegree+OutDegree) == WebDegMap.end()) {
+        WebDegMap.insert(std::pair<int, int>(InDegree+OutDegree, 0));
       }
-      WebDegMap[InDegree]++;
+      WebDegMap[InDegree+OutDegree]++;
     }
   }
 
