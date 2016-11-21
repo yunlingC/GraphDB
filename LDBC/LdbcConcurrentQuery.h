@@ -16,12 +16,12 @@
 #define _LDBCQUERYDESCRIPTION_H_
 
 #include "LdbcCustomVisitor.h"
-#include "LdbcUpdateVisitor.h"
-#include "ConcurrentBFS.h"
+//#include "LdbcUpdateVisitor.h"
+//#include "ConcurrentBFS.h"
 #include "QueryDescription.h"
-//#ifdef _INDEXING_
-//#include "Index.h"
-//#endif
+#ifdef _INDEXING_
+#include "Index.h"
+#endif
 
 #include <vector>
 #include <string>
@@ -30,6 +30,8 @@
 
 #define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
 #define MILLION 1000000
+#define NANO 1000000000
+#define SCALE 1000
 
 class Transaction;
 /// This is the base class for LdbcQuery
@@ -38,34 +40,53 @@ public:
   typedef std::pair<std::string, std::string> ParamPairType;
   typedef std::pair<std::string, std::pair<std::string, std::string> > RangePairType;
   typedef LocksManager LockManagerType;
-  typedef Transaction* TransactionType;
+  typedef Transaction* TransactionPointerType;
+  typedef GraphType::PropertyListType PropertyListType;
+  typedef Index IndexType;
 
 public:
   LdbcQuery(unsigned int Id) : QueryId(Id) {
     LdbcFile.open("ldbc"+std::to_string(Id)+".log", std::ios_base::out| std::ios_base::app);
   }
 
-  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex ) { }
+  virtual void runQuery(Graph & graph\
+              , VertexDescriptor StartVertex\
+              ) { }
 
-  virtual void runQuery(Graph & graph, LockManagerType & LockManager) { }
+  virtual void runQuery(Graph & graph\
+              , LockManagerType & LockManager\
+              ) { }
 
-  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
-      LockManagerType & LockManager) {}
+  virtual void runQuery(Graph & graph\
+              , VertexDescriptor StartVertex\
+              , LockManagerType & LockManager\
+              ) {}
 
-  virtual void runQuery(Graph & graph, VertexDescriptor StartVertex,
-      VertexDescriptor EndVertex, LockManagerType & LockManager) {}
+  virtual void runQuery(Graph & graph\
+              , VertexDescriptor StartVertex\
+              , VertexDescriptor EndVertex\
+              , LockManagerType & LockManager\
+              ) {}
 
-	virtual void runQuery(Graph & graph
-						, VertexDescriptor StartVertex
-						, TransactionType &tranx
-		);
+	virtual void runQuery(Graph & graph\
+						, VertexDescriptor StartVertex\
+						, TransactionPointerType tranx\
+		) {}
 
-	virtual void runQuery(Graph & graph
-						, VertexDescriptor StartVertex
-            , Visitor  & GraphVisitor
-						, TransactionType &tranx
-            , LOcksManagerType & LockManager
-		);
+	virtual void runQuery(Graph & graph\
+						, VertexDescriptor StartVertex\
+            , Visitor  & GraphVisitor\
+						, TransactionPointerType tranx\
+            , LockManagerType & LockManager\
+		){}
+
+	virtual void runQuery(Graph & graph\
+						, VertexDescriptor StartVertex\
+            , Visitor  & GraphVisitor\
+						, TransactionPointerType tranx\
+            , LockManagerType & LockManager\
+            , IndexType & Index\
+		){}
 
   void setParam(const std::string & Key, const std::string & Value) {
     ParamPair.first = Key;
@@ -95,8 +116,8 @@ public:
       exit(0);
     }
 
-    double execTime = ( End.tv_sec - Start.tv_sec )*1000
-                  + ( End.tv_nsec - Start.tv_nsec)/MILLION;
+    double execTime = (( End.tv_sec - Start.tv_sec )*NANO
+                  + ( End.tv_nsec - Start.tv_nsec))/SCALE;
 
     LdbcFile << "Query\t" << QueryId << "\t" << execTime << "\n"; 
   }
@@ -118,13 +139,14 @@ protected:
   RangePairType PropRange;
   std::ofstream LdbcFile;
 };
-
+/* **** Inactive ******/
+/**
 class LDBCQuery : public LdbcQuery {
   using LdbcQuery::LdbcQuery;
 public:
   typedef FixedString KeyType;
   typedef FixedString ValueType;
-  typedef PropertyList< KeyType, ValueType > PropertyListType;
+  typedef PropertyList< FixedString, FixedString> PropertyListType;
   typedef PropertyListType & PropertyListTypeReference;
 public:
   auto setPropertyList(PropertyListTypeReference PropList) 
@@ -134,7 +156,7 @@ public:
 protected:
   PropertyListType PropertyList;
 };
-
+*/
 
 class LdbcAddEdgeQuery : public LdbcQuery {
   using LdbcQuery::LdbcQuery;
@@ -155,7 +177,7 @@ public:
 
   void initEdge(LabelType label, std::string Key, std::string Value)  {
     PropertyListType PropList;
-    PropertyList.set(Key, Value);
+    PropList.set(Key, Value);
     initEdge(label, PropList);
   }
 
@@ -172,14 +194,16 @@ public:
   virtual void runQuery(Graph & graph
 	  					, VertexDescriptor StartVertex
               , Visitor & GraphVisitor
-	  					, TransactionType &tranx
+	  					, TransactionPointerType &tranx
               , LockManagerType LockManager
 	  	);
 
 protected:
   EdgePointer NewEdge;
-  VertexDescriptor FirstId;
-  VertexDescriptor SecondId;
+//  VertexDescriptor FirstId;
+//  VertexDescriptor SecondId;
+  ValueType FirstId;
+  ValueType SecondId;
   LabelType   FirstLabel;
   LabelType   SecondLabel;
 };
@@ -191,8 +215,10 @@ public:
 //  typedef std::pair<std::string, std::string> VertexPairType;
 //  typedef std::vector<VertexPairType>  EdgeListType;
   typedef std::string ValueType;
-  typedef std::unordered_map<EdgePointer, ValueType> EdgeMapType;
   typedef std::string LabelType;
+  typedef std::pair<ValueType, LabelType> VertexInfoPairType;
+  typedef std::unordered_map<EdgePointer, VertexInfoPairType> EdgeMapType;
+  typedef std::pair<EdgePointer, VertexInfoPairType> EdgeMapEntryType;
 //  typedef std::pair<ValueType, ValueType, LabelType, std::string, std::string> EdgeInitPairType;
 //  typedef std::vector<EdgeInitPairType> EdgeListType;
 public:
@@ -204,27 +230,28 @@ public:
 
   void initEdge(bool isNewVertexFirst
               , ValueType existVertexId
-              , LabelType label
+              , LabelType edgeLabel
+              , LabelType vertexLabel
               , std::string Key
               , std::string Value)  {
 
     EdgePointer NewEdge = new Edge(); 
-    NewEdge->setType(label);
+    NewEdge->setType(edgeLabel);
     PropertyListType PropList;
-    PropertyList.set(Key, Value);
+    PropList.set(Key, Value);
     NewEdge->setPropertyList(PropList);
     if (isNewVertexFirst) {
       NewEdge->setFirstVertexPtr(NewVertex);
-   
+    } 
     else {
       NewEdge->setSecondVertexPtr(NewVertex);
     }
-    EdgeMap.insert(NewEdge, existVertexId);
+    EdgeMap.insert(EdgeMapEntryType(NewEdge, VertexInfoPairType(vertexLabel,existVertexId)));
   }
 
   virtual void runQuery(Graph & graph
 	  					, VertexDescriptor StartVertex
-	  					, TransactionType &tranx
+	  					, TransactionPointerType &tranx
   );
 
 protected:

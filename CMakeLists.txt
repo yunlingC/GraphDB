@@ -62,11 +62,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14   -W
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -Wall")
 
-add_library (transaction
-  ../transactions/Transaction.cpp
-  ../transactions/LocksManager.cpp
-  ../transactions/TransactionManager.cpp
-  )
 
 # Storage sub directory
 add_subdirectory(storage)

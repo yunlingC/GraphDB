@@ -30,8 +30,11 @@
 class LdbcQuery1 : public LdbcQuery {
 	using LdbcQuery::LdbcQuery;
 public:
-	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType  Tranx) {
+	void runQuery(GraphType & Graph
+                , VertexDescriptor StartVertex
+	              , TransactionPointerType  Tranx
+                , LockManagerType & LockManager
+                ) {
 		getStartTime();
 		FilterType TmpFilter;
 		FilterType NameFilter;
@@ -44,13 +47,13 @@ public:
 		DepthVisitor.setNameFilter(NameFilter);
 		DepthVisitor.setDepth(3);
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, DepthVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, DepthVisitor, Tranx, LockManager);
 
 #ifdef _PRINTLOG_
 		auto target = DepthVisitor.getVertexList();
 	    LdbcFile << StartVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< "\n";
 #endif
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -61,7 +64,7 @@ class LdbcQuery2 : public LdbcQuery {
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType Tranx) {
+	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
 		FilterType TmpFilter[3];
 		traverseThroughMultiRelType("KNOWS", TmpFilter[0]);
@@ -77,7 +80,7 @@ public:
 		//check date
 		TypeVisitor.setPropToCheck(2);
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, TypeVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, TypeVisitor, Tranx, LockManager);
 
 #ifdef _PRINTLOG_
 		auto target = TypeVisitor.getVertexList();
@@ -89,7 +92,7 @@ public:
     }
 #endif
 
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -103,7 +106,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType Tranx) {
+	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
 		FilterType TmpFilter;
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
@@ -114,7 +117,7 @@ public:
 		SingleVisitor.setFilter(TmpFilter);
 		SingleVisitor.setDepth(2);
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx, LockManager);
 		auto target = SingleVisitor.getVertexList();
 
 #ifdef _PRINTLOG_
@@ -140,7 +143,7 @@ public:
 			RangeVisitor.setDepthToCheckVertexProp(2);
 			auto StartVertex = (*it)->getId();
       TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex, RangeVisitor, Tranx);
+			txBFS.breadthFirstSearch(Graph, StartVertex, RangeVisitor, Tranx, LockManager);
 			if (RangeVisitor.getIncludeState() == false) {
 				target.erase(it);
 			}
@@ -171,7 +174,7 @@ public:
 			RangeVisitor.setDepthToCheckVertexProp(2);
 			auto StartVertex = (*it)->getId();
       TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex, RangeVisitor, Tranx);
+			txBFS.breadthFirstSearch(Graph, StartVertex, RangeVisitor, Tranx, LockManager);
 			auto targetList = RangeVisitor.getVertexList();
 			PersonListMap.insert(PersonListPair((*it), targetList));
 		}
@@ -183,7 +186,7 @@ public:
     }
 #endif
 
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -194,7 +197,7 @@ class LdbcQuery4 : public LdbcQuery {
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType Tranx) {
+	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
 		FilterType TmpFilter[4];
 		traverseThroughMultiRelType("KNOWS", TmpFilter[0]);
@@ -211,7 +214,7 @@ public:
 		ResultsVisitor.setDepthToCheckRange(2);
 		ResultsVisitor.setPropToCheck(1); //check time
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, ResultsVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, ResultsVisitor, Tranx, LockManager);
 
 #ifdef _PRINTLOG_
 		auto targets = ResultsVisitor.getReturnResultMap();
@@ -222,7 +225,7 @@ public:
     }
 #endif
 
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -236,7 +239,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType Tranx) {
+	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
 		FilterType TmpFilter[2];
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
@@ -247,7 +250,7 @@ public:
 		SingleVisitor.setFilter(TmpFilter[1]);
 		SingleVisitor.setDepth(2);
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx, LockManager);
 
 		auto target = SingleVisitor.getVertexList();
 #ifdef _PRINTLOG_
@@ -282,7 +285,7 @@ public:
 			PropertiesVisitor.setPropToCheck(2); //check date
 			auto StartVertex = (*it)->getId();
       TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex, PropertiesVisitor, Tranx);
+			txBFS.breadthFirstSearch(Graph, StartVertex, PropertiesVisitor, Tranx, LockManager);
 			targetMap.insert(PropertiesVisitor.getResultMap().begin(),
 			                 PropertiesVisitor.getResultMap().end());
 		}
@@ -294,7 +297,7 @@ public:
         LdbcFile <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< "\n";
     }
 #endif
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -308,7 +311,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType Tranx) {
+	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
 		FilterType TmpFilter[2];
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
@@ -319,7 +322,7 @@ public:
 		SingleVisitor.setFilter(TmpFilter[1]);
 		SingleVisitor.setDepth(2);
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx, LockManager);
 
 		auto target = SingleVisitor.getVertexList();
 
@@ -342,7 +345,7 @@ public:
 			SPVisitor.setDepth(2);
 			unsigned int StartVertex = (*it)->getId();
       TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex, SPVisitor, Tranx);
+			txBFS.breadthFirstSearch(Graph, StartVertex, SPVisitor, Tranx, LockManager);
 			auto personMap = SPVisitor.getPersonMap();
 
 			for (auto it = personMap.begin(), it_end = personMap.end();
@@ -367,7 +370,7 @@ public:
     }
 #endif
 
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -381,7 +384,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType Tranx) {
+	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
 		FilterType TmpFilter[2];
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
@@ -390,7 +393,7 @@ public:
 		RelVisitor.setFilter(TmpFilter[0]);
 		RelVisitor.setDepth(1);
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx, LockManager);
 		auto target = RelVisitor.getVertexList();
 		std::vector<FilterType> VertexFilter;
 		for (auto iter = target.begin(); iter != target.end(); iter++) {
@@ -413,8 +416,8 @@ public:
 		MatchVisitor.setVertexFilterList(VertexFilter);
 		MatchVisitor.setDepthToCheckVertexProp(2);
 		MatchVisitor.setDepthToCompareTime(2);
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, MatchVisitor, Tranx);
+    TransactionalBFS txBFS2;
+		txBFS2.breadthFirstSearch(Graph, StartVertex, MatchVisitor, Tranx, LockManager);
 
 #ifdef _PRINTLOG_
 		auto targetsMap = MatchVisitor.getTimeMap();
@@ -430,7 +433,7 @@ public:
     }
 #endif
 
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -441,7 +444,7 @@ class LdbcQuery8 : public LdbcQuery {
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType Tranx) {
+	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
 		FilterType Filters[3];
 		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]);
@@ -455,7 +458,7 @@ public:
 		TimeVisitor.setDepth(3);
 		TimeVisitor.setDepthToCompareTime(2);
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, TimeVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, TimeVisitor, Tranx, LockManager);
 
 #ifdef _PRINTLOG_
 		auto vertexMap = TimeVisitor.getVertexMap();
@@ -465,7 +468,7 @@ public:
     }
 #endif
 
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -479,7 +482,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType Tranx) {
+	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
 		FilterType TmpFilter[2];
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
@@ -489,7 +492,7 @@ public:
 		RelVisitor.setFilter(TmpFilter[1]);
 		RelVisitor.setDepth(2);
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx, LockManager);
 
 		auto target = RelVisitor.getVertexList();
 
@@ -517,7 +520,7 @@ public:
 			RelVisitor.setPropToCheck(2); //check date
 			unsigned int StartVertex = (*it)->getId();
       TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx);
+			txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx, LockManager);
 			auto targets = RelVisitor.getTargetsMap();
 			TargetsMap.insert(targets.begin(), targets.end());
 		}
@@ -529,7 +532,7 @@ public:
     }
 #endif
 
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -542,13 +545,13 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType Tranx) {
+	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
 		///first find start person's friends
 		AdjacencyVisitor AdjVisitor;
 		traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, AdjVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, AdjVisitor, Tranx, LockManager);
 		auto startId = Graph.getVertexPointer(StartVertex)->getPropertyValue("id").first.std_str();
 
 		///find friends of friends of start person
@@ -562,7 +565,7 @@ public:
 				AdjacencyVisitor AdjVisitor;
 				traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
         TransactionalBFS txBFS;
-				txBFS.breadthFirstSearch(Graph, StartVertex->getId(), AdjVisitor, Tranx);
+				txBFS.breadthFirstSearch(Graph, StartVertex->getId(), AdjVisitor, Tranx, LockManager);
 				///concatenate two lists
 				targets.insert(targets.end(),AdjVisitor.getVertexList().begin(),
 				               AdjVisitor.getVertexList().end());
@@ -594,7 +597,7 @@ public:
 				SimVisitor.setFilter(TmpFilter[i]);
 			}
       TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, (*it).first->getId(), SimVisitor, Tranx);
+			txBFS.breadthFirstSearch(Graph, (*it).first->getId(), SimVisitor, Tranx, LockManager);
 			auto iterend = SimVisitor.getPostMap().end();
 			unsigned int PostItrd = 0;
 			for ( auto iter = SimVisitor.getPostMap().begin();
@@ -608,7 +611,7 @@ public:
 #endif
 		}
 
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -626,7 +629,7 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType Tranx) {
+	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
 		FilterType TmpFilter;
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
@@ -636,7 +639,7 @@ public:
 		RelVisitor.setFilter(TmpFilter);
 		RelVisitor.setDepth(2);
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx, LockManager);
 
 		auto target = RelVisitor.getVertexList();
 #ifdef _PRINTLOG_
@@ -667,7 +670,7 @@ public:
 			VPVisitor.setDepthToCheckVertexProp(2);
 			unsigned int StartVertex = (*it)->getId();
       TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex, VPVisitor, Tranx);
+			txBFS.breadthFirstSearch(Graph, StartVertex, VPVisitor, Tranx, LockManager);
 			auto targets = VPVisitor.getMatchMap();
 			TargetsMap.insert(targets.begin(), targets.end());
 		}
@@ -680,7 +683,7 @@ public:
       }
 #endif
 
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -693,13 +696,13 @@ public:
 public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              TransactionType Tranx) {
+	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
 		///first find start person's friends
 		AdjacencyVisitor AdjVisitor;
 		traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, AdjVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, AdjVisitor, Tranx, LockManager);
 
 		///find friends of friends of start person
 		std::vector<VertexPointer> targets;
@@ -725,7 +728,7 @@ public:
 
       TransactionalBFS txBFS;
 			txBFS.breadthFirstSearch(Graph, StartVertex->getId(),
-			                         ExpertVisitor, Tranx);
+			                         ExpertVisitor, Tranx, LockManager);
 			auto iterend = ExpertVisitor.getPostMap().end();
 			auto PostNum = 0;
 			for ( auto iter = ExpertVisitor.getPostMap().begin(); iter != iterend; iter++ ) {
@@ -738,7 +741,7 @@ public:
 #endif
 
 		}
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -750,8 +753,11 @@ class LdbcQuery13 : public LdbcQuery {
 	using LdbcQuery::LdbcQuery;
 public:
 
-	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              VertexDescriptor endVertex, TransactionType Tranx) {
+	void runQuery(GraphType & Graph
+              , VertexDescriptor StartVertex
+              , VertexDescriptor endVertex
+              , TransactionPointerType Tranx
+              , LockManagerType & LockManager) {
 
 		getStartTime();
 
@@ -763,7 +769,7 @@ public:
 		PathVisitor PVisitor;
 		PVisitor.setEndVertex(endVertex);
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, PVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, PVisitor, Tranx, LockManager);
 
 #ifdef _PRINTLOG_
 		auto target = PVisitor.getVertexList();
@@ -777,7 +783,7 @@ public:
     }
 #endif
 
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -788,8 +794,12 @@ class LdbcQuery14 : public LdbcQuery {
 	using LdbcQuery::LdbcQuery;
 public:
 
-	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
-	              VertexDescriptor endVertex, TransactionType Tranx ) {
+	void runQuery(GraphType & Graph
+              , VertexDescriptor StartVertex
+	            , VertexDescriptor endVertex
+              , TransactionPointerType Tranx 
+              , LockManagerType & LockManager
+              ) {
 		getStartTime();
 		SubGraphVisitor SubgVisitor;
 		SubgVisitor.setEndVertex(endVertex);
@@ -797,7 +807,7 @@ public:
 		traverseThroughTypeAndDirection("KNOWS", "out",  EdgeFilter);
 		SubgVisitor.setEdgeFilter(EdgeFilter);
     TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, SubgVisitor, Tranx);
+		txBFS.breadthFirstSearch(Graph, StartVertex, SubgVisitor, Tranx, LockManager);
 
 		auto target = SubgVisitor.getVertexList();
 
@@ -815,7 +825,7 @@ public:
 		///already found all the paths, calculate weights now
 		auto itend = target.end();
 		float Weight = 0.0;
-		for ( auto it = target.begin(); it != itend-1; it++ ) {
+		for ( auto it = target.begin(); it!= itend && it != itend-1; it++ ) {
 
 			FilterType TmpFilter[4];
 			traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", TmpFilter[0]);
@@ -832,14 +842,14 @@ public:
 			WPathVisitor.setVertexFilter(TmpFilter[3]);
 			WPathVisitor.setDepth(3);
       TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, (*it)->getId(), WPathVisitor, Tranx);
+			txBFS.breadthFirstSearch(Graph, (*it)->getId(), WPathVisitor, Tranx, LockManager);
 			Weight += WPathVisitor.getScore();
 		}
 
 #ifdef _PRINTLOG_
 		LdbcFile << "weight " << Weight <<"\n";
 #endif
-		Tranx.releaseAll();
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
@@ -858,15 +868,19 @@ public:
   /// Get locks only on exisiting edges and vertices
 	void runQuery(GraphType & Graph
                 , VertexDescriptor StartVertex
-                , Visitor  & GraphVisitor
-                , TransactionType Tranx 
-                , LockManagerType & LockManager) {
+//                , Visitor  & GraphVisitor
+                , TransactionPointerType Tranx 
+                , LockManagerType & LockManager
+                , IndexType & Index
+                ) {
 
     for (auto EdgeEntry : EdgeMap) {
       /// Search for Vertex
-      EdgePointer NewEdge = EdgeEntry->first;
-      ValueType existVertexId = EdgeEntry->second;
-      auto ExistIndex = getVertexIndex(existVertexId);
+      EdgePointer NewEdge = EdgeEntry.first;
+      VertexInfoPairType VertexInfoPair = EdgeEntry.second;
+      LabelType existVertexLabel = VertexInfoPair.first;
+      ValueType existVertexId = VertexInfoPair.second;
+      auto ExistIndex = Index.getVertexIndex(existVertexLabel, existVertexId);
 
       /// FirstVertex of NewEdge is existed
       bool isFirstExisted = false;
@@ -890,12 +904,13 @@ public:
         Tranx->abort();
       }
 
-      auto ExistNextEdge = !ExistIndex.first->getNextEdge();
-      if (ExistNextEdge && ExistNextEdge->getFirstVertexPtr() == ExistIndex.first) {
+      auto ExistNextEdge = ExistIndex.first->getNextEdge();
+      if (ExistNextEdge && (ExistNextEdge->getFirstVertexPtr() == ExistIndex.first)) {
         if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
           Tranx->abort();
         }
-      } else (ExistNextEdge && ExistNextEdge->getSecondVertexPtr() == ExistIndex.first) {
+      }
+      else if(ExistNextEdge && (ExistNextEdge->getSecondVertexPtr() == ExistIndex.first)) {
         isExistedFirst = false;
         if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
           Tranx->abort();
@@ -909,15 +924,18 @@ public:
       /// NewEdge -> FirstNextEdge,SecondNextEdge
       if (isFirstExisted) {
         NewEdge->setFirstNextEdge(ExistNextEdge);
+        /// NewVertex->getNextEdge() == NULL
+        NewEdge->setSecondNextEdge(NewVertex->getNextEdge());
       } else {
-        NewEdge->setSecondNextEdge(NewVertex-NextEdge);
+        NewEdge->setSecondNextEdge(ExistNextEdge);
+        NewEdge->setFirstNextEdge(NewVertex->getNextEdge());
       }
 
       /// ExistVertex's NextEdge -> FirstPreviousEdge/SecondPreviousEdge
       if (isExistedFirst) {
-        ExistedNextEdge->setFirstPreviousEdge(NewEdge);
+        ExistNextEdge->setFirstPreviousEdge(NewEdge);
       } else {
-        ExistedNextEdge->setSecondPreviousEdge(NewEdge);
+        ExistNextEdge->setSecondPreviousEdge(NewEdge);
       }
 
       ///NewVertex's NextEdge -> FirstPreviousEdge/SecondPreviousEdge
@@ -933,7 +951,6 @@ public:
       /// ExistedVertex & NewVertex -> NextEdge
       NewVertex->setNextEdge(NewEdge);
       ExistIndex.first->setNextEdge(NewEdge);
-
     }/// FOR 
   }
 
@@ -943,15 +960,18 @@ protected:
 };
 
 class Query16 : public LdbcAddEdgeQuery {
+  using LdbcAddEdgeQuery::LdbcAddEdgeQuery;
 public:
 	void runQuery(GraphType & Graph
                 , VertexDescriptor StartVertex
-                , Visitor  & GraphVisitor
-                , TransactionType Tranx
-                , LockManagerType & LockManager) {
+//                , Visitor  & GraphVisitor
+                , TransactionPointerType Tranx
+                , LockManagerType & LockManager
+                , IndexType & Index
+                ) {
 
-    auto FirstIndex = getVertexIndex(FirstLabel, FirstId);
-    auto SecondIndex = getVertexIndex(SecondLabel, SecondId);
+    auto FirstIndex = Index.getVertexIndex(FirstLabel, FirstId);
+    auto SecondIndex = Index.getVertexIndex(SecondLabel, SecondId);
     /// If both end vertices are retrievable, get locks on both vertex pointers
     if (FirstIndex.second && SecondIndex.second) {
       /// Switch here
@@ -1019,7 +1039,7 @@ public:
 		BranchMap = bm;
 	}
 
-	virtual void runQuery(GraphType & Graph, TransactionType Tranx) {
+	virtual void runQuery(GraphType & Graph, TransactionPointerType Tranx) {
 		getStartTime();
 		//a new vertex vs
 		//need new propertylist for vertex and branchmap (criteria) for searching neighbor

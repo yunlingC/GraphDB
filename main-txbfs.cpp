@@ -1,7 +1,7 @@
 #include "LDBCReader.h"
 #include "TransactionalBFS.h"
 #include "TransactionManager.h"
-#include "Index.h"
+//#include "Index.h"
 
 #include "LDBCTransactionalQuery.cpp"
 #include "global.h"
@@ -11,28 +11,51 @@
 
 using namespace std;
 
-int main() {
+
+int main(int argc, char *argv[]) {
 
 //  typedef Visitor VisitorType;
   typedef Index IndexType;
 //  typedef LdbcQuery * LdbcQueryPtr;
+  typedef LdbcQuery::TransactionPointerType TransactionPointerType;
+  typedef std::vector<GraphType::VertexDescriptor> VertexIdListType;
+
+  int InputSize = 1000;
+  int run = 1;
+  
+
+  ///arg: 0-main-txbfs 
+  ///     1- single thread (1) or multithread(2)
+  //      2 (optional) file size
+  if ( argc < 2) {
+    std::cout <<"Need one more arg: single thread(1) or multithread(2)\n";
+    exit(1);
+  } else {
+    run = std::stoi(argv[1]);
+    if (argc > 2)
+      InputSize = std::stoi(argv[2]);
+//    if ( (InputSize != 1000) && (InputSize != 5000) ) {
+//      std::cout <<"Arg error : should be: 1000 or 5000\n";
+//      exit(1);
+//    }
+  }
   GraphType g;
 
   cout << "Begin testing\n"; 
   LDBCReader reader(g);
-  reader.readDirectory("../tests/ldbc/social_network_1000");
+  reader.readDirectory("../tests/ldbc/social_network_"+std::to_string(InputSize));
 
-  auto persons = reader.getPersonList();
+  VertexIdListType persons = reader.getPersonList();
   cout << "Finish reading \n";
 
   LocksManager LkManager;
   LkManager.buildLockMap(g);
   TransactionManager TmManager;
   
-//  IndexType Index(g);
-//  auto NumIndices =  Index.buildVertexIndex("id");
-//  cout <<"Indexing vertex " << NumIndices << "\n";
-//
+  IndexType Index(g);
+  auto NumIndices =  Index.buildVertexIndex("id");
+  cout <<"Indexing vertex " << NumIndices << "\n";
+
 //  auto IndexEntry = Index.getVertexIndex( "420","PERSON" );
 //  if (IndexEntry.second)  {
 //    cout << (IndexEntry.first)->getPropertyValue("firstName").first
@@ -98,40 +121,78 @@ int main() {
   LdbcQuery14 q14(14);
 //  Queries.push_back(&q14);
 
-//        q1.runQuery(g, Input[0], LockManager);
-//        q2.runQuery(g, Input[0], LockManager);
-//        q3.runQuery(g, Input[2], LockManager);
-//        q4.runQuery(g, Input[3], LockManager);
-//        q5.runQuery(g, Input[4], LockManager);
-//        q6.runQuery(g, Input[5], LockManager);
-//        q7.runQuery(g, Input[6], LockManager);
-//        q8.runQuery(g, Input[7], LockManager);
-//        q9.runQuery(g, Input[8], LockManager);
-//        q10.runQuery(g, Input[9], LockManager);
-//        q11.runQuery(g, Input[10], LockManager);
-//        q12.runQuery(g, Input[11], LockManager);
-//        q13.runQuery(g, Input[12], Input[0], LockManager);
-//        q14.runQuery(g, Input[13], Input[1], LockManager);
+//  Query15 q15(15);
+   
+//  Query16 q16(16);
 
+  std::vector<TransactionPointerType> TranxList;
 
-    std::vector<TranPointer> TranxList;
-    for (auto i= 0; i < 14; i++) {
-      auto TxEntryPtr = TmManager.addTransaction();
-      auto TxPtr = TxEntryPtr.second;
-      TranxList.push_back(TxPtr);
-    }
+  for (auto i= 0; i < 14; i++) {
+    auto TxEntryPtr = TmManager.addTransaction();
+    auto TxPtr = TxEntryPtr.second;
+    TranxList.push_back(TxPtr);
+  }
+
+  if (run == 1) {
+    q1.runQuery(g, persons[0], (TranxList[0]), LkManager);
+  
+    q2.runQuery(g, persons[0], (TranxList[0]), LkManager);
+  
+    q3.runQuery(g, persons[0], (TranxList[0]), LkManager);
+  
+    q4.runQuery(g, persons[0], (TranxList[0]), LkManager);
+  
+    q5.runQuery(g, persons[0], (TranxList[0]), LkManager);
+  
+    q6.runQuery(g, persons[0], (TranxList[0]), LkManager);
+  
+    q7.runQuery(g, persons[0], (TranxList[0]), LkManager);
+  
+    q8.runQuery(g, persons[0], (TranxList[0]), LkManager);
+  
+    q9.runQuery(g, persons[0], (TranxList[0]), LkManager);
+  
+    q10.runQuery(g, persons[0], (TranxList[0]), LkManager);
+  
+    q11.runQuery(g, persons[0], (TranxList[0]), LkManager);
+  
+    q12.runQuery(g, persons[0], (TranxList[0]), LkManager);
+  
+    q13.runQuery(g, persons[0], persons[10], (TranxList[0]), LkManager);
+    
+    q14.runQuery(g, persons[0], persons[10], (TranxList[0]), LkManager);
+  
+  //  q15.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+  //
+  //  q16.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+
+  } 
+  else if (run == 2)  {
 
     vector<std::thread> threads;
 
-      threads.push_back(std::thread([&]{q1.runQuery(g, persons[0], *(TranxList[0]));}));
-      threads.push_back(std::thread([&]{q2.runQuery(g, persons[0], *(TranxList[1]));}));
-      threads.push_back(std::thread([&]{q3.runQuery(g, persons[0], *(TranxList[2]));}));
-      threads.push_back(std::thread([&]{q4.runQuery(g, persons[0], *(TranxList[3]));}));
-      threads.push_back(std::thread([&]{q5.runQuery(g, persons[0], *(TranxList[4]));}));
-      threads.push_back(std::thread([&]{q6.runQuery(g, persons[0], *(TranxList[5]));}));
+    threads.push_back(std::thread([&]{q1.runQuery(g, persons[0], (TranxList[0]), LkManager);}));
+    threads.push_back(std::thread([&]{q2.runQuery(g, persons[0], (TranxList[1]), LkManager);}));
+    threads.push_back(std::thread([&]{q3.runQuery(g, persons[0], (TranxList[2]), LkManager);}));
+    threads.push_back(std::thread([&]{q4.runQuery(g, persons[0], (TranxList[3]), LkManager);}));
+    threads.push_back(std::thread([&]{q5.runQuery(g, persons[0], (TranxList[4]), LkManager);}));
+    threads.push_back(std::thread([&]{q6.runQuery(g, persons[0], (TranxList[5]), LkManager);}));
+    threads.push_back(std::thread([&]{q7.runQuery(g, persons[0], (TranxList[6]), LkManager);}));
+    threads.push_back(std::thread([&]{q8.runQuery(g, persons[0], (TranxList[7]), LkManager);}));
+    threads.push_back(std::thread([&]{q9.runQuery(g, persons[0], (TranxList[8]), LkManager);}));
+    threads.push_back(std::thread([&]{q10.runQuery(g, persons[0], (TranxList[9]), LkManager);}));
+    threads.push_back(std::thread([&]{q11.runQuery(g, persons[0], (TranxList[10]), LkManager);}));
+    threads.push_back(std::thread([&]{q12.runQuery(g, persons[0], (TranxList[11]), LkManager);}));
+    threads.push_back(std::thread([&]{q13.runQuery(g, persons[0], persons[100], (TranxList[12]), LkManager);}));
+    threads.push_back(std::thread([&]{q14.runQuery(g, persons[0], persons[100], (TranxList[13]), LkManager);}));
 
     for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
+  }
 
+  else {
+    std::cout << "Error: Not single thread or multithread\n";
+    exit(0);
+  }
 //  
 //  for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
 //  VisitorType Visitor;

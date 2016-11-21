@@ -16,6 +16,7 @@
 #define _PRINTLDBC_ true
 
 //#define _PRINTGDB_ false 
+#define _PRINTLOG_ true
 
 #define _INDEXING_ true
 
