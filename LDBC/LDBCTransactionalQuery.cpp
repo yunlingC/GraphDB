@@ -855,7 +855,7 @@ public:
 	}
 };
 
-class Query15 : public LdbcAddVertexQuery {
+class LdbcQuery15 : public LdbcAddVertexQuery {
   using LdbcAddVertexQuery::LdbcAddVertexQuery;
 public:
   /// This function is a simplified function of chainEdges in Edge class
@@ -866,13 +866,15 @@ public:
   void chainEdges();
 
   /// Get locks only on exisiting edges and vertices
-	void runQuery(GraphType & Graph
+	virtual void runQuery(GraphType & Graph
                 , VertexDescriptor StartVertex
 //                , Visitor  & GraphVisitor
                 , TransactionPointerType Tranx 
                 , LockManagerType & LockManager
                 , IndexType & Index
                 ) {
+
+		getStartTime();
 
     for (auto EdgeEntry : EdgeMap) {
       /// Search for Vertex
@@ -952,6 +954,25 @@ public:
       NewVertex->setNextEdge(NewEdge);
       ExistIndex.first->setNextEdge(NewEdge);
     }/// FOR 
+
+		getExecTime();
+
+#ifdef _PRINTLOG_
+    int i = 0;
+    EdgePointer NextEdge = NewVertex->getNextEdge();
+		LdbcFile << "NewVertex\t" << NewVertex->getId() << "\n";
+    while (NextEdge && i++ < 5) {
+      LdbcFile << "FirstVertex\t" << NextEdge->getFirstVertexPtr()->getType() 
+                << "\nEdge\t" << NextEdge->getType()
+                << "\nSecondVertex\t" << NextEdge->getSecondVertexPtr()->getType()
+                << "\nSecondPrevEdge\t" << NextEdge->getSecondNextEdge()->getType()
+                << "\n";
+
+      NextEdge = NextEdge->getNextEdge(NewVertex);
+    }
+#endif
+
+		LdbcFile.close();
   }
 
 protected:
@@ -959,16 +980,18 @@ protected:
 
 };
 
-class Query16 : public LdbcAddEdgeQuery {
+class LdbcQuery16 : public LdbcAddEdgeQuery {
   using LdbcAddEdgeQuery::LdbcAddEdgeQuery;
 public:
-	void runQuery(GraphType & Graph
+	virtual void runQuery(GraphType & Graph
                 , VertexDescriptor StartVertex
 //                , Visitor  & GraphVisitor
                 , TransactionPointerType Tranx
                 , LockManagerType & LockManager
                 , IndexType & Index
                 ) {
+
+		getStartTime();
 
     auto FirstIndex = Index.getVertexIndex(FirstLabel, FirstId);
     auto SecondIndex = Index.getVertexIndex(SecondLabel, SecondId);
@@ -1005,6 +1028,8 @@ public:
       SecondIndex.first->setNextEdge(NewEdge);
       NewEdge->setFirstVertexPtr(FirstIndex.first);
       NewEdge->setSecondVertexPtr(SecondIndex.first);
+      NewEdge->setFirstNextEdge(FNEdge);
+      NewEdge->setSecondNextEdge(SNEdge);
  
       if (FNEdge) {
         FNEdge->setFirstPreviousEdge(NewEdge);
@@ -1015,6 +1040,23 @@ public:
         SNEdge->setSecondPreviousEdge(NewEdge);
       }
     }
+
+		getExecTime();
+
+#ifdef _PRINTLOG_
+    VertexPointer FirstVertex = NewEdge->getFirstVertexPtr();
+    VertexPointer SecondVertex = NewEdge->getSecondVertexPtr();
+		LdbcFile << "NewEdge\t" << NewEdge->getType() << "\t" << NewEdge->getId() 
+              << "\nFirstVertex\t" << FirstVertex->getType() 
+              << "\t" << FirstVertex->getId()
+              << "\nSecondVertex\t" << SecondVertex->getType()
+              << "\t" << SecondVertex->getId()
+              << "\nFirstNextEdge\t" <<  NewEdge->getNextEdge(FirstVertex)->getType() 
+              << "\nSecondNextEdge\t" <<  NewEdge->getNextEdge(SecondVertex)->getType() 
+              << "\n";
+#endif
+
+		LdbcFile.close();
 
   }
 

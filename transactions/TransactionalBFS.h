@@ -141,7 +141,7 @@ public:
 			}
 		}
 		GraphVisitor.finishVisit();
-    std::cout <<"Transactional BFS done\n";
+//    std::cout <<"Transactional BFS done\n";
 	}
 };
 

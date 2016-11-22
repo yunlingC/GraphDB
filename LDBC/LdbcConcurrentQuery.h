@@ -42,6 +42,9 @@ public:
   typedef LocksManager LockManagerType;
   typedef Transaction* TransactionPointerType;
   typedef GraphType::PropertyListType PropertyListType;
+  typedef std::string LabelType;
+  typedef std::string KeyType;
+  typedef std::string ValueType;
   typedef Index IndexType;
 
 public:
@@ -88,6 +91,19 @@ public:
             , IndexType & Index\
 		){}
 
+//  virtual void initEdge(LabelType label) {}
+//
+//  virtual void initEdge(LabelType label, PropertyListType PropList) {}
+//
+//  virtual void initEdge(LabelType label, std::string Key, std::string Value);
+//
+//  virtual void initEdge(bool isNewVertexFirst
+//              , LabelType edgeLabel
+//              , LabelType vertexLabel
+//              , ValueType existVertexId
+//              , std::string Key
+//              , std::string Value){}
+  
   void setParam(const std::string & Key, const std::string & Value) {
     ParamPair.first = Key;
     ParamPair.second = Value;
@@ -116,7 +132,7 @@ public:
       exit(0);
     }
 
-    double execTime = (( End.tv_sec - Start.tv_sec )*NANO
+    uint64_t execTime = (( End.tv_sec - Start.tv_sec )*NANO
                   + ( End.tv_nsec - Start.tv_nsec))/SCALE;
 
     LdbcFile << "Query\t" << QueryId << "\t" << execTime << "\n"; 
@@ -161,10 +177,11 @@ protected:
 class LdbcAddEdgeQuery : public LdbcQuery {
   using LdbcQuery::LdbcQuery;
 public:
-  typedef std::string LabelType;
-  typedef std::string KeyType;
-  typedef std::string ValueType;
-public:
+//  typedef std::string LabelType;
+//  typedef std::string KeyType;
+//  typedef std::string ValueType;
+//public:
+
   void initEdge(LabelType label) {
     NewEdge = new Edge(); 
     NewEdge->setType(label);
@@ -191,13 +208,13 @@ public:
     SecondLabel = secondLabel;
   }
 
-  virtual void runQuery(Graph & graph
-	  					, VertexDescriptor StartVertex
-              , Visitor & GraphVisitor
-	  					, TransactionPointerType &tranx
-              , LockManagerType LockManager
-	  	);
-
+//  virtual void runQuery(Graph & graph
+//	  					, VertexDescriptor StartVertex
+//              , Visitor & GraphVisitor
+//	  					, TransactionPointerType &tranx
+//              , LockManagerType LockManager
+//	  	);
+//
 protected:
   EdgePointer NewEdge;
 //  VertexDescriptor FirstId;
@@ -222,6 +239,7 @@ public:
 //  typedef std::pair<ValueType, ValueType, LabelType, std::string, std::string> EdgeInitPairType;
 //  typedef std::vector<EdgeInitPairType> EdgeListType;
 public:
+
   void initVertex(LabelType label, PropertyListType PropList) {
     NewVertex = new Vertex();  
     NewVertex->setType(label);
@@ -229,9 +247,9 @@ public:
   }
 
   void initEdge(bool isNewVertexFirst
-              , ValueType existVertexId
               , LabelType edgeLabel
               , LabelType vertexLabel
+              , ValueType existVertexId
               , std::string Key
               , std::string Value)  {
 
@@ -249,10 +267,10 @@ public:
     EdgeMap.insert(EdgeMapEntryType(NewEdge, VertexInfoPairType(vertexLabel,existVertexId)));
   }
 
-  virtual void runQuery(Graph & graph
-	  					, VertexDescriptor StartVertex
-	  					, TransactionPointerType &tranx
-  );
+//  virtual void runQuery(Graph & graph
+//	  					, VertexDescriptor StartVertex
+//	  					, TransactionPointerType &tranx
+//  );
 
 protected:
   ValueType NewVertexIndex;
