@@ -855,7 +855,7 @@ public:
 	}
 };
 
-class LdbcQuery15 : public LdbcAddVertexQuery {
+class LdbcQueryAddVertex : public LdbcAddVertexQuery {
   using LdbcAddVertexQuery::LdbcAddVertexQuery;
 public:
   /// This function is a simplified function of chainEdges in Edge class
@@ -966,7 +966,7 @@ public:
                 << "\nEdge\t" << NextEdge->getType()
                 << "\nSecondVertex\t" << NextEdge->getSecondVertexPtr()->getType()
                 << "\nSecondPrevEdge\t" << NextEdge->getSecondNextEdge()->getType()
-                << "\n";
+                << "\n\n";
 
       NextEdge = NextEdge->getNextEdge(NewVertex);
     }
@@ -980,7 +980,7 @@ protected:
 
 };
 
-class LdbcQuery16 : public LdbcAddEdgeQuery {
+class LdbcQueryAddEdge : public LdbcAddEdgeQuery {
   using LdbcAddEdgeQuery::LdbcAddEdgeQuery;
 public:
 	virtual void runQuery(GraphType & Graph
@@ -1053,9 +1053,8 @@ public:
               << "\t" << SecondVertex->getId()
               << "\nFirstNextEdge\t" <<  NewEdge->getNextEdge(FirstVertex)->getType() 
               << "\nSecondNextEdge\t" <<  NewEdge->getNextEdge(SecondVertex)->getType() 
-              << "\n";
+              << "\n\n";
 #endif
-
 		LdbcFile.close();
 
   }

@@ -52,6 +52,10 @@ public:
     LdbcFile.open("ldbc"+std::to_string(Id)+".log", std::ios_base::out| std::ios_base::app);
   }
 
+  ~LdbcQuery() {
+    LdbcFile.close();
+  }
+
   virtual void runQuery(Graph & graph\
               , VertexDescriptor StartVertex\
               ) { }

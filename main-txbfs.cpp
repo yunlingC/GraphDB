@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
 //  Queries.push_back(&q14);
 
   /** Update queries definitions**/
-  LdbcQuery15 q15(15);
+  LdbcQueryAddVertex q15(15);
   PropertyListType VertexProp;
   VertexProp.set("firstName", "Senator");
   VertexProp.set("id", "1234567");
@@ -134,15 +134,15 @@ int main(int argc, char *argv[]) {
   q15.initEdge(true, "HAS_INTEREST", "TAG", "10", "null", "null"); 
   q15.initEdge(true, "STUDY_AT", "ORGANISATION", "1580", "classYear", "2010"); 
 
-  LdbcQuery16 q16(16);
+  LdbcQueryAddEdge q16(16);
   q16.initEdge("LIKES_POST", "creationDate", "2015-12-08T00:47:05.399+0000") ;
   q16.getVertexId("78038", "PERSON", "8", "POST");
 
-  LdbcQuery16 q17(17);
+  LdbcQueryAddEdge q17(17);
   q17.initEdge("LIKES_COMMENTS", "creationDate", "2015-9-08T00:47:05.399+0000") ;
   q17.getVertexId("78038", "PERSON", "68719476749", "COMMENT");
 
-  LdbcQuery15 q18(18);
+  LdbcQueryAddVertex q18(18);
   PropertyListType ForumProp;
   ForumProp.set("id", "2015");
   ForumProp.set("title", "Boring Game");
@@ -152,11 +152,11 @@ int main(int argc, char *argv[]) {
   q18.initEdge(true, "HAS_MODERATOR", "PERSON", "78038", "null", "null"); 
   q18.initEdge(true, "FORUM_HAS_TAG", "TAG", "10", "null", "null"); 
 
-  LdbcQuery16 q19(19);
+  LdbcQueryAddEdge q19(19);
   q19.initEdge("HAS_MEMBER", "joinDate", "2015-12-08T00:47:05.399+0000") ;
   q19.getVertexId("2015", "FORUM", "78038", "PERSON");
 
-  LdbcQuery15 q20(20);
+  LdbcQueryAddVertex q20(20);
   PropertyListType PostProp;
   PostProp.set("id", "4023");
   q20.initVertex("POST", PostProp);
@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
   q20.initEdge(true, "POST_HAS_CREATOR", "PERSON", "78038", "null", "null"); 
   q20.initEdge(true, "POST_HAS_TAG", "TAG", "10", "null", "null"); 
  
-  LdbcQuery15 q21(21);
+  LdbcQueryAddVertex q21(21);
   PropertyListType CommentProp;
   CommentProp.set("id", "65432");
   CommentProp.set("creationDate", "2015-11-08T00:47:05.399+0000");
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
   q21.initEdge(true, "COMMENT_HAS_CREATOR", "PERSON", "78038", "null", "null"); 
   q21.initEdge(true, "COMMENT_HAS_TAG", "TAG", "10", "null", "null"); 
 
-  LdbcQuery16 q22(22);
+  LdbcQueryAddEdge q22(22);
   q22.initEdge("KNOWS", "creationDate", "2015-10-08T00:47:05.399+0000") ;
   q22.getVertexId("78038", "PERSON", "PERSON", "420");
   /*** End of Update queries definition ***/
@@ -256,22 +256,24 @@ int main(int argc, char *argv[]) {
 
   else if (run == 3) {
 
+    q21.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+
     q15.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
   
     q16.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
 
-    q17.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+//    q17.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+//  
+//    q18.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+
+//    q19.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
   
-    q18.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+//    q20.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
 
-    q19.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
-  
-    q20.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
 
-    q21.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
-
-    q22.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+ //   q22.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
   }
+
   else {
     std::cout << "Error: Not single thread or multithread\n";
     exit(0);
