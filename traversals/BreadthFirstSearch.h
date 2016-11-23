@@ -22,6 +22,8 @@
 #include <queue>
 #include <unordered_map>
 
+#define _STATS_ true
+
 void breadthFirstSearch(GraphType & Graph, 
                         const GraphType::VertexDescriptor & StartVertex, 
                         Visitor & GraphVisitor) {
@@ -52,6 +54,10 @@ void breadthFirstSearch(GraphType & Graph,
       
     /// Set to visited.    
     ColorMap[ScheduledVertex] = true;
+
+#ifdef _STATS_
+    GraphVisitor.countVertex(ScheduledVertex);
+#endif
 
     auto NextEdge = ScheduledVertex->getNextEdge();
 

@@ -74,7 +74,7 @@ set(TESTS
   #  main-dfs.cpp
   #  main-rdfs-ldbc.cpp
     main-txbfs.cpp
-  #  main-multithread.cpp
+  main-multithread.cpp
   main-input.cpp
   )
 

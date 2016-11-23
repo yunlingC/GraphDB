@@ -33,6 +33,14 @@ public:
   typedef std::unordered_set<VertexPointer> VertexSetType;
   typedef std::vector<VertexPointer> VertexPath;
 public:
+  Visitor() {
+    NumVertices = 0;
+  }
+
+  int getNumVertices() {
+    return NumVertices;
+  }
+
   virtual void setFilter(FilterType & filter) {
     Filter = filter;
   }
@@ -53,6 +61,10 @@ public:
 
   virtual bool discoverVertex(VertexPointer VertexPtr) {
     return false;
+  }
+
+  void countVertex(VertexPointer VertexPtr) {
+    NumVertices++;
   }
 
   virtual bool visitVertex(VertexPointer VertexPtr) {
@@ -113,6 +125,9 @@ protected:
   VertexTargetType VertexList; 
   VertexSetType   VertexSet;
   FilterType Filter;
+//#ifdef _STATS_
+  int NumVertices;
+//#endif 
 };
 
 #endif /*_VISITORS_H_ */

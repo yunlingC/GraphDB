@@ -35,6 +35,8 @@
 #include <fstream>
 #endif
 
+#define _STATS_ true
+
 class Query {
 public:
   typedef std::string KeyType;
@@ -46,7 +48,7 @@ public:
 public:
   Query() { }
   Query(unsigned int Id) : QueryId(Id) { 
-    GDFile.open("gd-time-"+std::to_string(QueryId)+".dat", std::ios_base::out | std::ios_base::app);
+    GDFile.open("gd-time-"+std::to_string(QueryId)+".csv", std::ios_base::out | std::ios_base::app);
   }
   
   virtual void runQuery(Graph & graph, TraversalType Traversal) { }
@@ -135,7 +137,11 @@ public:
     }
 #if _TIME_QUERY_
   auto ExecTime = getExecTime();
+#ifdef _STATS_
+  GDFile << QueryId << "\t" << ExecTime << "\t" << v1.getNumVertices() << "\n";
+#else
   GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
   GDFile.close();
 #endif
 
@@ -178,8 +184,12 @@ public:
     }
 
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << v1.getNumVertices() << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
 
@@ -229,8 +239,12 @@ public:
     }
 
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << v2.getNumVertices() << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
 
@@ -282,8 +296,12 @@ public:
         break;
     }
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << v3.getNumVertices() << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
 
@@ -334,8 +352,12 @@ public:
         break;
     }
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << v4.getNumVertices() << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
 
@@ -385,6 +407,8 @@ public:
     std::vector<VertexPointer> target;
     traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
     traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
+    int VisitedNum = 0;
+
     switch(Traversal) {
       case 1: {
         ReachabilityVisitor  v5b;
@@ -392,6 +416,8 @@ public:
         v5b.setFilter(tmpFilter[1]);
         v5b.setDepth(2);
         breadthFirstSearch(graph, PersonId, v5b);
+        VisitedNum = v5b.getNumVertices();;
+
 #ifdef _PRINTGDB_
         auto TargetSet = v5b.getTargetSet(); 
         GDFile << "The friends of Person with vid = " << PersonId 
@@ -410,6 +436,8 @@ public:
         v5d.setFilter(tmpFilter[1]);
         v5d.setDepth(2);
         depthFirstSearch(graph, PersonId, v5d);
+        VisitedNum = v5d.getNumVertices();;
+
 #ifdef _PRINTGDB_
         auto target = v5d.getVertexTargetMap();
         GDFile << "The friends of Person with vid = " << PersonId 
@@ -429,6 +457,8 @@ public:
         v5r.setFilter(tmpFilter[1]);
         v5r.setDepth(2);
         recursiveDepthFirstSearch(graph, PersonId, v5r);
+        VisitedNum = v5r.getNumVertices();;
+
 #ifdef _PRINTGDB_
         auto target = v5r.getTargetSet();
         GDFile << "The friends of Person with vid = " << PersonId 
@@ -445,8 +475,12 @@ public:
     }
 
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << VisitedNum << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
 
@@ -475,6 +509,7 @@ public:
     FilterType tmpFilter[2];
     traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
     traverseThroughTypeAndDirection("LIKES", "out", tmpFilter[1]);
+    int VisitedNum = 0;
     switch(Traversal) {
       case 1: {
         ReachabilityVisitor  v6b;
@@ -482,6 +517,7 @@ public:
         v6b.setFilter(tmpFilter[1]);
         v6b.setDepth(2);
         breadthFirstSearch(graph, PersonId, v6b);
+        VisitedNum = v6b.getNumVertices();;
 
 #ifdef _PRINTGDB_
         auto TargetSet = v6b.getTargetSet(); 
@@ -501,6 +537,8 @@ public:
         v6d.setFilter(tmpFilter[1]);
         v6d.setDepth(2);
         depthFirstSearch(graph, PersonId, v6d);
+        VisitedNum = v6d.getNumVertices();;
+
 
 #ifdef _PRINTGDB_
         auto target = v6d.getVertexTargetMap();
@@ -522,6 +560,8 @@ public:
         v6r.setFilter(tmpFilter[1]);
         v6r.setDepth(2);
         recursiveDepthFirstSearch(graph, PersonId, v6r);
+        VisitedNum = v6r.getNumVertices();;
+
 
 #ifdef _PRINTGDB_
         auto target = v6r.getTargetSet();
@@ -538,8 +578,12 @@ public:
               }
     }
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << VisitedNum << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
   }
@@ -570,6 +614,7 @@ public:
 //    traverseThroughType("LIKES", tmpFilter[1]);
     traverseThroughTypeAndDirection("LIKES", "out", tmpFilter[0]);
     traverseThroughTypeAndDirection("LIKES", "in", tmpFilter[1]);
+    int VisitedNum = 0;
     switch(Traversal) {
       case 1: {
         ReachabilityVisitor  v7b;
@@ -577,6 +622,8 @@ public:
         v7b.setFilter(tmpFilter[1]);
         v7b.setDepth(2);
         breadthFirstSearch(graph, PersonId, v7b);
+        VisitedNum = v7b.getNumVertices();;
+
 
 #ifdef _PRINTGDB_
         auto TargetSet = v7b.getTargetSet(); 
@@ -596,6 +643,8 @@ public:
         v7d.setFilter(tmpFilter[1]);
         v7d.setDepth(2);
         depthFirstSearch(graph, PersonId, v7d);
+        VisitedNum = v7d.getNumVertices();;
+
 
 #ifdef _PRINTGDB_
         auto target = v7d.getVertexTargetMap();
@@ -617,6 +666,8 @@ public:
         v7r.setFilter(tmpFilter[1]);
         v7r.setDepth(2);
         recursiveDepthFirstSearch(graph, PersonId, v7r);
+        VisitedNum = v7r.getNumVertices();;
+
 
 #ifdef _PRINTGDB_
         auto target = v7r.getTargetSet();
@@ -634,8 +685,12 @@ public:
     }
 
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << VisitedNum << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
 
@@ -661,11 +716,14 @@ public:
     getStartTime();
 #endif
 
+    int VisitedNum = 0;
     switch(Traversal) {
       case 1: {
         PathVisitor v8b;
         v8b.setEndVertex(PersonId2);
         breadthFirstSearch(graph, PersonId1, v8b);
+        VisitedNum = v8b.getNumVertices();;
+
 #ifdef _PRINTGDB_
         auto target = v8b.getVertexList();
         if(!target.empty())
@@ -681,6 +739,8 @@ public:
         DFSPathVisitor v8d;
         v8d.setEndVertex(PersonId2);
         depthFirstSearch(graph, PersonId1, v8d);
+        VisitedNum = v8d.getNumVertices();;
+
 #ifdef _PRINTGDB_
         auto target = v8d.getPathList();
         if(!target.empty())
@@ -696,6 +756,8 @@ public:
         RecursiveDFSPathVisitor v8r;
         v8r.setEndVertex(PersonId2);
         recursiveDepthFirstSearch(graph, PersonId1, v8r);
+        VisitedNum = v8r.getNumVertices();;
+
 #ifdef _PRINTGDB_
         auto target = v8r.getTargetPath();
         if(!target.empty())
@@ -709,8 +771,12 @@ public:
               }
     }
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << VisitedNum << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
   }
@@ -737,11 +803,14 @@ public:
 #if _TIME_QUERY_
     getStartTime();
 #endif
+    int VisitedNum = 0;
     switch(Traversal) {
       case 1: {
         PathVisitor v9b;
         v9b.setEndVertex(PersonId2);
         breadthFirstSearch(graph, PersonId1, v9b);
+        VisitedNum = v9b.getNumVertices();;
+
 #ifdef _PRINTGDB_
         auto target = v9b.getVertexList();
         if(target.empty())
@@ -760,6 +829,8 @@ public:
         DFSShortestPathVisitor v9d;
         v9d.setEndVertex(PersonId2);
         depthFirstSearch(graph, PersonId1, v9d);
+        VisitedNum = v9d.getNumVertices();;
+
 #ifdef _PRINTGDB_
         auto target = v9d.getPathList();
         if(target.empty())
@@ -780,6 +851,8 @@ public:
         RecursiveDFSShortestPathVisitor v9r;
         v9r.setEndVertex(PersonId2);
         recursiveDepthFirstSearch(graph, PersonId1, v9r);
+        VisitedNum = v9r.getNumVertices();;
+
 #ifdef _PRINTGDB_
         auto Path = v9r.getShortestPath();
         if (Path.empty())
@@ -798,8 +871,12 @@ public:
               }
     }
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << VisitedNum << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
   }
@@ -818,6 +895,8 @@ public:
     std::unordered_set<VertexPointer> TargetSet;
     traverseThroughTypeAndDirection("FRIENDS", "out",  tmpFilter[0]);
     traverseThroughTypeAndDirection("FRIENDS", "in", tmpFilter[1]);
+    int VisitedNum = 0;
+
     switch(Traversal) {
       case 1: {
         PatternVisitor v10d;
@@ -827,6 +906,8 @@ public:
         v10d.setEndVertex(PersonId2);
         breadthFirstSearch(graph, PersonId1, v10d);
         TargetSet = v10d.getVertexSet();
+        VisitedNum = v10d.getNumVertices();;
+
         break;
               }
       case 2: {
@@ -837,6 +918,8 @@ public:
         v10d.setEndVertex(PersonId2);
         depthFirstSearch(graph, PersonId1, v10d);
         TargetSet = v10d.getVertexSet();
+        VisitedNum = v10d.getNumVertices();;
+
         break;
               }
       case 3: {
@@ -846,14 +929,20 @@ public:
         v10r.setEndVertex(PersonId2);
         recursiveDepthFirstSearch(graph, PersonId1, v10r);
         TargetSet = v10r.getVertexSet();
+        VisitedNum = v10r.getNumVertices();;
+
         break;
               }
 
     }
 
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << VisitedNum << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
 
@@ -892,6 +981,8 @@ public:
     std::unordered_set<VertexPointer> target;
     traverseThroughTypeAndDirection("LIKES", "out",  tmpFilter[0]);
     traverseThroughTypeAndDirection("LIKES", "in",   tmpFilter[1]);
+    int VisitedNum = 0;
+
     switch(Traversal) {
       case 1: {
         PatternVisitor v11b;
@@ -901,6 +992,8 @@ public:
         v11b.setEndVertex(PersonId2);
         breadthFirstSearch(graph, PersonId1, v11b);
         target = v11b.getVertexSet();
+        VisitedNum = v11b.getNumVertices();;
+
         break;
               }
       case 2: {
@@ -911,6 +1004,8 @@ public:
         v11d.setEndVertex(PersonId2);
         depthFirstSearch(graph, PersonId1, v11d);
         target = v11d.getVertexSet();
+        VisitedNum = v11d.getNumVertices();;
+
         break;
               }
 
@@ -921,13 +1016,19 @@ public:
         v11r.setEndVertex(PersonId2);
         recursiveDepthFirstSearch(graph, PersonId1, v11r);
         target = v11r.getVertexSet();
+        VisitedNum = v11r.getNumVertices();;
+
         break;
               }
     }
 
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << VisitedNum << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
 
@@ -965,27 +1066,35 @@ public:
     std::unordered_set<VertexPointer>  target;
     AdjacencyVisitor v12; 
     traverseThroughTypeAndDirection("FRIENDS", "out", v12.getFilter());
+
     switch(Traversal) {
       case 1: {
         breadthFirstSearch(graph, PersonId, v12);
         target = v12.getVertexSet();
+
         break;
               }
       case 2: {
         depthFirstSearch(graph, PersonId, v12);
         target = v12.getVertexSet();
+
         break;
               }
       case 3:
         recursiveDepthFirstSearch(graph, PersonId, v12);
         target = v12.getVertexSet();
+
         break;
 
     }
 
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << v12.getNumVertices() << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
 
@@ -1035,6 +1144,8 @@ public:
     traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[0]);
     traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[1]);
     traverseThroughTypeAndDirection("FRIENDS", "out", tmpFilter[2]);
+    int VisitedNum = 0;
+
     switch(Traversal) {
       case 1: {
         ReachabilityVisitor  v13b;
@@ -1043,6 +1154,8 @@ public:
         v13b.setFilter(tmpFilter[2]);
         v13b.setDepth(3);
         breadthFirstSearch(graph, PersonId, v13b);
+        VisitedNum = v13b.getNumVertices();;
+
 
 #ifdef _PRINTGDB_
         auto TargetSet = v13b.getTargetSet(); 
@@ -1064,6 +1177,8 @@ public:
         v13d.setFilter(tmpFilter[2]);
         v13d.setDepth(3);
         depthFirstSearch(graph, PersonId, v13d);
+        VisitedNum = v13d.getNumVertices();;
+
 #ifdef _PRINTGDB_
         auto target = v13d.getVertexTargetMap();
         GDFile << "The friends of friends of person vid = " << PersonId 
@@ -1088,6 +1203,8 @@ public:
         v13r.setFilter(tmpFilter[2]);
         v13r.setDepth(3);
         recursiveDepthFirstSearch(graph, PersonId, v13r);
+        VisitedNum = v13r.getNumVertices();;
+
 #ifdef _PRINTGDB_
         auto target = v13r.getTargetSet();
         GDFile << "The friends of friends of person vid = " << PersonId 
@@ -1106,8 +1223,12 @@ public:
     }
 
 #if _TIME_QUERY_
-//    getExecTime();
-    GDFile << QueryId << "\t" << getExecTime() << "\n";
+    auto ExecTime = getExecTime();
+#ifdef _STATS_
+    GDFile << QueryId << "\t" << ExecTime << "\t" << VisitedNum << "\n";
+#else
+    GDFile << QueryId << "\t" << ExecTime << "\n";
+#endif
     GDFile.close();
 #endif
   }

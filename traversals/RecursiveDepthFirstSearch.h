@@ -20,6 +20,8 @@
 
 #define _DB_ 0
 
+#define _STATS_ true
+
 #ifdef _DB_
 #include <iostream>
 #endif 
@@ -35,6 +37,10 @@ void recursiveDFS(GraphType & Graph,
     Graph.getVertexPointer(VertexSourceId);
   
   VisitedColor.insert(ColorMapPair(CurrentVertex, true));
+
+#ifdef _STATS_
+    GraphVisitor.countVertex(CurrentVertex);
+#endif
 
   bool VertexMatch = GraphVisitor.visitVertex(CurrentVertex);
   if (VertexMatch == true) { 

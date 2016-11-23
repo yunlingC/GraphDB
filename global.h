@@ -22,5 +22,6 @@
 
 #define _TIME_QUERY_ true
 
+#define _STATS_ true
 
 #endif /*_GLOBAL_H_*/

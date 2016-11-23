@@ -17,6 +17,8 @@
 #include "Visitor.h"
 #include "GraphType.h"
 
+#define _STATS_ true
+
 void depthFirstSearch(GraphType & Graph,
                       GraphType::VertexDescriptor StartVertex,
                       Visitor & GraphVisitor ) {
@@ -43,6 +45,10 @@ void depthFirstSearch(GraphType & Graph,
       return ;
  
     ColorMap[ScheduledVertex] = true;
+
+#ifdef _STATS_
+    GraphVisitor.countVertex(ScheduledVertex);
+#endif
 
     auto NextEdge = ScheduledVertex->getNextEdge();
     while (NextEdge != nullptr) {
