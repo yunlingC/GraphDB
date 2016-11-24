@@ -19,7 +19,10 @@
 
 #include <stack>
 #include <string>
+
+#if _DEBUG_ENABLE_
 #include <iostream>
+#endif
 
   auto LocksManager::getVertexLockPointer(IdType VertexId, MutexType Mutex) 
     -> MutexPointer {
@@ -341,52 +344,56 @@
                                             , TransStackType  TransStack
                                             , TransSetType ChkTransList)
       ->  bool  {
-        /// Deadlock exists if any of LockingTrans is the waitingTrans
-        /// need return true; True - yes deadlock
-        if (WaitingTrans == LockingTrans) {
-          /// Print out deadlock
-          std::string Circle(std::to_string(LockingTrans)); 
-          while (!TransStack.empty()) {
-          
-            auto TX = TransStack.top();
-            TransStack.pop();
-            Circle.append("<--" + std::to_string(TX));
-          }
-          Circle.append("<--" + std::to_string(WaitingTrans));
-          return false;
+      /// Deadlock exists if any of LockingTrans is the waitingTrans
+      /// need return true; True - yes deadlock
+      if (WaitingTrans == LockingTrans) {
+        /// Print out deadlock
+        std::string Circle(std::to_string(LockingTrans)); 
+        while (!TransStack.empty()) {
+        
+          auto TX = TransStack.top();
+          TransStack.pop();
+          Circle.append("<--" + std::to_string(TX));
         }
-        /// check further if there is deadlock
-        /// TODO delete this?
-        ChkTransList.insert(LockingTrans);
-        /// Each transaction waits for one lock only
-        auto LockPtr  = WaitMap.find(LockingTrans);
-        if (LockPtr == WaitMap.end())
-          return true;
-        auto TxList  =  ResrMap.find(LockPtr->second);
-        /// This lock is available
-        if (TxList == ResrMap.end()) 
-          return true;
-
-        auto it_end = (*TxList).second.begin();
-        for (auto it  = (*TxList).second.begin(); it!= it_end; it++) {
-          /// This transaction has NOT been checked
-          if (ChkTransList.find(it->first) == ChkTransList.end()) {
-            TransStack.push(it->first);
-            auto WaitOn = checkWaitOnRecursive(WaitingTrans, it->first, TransStack, ChkTransList);
-            TransStack.pop();
-            /// If a deadlock is found, return cotrol  
-            if (!WaitOn)  {
-              return false;
-            }
-          }//if
-        }
-        return true;
+        Circle.append("<--" + std::to_string(WaitingTrans));
+        return false;
       }
+      /// check further if there is deadlock
+      /// TODO delete this?
+      ChkTransList.insert(LockingTrans);
+      /// Each transaction waits for one lock only
+      auto LockPtr  = WaitMap.find(LockingTrans);
+      if (LockPtr == WaitMap.end())
+        return true;
+      auto TxList  =  ResrMap.find(LockPtr->second);
+      /// This lock is available
+      if (TxList == ResrMap.end()) 
+        return true;
+
+      auto it_end = (*TxList).second.begin();
+      for (auto it  = (*TxList).second.begin(); it!= it_end; it++) {
+        /// This transaction has NOT been checked
+        if (ChkTransList.find(it->first) == ChkTransList.end()) {
+          TransStack.push(it->first);
+          auto WaitOn = checkWaitOnRecursive(WaitingTrans, it->first, TransStack, ChkTransList);
+          TransStack.pop();
+          /// If a deadlock is found, return cotrol  
+          if (!WaitOn)  {
+            return false;
+          }
+        }//if
+      }
+      return true;
+    }
 #endif
 
 #ifdef _DEADLOCK_DETECTION_
-    bool LocksManager::getVertexLock(IdType VId, MutexType Mutex, LockType Lock, IdType TxId)
-    {
+    bool LocksManager::getVertexLock(IdType VId
+                                    , MutexType Mutex
+                                    , LockType Lock
+                                    , IdType TxId
+                                    ){
+
         auto MutexPtr = getVertexLockPointer(VId, Mutex);
         DeadlockDetector->lock();
         registerLockMap(TxId, MutexPtr, Lock);

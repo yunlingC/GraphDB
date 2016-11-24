@@ -348,7 +348,7 @@ public:
   			VertexFilter.push_back(newFilter);
   		}
   
-      auto needRestart = false;
+      bool needRestart = false;
   		std::map<VertexPointer, unsigned int> targetMap;
   		for (auto it = target.begin(), it_end = target.end();
   		     it != it_end; it++) {
@@ -406,63 +406,78 @@ public:
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
-		FilterType TmpFilter[2];
-		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
-		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[1]);
 
-		SingleRelTypeVisitor SingleVisitor;
-		SingleVisitor.setFilter(TmpFilter[0]);
-		SingleVisitor.setFilter(TmpFilter[1]);
-		SingleVisitor.setDepth(2);
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx, LockManager);
+  		FilterType TmpFilter[2];
+  		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
+  		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[1]);
+  
+  		SingleRelTypeVisitor SingleVisitor;
+  		SingleVisitor.setFilter(TmpFilter[0]);
+  		SingleVisitor.setFilter(TmpFilter[1]);
+  		SingleVisitor.setDepth(2);
+      TransactionalBFS txBFS;
+  		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx, LockManager);
+      if (Tranx->checkStatus() == T_ABORT)
+        continue;
 
 		auto target = SingleVisitor.getVertexList();
 
 #ifdef _PRINTLOG_
-		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
+		  LdbcFile << StartVertex << "\tis connected with\t" 
+               << target.size() << "\tfriends and friends of friends" 
+               << "\n";
 #endif
 
-		FilterType Filters[3];
-		traverseThroughMultiRelType("POST_HAS_CREATOR", Filters[0]);
-		traverseThroughMultiRelType("POST_HAS_TAG", Filters[1]);
-		Filters[2].setProperty(ParamPair.first, ParamPair.second);
+  		FilterType Filters[3];
+  		traverseThroughMultiRelType("POST_HAS_CREATOR", Filters[0]);
+  		traverseThroughMultiRelType("POST_HAS_TAG", Filters[1]);
+  		Filters[2].setProperty(ParamPair.first, ParamPair.second);
+  
+      bool needRestart = false;
+  		std::map<std::string, unsigned int> TagMap;
+  		for(auto it = target.begin(); it != target.end(); it++) {
+  			SinglePropertyVisitor  SPVisitor;
+  			SPVisitor.setFilter(Filters[0]);
+  			SPVisitor.setFilter(Filters[1]);
+  			SPVisitor.setVertexFilter(Filters[2]);
+  			SPVisitor.setDepthToCheckVertexProp(2);
+  			SPVisitor.setDepth(2);
+  			unsigned int StartVertex = (*it)->getId();
+        TransactionalBFS txBFS;
+  			txBFS.breadthFirstSearch(Graph, StartVertex, SPVisitor, Tranx, LockManager);
+  
+        if (Tranx->checkStatus() == T_ABORT) {
+          needRestart = true;
+          break;
+        }
 
-		std::map<std::string, unsigned int> TagMap;
-		for(auto it = target.begin(); it != target.end(); it++) {
-			SinglePropertyVisitor  SPVisitor;
-			SPVisitor.setFilter(Filters[0]);
-			SPVisitor.setFilter(Filters[1]);
-			SPVisitor.setVertexFilter(Filters[2]);
-			SPVisitor.setDepthToCheckVertexProp(2);
-			SPVisitor.setDepth(2);
-			unsigned int StartVertex = (*it)->getId();
-      TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex, SPVisitor, Tranx, LockManager);
-			auto personMap = SPVisitor.getPersonMap();
+  			auto personMap = SPVisitor.getPersonMap();
+  			for (auto it = personMap.begin(), it_end = personMap.end();
+  			     it != it_end; it++) {
+  				if ((*it).second ) {
+  					for (auto iter = SPVisitor.getResultTargetsMap()[(*it).first].begin(); iter != SPVisitor.getResultTargetsMap()[(*it).first].end(); iter++) {
+  						// (*iter) --> Tag id (string)
+  						if (TagMap.find(*iter) == TagMap.end()) {
+  							TagMap.insert(std::pair<std::string, unsigned int>((*iter), 1));
+  						} else {
+  							TagMap[*iter]++;
+  						}
+  					}///for
+  				}///if
+  			}///for
+  		}///for
 
-			for (auto it = personMap.begin(), it_end = personMap.end();
-			     it != it_end; it++) {
-				if ((*it).second ) {
-					for (auto iter = SPVisitor.getResultTargetsMap()[(*it).first].begin(); iter != SPVisitor.getResultTargetsMap()[(*it).first].end(); iter++) {
-						// (*iter) --> Tag id (string)
-						if (TagMap.find(*iter) == TagMap.end()) {
-							TagMap.insert(std::pair<std::string, unsigned int>((*iter), 1));
-						} else {
-							TagMap[*iter]++;
-						}
-					}
-				}
-			}
-		}
+      if(needRestart)  {
+        continue;
+      }
 
-#ifdef _PRINTLOG_
-		for (auto it = TagMap.begin(), it_end = TagMap.end();
-        it != it_end; it++) {
-      LdbcFile << "Tag " << (*it).first << " has " << (*it).second << " posts\n";
-    }
-#endif
       Tranx->commit();
+#ifdef _PRINTLOG_
+  		for (auto it = TagMap.begin(), it_end = TagMap.end();
+          it != it_end; it++) {
+        LdbcFile << "Tag " << (*it).first << " has " << (*it).second << " posts\n";
+      }
+#endif
     }
 
 		LockManager.releaseAll(Tranx->getId());
@@ -484,53 +499,63 @@ public:
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
-		FilterType TmpFilter[2];
-		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
 
-		SingleRelTypeVisitor RelVisitor;
-		RelVisitor.setFilter(TmpFilter[0]);
-		RelVisitor.setDepth(1);
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx, LockManager);
-		auto target = RelVisitor.getVertexList();
-		std::vector<FilterType> VertexFilter;
-		for (auto iter = target.begin(); iter != target.end(); iter++) {
-			FilterType newFilter;
-			newFilter.setProperty("id", (*iter)->getPropertyValue("id").first.std_str());
-			VertexFilter.push_back(newFilter);
-		}
+  		FilterType TmpFilter[2];
+  		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
+  
+  		SingleRelTypeVisitor RelVisitor;
+  		RelVisitor.setFilter(TmpFilter[0]);
+  		RelVisitor.setDepth(1);
+      TransactionalBFS txBFS;
+  		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx, LockManager);
+      if (Tranx->checkStatus() == T_ABORT)
+        continue;
 
-#ifdef _PRINTLOG_
-		LdbcFile << StartVertex << " is connected with " << target.size() << " friends" << "\n";
-#endif
-
-		FilterType Filters[2];
-		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]);
-		traverseThroughMultiRelType("LIKES_COMMENT+LIKES_POST", Filters[1]);
-		VertexMatchVisitor MatchVisitor;
-		MatchVisitor.setFilter(Filters[0]);
-		MatchVisitor.setFilter(Filters[1]);
-		MatchVisitor.setDepth(2);
-		MatchVisitor.setVertexFilterList(VertexFilter);
-		MatchVisitor.setDepthToCheckVertexProp(2);
-		MatchVisitor.setDepthToCompareTime(2);
-    TransactionalBFS txBFS2;
-		txBFS2.breadthFirstSearch(Graph, StartVertex, MatchVisitor, Tranx, LockManager);
+  		auto target = RelVisitor.getVertexList();
+  		std::vector<FilterType> VertexFilter;
+  		for (auto iter = target.begin(); iter != target.end(); iter++) {
+  			FilterType newFilter;
+  			newFilter.setProperty("id", (*iter)->getPropertyValue("id").first.std_str());
+  			VertexFilter.push_back(newFilter);
+  		}
 
 #ifdef _PRINTLOG_
-		auto targetsMap = MatchVisitor.getTimeMap();
-    for (auto it = targetsMap.begin(), it_end = targetsMap.end();
-        it != it_end; it++) {
-      LdbcFile << (*it).first->getPropertyValue("firstName").first << "\t" << (*it).first->getPropertyValue("id").first<< " likes comment/posts at " << (*it).second << "\n";
-    }
-    auto personMap = MatchVisitor.getPersonMap();
-    for (auto it = personMap.begin(), it_end = personMap.end();
-        it != it_end; it++)  {
-      if ((*it).second)
-        LdbcFile << "comment/post " << (*it).first->getPropertyValue("id").first << " are made by friend\n" ;
-    }
+		  LdbcFile << StartVertex << "\tis connected with\t" 
+                << target.size() << "\tfriends" << "\n";
 #endif
+
+  		FilterType Filters[2];
+  		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]);
+  		traverseThroughMultiRelType("LIKES_COMMENT+LIKES_POST", Filters[1]);
+  		VertexMatchVisitor MatchVisitor;
+  		MatchVisitor.setFilter(Filters[0]);
+  		MatchVisitor.setFilter(Filters[1]);
+  		MatchVisitor.setDepth(2);
+  		MatchVisitor.setVertexFilterList(VertexFilter);
+  		MatchVisitor.setDepthToCheckVertexProp(2);
+  		MatchVisitor.setDepthToCompareTime(2);
+      TransactionalBFS txBFS2;
+  		txBFS2.breadthFirstSearch(Graph, StartVertex, MatchVisitor, Tranx, LockManager);
+
+      if (Tranx->checkStatus() == T_ABORT)
+        continue;
+
       Tranx->commit();
+#ifdef _PRINTLOG_
+  		auto targetsMap = MatchVisitor.getTimeMap();
+      for (auto it = targetsMap.begin(), it_end = targetsMap.end();
+          it != it_end; it++) {
+        LdbcFile << (*it).first->getPropertyValue("firstName").first 
+                 << "\t" << (*it).first->getPropertyValue("id").first
+                 << "\tlikes comment/posts at\t" << (*it).second << "\n";
+      }
+      auto personMap = MatchVisitor.getPersonMap();
+      for (auto it = personMap.begin(), it_end = personMap.end();
+          it != it_end; it++)  {
+        if ((*it).second)
+          LdbcFile << "comment/post " << (*it).first->getPropertyValue("id").first << " are made by friend\n" ;
+      }
+#endif
     }
 
 		LockManager.releaseAll(Tranx->getId());
@@ -549,28 +574,35 @@ public:
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
-		FilterType Filters[3];
-		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]);
-		traverseThroughMultiRelType("REPLY_OF_COMMENT+REPLY_OF_POST", Filters[1]);
-		traverseThroughMultiRelType("COMMENT_HAS_CREATOR", Filters[2]);
 
-		TimeCompareVisitor TimeVisitor;
-		TimeVisitor.setFilter(Filters[0]);
-		TimeVisitor.setFilter(Filters[1]);
-		TimeVisitor.setFilter(Filters[2]);
-		TimeVisitor.setDepth(3);
-		TimeVisitor.setDepthToCompareTime(2);
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, TimeVisitor, Tranx, LockManager);
+  		FilterType Filters[3];
+  		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]);
+  		traverseThroughMultiRelType("REPLY_OF_COMMENT+REPLY_OF_POST", Filters[1]);
+  		traverseThroughMultiRelType("COMMENT_HAS_CREATOR", Filters[2]);
+  
+  		TimeCompareVisitor TimeVisitor;
+  		TimeVisitor.setFilter(Filters[0]);
+  		TimeVisitor.setFilter(Filters[1]);
+  		TimeVisitor.setFilter(Filters[2]);
+  		TimeVisitor.setDepth(3);
+  		TimeVisitor.setDepthToCompareTime(2);
+      TransactionalBFS txBFS;
+  		txBFS.breadthFirstSearch(Graph, StartVertex, TimeVisitor, Tranx, LockManager);
 
-#ifdef _PRINTLOG_
-		auto vertexMap = TimeVisitor.getVertexMap();
-    for (auto it = vertexMap.begin(), it_end = vertexMap.end();
-        it != it_end; it++) {
-      LdbcFile << "Person " << (*it).second->getPropertyValue("firstName").first << " made replies " << (*it).first->getPropertyValue("id").first << " at " << (*it).first->getPropertyValue("creationDate").first << " to startperson's posts/comments\n";
-    }
-#endif
+      if (Tranx->checkStatus() == T_ABORT)
+        continue;
+
       Tranx->commit();
+#ifdef _PRINTLOG_
+  		auto vertexMap = TimeVisitor.getVertexMap();
+      for (auto it = vertexMap.begin(), it_end = vertexMap.end();
+          it != it_end; it++) {
+        LdbcFile << "Person\t" << (*it).second->getPropertyValue("firstName").first 
+                << "\tmade replies " << (*it).first->getPropertyValue("id").first 
+                << "\tat " << (*it).first->getPropertyValue("creationDate").first 
+                << " to startperson's posts/comments\n";
+      }
+#endif
     }
 
 		LockManager.releaseAll(Tranx->getId());
@@ -592,54 +624,74 @@ public:
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
-		FilterType TmpFilter[2];
-		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
-		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[1]);
-		SingleRelTypeVisitor RelVisitor;
-		RelVisitor.setFilter(TmpFilter[0]);
-		RelVisitor.setFilter(TmpFilter[1]);
-		RelVisitor.setDepth(2);
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx, LockManager);
 
-		auto target = RelVisitor.getVertexList();
+  		FilterType TmpFilter[2];
+  		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
+  		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[1]);
+  		SingleRelTypeVisitor RelVisitor;
+  		RelVisitor.setFilter(TmpFilter[0]);
+  		RelVisitor.setFilter(TmpFilter[1]);
+  		RelVisitor.setDepth(2);
+      TransactionalBFS txBFS;
+  		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx, LockManager);
+      if (Tranx->checkStatus() == T_ABORT)
+        continue;
+
+      auto target = RelVisitor.getVertexList();
 
 #ifdef _PRINTLOG_
-		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
+  		LdbcFile << StartVertex << "\tis connected with " 
+              << target.size() << " friends and friends of friends" 
+              << "\n";
 #endif
 
-		FilterType Filters[2];
-		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR",Filters[0]);
-		Filters[1].setValueRange("creationDate", "", "2011-07-16T23:59:00.255");
-
-		ReturnMapType TargetsMap;
-		for (auto it = target.begin(), it_end = target.end();
-		     it != it_end; ++it) {
+  		FilterType Filters[2];
+  		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR",Filters[0]);
+  		Filters[1].setValueRange("creationDate", "", "2011-07-16T23:59:00.255");
+  
+      bool needRestart = false;
+  		ReturnMapType TargetsMap;
+  		for (auto it = target.begin(), it_end = target.end();
+  		     it != it_end; ++it) {
 
 #ifdef _PRINTLOG_
 			LdbcFile <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << "\n";
 #endif
 
-			MultiRelTypeVisitor RelVisitor;
-			RelVisitor.setFilter(Filters[0]);
-			RelVisitor.setRangeFilter(Filters[1]);
-			RelVisitor.setDepth(1);
-			RelVisitor.setDepthToCheckRange(1);
-			RelVisitor.setPropToCheck(2); //check date
-			unsigned int StartVertex = (*it)->getId();
-      TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx, LockManager);
-			auto targets = RelVisitor.getTargetsMap();
-			TargetsMap.insert(targets.begin(), targets.end());
-		}
+  			MultiRelTypeVisitor RelVisitor;
+  			RelVisitor.setFilter(Filters[0]);
+  			RelVisitor.setRangeFilter(Filters[1]);
+  			RelVisitor.setDepth(1);
+  			RelVisitor.setDepthToCheckRange(1);
+  			RelVisitor.setPropToCheck(2); //check date
+  			unsigned int StartVertex = (*it)->getId();
+        TransactionalBFS txBFS;
+  			txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx, LockManager);
+  
+        if (Tranx->checkStatus() == T_ABORT) {
+          needRestart = true;
+          break;
+        }
 
-#ifdef _PRINTLOG_
-		for (auto iter = TargetsMap.begin(), iter_end = TargetsMap.end();
-        iter != iter_end; ++iter) {
-      LdbcFile << "posts/comments " << (*iter).first->getPropertyValue("id").first << "\t" << (*iter).first->getPropertyValue("creationDate").first << " made by person " << (*iter).second->getPropertyValue("id").first << "\t" <<  (*iter).second->getPropertyValue("firstName").first << "\n";
-    }
-#endif
+  			auto targets = RelVisitor.getTargetsMap();
+  			TargetsMap.insert(targets.begin(), targets.end());
+      }///for
+
+      if(needRestart)  {
+        continue;
+      }
+
       Tranx->commit();
+#ifdef _PRINTLOG_
+  		for (auto iter = TargetsMap.begin(), iter_end = TargetsMap.end();
+          iter != iter_end; ++iter) {
+        LdbcFile << "posts/comments\t" << (*iter).first->getPropertyValue("id").first 
+                << "\t" << (*iter).first->getPropertyValue("creationDate").first 
+                << "\tmade by person " << (*iter).second->getPropertyValue("id").first 
+                << "\t" <<  (*iter).second->getPropertyValue("firstName").first 
+                << "\n";
+      }
+#endif
     }
 
 		LockManager.releaseAll(Tranx->getId());
@@ -664,69 +716,98 @@ public:
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
-		///first find start person's friends
-		AdjacencyVisitor AdjVisitor;
-		traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, AdjVisitor, Tranx, LockManager);
-		auto startId = Graph.getVertexPointer(StartVertex)->getPropertyValue("id").first.std_str();
+      clearStorage();
 
-		///find friends of friends of start person
-		std::vector<VertexPointer> targets;
-		FilterType BDFilter;
-		BDFilter.setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second);
-		for (VertexPointer StartVertex : AdjVisitor.getVertexList()) {
-			auto EqualFlag = false;
-			if (checkRange<VertexPointer>(4, StartVertex, BDFilter, EqualFlag)){
-				SimMap[StartVertex] = 0;
-				AdjacencyVisitor AdjVisitor;
-				traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
-        TransactionalBFS txBFS;
-				txBFS.breadthFirstSearch(Graph, StartVertex->getId(), AdjVisitor, Tranx, LockManager);
-				///concatenate two lists
-				targets.insert(targets.end(),AdjVisitor.getVertexList().begin(),
-				               AdjVisitor.getVertexList().end());
-			}
-
-		}
-
-		for (VertexPointer Vertex : targets) {
-			auto EqualFlag = false;
-			if (checkRange<VertexPointer>(4, Vertex, BDFilter, EqualFlag)) {
-				SimMap[Vertex] = 0;
-			}
-		}
-
-		///iterate over the friends who satisfy the condition
-		auto itend  = SimMap.end();
-		for ( auto it = SimMap.begin(); it != itend; it++ ) {
-			FilterType TmpFilter[4];
-			traverseThroughMultiRelType("POST_HAS_CREATOR", TmpFilter[0]);
-			traverseThroughMultiRelType("POST_HAS_TAG", TmpFilter[1]);
-			traverseThroughMultiRelType("HAS_INTEREST", TmpFilter[2]);
-			TmpFilter[3].setProperty("id", startId);
-
-			SimilarityVisitor SimVisitor;
-			SimVisitor.setDepth(3);
-			SimVisitor.setDepthToCheckVertexProp(3);
-			SimVisitor.setVertexFilter(TmpFilter[3]);
-			for ( unsigned int i = 0; i < 3; i++ ) {
-				SimVisitor.setFilter(TmpFilter[i]);
-			}
+  		///first find start person's friends
+  		AdjacencyVisitor AdjVisitor;
+  		traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
       TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, (*it).first->getId(), SimVisitor, Tranx, LockManager);
-			auto iterend = SimVisitor.getPostMap().end();
-			unsigned int PostItrd = 0;
-			for ( auto iter = SimVisitor.getPostMap().begin();
-			      iter != iterend; iter++ ) {
-				if ((*iter).second ) { PostItrd++; }
-			}
-			SimMap[(*it).first] = 2*PostItrd - SimVisitor.getPostMap().size();
+  		txBFS.breadthFirstSearch(Graph, StartVertex, AdjVisitor, Tranx, LockManager);
+      if (Tranx->checkStatus() == T_ABORT)
+        continue;
+
+  		auto startId = Graph.getVertexPointer(StartVertex)->getPropertyValue("id").first.std_str();
+  
+  		///find friends of friends of start person
+  		std::vector<VertexPointer> targets;
+  		FilterType BDFilter;
+  		BDFilter.setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second);
+
+      bool needRestart = false;
+  		for (VertexPointer StartVertex : AdjVisitor.getVertexList()) {
+  			auto EqualFlag = false;
+  			if (checkRange<VertexPointer>(4, StartVertex, BDFilter, EqualFlag)){
+  				SimMap[StartVertex] = 0;
+  				AdjacencyVisitor AdjVisitor;
+  				traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
+          TransactionalBFS txBFS;
+  				txBFS.breadthFirstSearch(Graph, StartVertex->getId(), AdjVisitor, Tranx, LockManager);
+          if (Tranx->checkStatus() == T_ABORT) {
+            needRestart = true;
+            break;
+          }
+  				///concatenate two lists
+  				targets.insert(targets.end(),AdjVisitor.getVertexList().begin(),
+  				               AdjVisitor.getVertexList().end());
+  			}///if
+  		}///for
+  
+      if (Tranx->checkStatus() == T_ABORT) {
+        needRestart = true;
+        break;
+      }
+
+  		for (VertexPointer Vertex : targets) {
+  			auto EqualFlag = false;
+  			if (checkRange<VertexPointer>(4, Vertex, BDFilter, EqualFlag)) {
+  				SimMap[Vertex] = 0;
+  			}
+  		}
+  
+  		///iterate over the friends who satisfy the condition
+  		auto itend  = SimMap.end();
+  		for ( auto it = SimMap.begin(); it != itend; it++ ) {
+  			FilterType TmpFilter[4];
+  			traverseThroughMultiRelType("POST_HAS_CREATOR", TmpFilter[0]);
+  			traverseThroughMultiRelType("POST_HAS_TAG", TmpFilter[1]);
+  			traverseThroughMultiRelType("HAS_INTEREST", TmpFilter[2]);
+  			TmpFilter[3].setProperty("id", startId);
+  
+  			SimilarityVisitor SimVisitor;
+  			SimVisitor.setDepth(3);
+  			SimVisitor.setDepthToCheckVertexProp(3);
+  			SimVisitor.setVertexFilter(TmpFilter[3]);
+  			for ( unsigned int i = 0; i < 3; i++ ) {
+  				SimVisitor.setFilter(TmpFilter[i]);
+  			}
+
+        TransactionalBFS txBFS;
+  			txBFS.breadthFirstSearch(Graph, (*it).first->getId()\
+                                , SimVisitor, Tranx, LockManager);
+
+        if (Tranx->checkStatus() == T_ABORT) {
+          needRestart = true;
+          break;
+        }
+
+  			auto iterend = SimVisitor.getPostMap().end();
+  			unsigned int PostItrd = 0;
+  			for ( auto iter = SimVisitor.getPostMap().begin();
+  			      iter != iterend; iter++ ) {
+  				if ((*iter).second ) { PostItrd++; }
+  			}
+
+  			SimMap[(*it).first] = 2*PostItrd - SimVisitor.getPostMap().size();
 
 #ifdef _PRINTLOG_
 			LdbcFile << "person: " << (*it).first->getId() << " similarity score " << (*it).second << "\n";
 #endif
-		}
+		  }///For 
+
+      if(needRestart)  {
+        continue;
+      }
+
       Tranx->commit();
     }
 
@@ -754,58 +835,80 @@ public:
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
-		FilterType TmpFilter;
-		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
 
-		SingleRelTypeVisitor RelVisitor;
-		RelVisitor.setFilter(TmpFilter);
-		RelVisitor.setFilter(TmpFilter);
-		RelVisitor.setDepth(2);
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx, LockManager);
-
-		auto target = RelVisitor.getVertexList();
-#ifdef _PRINTLOG_
-		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
-#endif
-
-		FilterType Filters[4];
-		traverseThroughMultiRelType("WORKS_AT",Filters[0]);
-		traverseThroughMultiRelType("ORGANISATION_IS_LOCATED_IN",Filters[1]);
-		Filters[2].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second);
-		Filters[3].setProperty(ParamPair.first, ParamPair.second);
-
-		MatchMapType TargetsMap;
-		for(auto it = target.begin(), it_end = target.end();
-		    it != it_end; ++it) {
-
-#ifdef _PRINTLOG_
-			LdbcFile <<"friend " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << "\t" << (*it)->getPropertyValue("firstName").first  << "\n";
-#endif
-
-			VertexPropertyVisitor VPVisitor;
-			VPVisitor.setFilter(Filters[0]);
-			VPVisitor.setFilter(Filters[1]);
-			VPVisitor.setRangeFilter(Filters[2]);
-			VPVisitor.setVertexFilter(Filters[3]);
-			VPVisitor.setDepth(2);
-			VPVisitor.setDepthToCheckRange(1);
-			VPVisitor.setDepthToCheckVertexProp(2);
-			unsigned int StartVertex = (*it)->getId();
+  		FilterType TmpFilter;
+  		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
+  		SingleRelTypeVisitor RelVisitor;
+  		RelVisitor.setFilter(TmpFilter);
+  		RelVisitor.setFilter(TmpFilter);
+  		RelVisitor.setDepth(2);
       TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex, VPVisitor, Tranx, LockManager);
-			auto targets = VPVisitor.getMatchMap();
-			TargetsMap.insert(targets.begin(), targets.end());
-		}
+  		txBFS.breadthFirstSearch(Graph, StartVertex, RelVisitor, Tranx, LockManager);
+
+      if (Tranx->checkStatus() == T_ABORT)
+        continue;
+
+		  auto target = RelVisitor.getVertexList();
+#ifdef _PRINTLOG_
+		  LdbcFile << StartVertex << "\tis connected with\t" 
+               << target.size() << "\tfriends and friends of friends" 
+               << "\n";
+#endif
+
+  		FilterType Filters[4];
+  		traverseThroughMultiRelType("WORKS_AT",Filters[0]);
+  		traverseThroughMultiRelType("ORGANISATION_IS_LOCATED_IN",Filters[1]);
+  		Filters[2].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second);
+  		Filters[3].setProperty(ParamPair.first, ParamPair.second);
+  
+  		MatchMapType TargetsMap;
+      bool needRestart = false;
+  		for(auto it = target.begin(), it_end = target.end();
+  		    it != it_end; ++it) {
 
 #ifdef _PRINTLOG_
-		FixedString key("workFrom");
-    for (auto iter = TargetsMap.begin(), iter_end = TargetsMap.end();
+			  LdbcFile <<"friend " << (*it)->getId() 
+                 << "\t" << (*it)->getPropertyValue("id").first 
+                 << "\t" << (*it)->getPropertyValue("firstName").first  
+                 << "\n";
+#endif
+
+  			VertexPropertyVisitor VPVisitor;
+  			VPVisitor.setFilter(Filters[0]);
+  			VPVisitor.setFilter(Filters[1]);
+  			VPVisitor.setRangeFilter(Filters[2]);
+  			VPVisitor.setVertexFilter(Filters[3]);
+  			VPVisitor.setDepth(2);
+  			VPVisitor.setDepthToCheckRange(1);
+  			VPVisitor.setDepthToCheckVertexProp(2);
+  			unsigned int StartVertex = (*it)->getId();
+        TransactionalBFS txBFS;
+  			txBFS.breadthFirstSearch(Graph, StartVertex, VPVisitor, Tranx, LockManager);
+
+        if (Tranx->checkStatus() == T_ABORT) {
+          needRestart = true;
+          break;
+        }
+
+  			auto targets = VPVisitor.getMatchMap();
+  			TargetsMap.insert(targets.begin(), targets.end());
+      }
+
+      if (needRestart)  {
+        continue;
+      }
+
+      Tranx->commit();
+#ifdef _PRINTLOG_
+  		FixedString key("workFrom");
+      for (auto iter = TargetsMap.begin(), iter_end = TargetsMap.end();
         iter != iter_end; ++iter) {
-      LdbcFile << (*iter).first->getPropertyValue("firstName").first << " works at "  << (*iter).second.second->getPropertyValue("id").first << " from " << (*iter).second.first->getPropertyValue(key).first << "\n";
+        LdbcFile << (*iter).first->getPropertyValue("firstName").first 
+                 << "\tworks at "  << (*iter).second.second->getPropertyValue("id").first
+                 << "\tfrom " << (*iter).second.first->getPropertyValue(key).first 
+                 << "\n";
       }
 #endif
-      Tranx->commit();
     }
 
 		LockManager.releaseAll(Tranx->getId());
@@ -830,51 +933,68 @@ public:
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
-		///first find start person's friends
-		AdjacencyVisitor AdjVisitor;
-		traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, AdjVisitor, Tranx, LockManager);
+      clearStorage();
 
-		///find friends of friends of start person
-		std::vector<VertexPointer> targets;
-		FilterType TmpFilter[6];
-		traverseThroughMultiRelType("COMMENT_HAS_CREATOR", TmpFilter[0]);
-		traverseThroughMultiRelType("REPLY_OF_POST", TmpFilter[1]);
-		traverseThroughMultiRelType("POST_HAS_TAG", TmpFilter[2]);
-		traverseThroughMultiRelType("HAS_TYPE", TmpFilter[3]);
-		traverseThroughMultiRelType("IS_SUBCLASS_OF", TmpFilter[4]);
-		TmpFilter[5].setProperty(ParamPair.first, ParamPair.second);
-
-		for (VertexPointer StartVertex : AdjVisitor.getVertexList()) {
-			SimMap[StartVertex] = 0;
-
-			ExpertVisitor ExpertVisitor;
-			ExpertVisitor.setDepth(5);
-			ExpertVisitor.setDepthToCheckVertexProp(4);
-			ExpertVisitor.setVertexFilter(TmpFilter[5]);
-
-			for ( unsigned int i = 0; i < 5; i++ ) {
-				ExpertVisitor.setFilter(TmpFilter[i]);
-			}
-
+  		///first find start person's friends
+  		AdjacencyVisitor AdjVisitor;
+  		traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
       TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex->getId(),
-			                         ExpertVisitor, Tranx, LockManager);
-			auto iterend = ExpertVisitor.getPostMap().end();
-			auto PostNum = 0;
-			for ( auto iter = ExpertVisitor.getPostMap().begin(); iter != iterend; iter++ ) {
-				if ((*iter).second ) { PostNum++; }
-			}
+  		txBFS.breadthFirstSearch(Graph, StartVertex, AdjVisitor, Tranx, LockManager);
+      if (Tranx->checkStatus() == T_ABORT)
+        continue;
+  
+  		///find friends of friends of start person
+  		std::vector<VertexPointer> targets;
+  		FilterType TmpFilter[6];
+  		traverseThroughMultiRelType("COMMENT_HAS_CREATOR", TmpFilter[0]);
+  		traverseThroughMultiRelType("REPLY_OF_POST", TmpFilter[1]);
+  		traverseThroughMultiRelType("POST_HAS_TAG", TmpFilter[2]);
+  		traverseThroughMultiRelType("HAS_TYPE", TmpFilter[3]);
+  		traverseThroughMultiRelType("IS_SUBCLASS_OF", TmpFilter[4]);
+  		TmpFilter[5].setProperty(ParamPair.first, ParamPair.second);
+  
+      bool needRestart = false;
+  		for (VertexPointer StartVertex : AdjVisitor.getVertexList()) {
+  			SimMap[StartVertex] = 0;
+  
+  			ExpertVisitor ExpertVisitor;
+  			ExpertVisitor.setDepth(5);
+  			ExpertVisitor.setDepthToCheckVertexProp(4);
+  			ExpertVisitor.setVertexFilter(TmpFilter[5]);
+  
+  			for ( unsigned int i = 0; i < 5; i++ ) {
+  				ExpertVisitor.setFilter(TmpFilter[i]);
+  			}
+  
+        TransactionalBFS txBFS;
+  			txBFS.breadthFirstSearch(Graph, StartVertex->getId(),
+  			                         ExpertVisitor, Tranx, LockManager);
+
+        if (Tranx->checkStatus() == T_ABORT) {
+          needRestart = true;
+          break;
+        }
+
+  			auto iterend = ExpertVisitor.getPostMap().end();
+  			auto PostNum = 0;
+  			for ( auto iter = ExpertVisitor.getPostMap().begin(); iter != iterend; iter++ ) {
+  				if ((*iter).second ) { PostNum++; }
+  			}
 
 #ifdef _PRINTLOG_
 			SimMap[StartVertex] = PostNum;
-      LdbcFile << "person: " << StartVertex->getId() << " expert post " << PostNum << "\n";
+      LdbcFile << "person: " << StartVertex->getId() 
+               << "\texpert post " << PostNum 
+               << "\n";
 #endif
-      Tranx->commit();
-    }
+      }///for
 
-		}
+      if(needRestart)  {
+        continue;
+      }
+
+      Tranx->commit();
+		}///while
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
@@ -903,21 +1023,33 @@ public:
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
-		PathVisitor PVisitor;
-		PVisitor.setEndVertex(endVertex);
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, PVisitor, Tranx, LockManager);
+
+  		PathVisitor PVisitor;
+  		PVisitor.setEndVertex(endVertex);
+      TransactionalBFS txBFS;
+  		txBFS.breadthFirstSearch(Graph, StartVertex, PVisitor, Tranx, LockManager);
+      if (Tranx->checkStatus() == T_ABORT)
+        continue;
 
 #ifdef _PRINTLOG_
-		auto target = PVisitor.getVertexList();
-    if (target.empty())
-      LdbcFile << StartVertex << " and " <<  endVertex <<" are not connected" << "\n";
-    else {
-      LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << StartVertex << " to " << endVertex << "\n";
-      for(auto it = target.begin(); it != target.end(); ++it) {
-        LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first << (*it)->getPropertyValue("firstName").first<< "\n";
+  		auto target = PVisitor.getVertexList();
+      if (target.empty()) {
+        LdbcFile << StartVertex << "\tand\t" 
+                <<  endVertex <<"\tare not connected" 
+                << "\n";
       }
-    }
+      else {
+        LdbcFile << "There are  shortest paths of length \t" << target.size() 
+                << "\tfrom " << StartVertex 
+                << "\tto " << endVertex 
+                << "\n";
+        for (auto it = target.begin(); it != target.end(); ++it) {
+          LdbcFile <<"Vertex\t" << (*it)->getId() 
+                  << "\t" << (*it)->getPropertyValue("id").first 
+                  << "\t" << (*it)->getPropertyValue("firstName").first
+                  << "\n";
+        }
+      }
 #endif
       Tranx->commit();
     }
@@ -944,29 +1076,40 @@ public:
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
 
-		SubGraphVisitor SubgVisitor;
-		SubgVisitor.setEndVertex(endVertex);
-		FilterType EdgeFilter;
-		traverseThroughTypeAndDirection("KNOWS", "out",  EdgeFilter);
-		SubgVisitor.setEdgeFilter(EdgeFilter);
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, SubgVisitor, Tranx, LockManager);
+  		SubGraphVisitor SubgVisitor;
+  		SubgVisitor.setEndVertex(endVertex);
+  		FilterType EdgeFilter;
+  		traverseThroughTypeAndDirection("KNOWS", "out",  EdgeFilter);
+  		SubgVisitor.setEdgeFilter(EdgeFilter);
+      TransactionalBFS txBFS;
+  		txBFS.breadthFirstSearch(Graph, StartVertex, SubgVisitor, Tranx, LockManager);
 
-		auto target = SubgVisitor.getVertexList();
+      if (Tranx->checkStatus() == T_ABORT)
+        continue;
+
+  		auto target = SubgVisitor.getVertexList();
 
 #ifdef _PRINTLOG_
-		if (target.empty())
-      LdbcFile << StartVertex << " and " <<  endVertex <<" are not connected" << "\n";
-    else {
-      LdbcFile << "There are  shortest paths of length " << target.size() << "  from " << StartVertex << " to " << endVertex << "\n";
-      for(auto it = target.begin(); it != target.end(); ++it) {
-        LdbcFile <<"Vertex " << (*it)->getId() << "\t" << (*it)->getPropertyValue("id").first <<"\t" << (*it)->getPropertyValue("firstName").first<< "\n";
-      }//for
-    }//else
+  		if (target.empty()) {
+        LdbcFile << StartVertex << " and " <<  endVertex <<" are not connected" << "\n";
+      }
+      else {
+        LdbcFile << "There are  shortest paths of length\t" 
+                 << target.size() << "\tfrom\t" << StartVertex 
+                 << "\tto\t" << endVertex 
+                 << "\n";
+        for(auto it = target.begin(); it != target.end(); ++it) {
+          LdbcFile <<"Vertex\t" << (*it)->getId() 
+                   << "\t" << (*it)->getPropertyValue("id").first 
+                   << "\t" << (*it)->getPropertyValue("firstName").first
+                   << "\n";
+        }//for
+      }//else
 #endif
 
 		///already found all the paths, calculate weights now
 		auto itend = target.end();
+    bool needRestart = false;
 		float Weight = 0.0;
 		for ( auto it = target.begin(); it!= itend && it != itend-1; it++ ) {
 
@@ -986,14 +1129,24 @@ public:
 			WPathVisitor.setDepth(3);
       TransactionalBFS txBFS;
 			txBFS.breadthFirstSearch(Graph, (*it)->getId(), WPathVisitor, Tranx, LockManager);
-			Weight += WPathVisitor.getScore();
-		}
 
+      if (Tranx->checkStatus() == T_ABORT) {
+        needRestart = true;
+        break;
+      }
+
+			Weight += WPathVisitor.getScore();
+		}///for
+
+    if(needRestart)  {
+      continue;
+    }
+
+    Tranx->commit();
 #ifdef _PRINTLOG_
 		LdbcFile << "weight " << Weight <<"\n";
 #endif
-    Tranx->commit();
-    }
+    }///while
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
@@ -1025,103 +1178,111 @@ public:
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
 
-    for (auto EdgeEntry : EdgeMap) {
-      /// Search for Vertex
-      EdgePointer NewEdge = EdgeEntry.first;
-      VertexInfoPairType VertexInfoPair = EdgeEntry.second;
-      LabelType existVertexLabel = VertexInfoPair.first;
-      ValueType existVertexId = VertexInfoPair.second;
-      auto ExistIndex = Index.getVertexIndex(existVertexLabel, existVertexId);
-
-      /// FirstVertex of NewEdge is existed
-      bool isFirstExisted = false;
-      /// The NextEdge of existed vertex has this vertex as FirstVertex
-      bool isExistedFirst = true;
-
-      if (!ExistIndex.second) {
-///       assert(); 
-        exit(0);
-      }
-      if (NewEdge->getFirstVertexPtr() == NewVertex) {
-
-        NewEdge->setSecondVertexPtr(ExistIndex.first);
-      } else  {
-        isFirstExisted = true;
-        NewEdge->setFirstVertexPtr(ExistIndex.first);
-      } ///IF_FIRST_EXISTED
-
-      /// Get locks on existing vertex and edge
-      if (!LockManager.getVertexLock(ExistIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId())) {
-        Tranx->abort();
-      }
-
-      auto ExistNextEdge = ExistIndex.first->getNextEdge();
-      if (ExistNextEdge && (ExistNextEdge->getFirstVertexPtr() == ExistIndex.first)) {
-        std::cout << ExistNextEdge->getId() << "\t"
-                  << ExistNextEdge->getType().std_str() << "\n";
-        if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
-          Tranx->abort();
+      bool needRestart = false;
+      for (auto EdgeEntry : EdgeMap) {
+        /// Search for Vertex
+        EdgePointer NewEdge = EdgeEntry.first;
+        VertexInfoPairType VertexInfoPair = EdgeEntry.second;
+        LabelType existVertexLabel = VertexInfoPair.first;
+        ValueType existVertexId = VertexInfoPair.second;
+        auto ExistIndex = Index.getVertexIndex(existVertexLabel, existVertexId);
+  
+        /// FirstVertex of NewEdge is existed
+        bool isFirstExisted = false;
+        /// The NextEdge of existed vertex has this vertex as FirstVertex
+        bool isExistedFirst = true;
+  
+        if (!ExistIndex.second) {
+  ///       assert(); 
+          exit(0);
         }
-      }
-      else if(ExistNextEdge && (ExistNextEdge->getSecondVertexPtr() == ExistIndex.first)) {
-        isExistedFirst = false;
-        if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+        if (NewEdge->getFirstVertexPtr() == NewVertex) {
+  
+          NewEdge->setSecondVertexPtr(ExistIndex.first);
+        } else  {
+          isFirstExisted = true;
+          NewEdge->setFirstVertexPtr(ExistIndex.first);
+        } ///IF_FIRST_EXISTED
+  
+        /// Get locks on existing vertex and edge
+        if (!LockManager.getVertexLock(ExistIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId())) {
           Tranx->abort();
+          needRestart = true;
+          break;
         }
-      } ///IF_EXISTED_FIRST
-
-      /// /***************
-      ///  Chain edges
-      /// ****************/
-
-      /// NewEdge -> FirstNextEdge,SecondNextEdge
-      if (isFirstExisted) {
-        NewEdge->setFirstNextEdge(ExistNextEdge);
-        /// NewVertex->getNextEdge() == NULL
-        NewEdge->setSecondNextEdge(NewVertex->getNextEdge());
-      } else {
-        NewEdge->setSecondNextEdge(ExistNextEdge);
-        NewEdge->setFirstNextEdge(NewVertex->getNextEdge());
-      }
-
-      /// ExistVertex's NextEdge -> FirstPreviousEdge/SecondPreviousEdge
-      if (isExistedFirst) {
-        ExistNextEdge->setFirstPreviousEdge(NewEdge);
-      } else {
-        ExistNextEdge->setSecondPreviousEdge(NewEdge);
-      }
-
-      ///NewVertex's NextEdge -> FirstPreviousEdge/SecondPreviousEdge
-      auto NewVertexNextEdge = NewVertex->getNextEdge();
-      if (NewVertexNextEdge)  {
-        if (NewVertexNextEdge->getFirstVertexPtr() == NewVertex)  {
-          NewVertexNextEdge->setFirstPreviousEdge(NewEdge);  
+  
+        auto ExistNextEdge = ExistIndex.first->getNextEdge();
+        if (ExistNextEdge && (ExistNextEdge->getFirstVertexPtr() == ExistIndex.first)) {
+          std::cout << ExistNextEdge->getId() << "\t"
+                    << ExistNextEdge->getType().std_str() << "\n";
+          if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+            Tranx->abort();
+            needRestart = true;
+          }
+        }
+        else if(ExistNextEdge && (ExistNextEdge->getSecondVertexPtr() == ExistIndex.first)) {
+          isExistedFirst = false;
+          if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+            Tranx->abort();
+            needRestart = true;
+          }
+        } ///IF_EXISTED_FIRST
+  
+        /// /***************
+        ///  Chain edges
+        /// ****************/
+  
+        /// NewEdge -> FirstNextEdge,SecondNextEdge
+        if (isFirstExisted) {
+          NewEdge->setFirstNextEdge(ExistNextEdge);
+          /// NewVertex->getNextEdge() == NULL
+          NewEdge->setSecondNextEdge(NewVertex->getNextEdge());
         } else {
-          NewVertexNextEdge->setSecondPreviousEdge(NewEdge);  
+          NewEdge->setSecondNextEdge(ExistNextEdge);
+          NewEdge->setFirstNextEdge(NewVertex->getNextEdge());
         }
+  
+        /// ExistVertex's NextEdge -> FirstPreviousEdge/SecondPreviousEdge
+        if (isExistedFirst) {
+          ExistNextEdge->setFirstPreviousEdge(NewEdge);
+        } else {
+          ExistNextEdge->setSecondPreviousEdge(NewEdge);
+        }
+  
+        ///NewVertex's NextEdge -> FirstPreviousEdge/SecondPreviousEdge
+        auto NewVertexNextEdge = NewVertex->getNextEdge();
+        if (NewVertexNextEdge)  {
+          if (NewVertexNextEdge->getFirstVertexPtr() == NewVertex)  {
+            NewVertexNextEdge->setFirstPreviousEdge(NewEdge);  
+          } else {
+            NewVertexNextEdge->setSecondPreviousEdge(NewEdge);  
+          }
+        }
+        
+        /// ExistedVertex & NewVertex -> NextEdge
+        NewVertex->setNextEdge(NewEdge);
+        ExistIndex.first->setNextEdge(NewEdge);
+      }/// FOR 
+  
+      if(needRestart)  {
+        continue;
       }
-      
-      /// ExistedVertex & NewVertex -> NextEdge
-      NewVertex->setNextEdge(NewEdge);
-      ExistIndex.first->setNextEdge(NewEdge);
-    }/// FOR 
 
-
+      Tranx->commit();
 #ifdef _PRINTLOG_
-    int i = 0;
-    EdgePointer NextEdge = NewVertex->getNextEdge();
-		LdbcFile << "NewVertex\t" << NewVertex->getId() << "\n";
-    while (NextEdge && i++ < 5) {
-      LdbcFile << "FirstVertex\t" << NextEdge->getFirstVertexPtr()->getType() 
-                << "\nEdge\t" << NextEdge->getType()
-                << "\nSecondVertex\t" << NextEdge->getSecondVertexPtr()->getType()
-                << "\nSecondPrevEdge\t" << NextEdge->getSecondNextEdge()->getType()
-                << "\n\n";
-
-      NextEdge = NextEdge->getNextEdge(NewVertex);
-    }
+      int i = 0;
+      EdgePointer NextEdge = NewVertex->getNextEdge();
+  		LdbcFile << "NewVertex\t" << NewVertex->getId() << "\n";
+      while (NextEdge && i++ < 5) {
+        LdbcFile << "FirstVertex\t" << NextEdge->getFirstVertexPtr()->getType() 
+                  << "\nEdge\t" << NextEdge->getType()
+                  << "\nSecondVertex\t" << NextEdge->getSecondVertexPtr()->getType()
+                  << "\nSecondPrevEdge\t" << NextEdge->getSecondNextEdge()->getType()
+                  << "\n\n";
+  
+        NextEdge = NextEdge->getNextEdge(NewVertex);
+      }
 #endif
-    Tranx->commit();
     }
 /// TODO add locks to map LockManager
 
@@ -1157,17 +1318,21 @@ public:
       /// Switch here
       if (!LockManager.getVertexLock(FirstIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId())) {
         Tranx->abort();
+        break;
       }
       if (!LockManager.getVertexLock(SecondIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId()))  {
         Tranx->abort();
+        break;
       }
       auto FNEdge = FirstIndex.first->getNextEdge();
       if (FNEdge) {
         if (!LockManager.getEdgeLock(FNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
           Tranx->abort();
+          break;
         }
         if (!LockManager.getEdgeLock(FNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
           Tranx->abort();
+          break;
         }
       }
 
@@ -1175,9 +1340,11 @@ public:
       if (SNEdge) {
         if (!LockManager.getEdgeLock(SNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
           Tranx->abort();
+          break;
         }
         if (!LockManager.getEdgeLock(SNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
           Tranx->abort();
+          break;
         }
       }
 
@@ -1198,25 +1365,24 @@ public:
       }
     }
 
-#ifdef _PRINTLOG_
-    VertexPointer FirstVertex = NewEdge->getFirstVertexPtr();
-    VertexPointer SecondVertex = NewEdge->getSecondVertexPtr();
-		LdbcFile << "NewEdge\t" << NewEdge->getType() << "\t" << NewEdge->getId() 
-              << "\nFirstVertex\t" << FirstVertex->getType() 
-              << "\t" << FirstVertex->getId()
-              << "\nSecondVertex\t" << SecondVertex->getType()
-              << "\t" << SecondVertex->getId()
-              << "\nFirstNextEdge\t" <<  NewEdge->getNextEdge(FirstVertex)->getType() 
-              << "\nSecondNextEdge\t" <<  NewEdge->getNextEdge(SecondVertex)->getType() 
-              << "\n\n";
-#endif
     Tranx->commit();
+#ifdef _PRINTLOG_
+      VertexPointer FirstVertex = NewEdge->getFirstVertexPtr();
+      VertexPointer SecondVertex = NewEdge->getSecondVertexPtr();
+  		LdbcFile << "NewEdge\t" << NewEdge->getType() << "\t" << NewEdge->getId() 
+                << "\nFirstVertex\t" << FirstVertex->getType() 
+                << "\t" << FirstVertex->getId()
+                << "\nSecondVertex\t" << SecondVertex->getType()
+                << "\t" << SecondVertex->getId()
+                << "\nFirstNextEdge\t" <<  NewEdge->getNextEdge(FirstVertex)->getType() 
+                << "\nSecondNextEdge\t" <<  NewEdge->getNextEdge(SecondVertex)->getType() 
+                << "\n\n";
+#endif
     }
 
     /// TODO add locks to lockmap LockManager
 		getExecTime();
 		LdbcFile.close();
-
   }
 
 };

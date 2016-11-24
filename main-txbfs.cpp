@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
   /*** End of Update queries definition ***/
 
   std::vector<TransactionPointerType> TranxList;
-  for (auto i= 0; i < 14; i++) {
+  for (auto i= 0; i < 22; i++) {
     auto TxEntryPtr = TmManager.addTransaction();
     auto TxPtr = TxEntryPtr.second;
     TranxList.push_back(TxPtr);
@@ -188,49 +188,49 @@ int main(int argc, char *argv[]) {
 
 
   if (run == 1) {
-    q1.runQuery(g, persons[0], (TranxList[0]), LkManager);
+//    q1.runQuery(g, persons[0], (TranxList[0]), LkManager);
+//  
+//    q2.runQuery(g, persons[0], (TranxList[1]), LkManager);
+//  
+//    q3.runQuery(g, persons[0], (TranxList[2]), LkManager);
+//  
+//    q4.runQuery(g, persons[0], (TranxList[3]), LkManager);
+//  
+//    q5.runQuery(g, persons[0], (TranxList[4]), LkManager);
+//  
+//    q6.runQuery(g, persons[0], (TranxList[5]), LkManager);
+//  
+//    q7.runQuery(g, persons[0], (TranxList[6]), LkManager);
+//  
+//    q8.runQuery(g, persons[0], (TranxList[7]), LkManager);
+//  
+//    q9.runQuery(g, persons[0], (TranxList[8]), LkManager);
+//  
+//    q10.runQuery(g, persons[0], (TranxList[9]), LkManager);
+//  
+//    q11.runQuery(g, persons[0], (TranxList[10]), LkManager);
+//  
+//    q12.runQuery(g, persons[0], (TranxList[11]), LkManager);
   
-    q2.runQuery(g, persons[0], (TranxList[1]), LkManager);
-  
-    q3.runQuery(g, persons[0], (TranxList[2]), LkManager);
-  
-    q4.runQuery(g, persons[0], (TranxList[3]), LkManager);
-  
-    q5.runQuery(g, persons[0], (TranxList[4]), LkManager);
-  
-    q6.runQuery(g, persons[0], (TranxList[5]), LkManager);
-  
-    q7.runQuery(g, persons[0], (TranxList[7]), LkManager);
-  
-    q8.runQuery(g, persons[0], (TranxList[8]), LkManager);
-  
-    q9.runQuery(g, persons[0], (TranxList[9]), LkManager);
-  
-    q10.runQuery(g, persons[0], (TranxList[10]), LkManager);
-  
-    q11.runQuery(g, persons[0], (TranxList[11]), LkManager);
-  
-    q12.runQuery(g, persons[0], (TranxList[12]), LkManager);
-  
-    q13.runQuery(g, persons[0], persons[10], (TranxList[13]), LkManager);
+//    q13.runQuery(g, persons[0], persons[10], (TranxList[12]), LkManager);
     
-    q14.runQuery(g, persons[0], persons[10], (TranxList[14]), LkManager);
+//    q14.runQuery(g, persons[0], persons[10], (TranxList[13]), LkManager);
   
-    q15.runQuery(g, persons[0], (TranxList[15]), LkManager, Index);
+    q15.runQuery(g, persons[0], (TranxList[14]), LkManager, Index);
   
-    q16.runQuery(g, persons[0], (TranxList[16]), LkManager, Index);
+    q16.runQuery(g, persons[0], (TranxList[15]), LkManager, Index);
 
-    q17.runQuery(g, persons[0], (TranxList[17]), LkManager, Index);
+    q17.runQuery(g, persons[0], (TranxList[16]), LkManager, Index);
   
-    q18.runQuery(g, persons[0], (TranxList[18]), LkManager, Index);
+//    q18.runQuery(g, persons[0], (TranxList[17]), LkManager, Index);
 
-    q19.runQuery(g, persons[0], (TranxList[19]), LkManager, Index);
+//    q19.runQuery(g, persons[0], (TranxList[18]), LkManager, Index);
   
-    q20.runQuery(g, persons[0], (TranxList[20]), LkManager, Index);
+//    q20.runQuery(g, persons[0], (TranxList[19]), LkManager, Index);
 
-    q21.runQuery(g, persons[0], (TranxList[21]), LkManager, Index);
+//    q21.runQuery(g, persons[0], (TranxList[20]), LkManager, Index);
 
-    q22.runQuery(g, persons[0], (TranxList[22]), LkManager, Index);
+//    q22.runQuery(g, persons[0], (TranxList[21]), LkManager, Index);
   } 
   else if (run == 2)  {
 

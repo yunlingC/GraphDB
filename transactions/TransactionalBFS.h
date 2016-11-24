@@ -88,7 +88,7 @@ public:
 			/// Set to visited.
 			ColorMap[ScheduledVertex] = true;
 
-			if (!(LockManager.getVertexLock(ScheduledVertex->getId(), T_NextEdge, T_SH, TxId))  ){
+			if (!(LockManager.getVertexLock(ScheduledVertex->getId(), T_NextEdge, T_SH, TxId))){
         Tranx->abort();
         return;
       }
