@@ -35,24 +35,36 @@ public:
 	              , TransactionPointerType  Tranx
                 , LockManagerType & LockManager
                 ) {
+
 		getStartTime();
-		FilterType TmpFilter;
-		FilterType NameFilter;
-		filtProperty(ParamPair.first, ParamPair.second, NameFilter);
-		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
-		LimitedDepthVisitor  DepthVisitor;
-		for (auto i = 0; i < 3; i++) {
-			DepthVisitor.setFilter(TmpFilter);
-		}
-		DepthVisitor.setNameFilter(NameFilter);
-		DepthVisitor.setDepth(3);
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, DepthVisitor, Tranx, LockManager);
+
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
+
+	  	FilterType TmpFilter;
+	  	FilterType NameFilter;
+	  	filtProperty(ParamPair.first, ParamPair.second, NameFilter);
+	  	traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
+	  	LimitedDepthVisitor  DepthVisitor;
+	  	for (auto i = 0; i < 3; i++) {
+	  		DepthVisitor.setFilter(TmpFilter);
+	  	}
+	  	DepthVisitor.setNameFilter(NameFilter);
+	  	DepthVisitor.setDepth(3);
+      TransactionalBFS txBFS;
+	  	txBFS.breadthFirstSearch(Graph, StartVertex, DepthVisitor, Tranx, LockManager);
+      Tranx->commit();
 
 #ifdef _PRINTLOG_
-		auto target = DepthVisitor.getVertexList();
-	    LdbcFile << StartVertex << " is connected with " << target.size() << " people with " << ParamPair.first <<": " << ParamPair.second<< "\n";
+      if (Tranx->checkStatus() == T_COMMIT) {
+		    auto target = DepthVisitor.getVertexList();
+	      LdbcFile << StartVertex << "\tis connected with\t" << target.size() 
+                << "\tpeople with\t" << ParamPair.first <<": " << ParamPair.second
+                << "\n";
+      }
 #endif
+    }
+
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
@@ -66,31 +78,44 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
-		FilterType TmpFilter[3];
-		traverseThroughMultiRelType("KNOWS", TmpFilter[0]);
-		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", TmpFilter[1]);
-		TmpFilter[2].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second);
 
-		MultiRelTypeVisitor TypeVisitor;
-		TypeVisitor.setFilter(TmpFilter[0]);
-		TypeVisitor.setFilter(TmpFilter[1]);
-		TypeVisitor.setRangeFilter(TmpFilter[2]);
-		TypeVisitor.setDepth(2);
-		TypeVisitor.setDepthToCheckRange(2);
-		//check date
-		TypeVisitor.setPropToCheck(2);
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, TypeVisitor, Tranx, LockManager);
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 
-#ifdef _PRINTLOG_
-		auto target = TypeVisitor.getVertexList();
-    auto targets = TypeVisitor.getTargetsMap();
-    LdbcFile << StartVertex << " has friends made " << target.size() << " comments and posts \n";
-    for(auto it = targets.begin(); it != targets.end(); ++it) {
-      LdbcFile <<"person " << (*it).first->getId() << " " << (*it).second->getPropertyValue("id").first << "\t" <<"comments/posts " << (*it).first->getPropertyValue("id").first << "\t" << (*it).first->getPropertyValue("creationDate").first ;
-      LdbcFile << "\n";
+  		FilterType TmpFilter[3];
+  		traverseThroughMultiRelType("KNOWS", TmpFilter[0]);
+  		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", TmpFilter[1]);
+  		TmpFilter[2].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second);
+  
+  		MultiRelTypeVisitor TypeVisitor;
+  		TypeVisitor.setFilter(TmpFilter[0]);
+  		TypeVisitor.setFilter(TmpFilter[1]);
+  		TypeVisitor.setRangeFilter(TmpFilter[2]);
+  		TypeVisitor.setDepth(2);
+  		TypeVisitor.setDepthToCheckRange(2);
+  		//check date
+  		TypeVisitor.setPropToCheck(2);
+      TransactionalBFS txBFS;
+  		txBFS.breadthFirstSearch(Graph, StartVertex, TypeVisitor, Tranx, LockManager);
+      Tranx->commit();
+  
+  #ifdef _PRINTLOG_
+      if(Tranx->checkStatus() == T_COMMIT) {
+    		auto target = TypeVisitor.getVertexList();
+        auto targets = TypeVisitor.getTargetsMap();
+        LdbcFile << StartVertex << "\thas friends made\t" << target.size() 
+                  << "\tcomments and posts \n";
+        for(auto it = targets.begin(); it != targets.end(); ++it) {
+          LdbcFile <<"person " << (*it).first->getId() 
+                  << "\t" << (*it).second->getPropertyValue("id").first 
+                  << "\t" <<"comments/posts" 
+                  << "\t" << (*it).first->getPropertyValue("id").first 
+                  << "\t" << (*it).first->getPropertyValue("creationDate").first ;
+          LdbcFile << "\n";
+        }
+      }
+  #endif
     }
-#endif
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
@@ -108,83 +133,119 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
-		FilterType TmpFilter;
-		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
 
-		SingleRelTypeVisitor SingleVisitor;
-		SingleVisitor.setFilter(TmpFilter);
-		///Do NOT delete
-		SingleVisitor.setFilter(TmpFilter);
-		SingleVisitor.setDepth(2);
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx, LockManager);
-		auto target = SingleVisitor.getVertexList();
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 
-#ifdef _PRINTLOG_
-		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
-#endif
-
-		FilterType FilterSet[4];
-		traverseThroughMultiRelType("PERSON_IS_LOCATED_IN", FilterSet[0]);
-		traverseThroughMultiRelType("IS_PART_OF", FilterSet[1]);
-		auto country1 = PropRange.second.first;
-		auto country2 = PropRange.second.second;
-		FilterSet[2].setProperty("name", country1);
-		FilterSet[3].setProperty("name", country2);
-
-		auto it = target.begin();
-		while (it != target.end()) {
-			VertexPropertyRangeVisitor RangeVisitor;
-			RangeVisitor.setFilter(FilterSet[0]);
-			RangeVisitor.setFilter(FilterSet[1]);
-			RangeVisitor.setVertexFilters(FilterSet[2]);
-			RangeVisitor.setVertexFilters(FilterSet[3]);
-			RangeVisitor.setDepth(2);
-			RangeVisitor.setDepthToCheckVertexProp(2);
-			auto StartVertex = (*it)->getId();
+  		FilterType TmpFilter;
+  		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
+  
+  		SingleRelTypeVisitor SingleVisitor;
+  		SingleVisitor.setFilter(TmpFilter);
+  		///Do NOT delete
+  		SingleVisitor.setFilter(TmpFilter);
+  		SingleVisitor.setDepth(2);
       TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex, RangeVisitor, Tranx, LockManager);
-			if (RangeVisitor.getIncludeState() == false) {
-				target.erase(it);
-			}
-			else {
-				it++;
-			}
-		}
+  		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx, LockManager);
+      if (Tranx->checkStatus() == T_ABORT)
+        continue;
 
-		FilterType Filters[5];
-		PersonListMapType PersonListMap;
-		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR",Filters[0]);
-		Filters[1].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second);
-		traverseThroughMultiRelType("POST_IS_LOCATED_IN+COMMENT_IS_LOCATED_IN",Filters[2]);
-		Filters[3].setProperty("name", country1);
-		Filters[4].setProperty("name", country2);
+  		auto target = SingleVisitor.getVertexList();
 
-		for (auto it = target.begin(), it_end = target.end();
-		     it != it_end; it++) {
-			VertexPropertyRangeVisitor RangeVisitor;
-			RangeVisitor.setFilter(Filters[0]);
-			RangeVisitor.setFilter(Filters[2]);
-			RangeVisitor.setRangeFilter(Filters[1]);
-			RangeVisitor.setVertexFilters(Filters[4]);
-			RangeVisitor.setVertexFilters(Filters[3]);
-			RangeVisitor.setDepth(2);
-			RangeVisitor.setDepthToCheckRange(2);
-			RangeVisitor.setPropToCheck(2);
-			RangeVisitor.setDepthToCheckVertexProp(2);
-			auto StartVertex = (*it)->getId();
-      TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex, RangeVisitor, Tranx, LockManager);
-			auto targetList = RangeVisitor.getVertexList();
-			PersonListMap.insert(PersonListPair((*it), targetList));
-		}
+  #ifdef _PRINTLOG_
+  		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
+  #endif
+  
+  		FilterType FilterSet[4];
+  		traverseThroughMultiRelType("PERSON_IS_LOCATED_IN", FilterSet[0]);
+  		traverseThroughMultiRelType("IS_PART_OF", FilterSet[1]);
+  		auto country1 = PropRange.second.first;
+  		auto country2 = PropRange.second.second;
+  		FilterSet[2].setProperty("name", country1);
+  		FilterSet[3].setProperty("name", country2);
+  
+  		auto it = target.begin();
+      bool needRestart = false;
+  		while (it != target.end()) {
+  			VertexPropertyRangeVisitor RangeVisitor;
+  			RangeVisitor.setFilter(FilterSet[0]);
+  			RangeVisitor.setFilter(FilterSet[1]);
+  			RangeVisitor.setVertexFilters(FilterSet[2]);
+  			RangeVisitor.setVertexFilters(FilterSet[3]);
+  			RangeVisitor.setDepth(2);
+  			RangeVisitor.setDepthToCheckVertexProp(2);
+  			auto StartVertex = (*it)->getId();
+        TransactionalBFS txBFS;
+  			txBFS.breadthFirstSearch(Graph, StartVertex, RangeVisitor, Tranx, LockManager);
 
-#ifdef _PRINTLOG_
-		for(auto it = PersonListMap.begin(), it_end = PersonListMap.begin();
-        it != it_end; ++it) {
-      LdbcFile << "friend " << (*it).first->getPropertyValue("firstName").first  << " has " <<(*it).second.size() << " commmets/posts made in " << country1 << " or " << country2 << "\n";
+        if (Tranx->checkStatus() == T_ABORT) {
+          needRestart = true;
+          break;
+        }
+
+  			if (RangeVisitor.getIncludeState() == false) {
+  				target.erase(it);
+  			}
+  			else {
+  				it++;
+  			}
+  		}///while
+
+      if(needRestart)  {
+        continue;
+      }
+  
+  		FilterType Filters[5];
+  		PersonListMapType PersonListMap;
+  		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR",Filters[0]);
+  		Filters[1].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second);
+  		traverseThroughMultiRelType("POST_IS_LOCATED_IN+COMMENT_IS_LOCATED_IN",Filters[2]);
+  		Filters[3].setProperty("name", country1);
+  		Filters[4].setProperty("name", country2);
+  
+  		for (auto it = target.begin(), it_end = target.end();
+  		     it != it_end; it++) {
+  			VertexPropertyRangeVisitor RangeVisitor;
+  			RangeVisitor.setFilter(Filters[0]);
+  			RangeVisitor.setFilter(Filters[2]);
+  			RangeVisitor.setRangeFilter(Filters[1]);
+  			RangeVisitor.setVertexFilters(Filters[4]);
+  			RangeVisitor.setVertexFilters(Filters[3]);
+  			RangeVisitor.setDepth(2);
+  			RangeVisitor.setDepthToCheckRange(2);
+  			RangeVisitor.setPropToCheck(2);
+  			RangeVisitor.setDepthToCheckVertexProp(2);
+  			auto StartVertex = (*it)->getId();
+        TransactionalBFS txBFS;
+  			txBFS.breadthFirstSearch(Graph, StartVertex, RangeVisitor, Tranx, LockManager);
+
+        if (Tranx->checkStatus() == T_ABORT) {
+          needRestart = true;
+          break;
+        }
+
+  			auto targetList = RangeVisitor.getVertexList();
+  			PersonListMap.insert(PersonListPair((*it), targetList));
+  		}///for
+
+      if(needRestart)  {
+        continue;
+      }
+
+      Tranx->commit();
+  
+  #ifdef _PRINTLOG_
+      if (Tranx->checkStatus() == T_COMMIT) {
+    		for(auto it = PersonListMap.begin(), it_end = PersonListMap.end();
+            it != it_end; ++it) {
+          LdbcFile << "friend\t" << (*it).first->getPropertyValue("firstName").first  
+                   << "\thas\t" <<(*it).second.size() 
+                   << "\tcommmets/posts made in\t" << country1 
+                   << "\tor\t" << country2 << "\n";
+        }
+      }
+  #endif
     }
-#endif
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
@@ -199,31 +260,41 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
-		FilterType TmpFilter[4];
-		traverseThroughMultiRelType("KNOWS", TmpFilter[0]);
-		traverseThroughMultiRelType("POST_HAS_CREATOR", TmpFilter[1]);
-		traverseThroughMultiRelType("POST_HAS_TAG", TmpFilter[2]);
-		TmpFilter[3].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second);
 
-		MultiResultVisitor ResultsVisitor;
-		ResultsVisitor.setFilter(TmpFilter[0]);
-		ResultsVisitor.setFilter(TmpFilter[1]);
-		ResultsVisitor.setFilter(TmpFilter[2]);
-		ResultsVisitor.setRangeFilter(TmpFilter[3]);
-		ResultsVisitor.setDepth(3);
-		ResultsVisitor.setDepthToCheckRange(2);
-		ResultsVisitor.setPropToCheck(1); //check time
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, ResultsVisitor, Tranx, LockManager);
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
+
+  		FilterType TmpFilter[4];
+  		traverseThroughMultiRelType("KNOWS", TmpFilter[0]);
+  		traverseThroughMultiRelType("POST_HAS_CREATOR", TmpFilter[1]);
+  		traverseThroughMultiRelType("POST_HAS_TAG", TmpFilter[2]);
+  		TmpFilter[3].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second);
+  
+  		MultiResultVisitor ResultsVisitor;
+  		ResultsVisitor.setFilter(TmpFilter[0]);
+  		ResultsVisitor.setFilter(TmpFilter[1]);
+  		ResultsVisitor.setFilter(TmpFilter[2]);
+  		ResultsVisitor.setRangeFilter(TmpFilter[3]);
+  		ResultsVisitor.setDepth(3);
+  		ResultsVisitor.setDepthToCheckRange(2);
+  		ResultsVisitor.setPropToCheck(1); //check time
+      TransactionalBFS txBFS;
+  		txBFS.breadthFirstSearch(Graph, StartVertex, ResultsVisitor, Tranx, LockManager);
+      Tranx->commit();
 
 #ifdef _PRINTLOG_
-		auto targets = ResultsVisitor.getReturnResultMap();
-    LdbcFile << StartVertex << " has friends made posts of " << targets.size() << " tags\n";
-    for(auto it = targets.begin(), it_end = targets.end();
-        it != it_end; ++it) {
-      LdbcFile <<"tags " << (*it).first->getPropertyValue("id").first << "\t" <<"num of posts " << (*it).second <<  "\n";
-    }
+      if (Tranx->checkStatus() == T_COMMIT) {
+    		auto targets = ResultsVisitor.getReturnResultMap();
+        LdbcFile << StartVertex << "\thas friends made posts of" 
+                 << "\t" << targets.size() << "\ttags\n";
+        for(auto it = targets.begin(), it_end = targets.end();
+            it != it_end; ++it) {
+          LdbcFile <<"tags\t" << (*it).first->getPropertyValue("id").first 
+                   << "\t" <<"num of posts " << (*it).second <<  "\n";
+        }
+      }
 #endif
+    }
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
@@ -241,55 +312,72 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
-		FilterType TmpFilter[2];
-		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
-		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[1]);
 
-		SingleRelTypeVisitor SingleVisitor;
-		SingleVisitor.setFilter(TmpFilter[0]);
-		SingleVisitor.setFilter(TmpFilter[1]);
-		SingleVisitor.setDepth(2);
-    TransactionalBFS txBFS;
-		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx, LockManager);
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 
-		auto target = SingleVisitor.getVertexList();
+  		FilterType TmpFilter[2];
+  		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
+  		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[1]);
+  
+  		SingleRelTypeVisitor SingleVisitor;
+  		SingleVisitor.setFilter(TmpFilter[0]);
+  		SingleVisitor.setFilter(TmpFilter[1]);
+  		SingleVisitor.setDepth(2);
+      TransactionalBFS txBFS;
+  		txBFS.breadthFirstSearch(Graph, StartVertex, SingleVisitor, Tranx, LockManager);
+
+      if (Tranx->checkStatus() == T_ABORT)
+        continue;
+  
+  		auto target = SingleVisitor.getVertexList();
 #ifdef _PRINTLOG_
-		LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
+		  LdbcFile << StartVertex << " is connected with " << target.size() << " friends and friends of friends" << "\n";
 #endif
 
-		FilterType Filters[4];
-		traverseThroughMultiRelType("HAS_MEMBER", Filters[0]);
-		Filters[1].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second);
-		traverseThroughMultiRelType("CONTAINER_OF",Filters[2]);
-		traverseThroughMultiRelType("POST_HAS_CREATOR",Filters[3]);
-		std::vector<FilterType> VertexFilter;
-		for (auto iter = target.begin(), iter_end = target.end();
-		     iter != iter_end; iter++) {
-			FilterType newFilter;
-			newFilter.setProperty("id", (*iter)->getPropertyValue("id").first.std_str());
-			VertexFilter.push_back(newFilter);
-		}
+  		FilterType Filters[4];
+  		traverseThroughMultiRelType("HAS_MEMBER", Filters[0]);
+  		Filters[1].setValueRange(ValueRange.first, ValueRange.second.first, ValueRange.second.second);
+  		traverseThroughMultiRelType("CONTAINER_OF",Filters[2]);
+  		traverseThroughMultiRelType("POST_HAS_CREATOR",Filters[3]);
+  		std::vector<FilterType> VertexFilter;
+  		for (auto iter = target.begin(), iter_end = target.end();
+  		     iter != iter_end; iter++) {
+  			FilterType newFilter;
+  			newFilter.setProperty("id", (*iter)->getPropertyValue("id").first.std_str());
+  			VertexFilter.push_back(newFilter);
+  		}
+  
+      auto needRestart = false;
+  		std::map<VertexPointer, unsigned int> targetMap;
+  		for (auto it = target.begin(), it_end = target.end();
+  		     it != it_end; it++) {
+  			MultiPropertyVisitor PropertiesVisitor;
+  			PropertiesVisitor.setFilter(Filters[0]);
+  			PropertiesVisitor.setFilter(Filters[2]);
+  			PropertiesVisitor.setFilter(Filters[3]);
+  			PropertiesVisitor.setRangeFilter(Filters[1]);
+  			PropertiesVisitor.setVertexFilterList(VertexFilter);
+  			PropertiesVisitor.setDepth(3);
+  			PropertiesVisitor.setDepthToCheckVertexProp(3);
+  			PropertiesVisitor.setDepthToCheckRange(1);
+  			PropertiesVisitor.setPropToCheck(2); //check date
+  			auto StartVertex = (*it)->getId();
+        TransactionalBFS txBFS;
+  			txBFS.breadthFirstSearch(Graph, StartVertex, PropertiesVisitor, Tranx, LockManager);
+        if (Tranx->checkStatus() == T_ABORT) {
+          needRestart = true;
+          break;
+        }
+  			targetMap.insert(PropertiesVisitor.getResultMap().begin(),
+  			                 PropertiesVisitor.getResultMap().end());
+  		}///for
 
-		std::map<VertexPointer, unsigned int> targetMap;
-		for (auto it = target.begin(), it_end = target.end();
-		     it != it_end; it++) {
-			MultiPropertyVisitor PropertiesVisitor;
-			PropertiesVisitor.setFilter(Filters[0]);
-			PropertiesVisitor.setFilter(Filters[2]);
-			PropertiesVisitor.setFilter(Filters[3]);
-			PropertiesVisitor.setRangeFilter(Filters[1]);
-			PropertiesVisitor.setVertexFilterList(VertexFilter);
-			PropertiesVisitor.setDepth(3);
-			PropertiesVisitor.setDepthToCheckVertexProp(3);
-			PropertiesVisitor.setDepthToCheckRange(1);
-			PropertiesVisitor.setPropToCheck(2); //check date
-			auto StartVertex = (*it)->getId();
-      TransactionalBFS txBFS;
-			txBFS.breadthFirstSearch(Graph, StartVertex, PropertiesVisitor, Tranx, LockManager);
-			targetMap.insert(PropertiesVisitor.getResultMap().begin(),
-			                 PropertiesVisitor.getResultMap().end());
-		}
+      if (needRestart)  {
+        continue;
+      }
 
+      Tranx->commit();
 #ifdef _PRINTLOG_
 		for (auto it = targetMap.begin(), it_end = targetMap.end();
          it != it_end; ++it) {
@@ -297,6 +385,8 @@ public:
         LdbcFile <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< "\n";
     }
 #endif
+    }
+
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
@@ -313,6 +403,9 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 		FilterType TmpFilter[2];
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[1]);
@@ -369,6 +462,8 @@ public:
       LdbcFile << "Tag " << (*it).first << " has " << (*it).second << " posts\n";
     }
 #endif
+      Tranx->commit();
+    }
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
@@ -386,6 +481,9 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 		FilterType TmpFilter[2];
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
 
@@ -432,6 +530,8 @@ public:
         LdbcFile << "comment/post " << (*it).first->getPropertyValue("id").first << " are made by friend\n" ;
     }
 #endif
+      Tranx->commit();
+    }
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
@@ -446,6 +546,9 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 		FilterType Filters[3];
 		traverseThroughMultiRelType("COMMENT_HAS_CREATOR+POST_HAS_CREATOR", Filters[0]);
 		traverseThroughMultiRelType("REPLY_OF_COMMENT+REPLY_OF_POST", Filters[1]);
@@ -467,6 +570,8 @@ public:
       LdbcFile << "Person " << (*it).second->getPropertyValue("firstName").first << " made replies " << (*it).first->getPropertyValue("id").first << " at " << (*it).first->getPropertyValue("creationDate").first << " to startperson's posts/comments\n";
     }
 #endif
+      Tranx->commit();
+    }
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
@@ -484,6 +589,9 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 		FilterType TmpFilter[2];
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[0]);
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter[1]);
@@ -531,6 +639,8 @@ public:
       LdbcFile << "posts/comments " << (*iter).first->getPropertyValue("id").first << "\t" << (*iter).first->getPropertyValue("creationDate").first << " made by person " << (*iter).second->getPropertyValue("id").first << "\t" <<  (*iter).second->getPropertyValue("firstName").first << "\n";
     }
 #endif
+      Tranx->commit();
+    }
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
@@ -544,9 +654,16 @@ public:
 	typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;
 public:
 
+  virtual void clearStorage( ) {
+	  SimMap.clear();
+  }
+
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 		///first find start person's friends
 		AdjacencyVisitor AdjVisitor;
 		traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
@@ -610,11 +727,14 @@ public:
 			LdbcFile << "person: " << (*it).first->getId() << " similarity score " << (*it).second << "\n";
 #endif
 		}
+      Tranx->commit();
+    }
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
 	}
+
 protected:
 	SimMapType SimMap;
 };
@@ -631,6 +751,9 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 		FilterType TmpFilter;
 		traverseThroughTypeAndDirection("KNOWS", "", TmpFilter);
 
@@ -682,6 +805,8 @@ public:
       LdbcFile << (*iter).first->getPropertyValue("firstName").first << " works at "  << (*iter).second.second->getPropertyValue("id").first << " from " << (*iter).second.first->getPropertyValue(key).first << "\n";
       }
 #endif
+      Tranx->commit();
+    }
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
@@ -695,9 +820,16 @@ public:
 	typedef std::unordered_map<VertexPointer, unsigned int> SimMapType;
 public:
 
+  virtual void clearStorage( ) {
+	  SimMap.clear();
+  }
+
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 		///first find start person's friends
 		AdjacencyVisitor AdjVisitor;
 		traverseThroughTypeAndDirection("KNOWS", "out", AdjVisitor.getFilter());
@@ -739,8 +871,11 @@ public:
 			SimMap[StartVertex] = PostNum;
       LdbcFile << "person: " << StartVertex->getId() << " expert post " << PostNum << "\n";
 #endif
+      Tranx->commit();
+    }
 
 		}
+
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
@@ -766,6 +901,8 @@ public:
 			exit(0);
 		}
 
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 		PathVisitor PVisitor;
 		PVisitor.setEndVertex(endVertex);
     TransactionalBFS txBFS;
@@ -782,6 +919,8 @@ public:
       }
     }
 #endif
+      Tranx->commit();
+    }
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
@@ -801,6 +940,10 @@ public:
               , LockManagerType & LockManager
               ) {
 		getStartTime();
+
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
+
 		SubGraphVisitor SubgVisitor;
 		SubgVisitor.setEndVertex(endVertex);
 		FilterType EdgeFilter;
@@ -849,6 +992,9 @@ public:
 #ifdef _PRINTLOG_
 		LdbcFile << "weight " << Weight <<"\n";
 #endif
+    Tranx->commit();
+    }
+
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
@@ -875,6 +1021,9 @@ public:
                 ) {
 
 		getStartTime();
+
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 
     for (auto EdgeEntry : EdgeMap) {
       /// Search for Vertex
@@ -908,6 +1057,8 @@ public:
 
       auto ExistNextEdge = ExistIndex.first->getNextEdge();
       if (ExistNextEdge && (ExistNextEdge->getFirstVertexPtr() == ExistIndex.first)) {
+        std::cout << ExistNextEdge->getId() << "\t"
+                  << ExistNextEdge->getType().std_str() << "\n";
         if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
           Tranx->abort();
         }
@@ -955,7 +1106,6 @@ public:
       ExistIndex.first->setNextEdge(NewEdge);
     }/// FOR 
 
-		getExecTime();
 
 #ifdef _PRINTLOG_
     int i = 0;
@@ -971,7 +1121,11 @@ public:
       NextEdge = NextEdge->getNextEdge(NewVertex);
     }
 #endif
+    Tranx->commit();
+    }
+/// TODO add locks to map LockManager
 
+		getExecTime();
 		LdbcFile.close();
   }
 
@@ -992,6 +1146,9 @@ public:
                 ) {
 
 		getStartTime();
+
+    while (Tranx->checkStatus() != T_COMMIT) {
+      Tranx->expand();
 
     auto FirstIndex = Index.getVertexIndex(FirstLabel, FirstId);
     auto SecondIndex = Index.getVertexIndex(SecondLabel, SecondId);
@@ -1041,8 +1198,6 @@ public:
       }
     }
 
-		getExecTime();
-
 #ifdef _PRINTLOG_
     VertexPointer FirstVertex = NewEdge->getFirstVertexPtr();
     VertexPointer SecondVertex = NewEdge->getSecondVertexPtr();
@@ -1055,6 +1210,11 @@ public:
               << "\nSecondNextEdge\t" <<  NewEdge->getNextEdge(SecondVertex)->getType() 
               << "\n\n";
 #endif
+    Tranx->commit();
+    }
+
+    /// TODO add locks to lockmap LockManager
+		getExecTime();
 		LdbcFile.close();
 
   }
@@ -1093,6 +1253,7 @@ public:
 		getExecTime();
 		LdbcFile << "Add one more node into network \n";
 		LdbcFile.close();
+    Tranx->commit();
 	}
 protected:
 	BranchMapType BranchMap;

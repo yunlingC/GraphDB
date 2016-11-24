@@ -27,8 +27,7 @@
     -> IdType {
       IdType id = 0;
       TransIdGuard->lock();
-      id = TransNumber;
-      TransNumber++;
+      id = TransNumber++;
       TransIdGuard->unlock();
       return id;
   }
@@ -36,7 +35,7 @@
   auto TransactionManager::addTransaction()
   -> TransactionEntryType {
       auto Id = assignTransId();
-//      std::cout <<"add transaction " << Id << std::endl;
+      std::cout <<"add transaction " << Id << std::endl;
   		TransactionPointer TxPtr = new Transaction(Id);
   		TransTable.insert(std::pair<IdType, TransactionPointer>(Id, TxPtr));
   		return TransactionEntryType(Id, TxPtr);

@@ -28,6 +28,10 @@
 #include <time.h>
 #include <unordered_map>
 
+#ifdef _PRINTLOG_
+#include <iostream>
+#endif
+
 #define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
 #define MILLION 1000000
 #define NANO 1000000000
@@ -50,10 +54,12 @@ public:
 public:
   LdbcQuery(unsigned int Id) : QueryId(Id) {
     LdbcFile.open("ldbc"+std::to_string(Id)+".log", std::ios_base::out| std::ios_base::app);
+    std::cout <<"LdbcQuery\t" << QueryId << "\tconstructor opened file\n";
   }
 
   ~LdbcQuery() {
     LdbcFile.close();
+    std::cout <<"LdbcQuery\t" << QueryId << "\tdestructor closed file\n";
   }
 
   virtual void runQuery(Graph & graph\
@@ -108,6 +114,10 @@ public:
 //              , std::string Key
 //              , std::string Value){}
   
+  ///This function is to support transaction/Query aborts
+  //Clear all member storage for a restart
+  virtual void clearStorage() { }
+
   void setParam(const std::string & Key, const std::string & Value) {
     ParamPair.first = Key;
     ParamPair.second = Value;

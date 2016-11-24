@@ -29,9 +29,13 @@ public:
 
   IdType getId();
 
-  void  commit();
+  bool begin();
 
-  void  abort(); 
+  bool expand();
+
+  bool commit();
+
+  bool abort(); 
 
   bool  rollBack();
 

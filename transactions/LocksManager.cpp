@@ -51,7 +51,7 @@
     ->  MutexPointer {
 #if _DEBUG_ENABLE_
       if (EdgeLockMap.find(EdgeId) == EdgeLockMap.end()) {
-        std::cerr << "Error : No such edge" << EdgeId <<" in map \n";
+        std::cerr << "Error : No such edge\t" << EdgeId <<"\tin map \n";
         exit(0);
       }
 #endif
@@ -924,7 +924,7 @@
     -> void  {
       EdgePtr Edge = Graph.getEdgePointer(EdgeId);
       if (Edge == nullptr) {
-        std::cerr  << "Error : No such edge" << EdgeId <<" in map \n";
+        std::cerr  << "Error : No such edge" << EdgeId << "\tin map \n";
         exit(0);
       }
       EdgeLock*  NewEdgeLock = new EdgeLock();

@@ -100,7 +100,12 @@ public:
           Tranx->abort();
           return;
 				}
-				if (!LockManager.getEdgeLock(NextEdge->getId(), T_SecondVertex, T_SH, TxId)) { Tranx->abort();
+				if (!LockManager.getEdgeLock(NextEdge->getId(), T_SecondVertex, T_SH, TxId)) { 
+          Tranx->abort();
+          return;
+				}
+				if (!LockManager.getEdgeLock(NextEdge->getId(), T_SecondVertex, T_SH, TxId)) { 
+          Tranx->abort();
           return;
 				}
 

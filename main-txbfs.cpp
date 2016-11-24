@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
 
 //  typedef Visitor VisitorType;
   typedef Index IndexType;
-//  typedef LdbcQuery * LdbcQueryPtr;
+  typedef LdbcQuery * LdbcQueryPtr;
   typedef LdbcQuery::TransactionPointerType TransactionPointerType;
   typedef std::vector<GraphType::VertexDescriptor> VertexIdListType;
   typedef GraphType::PropertyListType PropertyListType;
@@ -66,29 +66,29 @@ int main(int argc, char *argv[]) {
 //  else 
 //    cout <<"Vertex Not found\n";
 
-//  std::vector<LdbcQueryPtr> Queries;
+  std::vector<LdbcQueryPtr> Queries;
 
   LdbcQuery1 q1(1);
   q1.setParam("gender", "male");
-//  Queries.push_back(&q1);
+  Queries.push_back(&q1);
 
   LdbcQuery2 q2(2);
   q2.setRange("creationDate", "", "2012-07-16T10:00:00.255"); 
-//  Queries.push_back(&q2);
+  Queries.push_back(&q2);
 
 
   LdbcQuery3 q3(3);
   q3.setPropertyRange("name", "Austria", "Angola"); 
   q3.setRange("creationDate", "2010-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
-//  Queries.push_back(&q3);
+  Queries.push_back(&q3);
 
   LdbcQuery4 q4(4);
   q4.setRange("creationDate", "2010-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
-//  Queries.push_back(&q4);
+  Queries.push_back(&q4);
 
   LdbcQuery5 q5(5);
   q5.setRange("joinDate", "2012-01-00T00:01:00.255", "2013-07-16T23:59:00.255"); 
-//  Queries.push_back(&q5);
+  Queries.push_back(&q5);
 
   LdbcQuery6 q6(6);
   q6.setParam("name", "Peter_Pan");
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
   q16.getVertexId("78038", "PERSON", "8", "POST");
 
   LdbcQueryAddEdge q17(17);
-  q17.initEdge("LIKES_COMMENTS", "creationDate", "2015-9-08T00:47:05.399+0000") ;
+  q17.initEdge("LIKES_COMMENT", "creationDate", "2015-9-08T00:47:05.399+0000") ;
   q17.getVertexId("78038", "PERSON", "68719476749", "COMMENT");
 
   LdbcQueryAddVertex q18(18);
@@ -190,47 +190,47 @@ int main(int argc, char *argv[]) {
   if (run == 1) {
     q1.runQuery(g, persons[0], (TranxList[0]), LkManager);
   
-    q2.runQuery(g, persons[0], (TranxList[0]), LkManager);
+    q2.runQuery(g, persons[0], (TranxList[1]), LkManager);
   
-    q3.runQuery(g, persons[0], (TranxList[0]), LkManager);
+    q3.runQuery(g, persons[0], (TranxList[2]), LkManager);
   
-    q4.runQuery(g, persons[0], (TranxList[0]), LkManager);
+    q4.runQuery(g, persons[0], (TranxList[3]), LkManager);
   
-    q5.runQuery(g, persons[0], (TranxList[0]), LkManager);
+    q5.runQuery(g, persons[0], (TranxList[4]), LkManager);
   
-    q6.runQuery(g, persons[0], (TranxList[0]), LkManager);
+    q6.runQuery(g, persons[0], (TranxList[5]), LkManager);
   
-    q7.runQuery(g, persons[0], (TranxList[0]), LkManager);
+    q7.runQuery(g, persons[0], (TranxList[7]), LkManager);
   
-    q8.runQuery(g, persons[0], (TranxList[0]), LkManager);
+    q8.runQuery(g, persons[0], (TranxList[8]), LkManager);
   
-    q9.runQuery(g, persons[0], (TranxList[0]), LkManager);
+    q9.runQuery(g, persons[0], (TranxList[9]), LkManager);
   
-    q10.runQuery(g, persons[0], (TranxList[0]), LkManager);
+    q10.runQuery(g, persons[0], (TranxList[10]), LkManager);
   
-    q11.runQuery(g, persons[0], (TranxList[0]), LkManager);
+    q11.runQuery(g, persons[0], (TranxList[11]), LkManager);
   
-    q12.runQuery(g, persons[0], (TranxList[0]), LkManager);
+    q12.runQuery(g, persons[0], (TranxList[12]), LkManager);
   
-    q13.runQuery(g, persons[0], persons[10], (TranxList[0]), LkManager);
+    q13.runQuery(g, persons[0], persons[10], (TranxList[13]), LkManager);
     
-    q14.runQuery(g, persons[0], persons[10], (TranxList[0]), LkManager);
+    q14.runQuery(g, persons[0], persons[10], (TranxList[14]), LkManager);
   
-    q15.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+    q15.runQuery(g, persons[0], (TranxList[15]), LkManager, Index);
   
-    q16.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+    q16.runQuery(g, persons[0], (TranxList[16]), LkManager, Index);
 
-    q17.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+    q17.runQuery(g, persons[0], (TranxList[17]), LkManager, Index);
   
-    q18.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+    q18.runQuery(g, persons[0], (TranxList[18]), LkManager, Index);
 
-    q19.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+    q19.runQuery(g, persons[0], (TranxList[19]), LkManager, Index);
   
-    q20.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+    q20.runQuery(g, persons[0], (TranxList[20]), LkManager, Index);
 
-    q21.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+    q21.runQuery(g, persons[0], (TranxList[21]), LkManager, Index);
 
-    q22.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+    q22.runQuery(g, persons[0], (TranxList[22]), LkManager, Index);
   } 
   else if (run == 2)  {
 
@@ -256,29 +256,37 @@ int main(int argc, char *argv[]) {
 
   else if (run == 3) {
 
-    q21.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
-
-    q15.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
-  
-    q16.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
-
-//    q17.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+//    q1.runQuery(g, persons[0], (TranxList[0]), LkManager);
+//
+//    q2.runQuery(g, persons[0], (TranxList[1]), LkManager);
 //  
-//    q18.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+//    q3.runQuery(g, persons[0], (TranxList[2]), LkManager);
+//  
+//    q4.runQuery(g, persons[0], (TranxList[3]), LkManager);
+//  
+//    q5.runQuery(g, persons[0], (TranxList[4]), LkManager);
 
-//    q19.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
-  
-//    q20.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+//   q15.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+   
+//   q16.runQuery(g, persons[0], (TranxList[1]), LkManager, Index);
 
+//   q17.runQuery(g, persons[0], (TranxList[2]), LkManager, Index);
+// 
+//   q18.runQuery(g, persons[0], (TranxList[3]), LkManager, Index);
+//
+//   q19.runQuery(g, persons[0], (TranxList[4]), LkManager, Index);
 
- //   q22.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
+//   q20.runQuery(g, persons[0], (TranxList[5]), LkManager, Index);
+//
+//   q21.runQuery(g, persons[0], (TranxList[6]), LkManager, Index);
+//
+//   q22.runQuery(g, persons[0], (TranxList[7]), LkManager, Index);
   }
 
   else {
     std::cout << "Error: Not single thread or multithread\n";
     exit(0);
   }
-//  
 //  for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
 //  VisitorType Visitor;
 
