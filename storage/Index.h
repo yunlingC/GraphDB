@@ -55,7 +55,11 @@ public:
     assert(Object != nullptr);
     auto retValue = Object->getPropertyValue(key);
     auto Label = Object->getType().std_str();
-///    std::cout << "++ Vertex " << Label << " Value " << retValue.first << "\n";
+    
+#ifdef _DEBUG_
+//    std::cout << "++ Vertex " << Label << " Value " << retValue.first << "\n";
+#endif
+
       if (retValue.second) {
         if (_IndexMap.find(Label) != _IndexMap.end()) {
           _IndexMap[Label].insert(IndexEntryType(retValue.first.std_str(), Object));
@@ -144,6 +148,9 @@ public:
     return VertexIndexMap.getNumIndices();
   }
 
+  bool buildVertexIndex(const KeyType & key, VertexPointer VertexPtr) {
+      return VertexIndexMap.buildIndex(key, VertexPtr);
+  }
 
   unsigned int  buildEdgeIndex(KeyType key) {
     auto Edges = _Graph.getAllEdges();

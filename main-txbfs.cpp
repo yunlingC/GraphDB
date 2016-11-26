@@ -58,13 +58,13 @@ int main(int argc, char *argv[]) {
   auto NumIndices =  Index.buildVertexIndex("id");
   cout <<"Indexing vertex " << NumIndices << "\n";
 
-//  auto IndexEntry = Index.getVertexIndex( "420","PERSON" );
-//  if (IndexEntry.second)  {
-//    cout << (IndexEntry.first)->getPropertyValue("firstName").first
-//          << "\t" << (IndexEntry.first)->getId() << endl;
-//  }
-//  else 
-//    cout <<"Vertex Not found\n";
+  auto IndexEntry = Index.getVertexIndex("PERSON", "78038");
+  if (IndexEntry.second)  {
+    cout << (IndexEntry.first)->getPropertyValue("firstName").first
+          << "\t" << (IndexEntry.first)->getId() << endl;
+  }
+  else 
+    cout <<"Vertex Not found\n";
 
   std::vector<LdbcQueryPtr> Queries;
 
@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
 
   LdbcQueryAddEdge q22(22);
   q22.initEdge("KNOWS", "creationDate", "2015-10-08T00:47:05.399+0000") ;
-  q22.getVertexId("78038", "PERSON", "PERSON", "420");
+  q22.getVertexId("78038", "PERSON", "420", "PERSON");
   /*** End of Update queries definition ***/
 
   std::vector<TransactionPointerType> TranxList;
@@ -216,21 +216,30 @@ int main(int argc, char *argv[]) {
     
 //    q14.runQuery(g, persons[0], persons[10], (TranxList[13]), LkManager);
   
+    LkManager.dumpMaps();
     q15.runQuery(g, persons[0], (TranxList[14]), LkManager, Index);
+    LkManager.dumpMaps();
   
     q16.runQuery(g, persons[0], (TranxList[15]), LkManager, Index);
+    LkManager.dumpMaps();
 
     q17.runQuery(g, persons[0], (TranxList[16]), LkManager, Index);
+    LkManager.dumpMaps();
   
-//    q18.runQuery(g, persons[0], (TranxList[17]), LkManager, Index);
+    q18.runQuery(g, persons[0], (TranxList[17]), LkManager, Index);
+    LkManager.dumpMaps();
 
-//    q19.runQuery(g, persons[0], (TranxList[18]), LkManager, Index);
-  
-//    q20.runQuery(g, persons[0], (TranxList[19]), LkManager, Index);
+    q19.runQuery(g, persons[0], (TranxList[18]), LkManager, Index);
+    LkManager.dumpMaps();
+
+    q20.runQuery(g, persons[0], (TranxList[19]), LkManager, Index);
+    LkManager.dumpMaps();
 
 //    q21.runQuery(g, persons[0], (TranxList[20]), LkManager, Index);
+//    LkManager.dumpMaps();
 
-//    q22.runQuery(g, persons[0], (TranxList[21]), LkManager, Index);
+    q22.runQuery(g, persons[0], (TranxList[21]), LkManager, Index);
+    LkManager.dumpMaps();
   } 
   else if (run == 2)  {
 

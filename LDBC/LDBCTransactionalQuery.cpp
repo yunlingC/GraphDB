@@ -1157,13 +1157,57 @@ public:
 class LdbcQueryAddVertex : public LdbcAddVertexQuery {
   using LdbcAddVertexQuery::LdbcAddVertexQuery;
 public:
+  typedef std::pair<EdgePointer, std::pair<bool, bool> > EdgePointerEntryType;
+  typedef std::vector<EdgePointerEntryType> EdgePointerMapType;
+  
+  void clearStorage() {
+    EdgePtrMap.clear();
+    NewVertex->setNextEdge(nullptr);
+  }
   /// This function is a simplified function of chainEdges in Edge class
   /// We simplify it because we know more information about how/what edges are created
   /// We don't need to query the whole graph to chain edges as in Edge class
   /// Basically the newly created edges will be chained first
   /// Edges involved with existing vertices won't be chained in this function
-  void chainEdges();
+  void chainEdges() {
+      for (auto EdgeEntry : EdgePtrMap) {
+        /// Search for Vertex
+        EdgePointer NewEdge = EdgeEntry.first;
+        bool isFirstExisted = EdgeEntry.second.first;
+        bool isExistedFirst = EdgeEntry.second.second;
+//        VertexPointer NewVertex = NewEdge->getFirstVertexPtr();
+        VertexPointer ExistVertex = NewEdge->getSecondVertexPtr();
+        if (isFirstExisted) {
+//          NewVertex = NewEdge->getSecondVertexPtr();
+          ExistVertex = NewEdge->getFirstVertexPtr();
+        }
 
+        std::cout << "Existing vertex\n";
+        std::cout << ExistVertex->getId() << "\t"
+                  << ExistVertex->getType().std_str() 
+                  << "\n";
+  
+        auto ExistNextEdge = ExistVertex->getNextEdge();
+        /// Existed vertex does NOT have NextEdge or is the FirstVertex of NextEdge
+        if (isExistedFirst && ExistNextEdge) {
+          ExistNextEdge->setFirstPreviousEdge(NewEdge);
+        } 
+        else if (ExistNextEdge) {
+          ExistNextEdge->setSecondPreviousEdge(NewEdge);
+        }
+
+        if (ExistNextEdge)  {
+          std::cout <<"Existing Next Edge\n";
+          std::cout << ExistNextEdge->getId() << "\t"
+                    << ExistNextEdge->getType().std_str() << "\n";
+        }
+
+        ExistVertex->setNextEdge(NewEdge);
+       
+
+      }/// FOR 
+  }
+  
   /// Get locks only on exisiting edges and vertices
 	virtual void runQuery(GraphType & Graph
                 , VertexDescriptor StartVertex
@@ -1177,6 +1221,7 @@ public:
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
+      clearStorage();
 
       bool needRestart = false;
       for (auto EdgeEntry : EdgeMap) {
@@ -1193,9 +1238,16 @@ public:
         bool isExistedFirst = true;
   
         if (!ExistIndex.second) {
-  ///       assert(); 
-          exit(0);
+          std::cout << "Error: Fail in getting index on\n" ;
+          ///TODO change 
+//          exit(0);
+           continue;
         }
+
+        std::cout << "Existing vertex\n";
+        std::cout << ExistIndex.first->getId() << "\t"
+                  << ExistIndex.first->getType().std_str() 
+                  << "\n";
         if (NewEdge->getFirstVertexPtr() == NewVertex) {
   
           NewEdge->setSecondVertexPtr(ExistIndex.first);
@@ -1213,6 +1265,7 @@ public:
   
         auto ExistNextEdge = ExistIndex.first->getNextEdge();
         if (ExistNextEdge && (ExistNextEdge->getFirstVertexPtr() == ExistIndex.first)) {
+          std::cout <<"Existing Next Edge\n";
           std::cout << ExistNextEdge->getId() << "\t"
                     << ExistNextEdge->getType().std_str() << "\n";
           if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
@@ -1221,6 +1274,11 @@ public:
           }
         }
         else if(ExistNextEdge && (ExistNextEdge->getSecondVertexPtr() == ExistIndex.first)) {
+
+          std::cout <<"Existing Next Edge\n";
+          std::cout << ExistNextEdge->getId() << "\t"
+                    << ExistNextEdge->getType().std_str() << "\n";
+
           isExistedFirst = false;
           if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
             Tranx->abort();
@@ -1242,13 +1300,6 @@ public:
           NewEdge->setFirstNextEdge(NewVertex->getNextEdge());
         }
   
-        /// ExistVertex's NextEdge -> FirstPreviousEdge/SecondPreviousEdge
-        if (isExistedFirst) {
-          ExistNextEdge->setFirstPreviousEdge(NewEdge);
-        } else {
-          ExistNextEdge->setSecondPreviousEdge(NewEdge);
-        }
-  
         ///NewVertex's NextEdge -> FirstPreviousEdge/SecondPreviousEdge
         auto NewVertexNextEdge = NewVertex->getNextEdge();
         if (NewVertexNextEdge)  {
@@ -1261,7 +1312,9 @@ public:
         
         /// ExistedVertex & NewVertex -> NextEdge
         NewVertex->setNextEdge(NewEdge);
-        ExistIndex.first->setNextEdge(NewEdge);
+//        ExistIndex.first->setNextEdge(NewEdge);
+        EdgePtrMap.push_back(EdgePointerEntryType(NewEdge, 
+                         std::pair<bool, bool>(isFirstExisted, isExistedFirst)));
       }/// FOR 
   
       if(needRestart)  {
@@ -1283,16 +1336,28 @@ public:
         NextEdge = NextEdge->getNextEdge(NewVertex);
       }
 #endif
-    }
+    }///while
 /// TODO add locks to map LockManager
 
+    chainEdges();
+    auto NewVertexId = Graph.addVertex(NewVertex);
+    Index.buildVertexIndex("id", NewVertex);
+    LockManager.addToVertexLockMap(NewVertex->getId());
+//      std::cout <<"Transaction\t" << Tranx->getId()
+//              <<"\tadd vertex lock\t" <<  NewVertex->getId()
+//              <<"\t to map\n";
+    for(auto EdgePtr : EdgePtrMap)  {
+      Graph.addEdge(EdgePtr.first, false);
+      LockManager.addToEdgeLockMap(EdgePtr.first->getId());
+    }
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
   }
 
 protected:
   ValueType NewVertexId;
-
+  EdgePointerMapType EdgePtrMap;
 };
 
 class LdbcQueryAddEdge : public LdbcAddEdgeQuery {
@@ -1308,79 +1373,106 @@ public:
 
 		getStartTime();
 
+    bool addSuccess = false;
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
 
-    auto FirstIndex = Index.getVertexIndex(FirstLabel, FirstId);
-    auto SecondIndex = Index.getVertexIndex(SecondLabel, SecondId);
-    /// If both end vertices are retrievable, get locks on both vertex pointers
-    if (FirstIndex.second && SecondIndex.second) {
-      /// Switch here
-      if (!LockManager.getVertexLock(FirstIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId())) {
-        Tranx->abort();
-        break;
-      }
-      if (!LockManager.getVertexLock(SecondIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId()))  {
-        Tranx->abort();
-        break;
-      }
-      auto FNEdge = FirstIndex.first->getNextEdge();
-      if (FNEdge) {
-        if (!LockManager.getEdgeLock(FNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
-          Tranx->abort();
-          break;
-        }
-        if (!LockManager.getEdgeLock(FNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
-          Tranx->abort();
-          break;
-        }
-      }
+      auto FirstIndex = Index.getVertexIndex(FirstLabel, FirstId);
+      auto SecondIndex = Index.getVertexIndex(SecondLabel, SecondId);
+      /// If both end vertices are retrievable, get locks on both vertex pointers
 
-      auto SNEdge = SecondIndex.first->getNextEdge();
-      if (SNEdge) {
-        if (!LockManager.getEdgeLock(SNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+      if (FirstIndex.second && SecondIndex.second) {
+        std::cout << "First Vertex\t" << FirstIndex.first->getId()
+                  << "\tLabel\t" << FirstIndex.first->getType().std_str()
+                  << "\n"
+                  << "Second Vertex\t" << SecondIndex.first->getId()
+                  << "\tLabel\t" << SecondIndex.first->getType().std_str()
+                  << "\n";
+        /// Switch here
+        if (!LockManager.getVertexLock(FirstIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId())) {
           Tranx->abort();
           break;
         }
-        if (!LockManager.getEdgeLock(SNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+        if (!LockManager.getVertexLock(SecondIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId()))  {
           Tranx->abort();
           break;
         }
-      }
+        auto FNEdge = FirstIndex.first->getNextEdge();
+        if (FNEdge) {
+          if (!LockManager.getEdgeLock(FNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+            Tranx->abort();
+            break;
+          }
+          if (!LockManager.getEdgeLock(FNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+            Tranx->abort();
+            break;
+          }
+        }
 
-      FirstIndex.first->setNextEdge(NewEdge);
-      SecondIndex.first->setNextEdge(NewEdge);
-      NewEdge->setFirstVertexPtr(FirstIndex.first);
-      NewEdge->setSecondVertexPtr(SecondIndex.first);
-      NewEdge->setFirstNextEdge(FNEdge);
-      NewEdge->setSecondNextEdge(SNEdge);
+        auto SNEdge = SecondIndex.first->getNextEdge();
+        if (SNEdge) {
+          if (!LockManager.getEdgeLock(SNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+            Tranx->abort();
+            break;
+          }
+          if (!LockManager.getEdgeLock(SNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+            Tranx->abort();
+            break;
+          }
+        }
+
+        FirstIndex.first->setNextEdge(NewEdge);
+        SecondIndex.first->setNextEdge(NewEdge);
+        NewEdge->setFirstVertexPtr(FirstIndex.first);
+        NewEdge->setSecondVertexPtr(SecondIndex.first);
+        NewEdge->setFirstNextEdge(FNEdge);
+        NewEdge->setSecondNextEdge(SNEdge);
  
-      if (FNEdge) {
-        FNEdge->setFirstPreviousEdge(NewEdge);
-        FNEdge->setSecondPreviousEdge(NewEdge);
+        if (FNEdge) {
+          FNEdge->setFirstPreviousEdge(NewEdge);
+          FNEdge->setSecondPreviousEdge(NewEdge);
+        }
+        if (SNEdge) {
+          SNEdge->setFirstPreviousEdge(NewEdge);
+          SNEdge->setSecondPreviousEdge(NewEdge);
+        }
+        addSuccess = true;
+      }///if
+      else {
+
+        std::cout << "Error: both vertices do NOT exist\n";
       }
-      if (SNEdge) {
-        SNEdge->setFirstPreviousEdge(NewEdge);
-        SNEdge->setSecondPreviousEdge(NewEdge);
-      }
+
+      Tranx->commit();
+//      std::cout <<"Transaction\t" << Tranx->getId() << "\t status\t" 
+//                << Tranx->checkStatus() << "\n";
+    }///while
+
+    /// TODO add locks to lockmap LockManager
+    if ( addSuccess ) {
+      auto NewEdgeId = Graph.addEdge(NewEdge, false);
+      LockManager.addToEdgeLockMap(NewEdgeId);
+//      std::cout <<"Transaction\t" << Tranx->getId()
+//              <<"\tadd edge lock\t" <<  NewEdgeId
+//              <<"\t to map\n";
     }
 
-    Tranx->commit();
 #ifdef _PRINTLOG_
-      VertexPointer FirstVertex = NewEdge->getFirstVertexPtr();
-      VertexPointer SecondVertex = NewEdge->getSecondVertexPtr();
+    VertexPointer FirstVertex = NewEdge->getFirstVertexPtr();
+    VertexPointer SecondVertex = NewEdge->getSecondVertexPtr();
+    if (addSuccess)  {
   		LdbcFile << "NewEdge\t" << NewEdge->getType() << "\t" << NewEdge->getId() 
                 << "\nFirstVertex\t" << FirstVertex->getType() 
                 << "\t" << FirstVertex->getId()
                 << "\nSecondVertex\t" << SecondVertex->getType()
                 << "\t" << SecondVertex->getId()
                 << "\nFirstNextEdge\t" <<  NewEdge->getNextEdge(FirstVertex)->getType() 
-                << "\nSecondNextEdge\t" <<  NewEdge->getNextEdge(SecondVertex)->getType() 
+                << "\nSecondNextEdge\t" << NewEdge->getNextEdge(SecondVertex)->getType() 
                 << "\n\n";
-#endif
     }
+#endif
 
-    /// TODO add locks to lockmap LockManager
+		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
   }

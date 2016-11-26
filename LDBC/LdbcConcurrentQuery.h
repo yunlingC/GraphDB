@@ -231,8 +231,6 @@ public:
 //
 protected:
   EdgePointer NewEdge;
-//  VertexDescriptor FirstId;
-//  VertexDescriptor SecondId;
   ValueType FirstId;
   ValueType SecondId;
   LabelType   FirstLabel;

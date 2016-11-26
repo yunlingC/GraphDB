@@ -395,7 +395,20 @@ auto GraphType::addEdge(EdgePointer NewEdge)
   ++NumberOfEdges;
   Edges.push_back(NewEdge);
   return NewEdge->getId();
+  }
 
+auto GraphType::addEdge(EdgePointer NewEdge, bool needChainEdges) 
+  -> EdgeDescriptor {
+    if ( needChainEdges ) {
+      return addEdge(NewEdge);
+    }
+    else {
+      NewEdge->setId(NumberOfEdges);    
+      EdgeMap.insert(EdgeEntryType(NumberOfEdges, NewEdge));
+      ++NumberOfEdges;
+      Edges.push_back(NewEdge);
+      return NewEdge->getId();
+    }
   }
 
 #ifdef _DEBUG_

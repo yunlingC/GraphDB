@@ -108,6 +108,8 @@ public:
 
   EdgeDescriptor addEdge(EdgePointer NewEdge);
 
+  EdgeDescriptor addEdge(EdgePointer NewEdge, bool needChainEdges);
+
 /// Allocate memory for vertices and edges
 #ifdef _FIXALLOC_
   void allocVertexMemory(unsigned int Size);

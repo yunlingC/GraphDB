@@ -43,10 +43,11 @@ public:
   typedef std::unordered_map<IdType, EdgeLock>    EdgeLockMapType;
   typedef std::pair<IdType, VertexLock> VLockPair;
   typedef std::pair<IdType, EdgeLock>   ELockPair;
-  typedef std::vector<std::pair<VertexPtr, std::pair<MutexType, LockType> > > VLockListType; 
+  typedef std::vector<std::pair<VertexPtr,std::pair<MutexType,LockType> > > VLockListType; 
   typedef std::vector<std::pair<EdgePtr, std::pair<MutexType, LockType> > > ELockListType; 
   typedef std::set<LockPointer> LockListType;
-  typedef std::unordered_map<IdType,  LockType> TransMapType;
+  typedef std::set<LockType> LockTpSetType;
+  typedef std::unordered_map<IdType,  LockTpSetType> TransMapType;
   typedef std::unordered_map<IdType, LockListType> TransactionResourceMap;
   typedef std::unordered_map<LockPointer, TransMapType> ResourceTransactionMap;
   typedef std::unordered_map<IdType, LockPointer> WaitingTransactionMap;
@@ -136,6 +137,7 @@ public:
   void  dumpMaps();
   void  dumpTransMap();
   void  dumpResrMap();
+  void  dumpTransMap(IdType TransId);
 #endif
 #endif /*_DEADLOCK_DETECTION_*/
 
