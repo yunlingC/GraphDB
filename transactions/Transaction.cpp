@@ -125,7 +125,7 @@
     }
 #ifdef _PRINTLOG_
     if (retValue)
-    std::cout <<"Transaction\t" << TransId << "\tCOMMIT\n";
+    std::cout <<"Transaction\t" << TransId << "\tABORT\n";
 #endif  
     return retValue;
   }

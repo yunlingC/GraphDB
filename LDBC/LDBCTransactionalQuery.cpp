@@ -100,20 +100,20 @@ public:
       Tranx->commit();
   
   #ifdef _PRINTLOG_
-      if(Tranx->checkStatus() == T_COMMIT) {
-    		auto target = TypeVisitor.getVertexList();
-        auto targets = TypeVisitor.getTargetsMap();
-        LdbcFile << StartVertex << "\thas friends made\t" << target.size() 
-                  << "\tcomments and posts \n";
-        for(auto it = targets.begin(); it != targets.end(); ++it) {
-          LdbcFile <<"person " << (*it).first->getId() 
-                  << "\t" << (*it).second->getPropertyValue("id").first 
-                  << "\t" <<"comments/posts" 
-                  << "\t" << (*it).first->getPropertyValue("id").first 
-                  << "\t" << (*it).first->getPropertyValue("creationDate").first ;
-          LdbcFile << "\n";
-        }
-      }
+//      if(Tranx->checkStatus() == T_COMMIT) {
+//    		auto target = TypeVisitor.getVertexList();
+//        auto targets = TypeVisitor.getTargetsMap();
+//        LdbcFile << StartVertex << "\thas friends made\t" << target.size() 
+//                  << "\tcomments and posts \n";
+//        for(auto it = targets.begin(); it != targets.end(); ++it) {
+//          LdbcFile <<"person " << (*it).first->getId() 
+//                  << "\t" << (*it).second->getPropertyValue("id").first 
+//                  << "\t" <<"comments/posts" 
+//                  << "\t" << (*it).first->getPropertyValue("id").first 
+//                  << "\t" << (*it).first->getPropertyValue("creationDate").first ;
+//          LdbcFile << "\n";
+//        }
+//      }
   #endif
     }
 
@@ -1410,7 +1410,7 @@ public:
         }
 
         auto SNEdge = SecondIndex.first->getNextEdge();
-        if (SNEdge) {
+        if (SNEdge && (SNEdge != FNEdge) ) {
           if (!LockManager.getEdgeLock(SNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
             Tranx->abort();
             break;
@@ -1421,6 +1421,7 @@ public:
           }
         }
 
+        std::cout <<"Addedge\tget all locks\n";
         FirstIndex.first->setNextEdge(NewEdge);
         SecondIndex.first->setNextEdge(NewEdge);
         NewEdge->setFirstVertexPtr(FirstIndex.first);

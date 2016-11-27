@@ -58,13 +58,13 @@ int main(int argc, char *argv[]) {
   auto NumIndices =  Index.buildVertexIndex("id");
   cout <<"Indexing vertex " << NumIndices << "\n";
 
-  auto IndexEntry = Index.getVertexIndex("PERSON", "78038");
-  if (IndexEntry.second)  {
-    cout << (IndexEntry.first)->getPropertyValue("firstName").first
-          << "\t" << (IndexEntry.first)->getId() << endl;
-  }
-  else 
-    cout <<"Vertex Not found\n";
+//  auto IndexEntry = Index.getVertexIndex("PERSON", "78038");
+//  if (IndexEntry.second)  {
+//    cout << (IndexEntry.first)->getPropertyValue("firstName").first
+//          << "\t" << (IndexEntry.first)->getId() << endl;
+//  }
+//  else 
+//    cout <<"Vertex Not found\n";
 
   std::vector<LdbcQueryPtr> Queries;
 
@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
 
   LdbcQueryAddEdge q22(22);
   q22.initEdge("KNOWS", "creationDate", "2015-10-08T00:47:05.399+0000") ;
-  q22.getVertexId("78038", "PERSON", "420", "PERSON");
+  q22.getVertexId("7803", "PERSON", "420", "PERSON");
   /*** End of Update queries definition ***/
 
   std::vector<TransactionPointerType> TranxList;
@@ -188,58 +188,58 @@ int main(int argc, char *argv[]) {
 
 
   if (run == 1) {
-//    q1.runQuery(g, persons[0], (TranxList[0]), LkManager);
-//  
-//    q2.runQuery(g, persons[0], (TranxList[1]), LkManager);
-//  
-//    q3.runQuery(g, persons[0], (TranxList[2]), LkManager);
-//  
-//    q4.runQuery(g, persons[0], (TranxList[3]), LkManager);
-//  
-//    q5.runQuery(g, persons[0], (TranxList[4]), LkManager);
-//  
-//    q6.runQuery(g, persons[0], (TranxList[5]), LkManager);
-//  
-//    q7.runQuery(g, persons[0], (TranxList[6]), LkManager);
-//  
-//    q8.runQuery(g, persons[0], (TranxList[7]), LkManager);
-//  
-//    q9.runQuery(g, persons[0], (TranxList[8]), LkManager);
-//  
-//    q10.runQuery(g, persons[0], (TranxList[9]), LkManager);
-//  
-//    q11.runQuery(g, persons[0], (TranxList[10]), LkManager);
-//  
-//    q12.runQuery(g, persons[0], (TranxList[11]), LkManager);
+    q1.runQuery(g, persons[0], (TranxList[0]), LkManager);
   
-//    q13.runQuery(g, persons[0], persons[10], (TranxList[12]), LkManager);
-    
-//    q14.runQuery(g, persons[0], persons[10], (TranxList[13]), LkManager);
+    q2.runQuery(g, persons[0], (TranxList[1]), LkManager);
   
-    LkManager.dumpMaps();
+    q3.runQuery(g, persons[0], (TranxList[2]), LkManager);
+  
+    q4.runQuery(g, persons[0], (TranxList[3]), LkManager);
+  
+    q5.runQuery(g, persons[0], (TranxList[4]), LkManager);
+  
+    q6.runQuery(g, persons[0], (TranxList[5]), LkManager);
+  
+    q7.runQuery(g, persons[0], (TranxList[6]), LkManager);
+  
+    q8.runQuery(g, persons[0], (TranxList[7]), LkManager);
+  
+    q9.runQuery(g, persons[0], (TranxList[8]), LkManager);
+  
+    q10.runQuery(g, persons[0], (TranxList[9]), LkManager);
+  
+    q11.runQuery(g, persons[0], (TranxList[10]), LkManager);
+  
+    q12.runQuery(g, persons[0], (TranxList[11]), LkManager);
+
+    q13.runQuery(g, persons[0], persons[10], (TranxList[12]), LkManager);
+  
+    q14.runQuery(g, persons[0], persons[10], (TranxList[13]), LkManager);
+  
+//    LkManager.dumpMaps();
     q15.runQuery(g, persons[0], (TranxList[14]), LkManager, Index);
-    LkManager.dumpMaps();
+//    LkManager.dumpMaps();
   
     q16.runQuery(g, persons[0], (TranxList[15]), LkManager, Index);
-    LkManager.dumpMaps();
+//    LkManager.dumpMaps();
 
     q17.runQuery(g, persons[0], (TranxList[16]), LkManager, Index);
-    LkManager.dumpMaps();
+//    LkManager.dumpMaps();
   
     q18.runQuery(g, persons[0], (TranxList[17]), LkManager, Index);
-    LkManager.dumpMaps();
+//    LkManager.dumpMaps();
 
     q19.runQuery(g, persons[0], (TranxList[18]), LkManager, Index);
-    LkManager.dumpMaps();
+//    LkManager.dumpMaps();
 
     q20.runQuery(g, persons[0], (TranxList[19]), LkManager, Index);
-    LkManager.dumpMaps();
+//    LkManager.dumpMaps();
 
-//    q21.runQuery(g, persons[0], (TranxList[20]), LkManager, Index);
+    q21.runQuery(g, persons[0], (TranxList[20]), LkManager, Index);
 //    LkManager.dumpMaps();
 
     q22.runQuery(g, persons[0], (TranxList[21]), LkManager, Index);
-    LkManager.dumpMaps();
+//    LkManager.dumpMaps();
   } 
   else if (run == 2)  {
 
@@ -259,6 +259,14 @@ int main(int argc, char *argv[]) {
     threads.push_back(std::thread([&]{q12.runQuery(g, persons[0], (TranxList[11]), LkManager);}));
     threads.push_back(std::thread([&]{q13.runQuery(g, persons[0], persons[100], (TranxList[12]), LkManager);}));
     threads.push_back(std::thread([&]{q14.runQuery(g, persons[0], persons[100], (TranxList[13]), LkManager);}));
+    threads.push_back(std::thread([&]{q15.runQuery(g, persons[0], (TranxList[14]), LkManager, Index);})); 
+    threads.push_back(std::thread([&]{q16.runQuery(g, persons[0], (TranxList[15]), LkManager, Index);}));
+    threads.push_back(std::thread([&]{q17.runQuery(g, persons[0], (TranxList[16]), LkManager, Index);}));
+    threads.push_back(std::thread([&]{q18.runQuery(g, persons[0], (TranxList[17]), LkManager, Index);}));
+    threads.push_back(std::thread([&]{q19.runQuery(g, persons[0], (TranxList[18]), LkManager, Index);}));
+    threads.push_back(std::thread([&]{q20.runQuery(g, persons[0], (TranxList[19]), LkManager, Index);}));
+    threads.push_back(std::thread([&]{q21.runQuery(g, persons[0], (TranxList[20]), LkManager, Index);}));
+    threads.push_back(std::thread([&]{q22.runQuery(g, persons[0], (TranxList[21]), LkManager, Index);}));
 
     for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
   }

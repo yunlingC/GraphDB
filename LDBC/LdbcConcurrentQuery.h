@@ -54,12 +54,12 @@ public:
 public:
   LdbcQuery(unsigned int Id) : QueryId(Id) {
     LdbcFile.open("ldbc"+std::to_string(Id)+".log", std::ios_base::out| std::ios_base::app);
-    std::cout <<"LdbcQuery\t" << QueryId << "\tconstructor opened file\n";
+//    std::cout <<"LdbcQuery\t" << QueryId << "\tconstructor opened file\n";
   }
 
   ~LdbcQuery() {
     LdbcFile.close();
-    std::cout <<"LdbcQuery\t" << QueryId << "\tdestructor closed file\n";
+//    std::cout <<"LdbcQuery\t" << QueryId << "\tdestructor closed file\n";
   }
 
   virtual void runQuery(Graph & graph\
