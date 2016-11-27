@@ -468,7 +468,14 @@
                       << "\twaits for lock\t" << MutexPtr
                       << "\ton type\t" << Lock
                       << "\n";
-            while (!tryLock(MutexPtr, Lock));
+            int trial = 5; 
+            while (!tryLock(MutexPtr, Lock) && trial > 0) {
+              trial--;
+            }
+            if (trial < 0) {
+              std::cout << "Abort\n";
+              return false;
+            }
 //            /// Acquire lock again for registration
             bool isReg  = LocksManager::registerToMap(TxId, MutexPtr, Lock);
             std::cout << "Transaction\t" << TxId
@@ -541,7 +548,14 @@
         case T_Wait: {
           DeadlockDetector->unlock();
 //          while (!(LocksManager::getEdgeLock(EId, Mutex, Lock)));
-          while (!tryLock(MutexPtr, Lock));
+          int trial = 5;
+          while (!tryLock(MutexPtr, Lock) && trial > 0)  {
+            trial--;
+          }
+          if (trial <= 0) {
+            std::cout << "Abort\n";
+            return false;
+          }
           bool isReg  = LocksManager::registerToMap(TxId, MutexPtr, Lock);
           std::cout << "Transaction\t" << TxId
                     << "Waits end and registers\t" << isReg

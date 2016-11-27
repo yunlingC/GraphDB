@@ -1271,6 +1271,7 @@ public:
           if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
             Tranx->abort();
             needRestart = true;
+            break;
           }
         }
         else if(ExistNextEdge && (ExistNextEdge->getSecondVertexPtr() == ExistIndex.first)) {
@@ -1283,6 +1284,7 @@ public:
           if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
             Tranx->abort();
             needRestart = true;
+            break;
           }
         } ///IF_EXISTED_FIRST
   
