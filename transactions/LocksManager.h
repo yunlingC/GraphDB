@@ -90,6 +90,10 @@ public:
 
   LockRetPairType requireEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock);
 
+  MutexPointer  getVertexLockPointer(IdType VertexId, MutexType Mutex);
+
+  MutexPointer  getEdgeLockPointer(IdType VertexId, MutexType Mutex);
+
   /*  New functions added to support deadlock detection */
 //  bool getLock(IdType ObjectId, MutexType Mutex, LockType Lock, IdType TxId);
 
@@ -180,11 +184,8 @@ public:
 
 #endif
 
+
 protected:
-  MutexPointer  getVertexLockPointer(IdType VertexId, MutexType Mutex);
-
-  MutexPointer  getEdgeLockPointer(IdType VertexId, MutexType Mutex);
-
   // LockType can be either SH or EX
   bool  tryLock(MutexPointer MutexPtr, LockType LType);
 

@@ -431,7 +431,7 @@
                                     , LockType Lock
                                     , IdType TxId
                                     ){
-
+#
         auto MutexPtr = getVertexLockPointer(VId, Mutex);
         DeadlockDetector->lock();
         bool isRegistered = registerLockMap(TxId, MutexPtr, Lock);

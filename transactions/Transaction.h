@@ -16,12 +16,23 @@
 #define _TRANSACTION_H_
 
 #include "Concurrency_control_config.h"
+#include "Lock.h"
 
 #include <stdlib.h>
+#include <unordered_map>
+
+#define _TRANX_STATS_ true
+
+//class VertexLock;
 
 class Transaction {
 public:
   typedef unsigned int IdType;
+#ifdef _TRANX_STATS_
+  typedef VertexLock::MutexPointer MutexPointer;
+  typedef std::pair<MutexPointer, int> MutexPairType;
+  typedef std::unordered_map<MutexPointer, int> MutexMapType;
+#endif
 public:
   Transaction(); 
 
@@ -43,12 +54,25 @@ public:
 
   ~Transaction();
 
+#ifdef _TRANX_STATS_
+  void visitMutex(MutexPointer MutexPtr);
+  void abortMutex(MutexPointer MutexPtr);
+  int getAbortNum();
+#endif
+
 protected:
   IdType  TransId;
   TransStatusType TransStatus;
 #ifdef _DEADLOCK_DETECTION_
   /// TODO dependency list <transaction_ptr>
 #endif
+
+#ifdef _TRANX_STATS_
+  int NumAbort;
+  MutexMapType AbortedMap;
+  MutexMapType VisitedMap;
+  void initStats();
+#endif 
 };
 
 #endif /*_TRANSACTION_H_*/

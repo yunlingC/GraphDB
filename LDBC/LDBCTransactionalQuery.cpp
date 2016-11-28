@@ -1239,8 +1239,6 @@ public:
   
         if (!ExistIndex.second) {
           std::cout << "Error: Fail in getting index on\n" ;
-          ///TODO change 
-//          exit(0);
            continue;
         }
 
@@ -1257,7 +1255,16 @@ public:
         } ///IF_FIRST_EXISTED
   
         /// Get locks on existing vertex and edge
+
+#ifdef _TRANX_STATS_
+        auto NEMutexPtr = LockManager.getVertexLockPointer(ExistIndex.first->getId(), T_NextEdge); 
+        Tranx->visitMutex(NEMutexPtr);
+#endif
         if (!LockManager.getVertexLock(ExistIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId())) {
+
+#ifdef _TRANX_STATS_
+          Tranx->abortMutex(NEMutexPtr);
+#endif
           Tranx->abort();
           needRestart = true;
           break;
@@ -1268,7 +1275,16 @@ public:
           std::cout <<"Existing Next Edge\n";
           std::cout << ExistNextEdge->getId() << "\t"
                     << ExistNextEdge->getType().std_str() << "\n";
+
+#ifdef _TRANX_STATS_
+          auto FPEMutexPtr = LockManager.getEdgeLockPointer(ExistNextEdge->getId(), T_FirstPrevEdge);
+          Tranx->visitMutex(FPEMutexPtr);
+#endif
           if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+
+#ifdef _TRANX_STATS_
+            Tranx->abortMutex(FPEMutexPtr);
+#endif
             Tranx->abort();
             needRestart = true;
             break;
@@ -1281,7 +1297,16 @@ public:
                     << ExistNextEdge->getType().std_str() << "\n";
 
           isExistedFirst = false;
+
+#ifdef _TRANX_STATS_
+          auto SPEMutexPtr = LockManager.getEdgeLockPointer(ExistNextEdge->getId(), T_SecondPrevEdge);
+          Tranx->visitMutex(SPEMutexPtr);
+#endif
           if (!LockManager.getEdgeLock(ExistNextEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+
+#ifdef _TRANX_STATS_
+            Tranx->abortMutex(SPEMutexPtr);
+#endif
             Tranx->abort();
             needRestart = true;
             break;
@@ -1342,7 +1367,7 @@ public:
 /// TODO add locks to map LockManager
 
     chainEdges();
-    auto NewVertexId = Graph.addVertex(NewVertex);
+    Graph.addVertex(NewVertex);
     Index.buildVertexIndex("id", NewVertex);
     LockManager.addToVertexLockMap(NewVertex->getId());
 //      std::cout <<"Transaction\t" << Tranx->getId()
@@ -1391,21 +1416,56 @@ public:
                   << "\tLabel\t" << SecondIndex.first->getType().std_str()
                   << "\n";
         /// Switch here
+
+#ifdef _TRANX_STATS_
+        auto NEMutexPtr = LockManager.getVertexLockPointer(FirstIndex.first->getId(), T_NextEdge);
+        Tranx->visitMutex(NEMutexPtr);
+#endif
+
         if (!LockManager.getVertexLock(FirstIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId())) {
+
+#ifdef _TRANX_STATS_
+          Tranx->abortMutex(NEMutexPtr);
+#endif
           Tranx->abort();
           break;
         }
+
+#ifdef _TRANX_STATS_
+        auto SNEMutexPtr = LockManager.getVertexLockPointer(SecondIndex.first->getId(), T_NextEdge);
+        Tranx->visitMutex(SNEMutexPtr);
+#endif
         if (!LockManager.getVertexLock(SecondIndex.first->getId(), T_NextEdge, T_EX, Tranx->getId()))  {
+
+#ifdef _TRANX_STATS_
+          Tranx->abortMutex(SNEMutexPtr);
+#endif
           Tranx->abort();
           break;
         }
         auto FNEdge = FirstIndex.first->getNextEdge();
         if (FNEdge) {
+#ifdef _TRANX_STATS_
+          auto FPEMutexPtr = LockManager.getEdgeLockPointer(FNEdge->getId(), T_FirstPrevEdge);
+          Tranx->visitMutex(FPEMutexPtr);
+#endif
+
           if (!LockManager.getEdgeLock(FNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+#ifdef _TRANX_STATS_
+            Tranx->abortMutex(FPEMutexPtr);
+#endif
             Tranx->abort();
             break;
           }
+
+#ifdef _TRANX_STATS_
+          auto SPEMutexPtr = LockManager.getEdgeLockPointer(FNEdge->getId(), T_SecondPrevEdge);
+          Tranx->visitMutex(SPEMutexPtr);
+#endif
           if (!LockManager.getEdgeLock(FNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+#ifdef _TRANX_STATS_
+            Tranx->abortMutex(SPEMutexPtr);
+#endif
             Tranx->abort();
             break;
           }
@@ -1413,11 +1473,28 @@ public:
 
         auto SNEdge = SecondIndex.first->getNextEdge();
         if (SNEdge && (SNEdge != FNEdge) ) {
+
+#ifdef _TRANX_STATS_
+          auto SFPEMutexPtr = LockManager.getEdgeLockPointer(SNEdge->getId(), T_FirstPrevEdge);
+          Tranx->visitMutex(SFPEMutexPtr);
+#endif
           if (!LockManager.getEdgeLock(SNEdge->getId(), T_FirstPrevEdge, T_EX, Tranx->getId()))  {
+#ifdef _TRANX_STATS_
+            Tranx->abortMutex(SFPEMutexPtr);
+#endif
             Tranx->abort();
             break;
           }
+
+#ifdef _TRANX_STATS_
+          auto SSPEMutexPtr = LockManager.getEdgeLockPointer(SNEdge->getId(), T_SecondPrevEdge);
+          Tranx->visitMutex(SSPEMutexPtr);
+#endif
           if (!LockManager.getEdgeLock(SNEdge->getId(), T_SecondPrevEdge, T_EX, Tranx->getId()))  {
+
+#ifdef _TRANX_STATS_
+            Tranx->abortMutex(SSPEMutexPtr);
+#endif
             Tranx->abort();
             break;
           }

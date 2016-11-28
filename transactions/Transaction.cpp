@@ -24,13 +24,27 @@
 #endif
 
   Transaction::Transaction() : TransId(0), TransStatus(T_EXPANDING) {
+#ifdef _TRANX_STATS_
+    initStats();
+#endif
     begin();
   } 
 
   Transaction::Transaction(IdType id) : TransId(id), TransStatus(T_EXPANDING){
+#ifdef _TRANX_STATS_
+    initStats();
+#endif
     begin();
   } 
 
+#ifdef _TRANX_STATS_
+  void Transaction::initStats()  {
+    NumAbort = 0;
+    AbortedMap.clear();
+    VisitedMap.clear();
+  }
+#endif
+  
   Transaction::IdType Transaction::getId() 
   {
     return TransId;
@@ -127,6 +141,10 @@
     if (retValue)
     std::cout <<"Transaction\t" << TransId << "\tABORT\n";
 #endif  
+
+#ifdef _TRANX_STATS_
+    NumAbort++;
+#endif
     return retValue;
   }
 
@@ -141,6 +159,26 @@
   {
       return TransStatus;
   }
+
+#ifdef _TRANX_STATS_
+  void Transaction::visitMutex(MutexPointer mptr) {
+    if ( VisitedMap.find(mptr) == VisitedMap.end() )  {
+      VisitedMap.insert(MutexPairType(mptr, 0));
+    }
+    VisitedMap[mptr]++;
+  }
+  
+  void Transaction::abortMutex(MutexPointer mptr)  {
+    if ( AbortedMap.find(mptr) == AbortedMap.end() )  {
+      AbortedMap.insert(MutexPairType(mptr, 0));
+    }
+    AbortedMap[mptr]++;
+  }
+
+  int Transaction::getAbortNum()  {
+    return NumAbort;
+  }
+#endif
 
   Transaction::~Transaction(){}
  
