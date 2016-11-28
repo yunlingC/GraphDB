@@ -24,4 +24,6 @@
 
 #define _STATS_ true
 
+#define _TRANX_STATS_ true
+
 #endif /*_GLOBAL_H_*/

@@ -271,55 +271,10 @@ int main(int argc, char *argv[]) {
     for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
   }
 
-  else if (run == 3) {
-
-//    q1.runQuery(g, persons[0], (TranxList[0]), LkManager);
-//
-//    q2.runQuery(g, persons[0], (TranxList[1]), LkManager);
-//  
-//    q3.runQuery(g, persons[0], (TranxList[2]), LkManager);
-//  
-//    q4.runQuery(g, persons[0], (TranxList[3]), LkManager);
-//  
-//    q5.runQuery(g, persons[0], (TranxList[4]), LkManager);
-
-//   q15.runQuery(g, persons[0], (TranxList[0]), LkManager, Index);
-   
-//   q16.runQuery(g, persons[0], (TranxList[1]), LkManager, Index);
-
-//   q17.runQuery(g, persons[0], (TranxList[2]), LkManager, Index);
-// 
-//   q18.runQuery(g, persons[0], (TranxList[3]), LkManager, Index);
-//
-//   q19.runQuery(g, persons[0], (TranxList[4]), LkManager, Index);
-
-//   q20.runQuery(g, persons[0], (TranxList[5]), LkManager, Index);
-//
-//   q21.runQuery(g, persons[0], (TranxList[6]), LkManager, Index);
-//
-//   q22.runQuery(g, persons[0], (TranxList[7]), LkManager, Index);
-  }
-
   else {
     std::cout << "Error: Not single thread or multithread\n";
     exit(0);
   }
-//  for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
-//  VisitorType Visitor;
-
-//  auto TxId = TmManager.addTransaction();
-
-//  auto TxEntryPtr = TmManager.addTransaction();
-//  auto TxPtr = TxEntryPtr.second;
-
-//  LdbcQuery1 Q1;
-//  Q1.setParam("firstName", "Bruno");
-//  Q1.runQuery(g, persons[0]);
-//
-// 
-//  LdbcQuery2 q2;
-//  Q2.runQuery(g, persons[0]);
-//
 //  vector<std::thread> threads;
 //  for (auto i= 0; i < 2; i++) {
 //    auto TxEntryPtr = TmManager.addTransaction();
@@ -330,6 +285,10 @@ int main(int argc, char *argv[]) {
 //  for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
 //
 //  LkManager.dumpMaps();
+
+  for (auto Tx : TranxList) {
+    Tx->dumpStats();
+  }
 
   cout <<"finish testing\n";
   fflush(stdout);

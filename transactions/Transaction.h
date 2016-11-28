@@ -58,14 +58,15 @@ public:
   void visitMutex(MutexPointer MutexPtr);
   void abortMutex(MutexPointer MutexPtr);
   int getAbortNum();
+  void dumpAbortNum();
+  void dumpAbortedMap();
+  void dumpVisitedMap();
+  void dumpStats();
 #endif
 
 protected:
   IdType  TransId;
   TransStatusType TransStatus;
-#ifdef _DEADLOCK_DETECTION_
-  /// TODO dependency list <transaction_ptr>
-#endif
 
 #ifdef _TRANX_STATS_
   int NumAbort;

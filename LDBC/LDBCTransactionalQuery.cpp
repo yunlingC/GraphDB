@@ -23,6 +23,8 @@
 #include <time.h>
 #include <unordered_map>
 
+#define _TRANX_STATS_ true
+
 #ifdef _PRINTLOG_
 #include <iostream>
 #endif

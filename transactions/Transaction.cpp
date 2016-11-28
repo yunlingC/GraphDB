@@ -178,6 +178,42 @@
   int Transaction::getAbortNum()  {
     return NumAbort;
   }
+
+  void Transaction::dumpAbortNum() {
+    std::cout << "Transaction\t" << TransId
+              << "\tabort_num\t" << getAbortNum()
+              << "\n";
+  }
+  
+  void Transaction::dumpAbortedMap() {
+    std::cout << "Transaction\t" << TransId
+              << "\tabort_obj\t" << AbortedMap.size()
+              << "\n";
+
+    for (auto obj : AbortedMap) {
+      std::cout << obj.first << "\t"
+                << obj.second 
+                << "\n";
+    }
+  }
+
+  void Transaction::dumpVisitedMap() {
+    std::cout << "Transaction\t" << TransId
+              << "\tvisit_obj\t" << VisitedMap.size()
+              << "\n";
+
+    for (auto obj : VisitedMap) {
+      std::cout << obj.first << "\t"
+                << obj.second 
+                << "\n";
+    }
+  }
+
+  void Transaction::dumpStats() {
+    dumpAbortNum();
+    dumpAbortedMap();
+    dumpVisitedMap();
+  }
 #endif
 
   Transaction::~Transaction(){}
