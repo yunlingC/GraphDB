@@ -95,6 +95,23 @@
     sumVisitedMap();
   }
 
+  void TransactionManager::sumStats()  {
+    for(auto Entry : totalAbortedMap)  {
+      /// Entry.second is the abort num for Entry.first
+      if (AbortStatsMap.find(Entry.second) == AbortStatsMap.end()) {
+        AbortStatsMap.insert(std::pair<int, int> (Entry.second, 0));
+      }
+      AbortStatsMap[Entry.second]++;
+    }
+
+    for (auto VisitEntry : totalVisitedMap) {
+      if (VisitStatsMap.find(VisitEntry.second) == VisitStatsMap.end()) {
+        VisitStatsMap.insert(std::pair<int, int>(VisitEntry.second, 0) );
+      }
+      VisitStatsMap[VisitEntry.second]++;
+    }
+  }
+
   TransactionManager::MutexMapType TransactionManager::getVisitedMap() {
     return totalVisitedMap;
   }

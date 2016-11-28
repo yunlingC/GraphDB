@@ -25,12 +25,16 @@
 class TransactionManager {
 public:
   typedef Transaction *  TransactionPointer;
-  typedef Transaction::MutexMapType MutexMapType;
-  typedef Transaction::MutexPairType MutexPairType;
-  
   typedef unsigned int IdType;
   typedef std::pair<IdType, TransactionPointer> TransactionEntryType;
   typedef std::unordered_map<IdType, TransactionPointer> TransactionTableType;
+
+#ifdef _TRANX_STATS_
+  typedef Transaction::MutexMapType MutexMapType;
+  typedef Transaction::MutexPairType MutexPairType;
+  typedef std::unordered_map<int, int> StatsMapType;
+#endif
+  
 public:
 
   TransactionManager();
@@ -49,6 +53,7 @@ public:
   void sumAbortNum();
   void sumAbortedMap();
   void sumVisitedMap();
+  void sumStats();
   void dumpStats();
 #endif 
 
@@ -70,6 +75,8 @@ protected:
   int totalAbortNum;
   MutexMapType totalVisitedMap;
   MutexMapType totalAbortedMap;
+  StatsMaptype VisitStatsMap; 
+  StatsMaptype AbortStatsMap; 
   
 #endif 
 
