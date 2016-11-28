@@ -443,10 +443,6 @@
 
         auto getLock = tryLock(MutexPtr, Lock);
 
-#ifdef _NO_WAIT_
-        DeadlockDetector->unlock();
-        return getLock;
-#endif 
         if (getLock) {
           registerTransMap(TxId, MutexPtr);
           DeadlockDetector->unlock();
@@ -454,7 +450,10 @@
         }
 
         retireFromLockMap(TxId, MutexPtr, Lock);
-//        registerWaitingMap(TxId, MutexPtr);
+
+#ifdef _NO_WAIT_
+        return false;
+#endif 
 
 #if _DEBUG_ENABLE_
 //        std::cout <<"Transaction\t" << TxId 
@@ -521,10 +520,6 @@
       }
 
       auto getLock =  tryLock(MutexPtr, Lock);
-#ifdef _NO_WAIT_
-      DeadlockDetector->unlock();
-      return getLock;
-#endif 
 
       if (getLock) {
         registerTransMap(TxId, MutexPtr);
@@ -533,8 +528,11 @@
       }
 
       retireFromLockMap(TxId, MutexPtr, Lock);
-//      registerWaitingMap(TxId, MutexPtr);
 
+#ifdef _NO_WAIT_
+      DeadlockDetector->unlock();
+      return getLock;
+#endif 
       /**
       std::lock_guard<std::mutex> DlLock(*DeadlockDetector);
       /// If this lock is available, assign lock to TxId, register to maps(Trans, Lock)
