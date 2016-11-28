@@ -53,7 +53,10 @@ int main(int argc, char *argv[]) {
   LDBCReader reader(g);
   reader.readDirectory("../tests/ldbc/social_network_"+std::to_string(InputSize));
 
-  VertexIdListType persons = reader.getPersonList();
+  VertexIdListType persons = {219997, 220078, 220387, 220242, 219706
+                              ,219987,  219676, 219842, 219821, 219792
+                              ,220153};
+//    = reader.getPersonList();
   cout << persons.size() << "\t persons id are to be chosen\n";
   cout << "Finish reading \n";
 

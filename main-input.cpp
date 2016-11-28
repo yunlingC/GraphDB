@@ -73,6 +73,9 @@ int main(int argc, char *argv[]) {
   InputFile << FileName << "\tVertexId\tOutdegree\tIndegree\n";
 
   for (VertexPointer VertexPtr : g.getAllVertices())  {
+    if (VertexPtr->getType().std_str() != "PERSON") {
+      continue;
+    }
     OutDegree = g.getOutEdges(VertexPtr).size();
     InDegree = g.getInEdges(VertexPtr).size();
 //    InputFile << VertexPtr->getId() // << "\t" << VertexPtr->getType().std_str()
@@ -94,38 +97,61 @@ int main(int argc, char *argv[]) {
     InDegreeMap[InDegree]++;
     totalInDeg += InDegree;
 
-    VertexDegMap.insert(std::pair<int, int>(OutDegree+InDegree, VertexPtr->getId()));
+    if (VertexPtr->getType().std_str() == "PERSON")
+      VertexDegMap.insert(std::pair<int, int>(OutDegree+InDegree, VertexPtr->getId()));
 
-    if (VertexPtr->getType().std_str() == "PERSON" ) {
+//    if (VertexPtr->getType().std_str() == "PERSON" ) {
       if (WebDegMap.find(InDegree+OutDegree) == WebDegMap.end()) {
         WebDegMap.insert(std::pair<int, int>(InDegree+OutDegree, 0));
       }
       WebDegMap[InDegree+OutDegree]++;
-    }
+//    }
   }
 
   int lastNum = 0;
 
+  int total = 0;
   InputFile << "Outdgree\n";
   for (auto OutEntry : OutDegreeMap)  {
     /// This while loop is for plotting purpose
     while ((OutEntry.first) > lastNum)  {
-      InputFile << lastNum++ << "\t" << "?"<< "\n";
+      InputFile << lastNum++ << "\t" << "?" << "\t" << "?" <<"\n";
     }
     lastNum = (OutEntry.first) + 1;
-    InputFile << OutEntry.first << "\t" << OutEntry.second << "\n";
+
+    total+= OutEntry.second;
+    InputFile << OutEntry.first << "\t" << OutEntry.second << "\t" << total << "\n";
   }
 
   InputFile << "Indgree\n";
 
   lastNum = 0;
 
+  total = 0;
   for (auto InEntry : InDegreeMap)  {
     while ((InEntry.first) > lastNum)  {
-      InputFile << lastNum++ << "\t" << "?"<< "\n";
+      InputFile << lastNum++ << "\t" << "?" << "\t" << "?" <<"\n";
     }
     lastNum = (InEntry.first) + 1;
-    InputFile << InEntry.first << "\t" << InEntry.second << "\n";
+
+    total+= InEntry.second;
+    InputFile << InEntry.first << "\t" << InEntry.second << "\t" << total << "\n";
+  }
+
+  InputFile << "\ndegree \n";
+
+  int totalNum = 0;
+  lastNum = 0;
+  for (auto WebEntry : WebDegMap ) {
+    totalNum += WebEntry.second;
+
+    while ((WebEntry.first) > lastNum)  {
+      InputFile << lastNum++ << "\t" << "?"<< "\n";
+    }
+
+    lastNum = (WebEntry.first) + 1;
+
+    InputFile << WebEntry.first << "\t" << WebEntry.second << "\t" << totalNum << "\n";
   }
 
   InputFile << "total outdegree \t" << totalOutDeg << "\ttotal Indgree\t" << totalInDeg << "\ttotal\t" << totalInDeg+totalOutDeg << "\n";
@@ -137,13 +163,6 @@ int main(int argc, char *argv[]) {
       InputFile << VEntry.second << "\t" << VEntry.first<< "\n";
   }
 
-  InputFile << "\nWebpage degree \n";
-
-  int totalNum = 0;
-  for (auto WebEntry : WebDegMap ) {
-    totalNum += WebEntry.second;
-    InputFile << WebEntry.first << "\t" << WebEntry.second << "\t" << totalNum << "\n";
-  }
 
   InputFile.close();
 
