@@ -286,10 +286,12 @@ int main(int argc, char *argv[]) {
 //
 //  LkManager.dumpMaps();
 
-  for (auto Tx : TranxList) {
-    Tx->dumpStats();
-  }
+//  for (auto Tx : TranxList) {
+//    Tx->dumpStats();
+//  }
 
+  TmManager.sumTx();
+  TmManager.dumpStats();
   cout <<"finish testing\n";
   fflush(stdout);
 

@@ -49,15 +49,19 @@
       return TransTable.at(TxId);
   }
 
+#ifdef _TRANX_STATS_
   int TransactionManager::getTotalAbortNum() {
-    int Sum = 0;
+    return totalAbortNum;
+  }
+  
+  void TransactionManager::sumAbortNum()  {
+    totalAbortNum= 0;
     for (auto Tx : TransTable) {
-      Sum += Tx.second->getAbortNum();
+      totalAbortNum += Tx.second->getAbortNum();
     }
-    return Sum;
   }
 
-  void TransactionManager::SumVisitedMap() {
+  void TransactionManager::sumVisitedMap() {
     totalVisitedMap.clear();
     for (auto Tx : TransTable)  {
       auto Map = Tx.second->getVisitedMap();
@@ -71,7 +75,7 @@
     return;
   }
 
-  void TransactionManager::SumAbortedMap() {
+  void TransactionManager::sumAbortedMap() {
     totalAbortedMap.clear();
     for (auto Tx : TransTable)  {
       auto Map = Tx.second->getAbortedMap();
@@ -85,6 +89,12 @@
     return;
   }
 
+  void TransactionManager::sumTx()  {
+    sumAbortNum();
+    sumAbortedMap();
+    sumVisitedMap();
+  }
+
   TransactionManager::MutexMapType TransactionManager::getVisitedMap() {
     return totalVisitedMap;
   }
@@ -92,6 +102,14 @@
   TransactionManager::MutexMapType TransactionManager::getAbortedMap() {
     return totalAbortedMap;
   }
+
+  void TransactionManager::dumpStats() {
+    std::cout << "Totol_Abort_Num\t" << totalAbortNum
+              << "\tTotal_Abort_Obj\t" << totalAbortedMap.size()
+              << "\tTotal_Visit_Obj\t" << totalVisitedMap.size()
+              << "\n";
+  }
+#endif
 /**
 		auto TransactionManager::rollBack(GraphType & graph)
 		-> bool {

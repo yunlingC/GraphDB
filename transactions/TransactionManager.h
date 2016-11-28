@@ -20,6 +20,8 @@
 #include <unordered_map>
 #include <shared_mutex>
 
+#define _TRANX_STATS_ true
+
 class TransactionManager {
 public:
   typedef Transaction *  TransactionPointer;
@@ -43,8 +45,11 @@ public:
   int getTotalAbortNum();
   MutexMapType getVisitedMap();
   MutexMapType getAbortedMap();
-  void SumAbortedMap();
-  void SumVisitedMap();
+  void sumTx();
+  void sumAbortNum();
+  void sumAbortedMap();
+  void sumVisitedMap();
+  void dumpStats();
 #endif 
 
 private:

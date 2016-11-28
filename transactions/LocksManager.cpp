@@ -22,6 +22,7 @@
 
 #define _DEBUG_ENABLE_ true
 #define _DEBUG_PRINT_ true
+#define _NO_WAIT_ true
 
 #if _DEBUG_ENABLE_
 #include <iostream>
@@ -431,8 +432,10 @@
                                     , LockType Lock
                                     , IdType TxId
                                     ){
-#
         auto MutexPtr = getVertexLockPointer(VId, Mutex);
+#ifdef _NO_WAIT_
+        return tryLock(MutexPtr, Lock);
+#endif 
         DeadlockDetector->lock();
         bool isRegistered = registerLockMap(TxId, MutexPtr, Lock);
         /// Not registered because of no need
@@ -508,6 +511,9 @@
                                 , IdType TxId
                                 ){
       auto MutexPtr = getEdgeLockPointer(EId, Mutex);
+#ifdef _NO_WAIT_
+        return tryLock(MutexPtr, Lock);
+#endif 
       DeadlockDetector->lock();
       bool isRegistered = registerLockMap(TxId, MutexPtr, Lock);
       if (!isRegistered)  {
