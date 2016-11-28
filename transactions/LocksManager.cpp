@@ -522,7 +522,7 @@
 
       auto getLock =  tryLock(MutexPtr, Lock);
 #ifdef _NO_WAIT_
-      DeadlockDetector->lock();
+      DeadlockDetector->unlock();
       return getLock;
 #endif 
 
