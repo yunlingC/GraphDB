@@ -49,6 +49,49 @@
       return TransTable.at(TxId);
   }
 
+  int TransactionManager::getTotalAbortNum() {
+    int Sum = 0;
+    for (auto Tx : TransTable) {
+      Sum += Tx.second->getAbortNum();
+    }
+    return Sum;
+  }
+
+  void TransactionManager::SumVisitedMap() {
+    totalVisitedMap.clear();
+    for (auto Tx : TransTable)  {
+      auto Map = Tx.second->getVisitedMap();
+      for (auto Entry : Map)  {
+        if (totalVisitedMap.find(Entry.first) == totalVisitedMap.end()) {
+          totalVisitedMap.insert(MutexPairType(Entry.first, 0));
+        }
+        totalVisitedMap[Entry.first]+= Entry.second;
+      }
+    }
+    return;
+  }
+
+  void TransactionManager::SumAbortedMap() {
+    totalAbortedMap.clear();
+    for (auto Tx : TransTable)  {
+      auto Map = Tx.second->getAbortedMap();
+      for (auto Entry : Map)  {
+        if (totalAbortedMap.find(Entry.first) == totalAbortedMap.end()) {
+          totalAbortedMap.insert(MutexPairType(Entry.first, 0));
+        }
+        totalAbortedMap[Entry.first]+= Entry.second;
+      }
+    }
+    return;
+  }
+
+  TransactionManager::MutexMapType TransactionManager::getVisitedMap() {
+    return totalVisitedMap;
+  }
+
+  TransactionManager::MutexMapType TransactionManager::getAbortedMap() {
+    return totalAbortedMap;
+  }
 /**
 		auto TransactionManager::rollBack(GraphType & graph)
 		-> bool {
@@ -82,7 +125,6 @@
 						delete (*it).second;
 				}
 		}
-
 
 //		auto TransactionManager::undoUpdate(GraphType & graph, TransactionPointer
 //		log)

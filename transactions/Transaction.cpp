@@ -179,6 +179,14 @@
     return NumAbort;
   }
 
+  Transaction::MutexMapType Transaction::getAbortedMap()  {
+    return AbortedMap;
+  }
+
+  Transaction::MutexMapType Transaction::getVisitedMap()  {
+    return VisitedMap;
+  }
+
   void Transaction::dumpAbortNum() {
     std::cout << "Transaction\t" << TransId
               << "\tabort_num\t" << getAbortNum()

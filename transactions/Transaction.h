@@ -58,6 +58,8 @@ public:
   void visitMutex(MutexPointer MutexPtr);
   void abortMutex(MutexPointer MutexPtr);
   int getAbortNum();
+  MutexMapType getAbortedMap();
+  MutexMapType getVisitedMap();
   void dumpAbortNum();
   void dumpAbortedMap();
   void dumpVisitedMap();
