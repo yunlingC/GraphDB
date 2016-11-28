@@ -121,10 +121,18 @@
   }
 
   void TransactionManager::dumpStats() {
+    auto FAEntry = AbortStatsMap.begin();
+    auto FVEntry = VisitStatsMap.begin();
     std::cout << "Totol_Abort_Num\t" << totalAbortNum
               << "\tTotal_Abort_Obj\t" << totalAbortedMap.size()
               << "\tTotal_Visit_Obj\t" << totalVisitedMap.size()
+              << "\tSingle_Obj_Largest_Abort_Num\t" << FAEntry->first
+              << "\t" << FAEntry->second
+              << "\tSingle_Obj_Largeest_Visit_Num\t" << FVEntry->first
+              << "\t" << FVEntry->second
               << "\n";
+
+    
   }
 #endif
 /**

@@ -17,7 +17,7 @@
 
 #include "Transaction.h"
 
-#include <unordered_map>
+#include <map>
 #include <shared_mutex>
 
 #define _TRANX_STATS_ true
@@ -32,7 +32,7 @@ public:
 #ifdef _TRANX_STATS_
   typedef Transaction::MutexMapType MutexMapType;
   typedef Transaction::MutexPairType MutexPairType;
-  typedef std::unordered_map<int, int> StatsMapType;
+  typedef std::map<int, int, std::less<int> > StatsMapType;
 #endif
   
 public:
