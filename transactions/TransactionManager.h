@@ -75,8 +75,8 @@ protected:
   int totalAbortNum;
   MutexMapType totalVisitedMap;
   MutexMapType totalAbortedMap;
-  StatsMaptype VisitStatsMap; 
-  StatsMaptype AbortStatsMap; 
+  StatsMapType VisitStatsMap; 
+  StatsMapType AbortStatsMap; 
   
 #endif 
 
