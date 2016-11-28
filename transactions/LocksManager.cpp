@@ -433,9 +433,6 @@
                                     , IdType TxId
                                     ){
         auto MutexPtr = getVertexLockPointer(VId, Mutex);
-#ifdef _NO_WAIT_
-        return tryLock(MutexPtr, Lock);
-#endif 
         DeadlockDetector->lock();
         bool isRegistered = registerLockMap(TxId, MutexPtr, Lock);
         /// Not registered because of no need
@@ -446,6 +443,10 @@
 
         auto getLock = tryLock(MutexPtr, Lock);
 
+#ifdef _NO_WAIT_
+        DeadlockDetector->unlock();
+        return getLock;
+#endif 
         if (getLock) {
           registerTransMap(TxId, MutexPtr);
           DeadlockDetector->unlock();
@@ -511,9 +512,7 @@
                                 , IdType TxId
                                 ){
       auto MutexPtr = getEdgeLockPointer(EId, Mutex);
-#ifdef _NO_WAIT_
-        return tryLock(MutexPtr, Lock);
-#endif 
+
       DeadlockDetector->lock();
       bool isRegistered = registerLockMap(TxId, MutexPtr, Lock);
       if (!isRegistered)  {
@@ -522,6 +521,10 @@
       }
 
       auto getLock =  tryLock(MutexPtr, Lock);
+#ifdef _NO_WAIT_
+      DeadlockDetector->lock();
+      return getLock;
+#endif 
 
       if (getLock) {
         registerTransMap(TxId, MutexPtr);
