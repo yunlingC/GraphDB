@@ -27,7 +27,7 @@ public:
   typedef Transaction *  TransactionPointer;
   typedef unsigned int IdType;
   typedef std::pair<IdType, TransactionPointer> TransactionEntryType;
-  typedef std::unordered_map<IdType, TransactionPointer> TransactionTableType;
+  typedef std::map<IdType, TransactionPointer, std::less<IdType> > TransactionTableType;
 
 #ifdef _TRANX_STATS_
   typedef Transaction::MutexMapType MutexMapType;

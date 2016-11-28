@@ -198,11 +198,11 @@
               << "\tabort_obj\t" << AbortedMap.size()
               << "\n";
 
-    for (auto obj : AbortedMap) {
-      std::cout << obj.first << "\t"
-                << obj.second 
-                << "\n";
-    }
+//    for (auto obj : AbortedMap) {
+//      std::cout << obj.first << "\t"
+//                << obj.second 
+//                << "\n";
+//    }
   }
 
   void Transaction::dumpVisitedMap() {
@@ -210,11 +210,11 @@
               << "\tvisit_obj\t" << VisitedMap.size()
               << "\n";
 
-    for (auto obj : VisitedMap) {
-      std::cout << obj.first << "\t"
-                << obj.second 
-                << "\n";
-    }
+//    for (auto obj : VisitedMap) {
+//      std::cout << obj.first << "\t"
+//                << obj.second 
+//                << "\n";
+//    }
   }
 
   void Transaction::dumpStats() {

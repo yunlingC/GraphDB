@@ -58,7 +58,9 @@
     totalAbortNum= 0;
     for (auto Tx : TransTable) {
       totalAbortNum += Tx.second->getAbortNum();
+      Tx.second->dumpAbortNum();
     }
+    return ;
   }
 
   void TransactionManager::sumVisitedMap() {
@@ -71,6 +73,8 @@
         }
         totalVisitedMap[Entry.first]+= Entry.second;
       }
+      Tx.second->dumpVisitedMap();
+
     }
     return;
   }
@@ -85,6 +89,7 @@
         }
         totalAbortedMap[Entry.first]+= Entry.second;
       }
+      Tx.second->dumpAbortedMap();
     }
     return;
   }
@@ -93,6 +98,7 @@
     sumAbortNum();
     sumAbortedMap();
     sumVisitedMap();
+    sumStats();
   }
 
   void TransactionManager::sumStats()  {
@@ -121,19 +127,36 @@
   }
 
   void TransactionManager::dumpStats() {
-    auto FAEntry = AbortStatsMap.begin();
-    auto FVEntry = VisitStatsMap.begin();
+//    auto FAEntry = AbortStatsMap.begin();
+//    auto FVEntry = VisitStatsMap.begin();
     std::cout << "Totol_Abort_Num\t" << totalAbortNum
-              << "\tTotal_Abort_Obj\t" << totalAbortedMap.size()
-              << "\tTotal_Visit_Obj\t" << totalVisitedMap.size()
-              << "\tSingle_Obj_Largest_Abort_Num\t" << FAEntry->first
-              << "\t" << FAEntry->second
-              << "\tSingle_Obj_Largeest_Visit_Num\t" << FVEntry->first
-              << "\t" << FVEntry->second
+              << "\nTotal_Abort_Obj\t" << totalAbortedMap.size()
+              << "\nTotal_Visit_Obj\t" << totalVisitedMap.size()
+  //            << "\n"
+  //            << "Diff_Abort_Num\t" << AbortStatsMap.size()
+  //            << "\nDiff_Visit_Num\t" << VisitStatsMap.size()
+  //            << "\n"
+  //            << "Single_Obj_Largest_Abort_Num\t" << FAEntry->first
+  //            << "\nObj_Num\t" << FAEntry->second
+  //            << "\nSingle_Obj_Largest_Visit_Num\t" << FVEntry->first
+  //            << "\nObj_Num\t" << FVEntry->second
               << "\n";
 
-    
+    std::cout <<"Abort Map\n";
+    for(auto AEntry : AbortStatsMap)  {
+      std::cout << "AbortNum\t" << AEntry.first
+                << "\tObjNum\t" << AEntry.second
+                << "\n";
+    }
+
+    std::cout <<"Visit Map\n";
+    for(auto VEntry : VisitStatsMap)  {
+      std::cout << "VisitNum\t" << VEntry.first
+                << "\tObjNum\t" << VEntry.second
+                << "\n";
+    }
   }
+
 #endif
 /**
 		auto TransactionManager::rollBack(GraphType & graph)
