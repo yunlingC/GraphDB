@@ -22,7 +22,7 @@
 
 #define _DEBUG_ENABLE_ true
 #define _DEBUG_PRINT_ true
-#define _NO_WAIT_ true
+//#define _NO_WAIT_ true
 
 #if _DEBUG_ENABLE_
 #include <iostream>
@@ -398,8 +398,7 @@
         return false;
       }
       /// check further if there is deadlock
-      /// TODO delete this?
-//      ChkTransList.insert(LockingTrans);
+      ChkTransList.insert(LockingTrans);
       /// Each transaction waits for one lock only
       auto LockPtr  = WaitMap.find(LockingTrans);
       if (LockPtr == WaitMap.end()) return true;
@@ -412,9 +411,9 @@
         /// This transaction has NOT been checked
         if (ChkTransList.find(it->first) == ChkTransList.end()) {
           TransStack.push(it->first);
-          auto WaitOn = checkWaitOnRecursive(LockingTrans, it->first, TransStack, ChkTransList);
+          auto WaitOn = checkWaitOnRecursive(WaitingTrans, it->first, TransStack, ChkTransList);
           TransStack.pop();
-          ChkTransList.insert(LockingTrans);
+//          ChkTransList.insert(LockingTrans);
           /// If a deadlock is found, return cotrol  
           if (!WaitOn)  {
             return false;
@@ -433,6 +432,7 @@
                                     , IdType TxId
                                     ){
         auto MutexPtr = getVertexLockPointer(VId, Mutex);
+//        TransactionManager::
         DeadlockDetector->lock();
         bool isRegistered = registerLockMap(TxId, MutexPtr, Lock);
         /// Not registered because of no need

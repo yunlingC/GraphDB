@@ -23,8 +23,6 @@
 
 #define _TRANX_STATS_ true
 
-//class VertexLock;
-
 class Transaction {
 public:
   typedef unsigned int IdType;

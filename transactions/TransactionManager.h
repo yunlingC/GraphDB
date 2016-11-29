@@ -57,6 +57,7 @@ public:
   void dumpStats();
 #endif 
 
+  friend class LocksManager;
 private:
   IdType assignTransId();
 

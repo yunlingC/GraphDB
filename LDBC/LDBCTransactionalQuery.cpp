@@ -625,6 +625,7 @@ public:
 		getStartTime();
 
     while (Tranx->checkStatus() != T_COMMIT) {
+		  LockManager.releaseAll(Tranx->getId());
       Tranx->expand();
 
   		FilterType TmpFilter[2];
