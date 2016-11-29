@@ -436,7 +436,6 @@
 #ifdef _NO_WAIT_
         
 #endif
-//        TransactionManager::
         DeadlockDetector->lock();
         bool isRegistered = registerLockMap(TxId, MutexPtr, Lock);
         /// Not registered because of no need
@@ -456,6 +455,8 @@
         retireFromLockMap(TxId, MutexPtr, Lock);
 
 #ifdef _NO_WAIT_
+        std::cout << "NO_WAIT\n";
+        DeadlockDetector->unlock();
         return false;
 #endif 
 
@@ -534,6 +535,7 @@
       retireFromLockMap(TxId, MutexPtr, Lock);
 
 #ifdef _NO_WAIT_
+      std::cout << "NO_WAIT\n";
       DeadlockDetector->unlock();
       return getLock;
 #endif 
