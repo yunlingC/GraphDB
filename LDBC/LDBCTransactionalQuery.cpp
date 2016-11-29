@@ -625,7 +625,6 @@ public:
 		getStartTime();
 
     while (Tranx->checkStatus() != T_COMMIT) {
-		  LockManager.releaseAll(Tranx->getId());
       Tranx->expand();
 
   		FilterType TmpFilter[2];
@@ -1269,6 +1268,7 @@ public:
           Tranx->abortMutex(NEMutexPtr);
 #endif
           Tranx->abort();
+		      LockManager.releaseAll(Tranx->getId());
           needRestart = true;
           break;
         }
@@ -1289,6 +1289,7 @@ public:
             Tranx->abortMutex(FPEMutexPtr);
 #endif
             Tranx->abort();
+		        LockManager.releaseAll(Tranx->getId());
             needRestart = true;
             break;
           }
@@ -1311,6 +1312,7 @@ public:
             Tranx->abortMutex(SPEMutexPtr);
 #endif
             Tranx->abort();
+		        LockManager.releaseAll(Tranx->getId());
             needRestart = true;
             break;
           }
@@ -1431,6 +1433,7 @@ public:
           Tranx->abortMutex(NEMutexPtr);
 #endif
           Tranx->abort();
+		      LockManager.releaseAll(Tranx->getId());
           break;
         }
 
@@ -1444,6 +1447,7 @@ public:
           Tranx->abortMutex(SNEMutexPtr);
 #endif
           Tranx->abort();
+		      LockManager.releaseAll(Tranx->getId());
           break;
         }
         auto FNEdge = FirstIndex.first->getNextEdge();
@@ -1458,6 +1462,7 @@ public:
             Tranx->abortMutex(FPEMutexPtr);
 #endif
             Tranx->abort();
+		        LockManager.releaseAll(Tranx->getId());
             break;
           }
 
@@ -1470,6 +1475,7 @@ public:
             Tranx->abortMutex(SPEMutexPtr);
 #endif
             Tranx->abort();
+		        LockManager.releaseAll(Tranx->getId());
             break;
           }
         }
@@ -1486,6 +1492,7 @@ public:
             Tranx->abortMutex(SFPEMutexPtr);
 #endif
             Tranx->abort();
+		        LockManager.releaseAll(Tranx->getId());
             break;
           }
 
@@ -1499,6 +1506,7 @@ public:
             Tranx->abortMutex(SSPEMutexPtr);
 #endif
             Tranx->abort();
+		        LockManager.releaseAll(Tranx->getId());
             break;
           }
         }

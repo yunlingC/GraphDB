@@ -16,6 +16,7 @@
 #define _LOCKSMANAGER_CPP_
 
 #include "LocksManager.h"
+#include "global.h"
 
 #include <stack>
 #include <string>

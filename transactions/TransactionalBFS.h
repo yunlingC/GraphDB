@@ -87,6 +87,7 @@ public:
         Tranx->abortMutex(MutexPtr);
 #endif
         Tranx->abort();
+		    LockManager.releaseAll(Tranx->getId());
         return;
       }
 
@@ -105,6 +106,7 @@ public:
         Tranx->abortMutex(NEMutexPtr);
 #endif
         Tranx->abort();
+		    LockManager.releaseAll(Tranx->getId());
         return;
       }
 
@@ -122,6 +124,7 @@ public:
         Tranx->abortMutex(FVMutexPtr);
 #endif
           Tranx->abort();
+		      LockManager.releaseAll(Tranx->getId());
           return;
 				}
 
@@ -130,10 +133,11 @@ public:
       Tranx->visitMutex(SVMutexPtr);
 #endif
 				if (!LockManager.getEdgeLock(NextEdge->getId(), T_SecondVertex, T_SH, TxId)) { 
-          Tranx->abort();
 #ifdef _TRANX_STATS_
-        Tranx->abortMutex(SVMutexPtr);
+          Tranx->abortMutex(SVMutexPtr);
 #endif
+          Tranx->abort();
+  		    LockManager.releaseAll(Tranx->getId());
           return;
 				}
 
@@ -167,9 +171,10 @@ public:
 #endif
 				if (!LockManager.getEdgeLock(NextEdge->getId(), T_FirstNextEdge, T_SH, TxId)) {
 #ifdef _TRANX_STATS_
-        Tranx->abortMutex(FNEMutexPtr);
+          Tranx->abortMutex(FNEMutexPtr);
 #endif
           Tranx->abort();
+		      LockManager.releaseAll(Tranx->getId());
           return;
 				}
 
@@ -180,9 +185,10 @@ public:
 				if ( !LockManager.getEdgeLock(NextEdge->getId(), T_SecondNextEdge, T_SH, TxId)) {
 
 #ifdef _TRANX_STATS_
-        Tranx->abortMutex(SNEMutexPtr);
+          Tranx->abortMutex(SNEMutexPtr);
 #endif
           Tranx->abort();
+		      LockManager.releaseAll(Tranx->getId());
           return;
 				}
 

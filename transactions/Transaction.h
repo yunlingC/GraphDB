@@ -59,7 +59,7 @@ public:
 
   bool abort(); 
 
-  bool  rollBack();
+  bool rollBack();
 
   void releaseVertexLock();
 

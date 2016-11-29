@@ -7,9 +7,9 @@
 
 ///#define _LOCKING_STORAGE_
 
-#define _NO_WAIT_ true
+//#define _NO_WAIT_ true
 
-#define _WAIT_DIE_
+//#define _WAIT_DIE_
 
 #define _DEBUG_PRINT_ true
 
