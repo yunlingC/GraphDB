@@ -39,7 +39,9 @@ public:
 
   TransactionManager();
 
-  TransactionEntryType  addTransaction();
+//  TransactionEntryType  addTransaction();
+
+  TransactionEntryType  addTransaction(LocksManager & LkManager);
 
   TransactionPointer getTransaction(IdType TxId);
 
@@ -55,9 +57,8 @@ public:
   void sumVisitedMap();
   void sumStats();
   void dumpStats();
-#endif 
-
   friend class LocksManager;
+#endif
 private:
   IdType assignTransId();
 

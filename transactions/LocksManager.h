@@ -19,6 +19,7 @@
 #include "Lock.h"
 #include "Concurrency_control_config.h"
 #include "global.h"
+//#include "TransactionManager.h"
 
 ///std=c++14 
 #include <unordered_map>
@@ -184,12 +185,12 @@ public:
 
 #endif
 
-
-protected:
   // LockType can be either SH or EX
   bool  tryLock(MutexPointer MutexPtr, LockType LType);
 
   void  tryUnlock(MutexPointer MutexPtr, LockType LType);
+
+protected:
 
 #ifndef _LOCKING_STORAGE_
   VertexLockMapType VertexLockMap;
@@ -198,10 +199,6 @@ protected:
   GraphType & Graph;
 #endif
 
-#ifdef _NO_WAIT_
-
-#endif 
-
 #ifdef _DEADLOCK_DETECTION_
 //	unsigned int DeadLockCount;
   /// TODO need lock for transMap, ResrMap, WaitMap separately
@@ -209,6 +206,7 @@ protected:
 	TransactionResourceMap  TransMap;
 	ResourceTransactionMap  ResrMap;
   WaitingTransactionMap WaitMap;
+//  TransactionManager & TmManager;
 #else 
 
 #endif /*_DEADLOCK_DETECTION_ */

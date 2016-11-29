@@ -16,6 +16,7 @@
 #define _TRANSACTION_CPP_
 
 #include "Transaction.h"
+#include "global.h"
 
 #define _PRINTLOG_ true
 
@@ -23,19 +24,19 @@
 #include <iostream>
 #endif
 
-  Transaction::Transaction() : TransId(0), TransStatus(T_EXPANDING) {
+//  Transaction::Transaction() : TransId(0), TransStatus(T_EXPANDING) {
+
+//  Transaction::Transaction(IdType id) : TransId(id), TransStatus(T_EXPANDING){
+
+  Transaction::Transaction(IdType id, LocksManager & LkManager) : LockManager(LkManager)
+                                                                    ,TransId(id)
+                                                                    , TransStatus(T_EXPANDING){
 #ifdef _TRANX_STATS_
     initStats();
 #endif
     begin();
   } 
 
-  Transaction::Transaction(IdType id) : TransId(id), TransStatus(T_EXPANDING){
-#ifdef _TRANX_STATS_
-    initStats();
-#endif
-    begin();
-  } 
 
 #ifdef _TRANX_STATS_
   void Transaction::initStats()  {
@@ -145,6 +146,7 @@
 #ifdef _TRANX_STATS_
     NumAbort++;
 #endif
+    
     return retValue;
   }
 
@@ -158,6 +160,50 @@
   TransStatusType Transaction::checkStatus() 
   {
       return TransStatus;
+  }
+
+
+  bool Transaction::registerVertexLock(MutexPointer mptr, VertexPointer vptr, LockType lktype) {
+    if (VertexLockMap.find(mptr) != VertexLockMap.end())  {
+      /// This mutex exists in the map -> Transaction already holds this lock
+      return false;
+    }
+    VertexLockMap.insert(VertexLockPairType(mptr, VLockPairType(vptr, lktype)));
+    return true;
+  }
+
+  bool Transaction::registerEdgeLock(MutexPointer mptr, EdgePointer eptr, LockType lktype) {
+    if (EdgeLockMap.find(mptr) != EdgeLockMap.end())  {
+      return false;
+    }
+    EdgeLockMap.insert(EdgeLockPairType(mptr, ELockPairType(eptr, lktype)));
+    return true;
+  }
+
+
+  void Transaction::releaseVertexLock( ) {
+    for (auto LockEntry : VertexLockMap) {
+      LockManager.tryUnlock(LockEntry.first, LockEntry.second.second);
+#ifndef _NO_WAIT_
+      LockManager.retireFromLockMap(TransId, LockEntry.first, LockEntry.second.second);
+#endif
+    }
+    return ;
+  }
+
+  void Transaction::releaseEdgeLock( ) {
+    for (auto LockEntry : EdgeLockMap) {
+      LockManager.tryUnlock(LockEntry.first, LockEntry.second.second);
+#ifndef _NO_WAIT_
+      LockManager.retireFromLockMap(TransId, LockEntry.first, LockEntry.second.second);
+#endif
+    }
+    return ;
+  }
+
+  void Transaction::releaseLock()  {
+    releaseVertexLock();
+    releaseEdgeLock();
   }
 
 #ifdef _TRANX_STATS_

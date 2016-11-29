@@ -15,13 +15,15 @@
 #ifndef _LOCKMANAGER_H_
 #define _LOCKMANAGER_H_
 
+#include "GraphType.h"
+#include "Transaction.h"
+
 ///TODO c++14
 #include <shared_mutex>
 #include <iostream>
 #include <thread>
 #include <map>
 
-#include "GraphType.h"
 
 typedef std::shared_timed_mutex Mutex;
 typedef std::shared_ptr<Mutex> MutexPointer;
@@ -33,6 +35,8 @@ public:
   typedef vector<unsigned int> LockIdListType;
 public:
   LockManager() {}
+  
+//  friend class Transaction;
   /// needs a mutex to guard LockMap in order not to 
   //allow multiple change concurrently
   auto testVertexMutex(unsigned int id) 

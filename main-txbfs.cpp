@@ -191,7 +191,7 @@ int main(int argc, char *argv[]) {
 
   std::vector<TransactionPointerType> TranxList;
   for (auto i= 0; i < 22; i++) {
-    auto TxEntryPtr = TmManager.addTransaction();
+    auto TxEntryPtr = TmManager.addTransaction(LkManager);
     auto TxPtr = TxEntryPtr.second;
     TranxList.push_back(TxPtr);
   }

@@ -17,6 +17,9 @@
 
 #include "Concurrency_control_config.h"
 #include "Lock.h"
+#include "GraphType.h"
+#include "LocksManager.h"
+#include "global.h"
 
 #include <stdlib.h>
 #include <unordered_map>
@@ -26,8 +29,16 @@
 class Transaction {
 public:
   typedef unsigned int IdType;
-#ifdef _TRANX_STATS_
+  typedef GraphType::VertexPointer VertexPointer;
+  typedef GraphType::EdgePointer EdgePointer;
   typedef VertexLock::MutexPointer MutexPointer;
+  typedef std::pair<VertexPointer, LockType> VLockPairType;
+  typedef std::pair<EdgePointer, LockType> ELockPairType;
+  typedef std::pair<MutexPointer, VLockPairType> VertexLockPairType; 
+  typedef std::unordered_map<MutexPointer, VLockPairType> VertexLockMapType; 
+  typedef std::pair<MutexPointer, ELockPairType> EdgeLockPairType;
+  typedef std::unordered_map<MutexPointer, ELockPairType> EdgeLockMapType;
+#ifdef _TRANX_STATS_
   typedef std::pair<MutexPointer, int> MutexPairType;
   typedef std::unordered_map<MutexPointer, int> MutexMapType;
 #endif
@@ -35,6 +46,8 @@ public:
   Transaction(); 
 
   Transaction(IdType id); 
+
+  Transaction(IdType id, LocksManager & LockManager); 
 
   IdType getId();
 
@@ -47,6 +60,20 @@ public:
   bool abort(); 
 
   bool  rollBack();
+
+  void releaseVertexLock();
+
+  void releaseEdgeLock();
+
+  void releaseLock();
+
+  bool registerVertexLock(MutexPointer , VertexPointer, LockType );
+
+  bool registerEdgeLock(MutexPointer , EdgePointer, LockType );
+
+  VertexLockMapType getVertexLockMap();
+
+  EdgeLockMapType getEdgeLockMap();
 
   TransStatusType checkStatus();
 
@@ -65,9 +92,11 @@ public:
 #endif
 
 protected:
+  LocksManager & LockManager;
   IdType  TransId;
   TransStatusType TransStatus;
-
+  EdgeLockMapType EdgeLockMap;
+  VertexLockMapType VertexLockMap;
 #ifdef _TRANX_STATS_
   int NumAbort;
   MutexMapType AbortedMap;

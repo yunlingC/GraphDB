@@ -432,6 +432,9 @@
                                     , IdType TxId
                                     ){
         auto MutexPtr = getVertexLockPointer(VId, Mutex);
+#ifdef _NO_WAIT_
+        
+#endif
 //        TransactionManager::
         DeadlockDetector->lock();
         bool isRegistered = registerLockMap(TxId, MutexPtr, Lock);
