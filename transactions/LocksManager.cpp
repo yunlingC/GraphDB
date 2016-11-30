@@ -22,7 +22,7 @@
 #include <string>
 
 #define _DEBUG_ENABLE_ true
-#define _DEBUG_PRINT_ true
+//#define _DEBUG_PRINT_ true
 //#define _NO_WAIT_ true
 
 #if _DEBUG_ENABLE_
