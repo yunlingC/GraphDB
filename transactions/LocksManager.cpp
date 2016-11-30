@@ -713,9 +713,11 @@
       if ((it->second).find(LockPtr) != (it->second).end()) {
         /// So far there is no need to update transMap, which means no lock 
         /// Update ResrMap only 
+#ifdef _DEBUG_PRINT_
         std::cout << "Transaction\t" << TransId
                   << "\talready registers lock\t" << LockPtr
                   << "\tin Trans Map\n";
+#endif
         return false;
       }
 
