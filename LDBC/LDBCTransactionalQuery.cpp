@@ -1205,7 +1205,6 @@ public:
         }
 
         ExistVertex->setNextEdge(NewEdge);
-       
 
       }/// FOR 
   }

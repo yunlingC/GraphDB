@@ -17,9 +17,9 @@
 
 #include "GraphType.h"
 #include "Lock.h"
+//#include "LockDetector.h"
 #include "Concurrency_control_config.h"
 #include "global.h"
-//#include "TransactionManager.h"
 
 ///std=c++14 
 #include <unordered_map>
@@ -29,12 +29,11 @@
 
 /// currently PLock is only supported in _LOCKING_STORAGE_
 /// i.e. in the LockMap we are still use shared_mutex from C++ lib
-/// TODO: support PLock with LockMap 
-/// but why?
 
 class LocksManager {
 public:
   typedef std::shared_timed_mutex Mutex;
+  typedef std::shared_ptr<std::mutex> ExMutexPointer;
   typedef VertexLock::MutexPointer  MutexPointer;
   typedef MutexPointer  LockPointer;
   typedef GraphType::VertexPointer VertexPtr;
@@ -51,7 +50,11 @@ public:
   typedef std::unordered_map<IdType,  LockTpSetType> TransMapType;
   typedef std::unordered_map<IdType, LockListType> TransactionResourceMap;
   typedef std::unordered_map<LockPointer, TransMapType> ResourceTransactionMap;
+  typedef std::unordered_map<LockPointer, ExMutexPointer> ResourceGuardMapType;
+  typedef std::pair<LockPointer, ExMutexPointer> ResourceGuardPairType;
   typedef std::unordered_map<IdType, LockPointer> WaitingTransactionMap;
+  typedef std::unordered_map<IdType, ExMutexPointer> WaitGuardMapType;
+  typedef std::pair<IdType, ExMutexPointer> WaitGuardPairType;
   typedef std::stack<IdType> TransStackType; 
   typedef std::set<IdType> TransSetType;
   typedef std::pair<bool, LockPointer> LockRetPairType;
@@ -202,10 +205,14 @@ protected:
 #ifdef _DEADLOCK_DETECTION_
 //	unsigned int DeadLockCount;
   /// TODO need lock for transMap, ResrMap, WaitMap separately
-  std::shared_ptr<std::mutex> DeadlockDetector;
+//  std::shared_ptr<std::mutex> DeadlockDetector;
+  ExMutexPointer DeadlockDetector;
 	TransactionResourceMap  TransMap;
 	ResourceTransactionMap  ResrMap;
   WaitingTransactionMap WaitMap;
+  ResourceGuardMapType  ResrGuardMap;
+  WaitGuardMapType   WaitGuardMap;
+
 //  TransactionManager & TmManager;
 #else 
 

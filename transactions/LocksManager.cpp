@@ -601,22 +601,34 @@
 ///#ifdef _DEADLOCK_DETECTION_
   auto LocksManager::registerWaitingMap(IdType TxId, LockPointer LockPtr)
     -> bool {
+      if (WaitGuardMap.find(TxId) == WaitGuardMap.end()) {
+        ExMutexPointer NewGuard(new std::mutex);
+        WaitGuardMap.insert(WaitGuardPairType(TxId, NewGuard));
+      }
+      auto Guard = WaitGuardMap[TxId];
+      if (!Guard->try_lock())  {
+        return false;
+      }
+
       auto it = WaitMap.find(TxId);
+      /// If TxId is found waiting for some lock, an error happens
       if (it != WaitMap.end())  {
-        std::cerr << "Transaction " << TxId << " is busy\n";
+        std::cout << "Transaction " << TxId << " is busy\n";
+        Guard->unlock();
         return false; 
       }
 
       WaitMap.insert(std::make_pair(TxId, LockPtr));
+      Guard->unlock();
       return true;
   }
 
   auto LocksManager::registerTransMap(IdType TransId, LockPointer LockPtr)
     ->  bool  {
-      auto it = TransMap.find(TransId);
 #ifdef _DEBUG_PRINT_
 //      std::cout << "Transaction " << TransId << " registers lock in trans map" << LockPtr << "\n";
 #endif
+      auto it = TransMap.find(TransId);
       /// If current transaction never registers itself with any lock
       if (it == TransMap.end()) {
         LockListType LockList{LockPtr}; 
@@ -625,32 +637,42 @@
       }
       /// If current lock exists in list 
       if ((it->second).find(LockPtr) != (it->second).end()) {
-        /// TODO do something ?
         /// So far there is no need to update transMap, which means no lock 
         /// Update ResrMap only 
         std::cout << "Transaction\t" << TransId
                   << "\talready registers lock\t" << LockPtr
                   << "\tin Trans Map\n";
-        return true;
+        return false;
       }
 
       (it->second).insert(LockPtr);
       return true;
   }
 
-  auto LocksManager::registerLockMap(IdType TransId, LockPointer LockPtr, LockType LType)
+  auto LocksManager::registerLockMap(IdType TransId
+                                    , LockPointer LockPtr
+                                    , LockType LType)
     ->  bool  {
 #ifdef _DEBUG_PRINT_
 //      std::cout << "Transaction " << TransId << " registers lock in lock map " << LockPtr << "\n";
-//      fflush(stdout);
 #endif
- 
+      /// No entry found -> create and add to map
+      if (ResrGuardMap.find(LockPtr)== ResrGuardMap.end())  {
+        ExMutexPointer NewGuard(new std::mutex);
+        ResrGuardMap.insert(ResourceGuardPairType(LockPtr, NewGuard));
+      }
+      auto Guard = ResrGuardMap[LockPtr];
+      if (!Guard->try_lock()) {
+        return false;
+      }
+
       auto it = ResrMap.find(LockPtr);
       if (it == ResrMap.end())  {
         std::set<LockType> lockset;
         lockset.insert(LType);
         TransMapType TxMap{{TransId, lockset}};
         ResrMap.insert(std::make_pair(LockPtr, TxMap)); 
+        Guard->unlock();
         return true;
       }
       auto TxRec  = (it->second).find(TransId);
@@ -659,6 +681,7 @@
         std::set<LockType> LockSet;
         LockSet.insert(LType);
         (it->second).insert(std::make_pair(TransId, LockSet));
+        Guard->unlock();
         return true;
       }
       /// If this transaction already holds the lock with same LockType
@@ -666,33 +689,31 @@
       auto LTypeSet = TxRec->second;
       if (LTypeSet.empty()) {
         LTypeSet.insert(LType);
+        Guard->unlock();
         return true;
       }
 
       ///EX + SH
+      ///This wouldn't happen; just for debugging
       if (LTypeSet.find(LType) == LTypeSet.end()) {
         ///already got T_EX, no need to get T_SH
-        if (LType == T_SH)  {
-          return false;
-        } 
-        else {
+        if (LType == T_EX)  {
           LTypeSet.insert(LType);
-          return true;
         }
       }
 
+#ifdef _DEBUG_ENABLE_
       else {
-#ifdef _DEBUG_PRINT_
-//        std::cout << "Transaction\t" << TransId 
-//                  << "\tholds\t" << LockPtr 
-//                  << "\twith lock type\t" << LType
-//                  << "\n";
+        std::cout << "Transaction\t" << TransId 
+                  << "\tholds\t" << LockPtr 
+                  << "\twith lock type\t" << LType
+                  << "\n";
+
+      }
 #endif
 
-        return false;
-      }
-
-      return false;
+      Guard->unlock();
+      return true;
   }
 
   auto LocksManager::registerToMap(IdType TransId, LockPointer LockPtr, LockType LType)
@@ -700,65 +721,146 @@
       bool regTrans = registerTransMap(TransId, LockPtr);
       bool regLock = registerLockMap(TransId, LockPtr, LType);
       return regTrans && regLock;
-
   }
 
   auto LocksManager::retireFromWaitingMap(IdType TxId, LockPointer LockPtr)
     -> bool {
-      /// TODO to be done
-      auto it = WaitMap.find(TxId);
-#if _DEBUG_ENABLE_
+#if _DEBUG_PRINT_
 //      std::cout << "Transaction " << TxId 
 //                << "\tretires from waiting map\t" << LockPtr 
 //                << "\n";
+#endif
+      bool missGuard = false;
+      if (WaitGuardMap.find(TxId) == WaitGuardMap.end()) {
+        if (WaitMap.find(TxId) != WaitMap.end()) {
+          missGuard = true;
+#if _DEBUG_ENABLE_
+          std::cout << "Transaction\t" << TxId 
+                    << "\t encounters Lock guard missing in WaitMap on\t" << LockPtr
+                    << "\n";
+#endif
+        }
+        else {
+#if _DEBUG_ENABLE_
+        std::cout << "Transaction\t" << TxId 
+                  << "\t holds is not waiting for" << LockPtr
+                  << "\n";
+#endif
+          return true;
+        }
+      }
+
+      if (!missGuard) {
+        while(WaitGuardMap[TxId]->try_lock())  {
+#if _DEBUG_PRINT_
+          std::cout << "Transaction\t" << TxId
+                    << "\tspin on lock_guard to retire\t" << LockPtr
+                    << "\tfrom wait map\n";
+#endif
+        }
+      }
+
+      auto it = WaitMap.find(TxId);
       if (it == WaitMap.end()) {
+#if _DEBUG_ENABLE_
         std::cout <<"Error : Transaction " << TxId << " is not waiting for any lock\n";
+#endif
+        if (!missGuard) { WaitGuardMap[TxId]->unlock();}
         return false;
       }
       if (it->second != LockPtr)  {
+#if _DEBUG_ENABLE_
         std::cout <<"Error : Transaction " << TxId << " is waiting for " << it->second << " not " << LockPtr <<"\n";
+#endif
+        if (!missGuard) { WaitGuardMap[TxId]->unlock();}
         return false;
       }
-#endif
+
       WaitMap.erase(it);
+      if (!missGuard) { WaitGuardMap[TxId]->unlock();}
+      ///TODO should delete lockGuard too?
       return true;
   }
 
   auto LocksManager::retireFromTransMap(IdType TxId, LockPointer LockPtr)
     -> bool {
     auto it = TransMap.find(TxId); 
-#if _DEBUG_ENABLE_
+#if _DEBUG_PRINT_
 //      std::cout << "Transaction " << TxId 
 //                << "\tretires from trans map\t" << LockPtr 
 //                << "\n";
  
+#endif
+
     if (it == TransMap.end()) {
+#if _DEBUG_ENABLE_
       std::cout <<"Error : Transaction " << TxId << " is not holding any lock\n";
+#endif
       return false;
     }
     /// it->second is a set holding all lock pointers
     auto iter = it->second.find(LockPtr);
     if (iter == it->second.end()) {
+#if _DEBUG_ENABLE_
       std::cout <<"Error : Transaction " << TxId << " does NOT have this lock\n";
+#endif
       return false;
     }
-#endif
     it->second.erase(LockPtr);
     return true;
   }
 
-  auto LocksManager::retireFromLockMap(IdType TxId, LockPointer LockPtr, LockType LType)
+  auto LocksManager::retireFromLockMap(IdType TxId
+                                      , LockPointer LockPtr
+                                      , LockType LType)
     -> bool {
-    auto it = ResrMap.find(LockPtr);
-#if _DEBUG_ENABLE_
+#if _DEBUG_PRINT_
 //      std::cout << "Transaction\t" << TxId 
 //                << "\tretires from lock map\t" << LockPtr 
 //                << "\n";
 #endif 
+
+    bool missGuard = false;
+    if (ResrGuardMap.find(LockPtr) == ResrGuardMap.end()) {
+      if (ResrMap.find(LockPtr) != ResrMap.end()) {
+      /// In this case, an error happened
+        missGuard = true;
+#if _DEBUG_ENABLE_
+        std::cout << "Transaction\t" << TxId 
+                  << "\t encounters Lock guard missing in LockMap on\t" << LockPtr
+                  << "\n";
+#endif
+//        return false;
+      }
+      else {
+#if _DEBUG_ENABLE_
+        std::cout << "Transaction\t" << TxId 
+                  << "\t holds no lock on" << LockPtr
+                  << "\n";
+#endif
+        return true;
+      }
+    }
+    
+    if (!missGuard) {
+      /// This statements blocks if lock is not available 
+      /// but there is no potential deadlock since we didn't create
+      /// "circular wait" situations
+      while (!ResrGuardMap[LockPtr]->try_lock()) {
+#if _DEBUG_PRINT_
+      std::cout << "Transaction\t" << TxId
+                << "\tspin on lock_guard to retire\t" << LockPtr
+                << "\tfrom lock map\n";
+#endif
+      }
+    }
+
+    auto it = ResrMap.find(LockPtr);
     if (it == ResrMap.end())  {
 #if _DEBUG_ENABLE_
       std::cout <<"Error : Lock " << LockPtr << " is not held by any transaction\n";
 #endif
+      if (!missGuard) { ResrGuardMap[LockPtr]->unlock(); }
       return false;
     }
     auto iter = it->second.find(TxId);
@@ -766,6 +868,7 @@
 #if _DEBUG_ENABLE_
       std::cout <<"Error : Lock " << LockPtr << " is not held by transaction " << TxId << "\n";
 #endif
+      if (!missGuard) { ResrGuardMap[LockPtr]->unlock(); }
       return false;
     }
 
@@ -778,6 +881,7 @@
                 << "\twith\t" << LType 
                 <<"\n";
 #endif
+      if (!missGuard) { ResrGuardMap[LockPtr]->unlock(); }
       return false;
     }
     /// Remove the entry created by TxId
@@ -786,6 +890,14 @@
     if (iter->second.empty()) {
       it->second.erase(TxId);
     }
+#if _DEBUG_ENABLE_
+    else {
+      std::cout << "Transaction\t" << TxId
+                << "\tstill holds lock type other than\t" << LType
+                << "\n";
+    }
+#endif
+    if (!missGuard) { ResrGuardMap[LockPtr]->unlock(); }
     return true;
   }
 
