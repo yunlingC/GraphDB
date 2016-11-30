@@ -24,6 +24,11 @@
 #include <iostream>
 #endif
 
+#define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
+#define MILLION 1000000
+#define NANO 1000000000
+#define SCALE 1000
+
 //  Transaction::Transaction() : TransId(0), TransStatus(T_EXPANDING) {
 
 //  Transaction::Transaction(IdType id) : TransId(id), TransStatus(T_EXPANDING){
@@ -43,6 +48,9 @@
     NumAbort = 0;
     AbortedMap.clear();
     VisitedMap.clear();
+    BeginTime = 0;
+    ExpandTime = 0; 
+    CommitTime = 0;
   }
 #endif
   
@@ -56,6 +64,10 @@
 #ifdef _PRINTLOG_
     std::cout <<"Transaction\t" << TransId << "\tSTART\n";
 #endif 
+
+#ifdef _TRANX_STATS_
+    setBeginTime();
+#endif
     return true;
   }
 
@@ -64,6 +76,10 @@
 #ifdef _PRINTLOG_
     std::cout <<"Transaction\t" << TransId << "\tEXPAND\n";
 #endif 
+
+#ifdef _TRANX_STATS_
+    setExpandTime();
+#endif
     return true;
 //    bool retValue = false; 
 //    switch()
@@ -97,6 +113,10 @@
     if (retValue)
     std::cout <<"Transaction\t" << TransId << "\tCOMMIT\n";
 #endif 
+
+#ifdef _TRANX_STATS_
+    setCommitTime();
+#endif
     return retValue;
   }
 
@@ -268,6 +288,49 @@
     dumpAbortedMap();
     dumpVisitedMap();
   }
+
+  uint64_t Transaction::setTime() {
+    timespec Time = (struct timespec){ 0 };
+    if ( clock_gettime( CLOCK_ID, &Time ) == -1) {
+      std::cout << "Error in get time\n";
+    }
+    return  Time.tv_sec * NANO + Time.tv_nsec ;
+  }
+
+  void Transaction::setBeginTime() {
+    BeginTime = setTime();
+  }
+
+  void Transaction::setCommitTime()  {
+    CommitTime = setTime();
+  }
+
+  void Transaction::setExpandTime()  {
+    ExpandTime  = setTime();
+  }
+
+  uint64_t Transaction::getBeginTime()  {
+    return BeginTime;
+  }
+
+  uint64_t Transaction::getExpandTime()  {
+    return ExpandTime;
+  }
+
+  uint64_t Transaction::getCommitTime()  {
+    return CommitTime;
+  }
+
+  uint64_t Transaction::getActiveTime()  {
+    ///Active time: begin() -- Commit()
+    return (CommitTime - BeginTime) / SCALE;
+  }
+
+  uint64_t Transaction::getExecTime()  {
+    /// Exec time: expand() -- commit()
+    return (CommitTime- ExpandTime) / SCALE;
+  }
+
 #endif
 
   Transaction::~Transaction(){}

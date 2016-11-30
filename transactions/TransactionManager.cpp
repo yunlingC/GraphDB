@@ -157,6 +157,21 @@
                 << "\tObjNum\t" << VEntry.second
                 << "\n";
     }
+
+    std::cout << "Processing time\n";
+//    std::cout << "TxId\tExecTime\tActiveTime\n";
+    for (auto Tx : TransTable)  {
+      std::cout <<"TxId\t" << Tx.second->getId()
+                << "\tBegin\t" << Tx.second->getBeginTime()
+                << "\tExpand\t" << Tx.second->getExpandTime()
+                << "\tCommit\t" << Tx.second->getCommitTime()
+                << "\tExecTime\t" <<Tx.second->getExecTime()
+                << "\tActiveTime\t" << Tx.second->getActiveTime()
+                << "\tpercentage\t" << (float)Tx.second->getExecTime() / (float)Tx.second->getActiveTime()
+
+                << "\n";
+    }
+
   }
 
 #endif

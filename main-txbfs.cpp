@@ -71,13 +71,13 @@ int main(int argc, char *argv[]) {
   auto NumIndices =  Index.buildVertexIndex("id");
   cout <<"Indexing vertex " << NumIndices << "\n";
 
-//  auto IndexEntry = Index.getVertexIndex("PERSON", "78038");
-//  if (IndexEntry.second)  {
-//    cout << (IndexEntry.first)->getPropertyValue("firstName").first
-//          << "\t" << (IndexEntry.first)->getId() << endl;
-//  }
-//  else 
-//    cout <<"Vertex Not found\n";
+  auto IndexEntry = Index.getVertexIndex("PERSON", "78038");
+  if (IndexEntry.second)  {
+    cout << (IndexEntry.first)->getPropertyValue("firstName").first
+          << "\t" << (IndexEntry.first)->getId() << endl;
+  }
+  else 
+    cout <<"Vertex Not found\n";
 
   std::vector<LdbcQueryPtr> Queries;
 
@@ -226,7 +226,7 @@ int main(int argc, char *argv[]) {
     q12.runQuery(g, persons[pid], (TranxList[11]), LkManager);
 
     q13.runQuery(g, persons[pid], persons[(pid+3)%persons.size()], (TranxList[12]), LkManager);
-  
+//  
     q14.runQuery(g, persons[pid], persons[(pid+3)%persons.size()], (TranxList[13]), LkManager);
   
     q15.runQuery(g, persons[pid], (TranxList[14]), LkManager, Index);

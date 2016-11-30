@@ -89,6 +89,15 @@ public:
   void dumpAbortedMap();
   void dumpVisitedMap();
   void dumpStats();
+  uint64_t getBeginTime();
+  uint64_t getCommitTime();
+  uint64_t getExpandTime();
+  void setBeginTime();
+  void setCommitTime();
+  void setExpandTime();
+  uint64_t setTime();
+  uint64_t getActiveTime();
+  uint64_t getExecTime();
 #endif
 
 protected:
@@ -102,6 +111,10 @@ protected:
   MutexMapType AbortedMap;
   MutexMapType VisitedMap;
   void initStats();
+  uint64_t BeginTime;
+  uint64_t CommitTime;
+  uint64_t ExpandTime;
+
 #endif 
 };
 
