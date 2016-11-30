@@ -276,28 +276,30 @@
       /// If current trans is waiting for some other lock, then give up
       /// Usually it won't happen because this trans must be spining on that lock
       /// TODO to be deleted
+#ifndef _WAIT_DIE_  /*Deadlock detection only*/
+
 #if _DEBUG_ENABLE_
       if (WaitMap.find(TransId) != WaitMap.end()) {
         std::cerr << "Error : Transaction " << TransId << " is waiting for a lock\n";
         return T_Abort;
       }
 #endif
-
-#ifndef _WAIT_DIE_  /*Deadlock detection only*/
       DeadlockDetector->lock();
 #endif
+
       TransStackType  TransStack;
       TransSetType CheckedTransList;
       LockGuardSetType GuardSet;
       auto Guard = ResrGuardMap.find(LockPtr);
+
 #if _DEBUG_ENABLE_
       if (Guard == ResrGuardMap.end()) {
         std::cout << "Transaction\t" << TransId
-                  << "\tcould not get ResrGuard on\t" << LockPtr
+                  << "\tcould not get ResrGuard when checkWaitON on\t" << LockPtr
                   << "\n";
         return T_Abort;
       }
-#endif
+#endif /*DEBUG_ENABLE*/
 
       while (!Guard->second->try_lock() ) {
 #if _DEBUG_PRINT_
@@ -305,7 +307,7 @@
                   << "\tspins on ResrGuard on\t" << LockPtr
                   << "\n";
 //        if (tryLock(LockPtr, LType))
-#endif
+#endif /*DEBUG_PRINT*/
       }
 
       GuardSet.insert(Guard->second);
@@ -314,23 +316,26 @@
 
       if (TxList == ResrMap.end()) {
         std::cout << "Error : Lock is not available but no record found\n";
+        dismissGuard(GuardSet);
         return T_Wait;
       }
 
       for (auto iter = (*TxList).second.begin(), iter_end = (*TxList).second.end();
            iter != iter_end; iter++) {
 #if _DEBUG_PRINT_
-        std::cout << "Transaction\t" << (*iter).first 
-                  << "\t holds this lock\t"<< LockPtr
-                  << "\n";
+//        std::cout << "Transaction\t" << (*iter).first 
+//                  << "\t holds this lock\t"<< LockPtr
+//                  << "\n";
 #endif
 #ifdef _WAIT_DIE_
         ///Just check Transaction Id, which indicates priority
         if ((*iter).first == TransId) {
+          dismissGuard(GuardSet);
           return T_Ignore;
         }
         /// Larger Id, lower priority
         else if (iter->first < TransId)  {
+          dismissGuard(GuardSet);
           return T_Abort;
         }
 #else /*DEADLOCK_DETECTION*/
@@ -395,6 +400,8 @@
 #endif
           }// switch
 */
+          dismissGuard(GuardSet);
+          DeadlockDetector->unlock();
           return  T_Ignore;
         }// if 
 
@@ -404,15 +411,17 @@
           //TransStack.pop();
           std::cout <<"CheckWaitOnRecursive: Abort\n";
           dismissGuard(GuardSet);
+          DeadlockDetector->lock();
           return T_Abort;
         } //if 
-        std::cout <<"CheckWaitOnRecursive: Wait\n";
-        dismissGuard(GuardSet);
         TransStack.pop();
 #endif /*DEADLOCK_DETECTION*/
       } //for
       
       /// If there is no deadlock, wait for this lock
+      std::cout <<"CheckWaitOnRecursive: Wait\n";
+      dismissGuard(GuardSet);
+      DeadlockDetector->lock();
       return T_Wait;
     }
 #endif 
@@ -548,7 +557,7 @@
           }
           else {
 
-#ifdef _WAIT_DIE
+#ifdef _WAIT_DIE_
             ///Spin on register lock -- Wait-die
             while(!registerLockMap(TxId, MutexPtr, Lock)) {
 #if _DEBUG_PRINT_
@@ -582,47 +591,53 @@
 //                  << "\n";
 #endif
 
-#ifdef _WAIT_DIE
+#ifdef _WAIT_DIE_
 
 #endif
-        switch (LocksManager::checkWaitOn(TxId, MutexPtr, Lock))  {
+        switch (checkWaitOn(TxId, MutexPtr, Lock))  {
           /// If there is no potential deadlock, wait for it
           case T_Wait:  {
-            /// Release lock
-            DeadlockDetector->unlock();
             std::cout <<"Transction\t" << TxId
-                      << "\twaits for lock\t" << MutexPtr
+                      << "\twaits to register lock\t" << MutexPtr
                       << "\ton type\t" << Lock
                       << "\n";
-            int trial = 5; 
+#ifndef _WAIT_DIE_
+            registerWaitingMap(TxId, MutexPtr);
+#endif
+
+            std::cout << "Transaction\t" << TxId
+                      << "Waits for\t" << MutexPtr
+                      << "\n";
+            int trial = 10; 
             while (!tryLock(MutexPtr, Lock) && trial > 0) {
               trial--;
             }
             if (trial < 0) {
-              std::cout << "Abort\n";
+              std::cout << "Wait does not work. Abort\n";
+              releaseAll(TxId);
               return false;
             }
-//            /// Acquire lock again for registration
-            bool isReg  = LocksManager::registerToMap(TxId, MutexPtr, Lock);
-            std::cout << "Transaction\t" << TxId
-                      << "Waits end and registers\t" << isReg
-                      << "\n";
-//            return true;
+#ifndef _WAIT_DIE_
+            retireFromWaitingMap(TxId, MutexPtr);
+#endif
             return true;
                         }
           case T_Abort:
             LocksManager::releaseAll(TxId);
-            DeadlockDetector->unlock();
             return false;
           case T_Ignore:
-            DeadlockDetector->unlock();
             return true;
             /// Release SH Lock on data and then request EX Lock
             /// If lock can be acquired, return true
             /// else return false and then restart
           case T_Upgrade:
             auto isUpgraded = upgradeLock(TxId, MutexPtr);
-            DeadlockDetector->unlock();
+#ifdef  _DEBUG_PRINT_
+            std::cout <<"Transaction\t" << TxId
+                      << "\tupgrades on\t" << MutexPtr
+                      << "\tand\t" << isUpgraded
+                      << "\n";
+#endif 
             return isUpgraded;
         }//switch
         return true;
@@ -992,6 +1007,8 @@
 //      std::cout <<"Transaction\t" << TxId << "\tSHRINKING\n";
 #endif
     auto AcqLocks  = TransMap.find(TxId);
+#ifndef _NO_WAIT_
+#ifndef _WAIT_DIE_
     auto WaitLocks  = WaitMap.find(TxId);
     auto WaitGuard = WaitGuardMap.find(TxId);
     if (WaitGuard != WaitGuardMap.end())  {
@@ -1006,11 +1023,12 @@
       WaitGuard->second->unlock();
     }
     WaitGuardMap.erase(TxId);
+#endif
+#endif /*DEADLOCK_DETECTION_ or WAIT_DIE*/
 
     /// This transaction does NOT have any lock
     if (AcqLocks == TransMap.end())  {
       std::cout << "Transaction\t" << TxId << "\tholds NO lock\n";
-//          DeadlockDetector->unlock();
       return true;
     }
 
@@ -1020,10 +1038,13 @@
     for (auto it = (*AcqLocks).second.begin(); it!= (*AcqLocks).second.end(); it++) {
       /// Remove entries from ResrMap one by one
       /// If this lock is not found in ResrMap, there is an error
+#ifndef _NO_WAIT_
       auto ResrGuard = ResrGuardMap.find(*it);
       if (ResrGuard != ResrGuardMap.end()) {
         ResrGuard->second->lock();
       }
+#endif /*DEADLOCK_DETECTION or WAIT_DIE */  
+
       auto TransRec = ResrMap.find(*it);
       if (TransRec == ResrMap.end()) {
         std::cerr << "Error: Lock\t" << *it
@@ -1031,9 +1052,11 @@
         tryUnlock(*it, T_SH);
         tryUnlock(*it, T_EX);
 
+#ifndef _NO_WAIT_
         if (ResrGuard != ResrGuardMap.end()) {
           ResrGuard->second->unlock();
         }
+#endif
         continue;
         /// TODO shoud be exit?
       }
@@ -1044,12 +1067,13 @@
         tryUnlock(*it, T_SH);
         tryUnlock(*it, T_EX);
 
+#ifndef _NO_WAIT_
         if (ResrGuard != ResrGuardMap.end()) {
           ResrGuard->second->unlock();
         }
+#endif
 
         continue;
-//        return false;
       }
 //      std::cout << "Transaction\t" << TxId << "\treleases locks\t" << *it << "\n";
       if (Tx->second.size() > 1)  {
@@ -1064,9 +1088,11 @@
 
       TransRec->second.erase(TxId);
 
+#ifndef _NO_WAIT_
       if (ResrGuard != ResrGuardMap.end()) {
         ResrGuard->second->unlock();
       }
+#endif
 //      ResrMap.find(*it)->second.erase(TxId);
     }///for
     /// Now remove records of TxId from TransMap

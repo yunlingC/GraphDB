@@ -87,7 +87,7 @@ public:
         Tranx->abortMutex(MutexPtr);
 #endif
         Tranx->abort();
-		    LockManager.releaseAll(Tranx->getId());
+//		    LockManager.releaseAll(Tranx->getId());
         return;
       }
 
@@ -106,7 +106,7 @@ public:
         Tranx->abortMutex(NEMutexPtr);
 #endif
         Tranx->abort();
-		    LockManager.releaseAll(Tranx->getId());
+//		    LockManager.releaseAll(Tranx->getId());
         return;
       }
 
@@ -124,7 +124,7 @@ public:
         Tranx->abortMutex(FVMutexPtr);
 #endif
           Tranx->abort();
-		      LockManager.releaseAll(Tranx->getId());
+//		      LockManager.releaseAll(Tranx->getId());
           return;
 				}
 
@@ -137,7 +137,7 @@ public:
           Tranx->abortMutex(SVMutexPtr);
 #endif
           Tranx->abort();
-  		    LockManager.releaseAll(Tranx->getId());
+//  		    LockManager.releaseAll(Tranx->getId());
           return;
 				}
 
@@ -174,7 +174,7 @@ public:
           Tranx->abortMutex(FNEMutexPtr);
 #endif
           Tranx->abort();
-		      LockManager.releaseAll(Tranx->getId());
+//		      LockManager.releaseAll(Tranx->getId());
           return;
 				}
 
@@ -188,7 +188,7 @@ public:
           Tranx->abortMutex(SNEMutexPtr);
 #endif
           Tranx->abort();
-		      LockManager.releaseAll(Tranx->getId());
+//		      LockManager.releaseAll(Tranx->getId());
           return;
 				}
 
