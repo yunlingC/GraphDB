@@ -56,7 +56,10 @@ int main(int argc, char *argv[]) {
   VertexIdListType persons = {219997, 220078, 220387, 220242, 219706
                               ,219987,  219676, 219842, 219821, 219792
                               ,220153};
-//    = reader.getPersonList();
+  if (InputSize == 100) {
+    persons = reader.getPersonList();
+  }
+
   cout << persons.size() << "\t persons id are to be chosen\n";
   cout << "Finish reading \n";
 
@@ -222,9 +225,9 @@ int main(int argc, char *argv[]) {
   
     q12.runQuery(g, persons[pid], (TranxList[11]), LkManager);
 
-    q13.runQuery(g, persons[pid], persons[10], (TranxList[12]), LkManager);
+    q13.runQuery(g, persons[pid], persons[(pid+3)/persons.size()], (TranxList[12]), LkManager);
   
-    q14.runQuery(g, persons[pid], persons[10], (TranxList[13]), LkManager);
+    q14.runQuery(g, persons[pid], persons[(pid+3)/persons.size()], (TranxList[13]), LkManager);
   
     q15.runQuery(g, persons[pid], (TranxList[14]), LkManager, Index);
   

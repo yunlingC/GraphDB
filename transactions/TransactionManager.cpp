@@ -102,6 +102,7 @@
   }
 
   void TransactionManager::sumStats()  {
+    AbortStatsMap.clear();
     for(auto Entry : totalAbortedMap)  {
       /// Entry.second is the abort num for Entry.first
       if (AbortStatsMap.find(Entry.second) == AbortStatsMap.end()) {
@@ -110,6 +111,7 @@
       AbortStatsMap[Entry.second]++;
     }
 
+    VisitStatsMap.clear();
     for (auto VisitEntry : totalVisitedMap) {
       if (VisitStatsMap.find(VisitEntry.second) == VisitStatsMap.end()) {
         VisitStatsMap.insert(std::pair<int, int>(VisitEntry.second, 0) );
