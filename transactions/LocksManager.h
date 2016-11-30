@@ -58,6 +58,7 @@ public:
   typedef std::stack<IdType> TransStackType; 
   typedef std::set<IdType> TransSetType;
   typedef std::pair<bool, LockPointer> LockRetPairType;
+  typedef std::unordered_set<ExMutexPointer> LockGuardSetType;
 public:
 
 #ifndef _LOCKING_STORAGE_
@@ -106,6 +107,8 @@ public:
 
   bool getEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
 
+  bool getLock(MutexPointer MutexPtr, LockType Lock, IdType TxId);
+
 //  bool releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
 
 //  bool releaseEdgeLock(IdType EdgeId, MutexType Mutex, LockType Lock, IdType TxId);
@@ -115,22 +118,20 @@ public:
 	LockRequestRetType  checkWaitOn(IdType, LockPointer, LockType);
 
   /// Yes - wait  No - deadlock
-  bool  checkWaitOnRecursive(IdType, IdType, TransStackType, TransSetType);
+  bool  checkWaitOnRecursive(IdType, IdType, TransStackType, TransSetType, LockGuardSetType );
 
-  /// TODO lock
+  void  dismissGuard(LockGuardSetType & Guards);
+
   bool  releaseAll(IdType TxId);
 
-  /// TODO lock
   bool  registerWaitingMap(IdType TransId,  LockPointer  LockPtr); 
 
   bool  retireFromWaitingMap(IdType TransId, LockPointer LockPtr);
 
-  /// TODO lock
   bool  registerTransMap(IdType TransId,  LockPointer  LockPtr);
 
   bool  retireFromTransMap(IdType TransId,  LockPointer  LockPtr);
 
-  /// TODO lock
   bool  registerLockMap(IdType TransId, LockPointer  LockPtr,  LockType  LType);
 
   bool  retireFromLockMap(IdType TransId, LockPointer  LockPtr,  LockType  LType);
@@ -138,6 +139,8 @@ public:
   bool  registerToMap(IdType TransId,  LockPointer  LockPtr, LockType LType);
 
   bool  retireFromMap(IdType TransId,  LockPointer  LockPtr, LockType LType);
+
+  bool  checkTransMap(IdType TransId,  LockPointer  LockPtr);
 
   bool  upgradeLock(IdType TransId, LockPointer LockPtr);
 
