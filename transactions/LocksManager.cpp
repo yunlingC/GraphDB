@@ -551,6 +551,8 @@
 #else /**DEADLOCK_DETECTION or WAIT_DIE*/
 
         if (getLock) {
+          if (checkTransMap(TxId, MutexPtr))  return true;
+
           if (registerLockMap(TxId, MutexPtr, Lock)) {
             registerTransMap(TxId, MutexPtr);
             return true;
@@ -803,13 +805,15 @@
           LTypeSet.insert(LType);
         }
       }
+#if _DEBUG_PRINT_
       else {
         std::cout << "Transaction\t" << TransId 
                   << "\tholds\t" << LockPtr 
                   << "\twith lock type\t" << LType
                   << "\n";
-
       }
+#endif
+
 #endif
 
       Guard->unlock();
