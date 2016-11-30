@@ -993,10 +993,20 @@
 #endif
     auto AcqLocks  = TransMap.find(TxId);
     auto WaitLocks  = WaitMap.find(TxId);
+    auto WaitGuard = WaitGuardMap.find(TxId);
+    if (WaitGuard != WaitGuardMap.end())  {
+      WaitGuard->second->lock();
+    }
     /// Remove entry <TxId, Lock> in WaitMap if it exists
     if (WaitLocks != WaitMap.end()) {
       WaitMap.erase(TxId);
     }
+
+    if (WaitGuard != WaitGuardMap.end())  {
+      WaitGuard->second->unlock();
+    }
+    WaitGuardMap.erase(TxId);
+
     /// This transaction does NOT have any lock
     if (AcqLocks == TransMap.end())  {
       std::cout << "Transaction\t" << TxId << "\tholds NO lock\n";
@@ -1010,15 +1020,21 @@
     for (auto it = (*AcqLocks).second.begin(); it!= (*AcqLocks).second.end(); it++) {
       /// Remove entries from ResrMap one by one
       /// If this lock is not found in ResrMap, there is an error
+      auto ResrGuard = ResrGuardMap.find(*it);
+      if (ResrGuard != ResrGuardMap.end()) {
+        ResrGuard->second->lock();
+      }
       auto TransRec = ResrMap.find(*it);
       if (TransRec == ResrMap.end()) {
         std::cerr << "Error: Lock\t" << *it
                   << "\tnot found\n";
         tryUnlock(*it, T_SH);
         tryUnlock(*it, T_EX);
+
+        if (ResrGuard != ResrGuardMap.end()) {
+          ResrGuard->second->unlock();
+        }
         continue;
-//        break;
-//        return false;
         /// TODO shoud be exit?
       }
       /// If this transaction is not found with this lock, there is an error
@@ -1027,6 +1043,11 @@
         std::cerr << "Error: Transaction " << TxId << " not found \n"; 
         tryUnlock(*it, T_SH);
         tryUnlock(*it, T_EX);
+
+        if (ResrGuard != ResrGuardMap.end()) {
+          ResrGuard->second->unlock();
+        }
+
         continue;
 //        return false;
       }
@@ -1042,12 +1063,15 @@
       }
 
       TransRec->second.erase(TxId);
+
+      if (ResrGuard != ResrGuardMap.end()) {
+        ResrGuard->second->unlock();
+      }
 //      ResrMap.find(*it)->second.erase(TxId);
     }///for
     /// Now remove records of TxId from TransMap
     TransMap.erase(TxId);
     std::cout << "Transaction\t" << TxId << "\tFinishes\n";
-//          DeadlockDetector->unlock();
     return true;
   }
 
