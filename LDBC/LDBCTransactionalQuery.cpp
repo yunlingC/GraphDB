@@ -102,20 +102,20 @@ public:
       Tranx->commit();
   
   #ifdef _PRINTLOG_
-//      if(Tranx->checkStatus() == T_COMMIT) {
-//    		auto target = TypeVisitor.getVertexList();
-//        auto targets = TypeVisitor.getTargetsMap();
-//        LdbcFile << StartVertex << "\thas friends made\t" << target.size() 
-//                  << "\tcomments and posts \n";
-//        for(auto it = targets.begin(); it != targets.end(); ++it) {
-//          LdbcFile <<"person " << (*it).first->getId() 
-//                  << "\t" << (*it).second->getPropertyValue("id").first 
-//                  << "\t" <<"comments/posts" 
-//                  << "\t" << (*it).first->getPropertyValue("id").first 
-//                  << "\t" << (*it).first->getPropertyValue("creationDate").first ;
-//          LdbcFile << "\n";
-//        }
-//      }
+      if(Tranx->checkStatus() == T_COMMIT) {
+    		auto target = TypeVisitor.getVertexList();
+        auto targets = TypeVisitor.getTargetsMap();
+        LdbcFile << StartVertex << "\thas friends made\t" << target.size() 
+                  << "\tcomments and posts \n";
+        for(auto it = targets.begin(); it != targets.end(); ++it) {
+          LdbcFile <<"person " << (*it).first->getId() 
+                  << "\t" << (*it).second->getPropertyValue("id").first 
+                  << "\t" <<"comments/posts" 
+                  << "\t" << (*it).first->getPropertyValue("id").first 
+                  << "\t" << (*it).first->getPropertyValue("creationDate").first ;
+          LdbcFile << "\n";
+        }
+      }
   #endif
     }
 
@@ -381,11 +381,11 @@ public:
 
       Tranx->commit();
 #ifdef _PRINTLOG_
-		for (auto it = targetMap.begin(), it_end = targetMap.end();
-         it != it_end; ++it) {
-      if (!(*it).second)
-        LdbcFile <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< "\n";
-    }
+  		for (auto it = targetMap.begin(), it_end = targetMap.end();
+           it != it_end; ++it) {
+        if (!(*it).second)
+          LdbcFile <<"forum " << (*it).first->getPropertyValue("id").first  << " has " <<(*it).second << " posts made by friends"<< "\n";
+      }
 #endif
     }
 
@@ -754,9 +754,8 @@ public:
   			}///if
   		}///for
   
-      if (Tranx->checkStatus() == T_ABORT) {
-        needRestart = true;
-        break;
+      if(needRestart)  {
+        continue;
       }
 
   		for (VertexPointer Vertex : targets) {
@@ -1019,8 +1018,10 @@ public:
 		getStartTime();
 
 		if ( StartVertex == endVertex ) {
-			std::cerr << "StartVertex == endVertex \n";
-			exit(0);
+			std::cout << "StartVertex == endVertex \n";
+      Tranx->commit();
+      return;
+//			exit(0);
 		}
 
     while (Tranx->checkStatus() != T_COMMIT) {
@@ -1177,10 +1178,8 @@ public:
         EdgePointer NewEdge = EdgeEntry.first;
         bool isFirstExisted = EdgeEntry.second.first;
         bool isExistedFirst = EdgeEntry.second.second;
-//        VertexPointer NewVertex = NewEdge->getFirstVertexPtr();
         VertexPointer ExistVertex = NewEdge->getSecondVertexPtr();
         if (isFirstExisted) {
-//          NewVertex = NewEdge->getSecondVertexPtr();
           ExistVertex = NewEdge->getFirstVertexPtr();
         }
 
@@ -1212,7 +1211,6 @@ public:
   /// Get locks only on exisiting edges and vertices
 	virtual void runQuery(GraphType & Graph
                 , VertexDescriptor StartVertex
-//                , Visitor  & GraphVisitor
                 , TransactionPointerType Tranx 
                 , LockManagerType & LockManager
                 , IndexType & Index
@@ -1239,14 +1237,18 @@ public:
         bool isExistedFirst = true;
   
         if (!ExistIndex.second) {
+#if _DEBUG_PRINT_
           std::cout << "Error: Fail in getting index on\n" ;
-           continue;
+#endif
+          continue;
         }
 
+#if _DEBUG_PRINT_
         std::cout << "Existing vertex\n";
         std::cout << ExistIndex.first->getId() << "\t"
                   << ExistIndex.first->getType().std_str() 
                   << "\n";
+#endif
         if (NewEdge->getFirstVertexPtr() == NewVertex) {
   
           NewEdge->setSecondVertexPtr(ExistIndex.first);
@@ -1267,16 +1269,18 @@ public:
           Tranx->abortMutex(NEMutexPtr);
 #endif
           Tranx->abort();
-//		      LockManager.releaseAll(Tranx->getId());
           needRestart = true;
           break;
         }
   
         auto ExistNextEdge = ExistIndex.first->getNextEdge();
         if (ExistNextEdge && (ExistNextEdge->getFirstVertexPtr() == ExistIndex.first)) {
+
+#if _DEBUG_PRINT_
           std::cout <<"Existing Next Edge\n";
           std::cout << ExistNextEdge->getId() << "\t"
                     << ExistNextEdge->getType().std_str() << "\n";
+#endif
 
 #ifdef _TRANX_STATS_
           auto FPEMutexPtr = LockManager.getEdgeLockPointer(ExistNextEdge->getId(), T_FirstPrevEdge);
@@ -1288,16 +1292,17 @@ public:
             Tranx->abortMutex(FPEMutexPtr);
 #endif
             Tranx->abort();
-//		        LockManager.releaseAll(Tranx->getId());
             needRestart = true;
             break;
           }
         }
         else if(ExistNextEdge && (ExistNextEdge->getSecondVertexPtr() == ExistIndex.first)) {
 
+#if _DEBUG_PRINT_
           std::cout <<"Existing Next Edge\n";
           std::cout << ExistNextEdge->getId() << "\t"
                     << ExistNextEdge->getType().std_str() << "\n";
+#endif
 
           isExistedFirst = false;
 
@@ -1311,7 +1316,6 @@ public:
             Tranx->abortMutex(SPEMutexPtr);
 #endif
             Tranx->abort();
-//		        LockManager.releaseAll(Tranx->getId());
             needRestart = true;
             break;
           }
@@ -1374,13 +1378,12 @@ public:
     Graph.addVertex(NewVertex);
     Index.buildVertexIndex("id", NewVertex);
     LockManager.addToVertexLockMap(NewVertex->getId());
-//      std::cout <<"Transaction\t" << Tranx->getId()
-//              <<"\tadd vertex lock\t" <<  NewVertex->getId()
-//              <<"\t to map\n";
+
     for(auto EdgePtr : EdgePtrMap)  {
       Graph.addEdge(EdgePtr.first, false);
       LockManager.addToEdgeLockMap(EdgePtr.first->getId());
     }
+
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
 		LdbcFile.close();
@@ -1432,8 +1435,7 @@ public:
           Tranx->abortMutex(NEMutexPtr);
 #endif
           Tranx->abort();
-//		      LockManager.releaseAll(Tranx->getId());
-          break;
+          continue;
         }
 
 #ifdef _TRANX_STATS_
@@ -1446,8 +1448,7 @@ public:
           Tranx->abortMutex(SNEMutexPtr);
 #endif
           Tranx->abort();
-//		      LockManager.releaseAll(Tranx->getId());
-          break;
+          continue;
         }
         auto FNEdge = FirstIndex.first->getNextEdge();
         if (FNEdge) {
@@ -1461,8 +1462,7 @@ public:
             Tranx->abortMutex(FPEMutexPtr);
 #endif
             Tranx->abort();
-//		        LockManager.releaseAll(Tranx->getId());
-            break;
+            continue;
           }
 
 #ifdef _TRANX_STATS_
@@ -1474,8 +1474,7 @@ public:
             Tranx->abortMutex(SPEMutexPtr);
 #endif
             Tranx->abort();
-//		        LockManager.releaseAll(Tranx->getId());
-            break;
+            continue;
           }
         }
 
@@ -1491,8 +1490,7 @@ public:
             Tranx->abortMutex(SFPEMutexPtr);
 #endif
             Tranx->abort();
-//		        LockManager.releaseAll(Tranx->getId());
-            break;
+            continue;
           }
 
 #ifdef _TRANX_STATS_
@@ -1505,8 +1503,7 @@ public:
             Tranx->abortMutex(SSPEMutexPtr);
 #endif
             Tranx->abort();
-//		        LockManager.releaseAll(Tranx->getId());
-            break;
+            continue;
           }
         }
 
@@ -1530,21 +1527,15 @@ public:
       }///if
       else {
 
-        std::cout << "Error: both vertices do NOT exist\n";
+        std::cout << "Error: At least one vertex do NOT exist\n";
       }
 
       Tranx->commit();
-//      std::cout <<"Transaction\t" << Tranx->getId() << "\t status\t" 
-//                << Tranx->checkStatus() << "\n";
     }///while
 
-    /// TODO add locks to lockmap LockManager
     if ( addSuccess ) {
       auto NewEdgeId = Graph.addEdge(NewEdge, false);
       LockManager.addToEdgeLockMap(NewEdgeId);
-//      std::cout <<"Transaction\t" << Tranx->getId()
-//              <<"\tadd edge lock\t" <<  NewEdgeId
-//              <<"\t to map\n";
     }
 
 #ifdef _PRINTLOG_

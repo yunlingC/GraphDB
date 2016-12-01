@@ -17,7 +17,6 @@
 
 #include "GraphType.h"
 #include "Lock.h"
-//#include "LockDetector.h"
 #include "Concurrency_control_config.h"
 #include "global.h"
 
@@ -206,9 +205,6 @@ protected:
 #endif
 
 #ifdef _DEADLOCK_DETECTION_
-//	unsigned int DeadLockCount;
-  /// TODO need lock for transMap, ResrMap, WaitMap separately
-//  std::shared_ptr<std::mutex> DeadlockDetector;
   ExMutexPointer DeadlockDetector;
 	TransactionResourceMap  TransMap;
 	ResourceTransactionMap  ResrMap;
@@ -216,7 +212,6 @@ protected:
   ResourceGuardMapType  ResrGuardMap;
   WaitGuardMapType   WaitGuardMap;
 
-//  TransactionManager & TmManager;
 #else 
 
 #endif /*_DEADLOCK_DETECTION_ */
