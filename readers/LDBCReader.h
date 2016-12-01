@@ -17,13 +17,13 @@
 
 #include "GraphType.h"
 #include "FileTypes.h"
+#include "global.h"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <map>
 #include <dirent.h>
 
-#define _DEBUG_ 1
 
 #if _DEBUG_ 
 #include <iostream>
@@ -50,7 +50,12 @@ private:
 #endif 
 
 public:
+
+#ifndef _DEBUG_
+  LDBCReader(GraphType & graph) : _Graph( graph ) { }
+#else 
   LDBCReader(GraphType & graph) : _Graph( graph ), _NodeNum(0), _EdgeNum(0) { }
+#endif
 
   auto readDirectory(std::string  DirName) 
     -> int {
@@ -103,9 +108,11 @@ public:
     } //END_FOR
 
     closedir(_DirPointer);
+#if _DEBUG_
     std::cout << "\n+++++++++ Summary ++++++++++\n";
     std::cout << _NodeNum << " Nodes are read in total\n";
     std::cout << _EdgeNum << " Edges are read in total\n";
+#endif
     return 0;
   }
 
@@ -131,7 +138,7 @@ private:
       if (_LDBCFile.fail())
         throw 1;
 
-      auto Counter = 0;
+//      auto Counter = 0;
       if (getline(_LDBCFile, line)) {
         boost::split(keys, line, boost::is_any_of("|"));
       }
@@ -147,14 +154,14 @@ private:
 //        PropertyList.print();
         _VertexLabelMap[Label.First].insert(std::pair<std::string, VertexDescriptor>
                                             (attributes[0], vd));
-        if ((Counter ++) < 5)
+//        if ((Counter ++) < 5)
           if (Label.First == "PERSON")
             _PersonList.push_back(vd);
 
         counter++;
       } //END_WHILE
 #if  _DEBUG_
-      std::cout << counter << " Nodes are read in this file\n";
+      std::cout << counter << "\tNodes \t" << Label.First << "\n";
       _NodeNum += counter;
 #endif
     }//END_TRY
@@ -215,7 +222,7 @@ private:
         counter++;
       } //END_WHILE
 #if _DEBUG_
-      std::cout << counter << " Rels are read in this file\n";
+      std::cout << counter << "\tRels \t" << EdgeLabel.Edge << "\n";
       _EdgeNum += counter;
 #endif
     }//END_TRY

@@ -22,7 +22,9 @@
 #include <map>
 #include <boost/algorithm/string.hpp>
 
+#ifdef _DEBUG_
 #include <iostream> 
+#endif
 
 typedef std::string KeyType;
 typedef std::string ValueType;
