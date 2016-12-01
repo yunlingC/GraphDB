@@ -53,21 +53,21 @@ int main(int argc, char *argv[]) {
   LDBCReader reader(g);
   reader.readDirectory("../tests/ldbc/social_network_"+std::to_string(InputSize));
 
-  VertexIdListType personId = {219997, 220078, 220387, 220242, 219706
+  VertexIdListType persons = {219530, 219997, 220078, 220387, 220242, 219706
                               ,219987,  219676, 219842, 219821, 219792
                               ,220153};
 
-  unsigned int Offset = reader.getPersonList()[0];
-
-  VertexIdListType persons;
-  
-  persons.push_back(0);
-
-  for (unsigned int i = 0; i < personId.size(); i++) {
-    auto value = personId[i] - Offset;
-    persons.push_back(value);
-  }
-
+//  unsigned int Offset = reader.getPersonList()[0];
+//
+//  VertexIdListType persons;
+//  
+//  persons.push_back(0);
+//
+//  for (unsigned int i = 0; i < personId.size(); i++) {
+//    auto value = personId[i] - Offset;
+//    persons.push_back(value);
+//  }
+//
   if (InputSize == 100) {
     persons = reader.getPersonList();
   }
