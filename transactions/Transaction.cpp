@@ -108,7 +108,6 @@
         retValue = true;
         break;
     }
-//    std::cout << TransId << "\t commits\n";
 #ifdef _PRINTLOG_
     if (retValue)
     std::cout <<"Transaction\t" << TransId << "\tCOMMIT\n";
@@ -138,11 +137,11 @@
 #endif
         break;
       case T_ABORT:
-//        TransStatus = T_ABORT;
 #ifdef _PRINTLOG_
         std::cout <<"Error in Abort:\t" << TransId << "\tis ABORT\n";
         exit(0);
 #endif
+        TransStatus = T_ROLLBACK;
         break;
       case T_ROLLBACK:
         TransStatus = T_EXPANDING;
@@ -173,7 +172,6 @@
   bool Transaction::rollBack()
   {
       TransStatus = T_ROLLBACK;
-      ///TODO roll back
       return true;
   }
 

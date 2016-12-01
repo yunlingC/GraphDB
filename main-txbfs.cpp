@@ -53,13 +53,13 @@ int main(int argc, char *argv[]) {
   LDBCReader reader(g);
   reader.readDirectory("../tests/ldbc/social_network_"+std::to_string(InputSize));
 
-  VertexIdListType persons = {219530, 219997, 220078, 220387, 220242, 219706
-                              ,219987,  219676, 219842, 219821, 219792
-                              ,220153};
+//  VertexIdListType persons = {219530, 219997, 220078, 220387, 220242, 219706
+//                              ,219987,  219676, 219842, 219821, 219792
+//                              ,220153};
 
 //  unsigned int Offset = reader.getPersonList()[0];
 //
-//  VertexIdListType persons;
+  VertexIdListType persons;
 //  
 //  persons.push_back(0);
 //
@@ -68,9 +68,9 @@ int main(int argc, char *argv[]) {
 //    persons.push_back(value);
 //  }
 //
-  if (InputSize == 100) {
+//  if (InputSize == 100) {
     persons = reader.getPersonList();
-  }
+//  }
 
   cout << persons.size() << "\t persons id are to be chosen\n";
   cout << "Finish reading \n";
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
   
   IndexType Index(g);
   auto NumIndices =  Index.buildVertexIndex("id");
-  cout <<"Indexing vertex " << NumIndices << "\n";
+//  cout <<"Indexing vertex " << NumIndices << "\n";
 
 //  auto IndexEntry = Index.getVertexIndex("PERSON", "78038");
 //  if (IndexEntry.second)  {
@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
 
   LdbcQueryAddEdge q22(22);
   q22.initEdge("KNOWS", "creationDate", "2015-10-08T00:47:05.399+0000") ;
-  q22.getVertexId("7803", "PERSON", "420", "PERSON");
+  q22.getVertexId("78038", "PERSON", "420", "PERSON");
   /*** End of Update queries definition ***/
 
   std::vector<TransactionPointerType> TranxList;

@@ -26,11 +26,6 @@
 #include <unordered_map>
 #include <vector>
 
-#define _TRANX_STATS_ true
-
-//TODO
-/// update graph->add/delete nodes/edges
-/// Macros of spinning on locks
 class TransactionalBFS {
 public:
   typedef GraphType::VertexPointer  VertexPointer;
@@ -40,11 +35,6 @@ public:
 	typedef Transaction* TransactionType;
   typedef LocksManager   LockManagerType;
 
-  /// TODO but why?
-  /// back-off one by one /read or write - stack
-	/// get read locks one by one and store in locklists,
-	/// then release locks in reverse order one by one before return.
-  
 public:
 	void breadthFirstSearch(GraphType & Graph
                         , const VertexDescriptor & StartVertex
@@ -59,7 +49,8 @@ public:
 #if _DEBUG_ENABLE_
 		if (ScheduledVertex  == nullptr) {
 			std::cerr << "Error: No such vertex in graph \n";
-			exit(1);
+      return ;
+//			exit(1);
 		}
 #endif
 		// Start traversing the graph from here.
@@ -87,7 +78,6 @@ public:
         Tranx->abortMutex(MutexPtr);
 #endif
         Tranx->abort();
-//		    LockManager.releaseAll(Tranx->getId());
         return;
       }
 
@@ -106,7 +96,6 @@ public:
         Tranx->abortMutex(NEMutexPtr);
 #endif
         Tranx->abort();
-//		    LockManager.releaseAll(Tranx->getId());
         return;
       }
 
@@ -124,7 +113,6 @@ public:
         Tranx->abortMutex(FVMutexPtr);
 #endif
           Tranx->abort();
-//		      LockManager.releaseAll(Tranx->getId());
           return;
 				}
 
@@ -137,7 +125,6 @@ public:
           Tranx->abortMutex(SVMutexPtr);
 #endif
           Tranx->abort();
-//  		    LockManager.releaseAll(Tranx->getId());
           return;
 				}
 
@@ -174,7 +161,6 @@ public:
           Tranx->abortMutex(FNEMutexPtr);
 #endif
           Tranx->abort();
-//		      LockManager.releaseAll(Tranx->getId());
           return;
 				}
 
@@ -188,7 +174,6 @@ public:
           Tranx->abortMutex(SNEMutexPtr);
 #endif
           Tranx->abort();
-//		      LockManager.releaseAll(Tranx->getId());
           return;
 				}
 
@@ -197,7 +182,6 @@ public:
 			}
 		}
 		GraphVisitor.finishVisit();
-//    std::cout <<"Transactional BFS done\n";
 	}
 };
 
