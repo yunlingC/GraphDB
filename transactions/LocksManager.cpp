@@ -545,6 +545,11 @@
           return true;
         }
         else {
+          bool isAcq = checkTransMap(TxId, MutexPtr, Lock);
+          if (!isAcq) 
+          std::cout << "Can't get lock on\t" << MutexPtr
+                    << "\twith type\t" << Lock
+                    << "\n";
           return checkTransMap(TxId, MutexPtr, Lock);
         }
 
