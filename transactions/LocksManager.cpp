@@ -1069,7 +1069,9 @@
       /// If this lock is not found in ResrMap, there is an error
 #ifdef _NO_WAIT_
 //      std::cout << "I really don't know what happen\n";
-      tryUnlock(it->first, it->second);
+//      tryUnlock(it->first, it->second);
+      tryUnlock(it->first, T_SH);
+      tryUnlock(it->first, T_EX);
 //      retireFromTransMap(TxId, it->first, it->second);
 //      std::cout << "try unlocking\t" << it->first 
 //                << "\ttype\t" << it->second 
