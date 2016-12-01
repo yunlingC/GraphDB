@@ -733,8 +733,16 @@
 #endif
       }
       ///SH + EX
-      else if (LType == T_EX) {
+      else {
+        if (LType == T_EX) {
+#ifdef _DEBUG_PRINT_
+        std::cout << "Transaction\t" << TransId
+                  << "\talready registers lock\t" << LockPtr
+                  << "\t with type\t" << LockPair->second
+                  << "\tin Trans Map\n";
+#endif
         LockPair->second = T_EX;
+        }
       }
       return true;
   }
