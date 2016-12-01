@@ -11,11 +11,11 @@
 
 #define _DEADLOCK_DETECTION_  true
 
-//#define _NO_WAIT_ true
+#define _NO_WAIT_ true
 
 //#define _WAIT_DIE_
 
-//#define _DEBUG_PRINT_ true
+#define _DEBUG_PRINT_ true
 
 #define _PRINTLDBC_ true
 

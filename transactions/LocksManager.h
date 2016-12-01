@@ -45,9 +45,12 @@ public:
   typedef std::vector<std::pair<VertexPtr,std::pair<MutexType,LockType> > > VLockListType; 
   typedef std::vector<std::pair<EdgePtr, std::pair<MutexType, LockType> > > ELockListType; 
   typedef std::set<LockPointer> LockListType;
+  typedef std::unordered_map<LockPointer, LockType> LockMapType;
+  typedef std::pair<LockPointer, LockType> LockEntryType;
   typedef std::set<LockType> LockTpSetType;
   typedef std::unordered_map<IdType,  LockTpSetType> TransMapType;
-  typedef std::unordered_map<IdType, LockListType> TransactionResourceMap;
+  typedef std::unordered_map<IdType, LockMapType> TransactionResourceMap;
+  typedef std::pair<IdType, LockMapType> TxRrEntryType;
   typedef std::unordered_map<LockPointer, TransMapType> ResourceTransactionMap;
   typedef std::unordered_map<LockPointer, ExMutexPointer> ResourceGuardMapType;
   typedef std::pair<LockPointer, ExMutexPointer> ResourceGuardPairType;
@@ -127,9 +130,9 @@ public:
 
   bool  retireFromWaitingMap(IdType TransId, LockPointer LockPtr);
 
-  bool  registerTransMap(IdType TransId,  LockPointer  LockPtr);
+  bool  registerTransMap(IdType TransId,  LockPointer  LockPtr, LockType LType);
 
-  bool  retireFromTransMap(IdType TransId,  LockPointer  LockPtr);
+  bool  retireFromTransMap(IdType TransId,  LockPointer  LockPtr, LockType LType);
 
   bool  registerLockMap(IdType TransId, LockPointer  LockPtr,  LockType  LType);
 
@@ -139,7 +142,7 @@ public:
 
   bool  retireFromMap(IdType TransId,  LockPointer  LockPtr, LockType LType);
 
-  bool  checkTransMap(IdType TransId,  LockPointer  LockPtr);
+  bool  checkTransMap(IdType TransId,  LockPointer  LockPtr, LockType LType);
 
   bool  upgradeLock(IdType TransId, LockPointer LockPtr);
 

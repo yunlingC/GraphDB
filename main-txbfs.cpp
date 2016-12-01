@@ -80,7 +80,8 @@ int main(int argc, char *argv[]) {
   TransactionManager TmManager;
   
   IndexType Index(g);
-  auto NumIndices =  Index.buildVertexIndex("id");
+//  auto NumIndices =  
+  Index.buildVertexIndex("id");
 //  cout <<"Indexing vertex " << NumIndices << "\n";
 
 //  auto IndexEntry = Index.getVertexIndex("PERSON", "78038");
@@ -287,6 +288,10 @@ int main(int argc, char *argv[]) {
     for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
   }
 
+  else if (run == 3) {
+
+    q16.runQuery(g, persons[pid], (TranxList[15]), LkManager, Index);
+  }
   else {
     std::cout << "Error: Not single thread or multithread\n";
     exit(0);
