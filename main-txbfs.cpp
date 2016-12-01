@@ -61,11 +61,12 @@ int main(int argc, char *argv[]) {
 
   VertexIdListType persons;
   
+  persons.push_back(0);
+
   for (unsigned int i = 0; i < personId.size(); i++) {
     auto value = personId[i] - Offset;
     persons.push_back(value);
   }
-  persons.push_back(0);
 
   if (InputSize == 100) {
     persons = reader.getPersonList();
@@ -236,9 +237,9 @@ int main(int argc, char *argv[]) {
 //  
 //    q12.runQuery(g, persons[pid], (TranxList[11]), LkManager);
 //
-//    q13.runQuery(g, persons[pid], persons[(pid+3)%persons.size()], (TranxList[12]), LkManager);
+//    q13.runQuery(g, persons[pid], persons[(pid+5)%persons.size()], (TranxList[12]), LkManager);
 //  
-    q14.runQuery(g, persons[pid], persons[(pid+3)%persons.size()], (TranxList[13]), LkManager);
+    q14.runQuery(g, persons[pid], persons[(pid+5)%persons.size()], (TranxList[13]), LkManager);
   
 //    q15.runQuery(g, persons[pid], (TranxList[14]), LkManager, Index);
 //  
@@ -272,8 +273,8 @@ int main(int argc, char *argv[]) {
 //    threads.push_back(std::thread([&]{q10.runQuery(g, persons[pid], (TranxList[9]), LkManager);}));
 //    threads.push_back(std::thread([&]{q11.runQuery(g, persons[pid], (TranxList[10]), LkManager);}));
 //    threads.push_back(std::thread([&]{q12.runQuery(g, persons[pid], (TranxList[11]), LkManager);}));
-//    threads.push_back(std::thread([&]{q13.runQuery(g, persons[pid], persons[(pid+3)%persons.size()], (TranxList[12]), LkManager);}));
-//    threads.push_back(std::thread([&]{q14.runQuery(g, persons[pid], persons[(pid+3)%persons.size()], (TranxList[13]), LkManager);}));
+//    threads.push_back(std::thread([&]{q13.runQuery(g, persons[pid], persons[(pid+5)%persons.size()], (TranxList[12]), LkManager);}));
+//    threads.push_back(std::thread([&]{q14.runQuery(g, persons[pid], persons[(pid+5)%persons.size()], (TranxList[13]), LkManager);}));
 //    threads.push_back(std::thread([&]{q15.runQuery(g, persons[pid], (TranxList[14]), LkManager, Index);})); 
 //    threads.push_back(std::thread([&]{q16.runQuery(g, persons[pid], (TranxList[15]), LkManager, Index);}));
 //    threads.push_back(std::thread([&]{q17.runQuery(g, persons[pid], (TranxList[16]), LkManager, Index);}));
@@ -282,8 +283,6 @@ int main(int argc, char *argv[]) {
     threads.push_back(std::thread([&]{q20.runQuery(g, persons[pid], (TranxList[19]), LkManager, Index);}));
     threads.push_back(std::thread([&]{q21.runQuery(g, persons[pid], (TranxList[20]), LkManager, Index);}));
     threads.push_back(std::thread([&]{q22.runQuery(g, persons[pid], (TranxList[21]), LkManager, Index);}));
-
-    std::cout << "Starts threads\n";
 
     for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
   }
@@ -302,10 +301,6 @@ int main(int argc, char *argv[]) {
 //  for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
 //
 //  LkManager.dumpMaps();
-
-//  for (auto Tx : TranxList) {
-//    Tx->dumpStats();
-//  }
 
   TmManager.sumTx();
   TmManager.dumpStats();

@@ -5,7 +5,7 @@
 ///#define _LOCKING_STORAGE_
 
 ///This is for debug print in storage classes and reader classes
-#define _DEBUG_ true
+//#define _DEBUG_ true
 
 #define _DEBUG_ENABLE_ true
 
