@@ -242,21 +242,23 @@ int main(int argc, char *argv[]) {
   
     q14.runQuery(g, persons[pid], persons[(pid+5)%persons.size()], (TranxList[13]), LkManager);
   
+    LkManager.dumpMaps();
     q15.runQuery(g, persons[pid], (TranxList[14]), LkManager, Index);
   
-    q16.runQuery(g, persons[pid], (TranxList[15]), LkManager, Index);
-
-    q17.runQuery(g, persons[pid], (TranxList[16]), LkManager, Index);
-  
-    q18.runQuery(g, persons[pid], (TranxList[17]), LkManager, Index);
-
-    q19.runQuery(g, persons[pid], (TranxList[18]), LkManager, Index);
-
-    q20.runQuery(g, persons[pid], (TranxList[19]), LkManager, Index);
-
-    q21.runQuery(g, persons[pid], (TranxList[20]), LkManager, Index);
-
-    q22.runQuery(g, persons[pid], (TranxList[21]), LkManager, Index);
+    LkManager.dumpMaps();
+//    q16.runQuery(g, persons[pid], (TranxList[15]), LkManager, Index);
+//
+//    q17.runQuery(g, persons[pid], (TranxList[16]), LkManager, Index);
+//  
+//    q18.runQuery(g, persons[pid], (TranxList[17]), LkManager, Index);
+//
+//    q19.runQuery(g, persons[pid], (TranxList[18]), LkManager, Index);
+//
+//    q20.runQuery(g, persons[pid], (TranxList[19]), LkManager, Index);
+//
+//    q21.runQuery(g, persons[pid], (TranxList[20]), LkManager, Index);
+//
+//    q22.runQuery(g, persons[pid], (TranxList[21]), LkManager, Index);
   } 
   else if (run == 2)  {
 
