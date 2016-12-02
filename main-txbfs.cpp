@@ -1,10 +1,11 @@
+#include "global.h"
 #include "LDBCReader.h"
 #include "TransactionalBFS.h"
 #include "TransactionManager.h"
+#include "helper.h"
 //#include "Index.h"
 
 #include "LDBCTransactionalQuery.cpp"
-#include "global.h"
 
 #include <thread>
 #include <iostream>
@@ -47,11 +48,14 @@ int main(int argc, char *argv[]) {
 //    }
   }
 
+  uint64_t start = get_clock();
+
   GraphType g;
 
-  cout << "Begin testing\n"; 
+//  cout << "Begin testing\n"; 
   LDBCReader reader(g);
   reader.readDirectory("../tests/ldbc/social_network_"+std::to_string(InputSize));
+
 
 //  VertexIdListType persons = {219530, 219997, 220078, 220387, 220242, 219706
 //                              ,219987,  219676, 219842, 219821, 219792
@@ -72,16 +76,15 @@ int main(int argc, char *argv[]) {
     persons = reader.getPersonList();
 //  }
 
-  cout << persons.size() << "\t persons id are to be chosen\n";
-  cout << "Finish reading \n";
+//  cout << persons.size() << "\t persons id are to be chosen\n";
+//  cout << "Finish reading \n";
 
-  LocksManager LkManager;
-  LkManager.buildLockMap(g);
-  TransactionManager TmManager;
-  
+  uint64_t read = get_clock();
+
   IndexType Index(g);
 //  auto NumIndices =  
   Index.buildVertexIndex("id");
+
 //  cout <<"Indexing vertex " << NumIndices << "\n";
 
 //  auto IndexEntry = Index.getVertexIndex("PERSON", "78038");
@@ -91,6 +94,8 @@ int main(int argc, char *argv[]) {
 //  }
 //  else 
 //    cout <<"Vertex Not found\n";
+
+  uint64_t index = get_clock();
 
   std::vector<LdbcQueryPtr> Queries;
 
@@ -205,15 +210,39 @@ int main(int argc, char *argv[]) {
   q22.getVertexId("78038", "PERSON", "420", "PERSON");
   /*** End of Update queries definition ***/
 
+  uint64_t init = get_clock();
+
+  LocksManager LkManager;
+  LkManager.buildLockMap(g);
+  TransactionManager TmManager;
+
   std::vector<TransactionPointerType> TranxList;
   for (auto i= 0; i < 22; i++) {
     auto TxEntryPtr = TmManager.addTransaction(LkManager);
     auto TxPtr = TxEntryPtr.second;
     TranxList.push_back(TxPtr);
   }
-
+  
+  uint64_t build = get_clock();
 
   if (run == 1) {
+
+    q15.runQuery(g, persons[pid], (TranxList[14]), LkManager, Index);
+  
+    q16.runQuery(g, persons[pid], (TranxList[15]), LkManager, Index);
+
+    q17.runQuery(g, persons[pid], (TranxList[16]), LkManager, Index);
+  
+    q18.runQuery(g, persons[pid], (TranxList[17]), LkManager, Index);
+
+    q19.runQuery(g, persons[pid], (TranxList[18]), LkManager, Index);
+
+    q20.runQuery(g, persons[pid], (TranxList[19]), LkManager, Index);
+
+    q21.runQuery(g, persons[pid], (TranxList[20]), LkManager, Index);
+
+    q22.runQuery(g, persons[pid], (TranxList[21]), LkManager, Index);
+
     q1.runQuery(g, persons[pid], (TranxList[0]), LkManager);
   
     q2.runQuery(g, persons[pid], (TranxList[1]), LkManager);
@@ -242,21 +271,6 @@ int main(int argc, char *argv[]) {
   
     q14.runQuery(g, persons[pid], persons[(pid+5)%persons.size()], (TranxList[13]), LkManager);
   
-    q15.runQuery(g, persons[pid], (TranxList[14]), LkManager, Index);
-  
-    q16.runQuery(g, persons[pid], (TranxList[15]), LkManager, Index);
-
-    q17.runQuery(g, persons[pid], (TranxList[16]), LkManager, Index);
-  
-    q18.runQuery(g, persons[pid], (TranxList[17]), LkManager, Index);
-
-    q19.runQuery(g, persons[pid], (TranxList[18]), LkManager, Index);
-
-    q20.runQuery(g, persons[pid], (TranxList[19]), LkManager, Index);
-
-    q21.runQuery(g, persons[pid], (TranxList[20]), LkManager, Index);
-
-    q22.runQuery(g, persons[pid], (TranxList[21]), LkManager, Index);
   } 
   else if (run == 2)  {
 
@@ -296,6 +310,9 @@ int main(int argc, char *argv[]) {
     std::cout << "Error: Not single thread or multithread\n";
     exit(0);
   }
+
+  uint64_t end = get_clock();
+
 //  vector<std::thread> threads;
 //  for (auto i= 0; i < 2; i++) {
 //    auto TxEntryPtr = TmManager.addTransaction();
@@ -309,6 +326,19 @@ int main(int argc, char *argv[]) {
 
   TmManager.sumTx();
   TmManager.dumpStats();
+
+  uint64_t querytime = diff_clock(build, end) ;
+  uint64_t runtime = diff_clock(start, end) ;
+
+  cout << "Summary_Build_Graph\t"<< diff_clock(start, read)
+       << "\tIndexing\t" << diff_clock(read, index)
+       << "\tIniting\t" << diff_clock(index, init)
+       << "\tBuildTM\t" << diff_clock(init, build)
+       << "\tQuerying\t" << querytime
+       << "\tRunning\t" << runtime
+       << "\tQuery_Efficiency\t" << getPercent(querytime, runtime)
+       << "\n";
+
   cout <<"finish testing\n";
   fflush(stdout);
 

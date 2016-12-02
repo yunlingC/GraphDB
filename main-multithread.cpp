@@ -2,6 +2,7 @@
 #include "GDBReader.h"
 #include "QueryDescription.h"
 #include "QueryRandomizer.h"
+#include "helper.h"
 
 #include <stdlib.h>
 #include <algorithm>
@@ -11,21 +12,7 @@
 #include <string>
 #include <time.h>
 
-#define SCALE 1000
-#define NANO 1000000000
-
 using namespace std;
-
-uint64_t get_clock()  {
-  timespec tp = (struct timespec) {0};
-  clock_gettime(CLOCK_THREAD_CPUTIME_ID, &tp);
-  uint64_t ret = tp.tv_sec * NANO + tp.tv_nsec;
-  return ret;
-}
-
-uint64_t diff_clock(uint64_t  start, uint64_t end) {
-  return (end - start) / SCALE;
-}
 
 int main(int argc, char *argv[]) {
   
@@ -265,6 +252,5 @@ int main(int argc, char *argv[]) {
   cout << "Processing time " << diff_clock(startTime, endTime) << "\n";
 
 //  cout << "finish testing\n";
-///  myfile.close();
   return 0;
 }

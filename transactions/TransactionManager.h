@@ -51,7 +51,6 @@ public:
   int getTotalAbortNum();
   MutexMapType getVisitedMap();
   MutexMapType getAbortedMap();
-  float getPercent(uint64_t, uint64_t);
   void sumTx();
   void sumAbortNum();
   void sumAbortedMap();

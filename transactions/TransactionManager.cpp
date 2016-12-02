@@ -16,8 +16,11 @@
 #define _TRANSACTIONMANAGER_CPP_
 
 #include "TransactionManager.h"
+#include "helper.h"
 
+#ifdef _TRANX_STATS_
 #include <iostream>
+#endif
 
   TransactionManager::TransactionManager() : TransNumber(0) {
     TransIdGuard = std::shared_ptr<std::mutex>(new std::mutex);
@@ -99,10 +102,6 @@
     sumAbortedMap();
     sumVisitedMap();
     sumStats();
-  }
-
-  float TransactionManager::getPercent(uint64_t top, uint64_t base) {
-    return (float)(100 * ((float) top/ (float)(base)));
   }
 
   void TransactionManager::sumStats()  {
