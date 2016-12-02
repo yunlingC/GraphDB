@@ -20,9 +20,7 @@
 #include "CustomVisitor.h"
 #include "RecursiveDFSCustomVisitor.h"
 #include "RecursiveDepthFirstSearch.h"
-
-#define _TIME_QUERY_ true
-#define _STATS_ true
+#include "global.h"
 
 #if _TIME_QUERY_
 #define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID

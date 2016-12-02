@@ -20,16 +20,17 @@
 ///Debug print for RDFS ldbc
 //#define _PRINTLDBC_ true
 
-//#define _PRINTGDB_ false 
-
 //#define _PRINTLOG_ true
+
+#define _TRANX_STATS_ true
 
 #define _INDEXING_ true
 
+/// For GDBench
 #define _TIME_QUERY_ true
 
 #define _STATS_ true
 
-#define _TRANX_STATS_ true
+//#define _PRINTGDB_ false 
 
 #endif /*_GLOBAL_H_*/
