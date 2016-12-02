@@ -16,8 +16,6 @@
 #define _LDBCQUERYDESCRIPTION_H_
 
 #include "LdbcCustomVisitor.h"
-//#include "LdbcUpdateVisitor.h"
-//#include "ConcurrentBFS.h"
 #include "QueryDescription.h"
 #ifdef _INDEXING_
 #include "Index.h"
@@ -53,13 +51,15 @@ public:
 
 public:
   LdbcQuery(unsigned int Id) : QueryId(Id) {
+#ifdef _PRINTLOG_
     LdbcFile.open("ldbc"+std::to_string(Id)+".log", std::ios_base::out| std::ios_base::app);
-//    std::cout <<"LdbcQuery\t" << QueryId << "\tconstructor opened file\n";
+#endif
   }
 
   ~LdbcQuery() {
+#ifdef _PRINTLOG_
     LdbcFile.close();
-//    std::cout <<"LdbcQuery\t" << QueryId << "\tdestructor closed file\n";
+#endif
   }
 
   virtual void runQuery(Graph & graph\
@@ -142,20 +142,25 @@ public:
   void getExecTime() {
     End = (struct timespec){ 0 };
     if ( clock_gettime( CLOCK_ID, &End) == -1) {
+#ifdef _PRINTLOG_
       LdbcFile << "Query\t" << QueryId << "\tCould NOT get exec time\n"; 
+#endif
       exit(0);
     }
 
+#ifdef _PRINTLOG_
     uint64_t execTime = (( End.tv_sec - Start.tv_sec )*NANO
                   + ( End.tv_nsec - Start.tv_nsec))/SCALE;
-
     LdbcFile << "Query\t" << QueryId << "\t" << execTime << "\n"; 
+#endif
   }
 
   void getStartTime() { 
     Start = (struct timespec){ 0 };
     if ( clock_gettime( CLOCK_ID, &Start ) == -1 ) {
+#ifdef _PRINTLOG_
       LdbcFile << "Fail to get start time\n";
+#endif
       exit(0);
     } 
   }
@@ -167,7 +172,9 @@ protected:
   ParamPairType ParamPair;
   RangePairType ValueRange;
   RangePairType PropRange;
+#ifdef _PRINTLOG_
   std::ofstream LdbcFile;
+#endif
 };
 /* **** Inactive ******/
 /**

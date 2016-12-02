@@ -61,6 +61,8 @@ public:
 
   bool rollBack();
 
+  bool close(); 
+
   void releaseVertexLock();
 
   void releaseEdgeLock();
@@ -95,9 +97,12 @@ public:
   void setBeginTime();
   void setCommitTime();
   void setExpandTime();
+  void setCloseTime();
   uint64_t setTime();
   uint64_t getActiveTime();
   uint64_t getExecTime();
+  uint64_t getShrinkTime();
+  uint64_t getProcTime();
 #endif
 
 protected:
@@ -114,6 +119,7 @@ protected:
   uint64_t BeginTime;
   uint64_t CommitTime;
   uint64_t ExpandTime;
+  uint64_t CloseTime;
 
 #endif 
 };

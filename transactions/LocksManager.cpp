@@ -191,16 +191,20 @@
     -> void  {
       VertexLock *NewVertex = new VertexLock();
       VertexLockMap.insert(VLockPair(VertexId, *NewVertex));
+#if _DEBUG_PRINT_
       std::cout << "Add vertex lock\t" <<  VertexId
               <<"\t to map\n";
+#endif
   }
 
   auto LocksManager::addToEdgeLockMap(IdType EdgeId) 
     -> void  {
       EdgeLock *NewEdge = new EdgeLock();
       EdgeLockMap.insert(ELockPair(EdgeId, *NewEdge)); 
+#if _DEBUG_PRINT_
       std::cout << "Add edge lock\t" << EdgeId
               <<"\t to map\n";
+#endif
   }
  
   auto LocksManager::buildLockMap(GraphType & Graph) 
@@ -315,7 +319,9 @@
       auto TxList = ResrMap.find(LockPtr);
 
       if (TxList == ResrMap.end()) {
+#if _DEBUG_PRINT_
         std::cout << "Error : Lock is not available but no record found\n";
+#endif
         dismissGuard(GuardSet);
         return T_Wait;
       }
@@ -409,7 +415,9 @@
         if (!checkWaitOnRecursive(TransId, (*iter).first, TransStack, CheckedTransList, GuardSet)) {
           /// checkWaitOnRecursive returns false in case of deadlock
           //TransStack.pop();
+#if _DEBUG_PRINT_
           std::cout <<"CheckWaitOnRecursive: Abort\n";
+#endif
           dismissGuard(GuardSet);
           DeadlockDetector->lock();
           return T_Abort;
@@ -419,7 +427,9 @@
       } //for
       
       /// If there is no deadlock, wait for this lock
+#if _DEBUG_PRINT_
       std::cout <<"CheckWaitOnRecursive: Wait\n";
+#endif
       dismissGuard(GuardSet);
       DeadlockDetector->lock();
       return T_Wait;
@@ -445,7 +455,10 @@
           Circle.append("<--" + std::to_string(TX));
         }
         Circle.append("<--" + std::to_string(WaitingTrans));
+
+#if _DEBUG_PRINT_
         std::cout << Circle << "\n";
+#endif
         return false;
       }
       /// check further if there is deadlock
@@ -545,11 +558,11 @@
           return true;
         }
         else {
-          bool isAcq = checkTransMap(TxId, MutexPtr, Lock);
-          if (!isAcq) 
-          std::cout << "Can't get lock on\t" << MutexPtr
-                    << "\twith type\t" << Lock
-                    << "\n";
+//          bool isAcq = checkTransMap(TxId, MutexPtr, Lock);
+//          if (!isAcq) 
+//          std::cout << "Can't get lock on\t" << MutexPtr
+//                    << "\twith type\t" << Lock
+//                    << "\n";
           return checkTransMap(TxId, MutexPtr, Lock);
         }
 
@@ -612,9 +625,11 @@
             registerWaitingMap(TxId, MutexPtr);
 #endif
 
+#if _DEBUG_PRINT_
             std::cout << "Transaction\t" << TxId
                       << "Waits for\t" << MutexPtr
                       << "\n";
+#endif
             int trial = 10; 
             while (!tryLock(MutexPtr, Lock) && trial > 0) {
               trial--;
@@ -685,16 +700,20 @@
       ///TODO A potential deadlock point
       ///In  theory there won't be deadlock existing
       while (!Guard->try_lock())  {
+#if _DEBUG_PRINT_
         std::cout << "Transaction\t" << TxId 
                   << "\tspins on waiting map for lock\t" << LockPtr
                   << "\n";
+#endif
 //        return false;
       }
 
       auto it = WaitMap.find(TxId);
       /// If TxId is found waiting for some lock, an error happens
       if (it != WaitMap.end())  {
+#if _DEBUG_PRINT_
         std::cout << "Transaction " << TxId << " is busy\n";
+#endif
         Guard->unlock();
         return false; 
       }

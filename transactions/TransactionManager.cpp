@@ -101,6 +101,10 @@
     sumStats();
   }
 
+  float TransactionManager::getPercent(uint64_t top, uint64_t base) {
+    return (float)(100 * ((float) top/ (float)(base)));
+  }
+
   void TransactionManager::sumStats()  {
     AbortStatsMap.clear();
     for(auto Entry : totalAbortedMap)  {
@@ -160,6 +164,7 @@
 
     std::cout << "Processing time\n";
 //    std::cout << "TxId\tExecTime\tActiveTime\n";
+    uint64_t totalExec = 0, totalActive = 0, totalProc = 0, totalShrink = 0;
     for (auto Tx : TransTable)  {
       std::cout <<"TxId\t" << Tx.second->getId()
                 << "\tBegin\t" << Tx.second->getBeginTime()
@@ -167,10 +172,26 @@
                 << "\tCommit\t" << Tx.second->getCommitTime()
                 << "\tExecTime\t" <<Tx.second->getExecTime()
                 << "\tActiveTime\t" << Tx.second->getActiveTime()
-                << "\tpercentage\t" << (float)Tx.second->getExecTime() / (float)Tx.second->getActiveTime()
-
+                << "\tShrinkTime\t" << Tx.second->getShrinkTime()
+                << "\tProcTime\t" << Tx.second->getProcTime()
+                << "\tExec/Active\t" << getPercent(Tx.second->getExecTime(), Tx.second->getActiveTime())
+                << "\tExec/Proc\t" << getPercent(Tx.second->getExecTime(), Tx.second->getProcTime())
+                << "\tShrink/Proc\t" << getPercent(Tx.second->getShrinkTime(), Tx.second->getProcTime())
                 << "\n";
+
+      totalExec += Tx.second->getExecTime();
+      totalActive += Tx.second->getActiveTime();
+      totalProc += Tx.second->getProcTime();
+      totalShrink += Tx.second->getShrinkTime();
     }
+    std::cout << "Total Exec time\t" << totalExec
+              << "\ttotal Active time\t" << totalActive
+              << "\ttotal Shrink time\t" << totalShrink
+              << "\ttotal Proccess time\t" << totalProc
+              << "\tExec/Active ratio\t" << getPercent(totalExec, totalActive)
+              << "\tExec/Proc ratio\t" << getPercent(totalExec, totalProc)
+              << "\tShrink/Proc ratio\t" << getPercent(totalShrink, totalProc)
+              << "\n";
 
   }
 

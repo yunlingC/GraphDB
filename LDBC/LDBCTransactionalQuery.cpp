@@ -39,6 +39,7 @@ public:
                 ) {
 
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -69,7 +70,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 };
 
@@ -80,6 +81,7 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -121,7 +123,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 };
 
@@ -135,6 +137,7 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -251,7 +254,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 };
 
@@ -261,8 +264,10 @@ public:
 
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
-		getStartTime();
 
+		getStartTime();
+    Tranx->begin();
+    
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
 
@@ -300,7 +305,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 };
 
@@ -314,6 +319,7 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -391,7 +397,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 };
 
@@ -405,6 +411,7 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -484,7 +491,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 };
 
@@ -498,6 +505,7 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -562,7 +570,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 };
 
@@ -573,6 +581,7 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -609,7 +618,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 };
 
@@ -623,6 +632,7 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -698,7 +708,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 };
 
@@ -715,6 +725,7 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -814,7 +825,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 
 protected:
@@ -833,6 +844,7 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -914,7 +926,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 };
 
@@ -931,6 +943,7 @@ public:
 	void runQuery(GraphType & Graph, VertexDescriptor StartVertex,
 	              TransactionPointerType Tranx, LockManagerType & LockManager) {
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -999,7 +1012,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 protected:
 	SimMapType SimMap;
@@ -1016,6 +1029,7 @@ public:
               , LockManagerType & LockManager) {
 
 		getStartTime();
+    Tranx->begin();
 
 		if ( StartVertex == endVertex ) {
 			std::cout << "StartVertex == endVertex \n";
@@ -1059,7 +1073,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 
 };
@@ -1075,6 +1089,7 @@ public:
               , LockManagerType & LockManager
               ) {
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -1153,7 +1168,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
 	}
 };
 
@@ -1183,10 +1198,12 @@ public:
           ExistVertex = NewEdge->getFirstVertexPtr();
         }
 
+#if _DEBUG_PRINT_
         std::cout << "Existing vertex\n";
         std::cout << ExistVertex->getId() << "\t"
                   << ExistVertex->getType().std_str() 
                   << "\n";
+#endif
   
         auto ExistNextEdge = ExistVertex->getNextEdge();
         /// Existed vertex does NOT have NextEdge or is the FirstVertex of NextEdge
@@ -1197,11 +1214,13 @@ public:
           ExistNextEdge->setSecondPreviousEdge(NewEdge);
         }
 
+#if _DEBUG_PRINT_
         if (ExistNextEdge)  {
           std::cout <<"Existing Next Edge\n";
           std::cout << ExistNextEdge->getId() << "\t"
                     << ExistNextEdge->getType().std_str() << "\n";
         }
+#endif
 
         ExistVertex->setNextEdge(NewEdge);
 
@@ -1217,6 +1236,7 @@ public:
                 ) {
 
 		getStartTime();
+    Tranx->begin();
 
     while (Tranx->checkStatus() != T_COMMIT) {
       Tranx->expand();
@@ -1386,7 +1406,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
   }
 
 protected:
@@ -1406,6 +1426,7 @@ public:
                 ) {
 
 		getStartTime();
+    Tranx->begin();
 
     bool addSuccess = false;
     while (Tranx->checkStatus() != T_COMMIT) {
@@ -1416,12 +1437,14 @@ public:
       /// If both end vertices are retrievable, get locks on both vertex pointers
 
       if (FirstIndex.second && SecondIndex.second) {
+#if _DEBUG_PRINT_
         std::cout << "First Vertex\t" << FirstIndex.first->getId()
                   << "\tLabel\t" << FirstIndex.first->getType().std_str()
                   << "\n"
                   << "Second Vertex\t" << SecondIndex.first->getId()
                   << "\tLabel\t" << SecondIndex.first->getType().std_str()
                   << "\n";
+#endif
         /// Switch here
 
 #ifdef _TRANX_STATS_
@@ -1507,7 +1530,6 @@ public:
           }
         }
 
-        std::cout <<"Addedge\tget all locks\n";
         FirstIndex.first->setNextEdge(NewEdge);
         SecondIndex.first->setNextEdge(NewEdge);
         NewEdge->setFirstVertexPtr(FirstIndex.first);
@@ -1526,8 +1548,9 @@ public:
         addSuccess = true;
       }///if
       else {
-
+#ifdef _PRINTLOG_
         std::cout << "Error: At least one vertex do NOT exist\n";
+#endif
       }
 
       Tranx->commit();
@@ -1555,7 +1578,7 @@ public:
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
-		LdbcFile.close();
+    Tranx->close();
   }
 
 };

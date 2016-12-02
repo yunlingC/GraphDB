@@ -227,7 +227,7 @@ int main(int argc, char *argv[]) {
     q6.runQuery(g, persons[pid], (TranxList[5]), LkManager);
 
     q7.runQuery(g, persons[pid], (TranxList[6]), LkManager);
-  
+
     q8.runQuery(g, persons[pid], (TranxList[7]), LkManager);
   
     q9.runQuery(g, persons[pid], (TranxList[8]), LkManager);
@@ -235,17 +235,15 @@ int main(int argc, char *argv[]) {
     q10.runQuery(g, persons[pid], (TranxList[9]), LkManager);
   
     q11.runQuery(g, persons[pid], (TranxList[10]), LkManager);
-  
+
     q12.runQuery(g, persons[pid], (TranxList[11]), LkManager);
 
     q13.runQuery(g, persons[pid], persons[(pid+5)%persons.size()], (TranxList[12]), LkManager);
   
     q14.runQuery(g, persons[pid], persons[(pid+5)%persons.size()], (TranxList[13]), LkManager);
   
-    LkManager.dumpMaps();
     q15.runQuery(g, persons[pid], (TranxList[14]), LkManager, Index);
   
-    LkManager.dumpMaps();
     q16.runQuery(g, persons[pid], (TranxList[15]), LkManager, Index);
 
     q17.runQuery(g, persons[pid], (TranxList[16]), LkManager, Index);

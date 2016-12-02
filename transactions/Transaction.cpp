@@ -39,7 +39,7 @@
 #ifdef _TRANX_STATS_
     initStats();
 #endif
-    begin();
+//    begin();
   } 
 
 
@@ -117,6 +117,13 @@
     setCommitTime();
 #endif
     return retValue;
+  }
+
+  bool Transaction::close() {
+#ifdef _TRANX_STATS_
+    setCloseTime();
+#endif
+    return true;
   }
 
   bool Transaction::abort() 
@@ -224,6 +231,7 @@
     releaseEdgeLock();
   }
 
+
 #ifdef _TRANX_STATS_
   void Transaction::visitMutex(MutexPointer mptr) {
     if ( VisitedMap.find(mptr) == VisitedMap.end() )  {
@@ -287,6 +295,7 @@
     dumpVisitedMap();
   }
 
+
   uint64_t Transaction::setTime() {
     timespec Time = (struct timespec){ 0 };
     if ( clock_gettime( CLOCK_ID, &Time ) == -1) {
@@ -301,6 +310,10 @@
 
   void Transaction::setCommitTime()  {
     CommitTime = setTime();
+  }
+
+  void Transaction::setCloseTime()  {
+    CloseTime = setTime();
   }
 
   void Transaction::setExpandTime()  {
@@ -327,6 +340,16 @@
   uint64_t Transaction::getExecTime()  {
     /// Exec time: expand() -- commit()
     return (CommitTime- ExpandTime) / SCALE;
+  }
+  
+  uint64_t Transaction::getShrinkTime()  {
+    /// Shrink time: commit() -- close()
+    return (CloseTime- CommitTime) / SCALE;
+  }
+  
+  uint64_t Transaction::getProcTime() {
+    ///begin() -- close()
+    return (CloseTime- BeginTime) / SCALE;
   }
 
 #endif
