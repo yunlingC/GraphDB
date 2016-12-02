@@ -21,7 +21,8 @@
 #include "RecursiveDFSCustomVisitor.h"
 #include "RecursiveDepthFirstSearch.h"
 
-//#define _PRINTGDB_  true
+#define _TIME_QUERY_ true
+#define _STATS_ true
 
 #if _TIME_QUERY_
 #define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
@@ -35,7 +36,6 @@
 #include <fstream>
 #endif
 
-#define _STATS_ true
 
 class Query {
 public:
