@@ -136,7 +136,9 @@ public:
 #if _TIME_QUERY_
   auto ExecTime = getExecTime();
 #ifdef _STATS_
-  GDFile << QueryId << "\t" << ExecTime << "\t" << v1.getNumVertices() << v1.getNumEdges()<< "\n";
+  GDFile << QueryId << "\t" << ExecTime 
+                    << "\t" << v1.getNumVertices() 
+                    << "\t" << v1.getNumEdges()<< "\n";
 #else
   GDFile << QueryId << "\t" << ExecTime << "\n";
 #endif
@@ -184,7 +186,7 @@ public:
 #if _TIME_QUERY_
     auto ExecTime = getExecTime();
 #ifdef _STATS_
-    GDFile << QueryId << "\t" << ExecTime << "\t" << v1.getNumVertices() << v1.getNumEdges() << "\n";
+    GDFile << QueryId << "\t" << ExecTime << "\t" << v1.getNumVertices() << "\t" << v1.getNumEdges() << "\n";
 #else
     GDFile << QueryId << "\t" << ExecTime << "\n";
 #endif
@@ -239,7 +241,7 @@ public:
 #if _TIME_QUERY_
     auto ExecTime = getExecTime();
 #ifdef _STATS_
-    GDFile << QueryId << "\t" << ExecTime << "\t" << v2.getNumVertices() << v2.getNumEdges() << "\n";
+    GDFile << QueryId << "\t" << ExecTime << "\t" << v2.getNumVertices() << "\t" << v2.getNumEdges() << "\n";
 #else
     GDFile << QueryId << "\t" << ExecTime << "\n";
 #endif
@@ -296,7 +298,7 @@ public:
 #if _TIME_QUERY_
     auto ExecTime = getExecTime();
 #ifdef _STATS_
-    GDFile << QueryId << "\t" << ExecTime << "\t" << v3.getNumVertices() << v3.getNumEdges() << "\n";
+    GDFile << QueryId << "\t" << ExecTime << "\t" << v3.getNumVertices() << "\t" << v3.getNumEdges() << "\n";
 #else
     GDFile << QueryId << "\t" << ExecTime << "\n";
 #endif
@@ -352,7 +354,7 @@ public:
 #if _TIME_QUERY_
     auto ExecTime = getExecTime();
 #ifdef _STATS_
-    GDFile << QueryId << "\t" << ExecTime << "\t" << v4.getNumVertices() << v4.getNumEdges() << "\n";
+    GDFile << QueryId << "\t" << ExecTime << "\t" << v4.getNumVertices() << "\t" << v4.getNumEdges() << "\n";
 #else
     GDFile << QueryId << "\t" << ExecTime << "\n";
 #endif
@@ -1119,7 +1121,7 @@ public:
 #if _TIME_QUERY_
     auto ExecTime = getExecTime();
 #ifdef _STATS_
-    GDFile << QueryId << "\t" << ExecTime << "\t" << v12.getNumVertices() << "\n";
+    GDFile << QueryId << "\t" << ExecTime << "\t" << v12.getNumVertices() << "\t" << v12.getNumEdges() << "\n";
 #else
     GDFile << QueryId << "\t" << ExecTime << "\n";
 #endif

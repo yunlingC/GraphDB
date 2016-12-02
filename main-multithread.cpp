@@ -26,8 +26,8 @@ int main(int argc, char *argv[]) {
   ///arg: 0-main-multithread 1- filesize 2-traversal 3-Q1_startVertex 4-Q2_startVertex
 
   unsigned int InputSize;
-  if ( argc < 8) {
-//    std::cout <<"Need one more arg: 1000 or 5000 or 10000 or 100000\n";
+  if ( argc < 7) {
+    std::cout <<"Need one more arg: 1000 or 5000 or 10000 or 100000\n";
     exit(1);
   } else {
     InputSize = std::stoi(argv[1]);
