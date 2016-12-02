@@ -41,18 +41,23 @@ void depthFirstSearch(GraphType & Graph,
     ScheduledVertex = VertexStack.back();  VertexStack.pop_back();
 
     bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
-    if (VertexMatch == true)
-      return ;
- 
-    ColorMap[ScheduledVertex] = true;
 
 #ifdef _STATS_
     GraphVisitor.countVertex(ScheduledVertex);
 #endif
 
+    if (VertexMatch == true)
+      return ;
+ 
+    ColorMap[ScheduledVertex] = true;
+
+
     auto NextEdge = ScheduledVertex->getNextEdge();
     while (NextEdge != nullptr) {
     
+#ifdef _STATS_
+    GraphVisitor.countEdge(NextEdge);
+#endif
       TargetVertex = NextEdge->getTarget(ScheduledVertex);
       bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);
       bool BranchMatch = GraphVisitor.scheduleBranch(ScheduledVertex, NextEdge, TargetVertex);

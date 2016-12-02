@@ -49,19 +49,24 @@ void breadthFirstSearch(GraphType & Graph,
     ScheduledVertex = VertexQueue.front();  VertexQueue.pop();
 
     bool VertexMatch = GraphVisitor.visitVertex(ScheduledVertex);
+#ifdef _STATS_
+    GraphVisitor.countVertex(ScheduledVertex);
+#endif
+
     if (VertexMatch == true)
       return;
       
     /// Set to visited.    
     ColorMap[ScheduledVertex] = true;
 
-#ifdef _STATS_
-    GraphVisitor.countVertex(ScheduledVertex);
-#endif
 
     auto NextEdge = ScheduledVertex->getNextEdge();
 
     while (NextEdge != nullptr) {                  
+
+#ifdef _STATS_
+    GraphVisitor.countEdge(NextEdge);
+#endif
       /// Get the target node.
       TargetVertex = NextEdge->getTarget(ScheduledVertex);     
       bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);             

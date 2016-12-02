@@ -55,6 +55,10 @@ void recursiveDFS(GraphType & Graph,
 
   auto NextEdge = CurrentVertex->getNextEdge();
   while (NextEdge != nullptr) {
+#ifdef _STATS_
+    GraphVisitor.countEdge(NextEdge);
+#endif
+
     GraphType::VertexPointer TargetVertex =
       NextEdge->getTarget(CurrentVertex);
 

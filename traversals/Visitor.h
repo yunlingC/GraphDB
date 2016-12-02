@@ -35,10 +35,15 @@ public:
 public:
   Visitor() {
     NumVertices = 0;
+    NumEdges = 0;
   }
 
   int getNumVertices() {
     return NumVertices;
+  }
+
+  int getNumEdges() {
+    return NumEdges;
   }
 
   virtual void setFilter(FilterType & filter) {
@@ -65,6 +70,10 @@ public:
 
   void countVertex(VertexPointer VertexPtr) {
     NumVertices++;
+  }
+
+  void countEdge(EdgePointer EdgePtr) {
+    NumEdges++;
   }
 
   virtual bool visitVertex(VertexPointer VertexPtr) {
@@ -127,6 +136,7 @@ protected:
   FilterType Filter;
 //#ifdef _STATS_
   int NumVertices;
+  int NumEdges;
 //#endif 
 };
 
