@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
   std::vector<LdbcQueryPtr> Queries;
 
   LdbcQuery1 q1(1);
-  q1.setParam("gender", "male");
+  q1.setParam("firstName", "");
   Queries.push_back(&q1);
 
   LdbcQuery2 q2(2);

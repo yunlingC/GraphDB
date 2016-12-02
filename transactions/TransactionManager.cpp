@@ -135,7 +135,7 @@
   void TransactionManager::dumpStats() {
 //    auto FAEntry = AbortStatsMap.begin();
 //    auto FVEntry = VisitStatsMap.begin();
-    std::cout << "Totol_Abort_Num\t" << totalAbortNum
+    std::cout << "Total_Abort_Num\t" << totalAbortNum
               << "\nTotal_Abort_Obj\t" << totalAbortedMap.size()
               << "\nTotal_Visit_Obj\t" << totalVisitedMap.size()
   //            << "\n"
@@ -184,13 +184,13 @@
       totalProc += Tx.second->getProcTime();
       totalShrink += Tx.second->getShrinkTime();
     }
-    std::cout << "Total Exec time\t" << totalExec
-              << "\ttotal Active time\t" << totalActive
-              << "\ttotal Shrink time\t" << totalShrink
-              << "\ttotal Proccess time\t" << totalProc
-              << "\tExec/Active ratio\t" << getPercent(totalExec, totalActive)
-              << "\tExec/Proc ratio\t" << getPercent(totalExec, totalProc)
-              << "\tShrink/Proc ratio\t" << getPercent(totalShrink, totalProc)
+    std::cout << "Total_Exec_Time\t" << totalExec
+              << "\tTotal_Active Time\t" << totalActive
+              << "\tTotal_Shrink Time\t" << totalShrink
+              << "\tTotal_Proccess Time\t" << totalProc
+              << "\tExec/Active_Ratio\t" << getPercent(totalExec, totalActive)
+              << "\tExec/Proc_Ratio\t" << getPercent(totalExec, totalProc)
+              << "\tShrink/Proc_Ratio\t" << getPercent(totalShrink, totalProc)
               << "\n";
 
   }
