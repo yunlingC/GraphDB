@@ -1,6 +1,8 @@
 #ifndef _HELPER_H_
 #define _HELPER_H_
 
+#include <time.h>
+
 #define SCALE 1000
 #define NANO 1000000000
 
@@ -19,4 +21,4 @@ float getPercent(uint64_t top, uint64_t base) {
   return (float)(100 * ((float) top/ (float)(base)));
 }
 
-#endif
+#endif /*_HELPER_H_*/

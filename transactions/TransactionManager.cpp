@@ -16,7 +16,6 @@
 #define _TRANSACTIONMANAGER_CPP_
 
 #include "TransactionManager.h"
-#include "helper.h"
 
 #ifdef _TRANX_STATS_
 #include <iostream>
@@ -53,6 +52,11 @@
   }
 
 #ifdef _TRANX_STATS_
+
+  float TransactionManager::getPercent(uint64_t top, uint64_t base) {
+    return (float)(100 * ((float) top/ (float)(base)));
+  }
+
   int TransactionManager::getTotalAbortNum() {
     return totalAbortNum;
   }

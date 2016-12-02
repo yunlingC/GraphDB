@@ -57,6 +57,7 @@ public:
   void sumVisitedMap();
   void sumStats();
   void dumpStats();
+  float getPercent(uint64_t, uint64_t);
 #endif
 //  friend class LocksManager;
 private:
