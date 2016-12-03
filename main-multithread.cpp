@@ -25,26 +25,24 @@ int main(int argc, char *argv[]) {
 
   ///arg: 0-main-multithread 1- filesize 2-traversal 3-Q1_startVertex 4-Q2_startVertex
 
-  unsigned int InputSize;
   if ( argc < 7) {
     std::cout <<"Need one more arg: 1000 or 5000 or 10000 or 100000\n";
     exit(1);
-  } else {
-    InputSize = std::stoi(argv[1]);
+  } 
 //    if ( (InputSize != 1000) && (InputSize != 5000) ) {
 //      std::cout <<"Arg error : should be: 1000 or 5000\n";
 //      exit(1);
 //    }
-  }
-  
 #ifdef _FIXALLOC_
   g.allocVertexMemory(InputSize*1.1);
   g.allocEdgeMemory(InputSize*20);
 #endif /* _FIXALLOC */
+
+  unsigned int InputSize = std::stoi(argv[1]);
  
   GDBReader reader(g);
   std::string FileName = "../tests/gd/sndata" +std::to_string(InputSize)+".gd";
-//  std::cout <<"Read file name " << FileName <<"\n";
+//  std::cout <<"Read file name " << FileName <<"\n"; 
   reader.readFile(FileName);
 
 //  cout << "Finish reading\n";
@@ -53,6 +51,17 @@ int main(int argc, char *argv[]) {
 
   string name, pid;
   VertexDescriptor webId, personId1, personId2, personId3;
+
+//  std::cout <<"Arguments:\t" << argv[1] 
+//            << "\t" << argv[2]
+//            << "\t" << argv[3]
+//            << "\t" << argv[4]
+//            << "\t" << argv[5]
+//            << "\t" << argv[6]
+//            << "\t" << argv[7]
+//            << "\n";
+
+//  cout <<"number of vertices\n" << g.getAllVertices().size() << "\n";
 
   int traversal = std::stoi(argv[2]);
   
@@ -196,7 +205,6 @@ int main(int argc, char *argv[]) {
   
       Q7.runQuery(g, traversal);
   
-      Q8.runQuery(g, traversal);
   
   //    auto Time8 = get_clock();
   //    cout << "Processing time Q8\t" << diff_clock(Time6, Time8) << "\n";
@@ -218,6 +226,7 @@ int main(int argc, char *argv[]) {
   //    auto Time14 = get_clock();
   //    cout << "Processing time Q14\t" << diff_clock(Time8, Time14) << "\n";
   
+      Q8.runQuery(g, traversal);
       Q9.runQuery(g, traversal);
 
     }
