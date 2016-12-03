@@ -21,113 +21,10 @@
 #include <stack>
 #include <string>
 
-#define _DEBUG_ENABLE_ true
-//#define _DEBUG_PRINT_ true
-//#define _NO_WAIT_ true
 
 #if _DEBUG_ENABLE_
 #include <iostream>
 #endif
-
-  auto LocksManager::getVertexLockPointer(IdType VertexId, MutexType Mutex) 
-    -> MutexPointer {
-#if _DEBUG_ENABLE_
-      if (VertexLockMap.find(VertexId) == VertexLockMap.end()) {
-        std::cerr  << "Error : No such vertex " << VertexId <<" in map \n";
-        exit(0);
-      }
-#endif
-      switch (Mutex) {
-        case T_Property:
-          return VertexLockMap[VertexId].getPpMutex();
-        case T_LastEdge:
-          return VertexLockMap[VertexId].getLEMutex();
-        case T_NextEdge:
-          return VertexLockMap[VertexId].getNEMutex();
-        case T_ID:
-          return VertexLockMap[VertexId].getIdMutex();
-        case T_Label:
-          return VertexLockMap[VertexId].getLbMutex();
-        default:
-          // assert(false);
-          std::cerr << "ERROR: No such Mutex Type\t" << Mutex << "\tin VertexLock\n";
-          exit(0);
-      }
-    }
- 
-  auto LocksManager::getEdgeLockPointer(IdType EdgeId, MutexType Mutex) 
-    ->  MutexPointer {
-#if _DEBUG_ENABLE_
-      if (EdgeLockMap.find(EdgeId) == EdgeLockMap.end()) {
-        std::cerr << "Error : No such edge\t" << EdgeId <<"\tin map \n";
-        exit(0);
-      }
-#endif
-      switch (Mutex) {
-        case T_ID:
-          return EdgeLockMap[EdgeId].getIdMutex();
-        case T_Property:
-          return EdgeLockMap[EdgeId].getPpMutex();
-        case T_FirstVertex:
-          return EdgeLockMap[EdgeId].getFVMutex();
-        case T_SecondVertex:
-          return EdgeLockMap[EdgeId].getSVMutex();
-        case T_FirstNextEdge:
-          return EdgeLockMap[EdgeId].getFNEMutex();
-        case T_FirstPrevEdge:
-          return EdgeLockMap[EdgeId].getFPEMutex();
-        case T_SecondNextEdge:
-          return EdgeLockMap[EdgeId].getSNEMutex();
-        case T_SecondPrevEdge:
-          return EdgeLockMap[EdgeId].getSPEMutex();
-        case T_Label:
-          return EdgeLockMap[EdgeId].getLbMutex();
-#if _DEBUG_ENABLE_
-          // assert("ERROR: No such Mutex in EdgeLock" && false);
-        default:
-          std::cerr << "ERROR: No such Mutex in EdgeLock\n";
-          exit(0);
-#endif
-      }
-  }
-
-  auto LocksManager::tryLock(MutexPointer MutexPtr, LockType LType)
-    -> bool {
-#if _DEBUG_ENABLE_
-      // assert(MutexPtr != nullptr);
-      if (MutexPtr == nullptr) {
-        std::cout <<"Error in tryLock: MutexPointer not valid\n";
-      }
-#endif
-      switch (LType) {   
-        ///Shared lock
-        case T_SH:
-          return MutexPtr->try_lock_shared();
-        ///Exclusive lock
-        case T_EX:
-          return MutexPtr->try_lock(); 
-#if _DEBUG_ENABLE_
-        default:
-          std::cerr << "ERROR: No such Mutex in a lock\n";
-          exit(0);
-#endif
-      }
-    }
-
-  auto LocksManager::tryUnlock(MutexPointer MutexPtr, LockType LType)
-    -> void {
-      switch (LType) {   
-        case T_SH:
-          return MutexPtr->unlock_shared();
-        case T_EX:
-          return MutexPtr->unlock(); 
-#if _DEBUG_ENABLE_
-        default:
-          std::cerr << "ERROR: No such Lock Type\t" << LType << "\tin VertexLock\n";
-          exit(0);
-#endif
-      }
-    }
 
 #ifndef _LOCKING_STORAGE_
 
@@ -253,6 +150,107 @@
       return LockRetPairType(RetValue, MutexPtr);
     }
 
+  auto LocksManager::getVertexLockPointer(IdType VertexId, MutexType Mutex) 
+    -> MutexPointer {
+#if _DEBUG_ENABLE_
+      if (VertexLockMap.find(VertexId) == VertexLockMap.end()) {
+        std::cerr  << "Error : No such vertex " << VertexId <<" in map \n";
+        exit(0);
+      }
+#endif
+      switch (Mutex) {
+        case T_Property:
+          return VertexLockMap[VertexId].getPpMutex();
+        case T_LastEdge:
+          return VertexLockMap[VertexId].getLEMutex();
+        case T_NextEdge:
+          return VertexLockMap[VertexId].getNEMutex();
+        case T_ID:
+          return VertexLockMap[VertexId].getIdMutex();
+        case T_Label:
+          return VertexLockMap[VertexId].getLbMutex();
+        default:
+          // assert(false);
+          std::cerr << "ERROR: No such Mutex Type\t" << Mutex << "\tin VertexLock\n";
+          exit(0);
+      }
+    }
+ 
+  auto LocksManager::getEdgeLockPointer(IdType EdgeId, MutexType Mutex) 
+    ->  MutexPointer {
+#if _DEBUG_ENABLE_
+      if (EdgeLockMap.find(EdgeId) == EdgeLockMap.end()) {
+        std::cerr << "Error : No such edge\t" << EdgeId <<"\tin map \n";
+        exit(0);
+      }
+#endif
+      switch (Mutex) {
+        case T_ID:
+          return EdgeLockMap[EdgeId].getIdMutex();
+        case T_Property:
+          return EdgeLockMap[EdgeId].getPpMutex();
+        case T_FirstVertex:
+          return EdgeLockMap[EdgeId].getFVMutex();
+        case T_SecondVertex:
+          return EdgeLockMap[EdgeId].getSVMutex();
+        case T_FirstNextEdge:
+          return EdgeLockMap[EdgeId].getFNEMutex();
+        case T_FirstPrevEdge:
+          return EdgeLockMap[EdgeId].getFPEMutex();
+        case T_SecondNextEdge:
+          return EdgeLockMap[EdgeId].getSNEMutex();
+        case T_SecondPrevEdge:
+          return EdgeLockMap[EdgeId].getSPEMutex();
+        case T_Label:
+          return EdgeLockMap[EdgeId].getLbMutex();
+#if _DEBUG_ENABLE_
+          // assert("ERROR: No such Mutex in EdgeLock" && false);
+        default:
+          std::cerr << "ERROR: No such Mutex in EdgeLock\n";
+          exit(0);
+#endif
+      }
+  }
+
+  auto LocksManager::tryLock(MutexPointer MutexPtr, LockType LType)
+    -> bool {
+#if _DEBUG_ENABLE_
+      // assert(MutexPtr != nullptr);
+      if (MutexPtr == nullptr) {
+        std::cout <<"Error in tryLock: MutexPointer not valid\n";
+      }
+#endif
+      switch (LType) {   
+        ///Shared lock
+        case T_SH:
+          return MutexPtr->try_lock_shared();
+        ///Exclusive lock
+        case T_EX:
+          return MutexPtr->try_lock(); 
+#if _DEBUG_ENABLE_
+        default:
+          std::cerr << "ERROR: No such Mutex in a lock\n";
+          exit(0);
+#endif
+      }
+    }
+
+  auto LocksManager::tryUnlock(MutexPointer MutexPtr, LockType LType)
+    -> void {
+      switch (LType) {   
+        case T_SH:
+          return MutexPtr->unlock_shared();
+        case T_EX:
+          return MutexPtr->unlock(); 
+#if _DEBUG_ENABLE_
+        default:
+          std::cerr << "ERROR: No such Lock Type\t" << LType << "\tin VertexLock\n";
+          exit(0);
+#endif
+      }
+    }
+
+
 #ifdef _DEADLOCK_DETECTION_
 /// Need to figure out all circles 
 /// TODO need to chect transaction status before aborting any transaction
@@ -272,9 +270,7 @@
       }
       return false;
   }
-#endif /*_DEADLOCK_DETECTION_*/
 
-#ifdef _DEADLOCK_DETECTION_
   auto LocksManager::checkWaitOn(IdType TransId, LockPointer LockPtr, LockType LType) 
     ->  LockRequestRetType {
       /// If current trans is waiting for some other lock, then give up
@@ -434,9 +430,7 @@
       DeadlockDetector->lock();
       return T_Wait;
     }
-#endif 
 
-#ifdef _DEADLOCK_DETECTION_
     auto LocksManager::checkWaitOnRecursive(IdType WaitingTrans
                                             , IdType LockingTrans
                                             , TransStackType  TransStack
@@ -531,42 +525,39 @@
 
       return false;
     }
-#endif
 
-#ifdef _DEADLOCK_DETECTION_
   void LocksManager::dismissGuard(LockGuardSetType & Guards)  {
     for (auto guard : Guards) {
       guard->unlock(); 
     }
     return;
   }
-#endif /*DEADLOCK_DETECTION*/
 
 
+#ifdef _NO_WAIT_
+    bool LocksManager::getLock(MutexPointer MutexPtr
+                              , LockType Lock
+                              , IdType TxId
+                              ){
 
-#ifdef _DEADLOCK_DETECTION_
+      if (checkTransMap(TxId, MutexPtr, Lock))  
+        return true;
+      
+      auto getLock = tryLock(MutexPtr, Lock);
+      if (getLock)  {
+        registerTransMap(TxId, MutexPtr, Lock);
+        return true;
+      }
+      return false;
+  }
+
+#elif defined _WAIT_DIE_
     bool LocksManager::getLock(MutexPointer MutexPtr
                               , LockType Lock
                               , IdType TxId
                               ){
 
         auto getLock = tryLock(MutexPtr, Lock);
-
-#ifdef _NO_WAIT_
-        if (getLock)  {
-          registerTransMap(TxId, MutexPtr, Lock);
-          return true;
-        }
-        else {
-//          bool isAcq = checkTransMap(TxId, MutexPtr, Lock);
-//          if (!isAcq) 
-//          std::cout << "Can't get lock on\t" << MutexPtr
-//                    << "\twith type\t" << Lock
-//                    << "\n";
-          return checkTransMap(TxId, MutexPtr, Lock);
-        }
-
-#else /**DEADLOCK_DETECTION or WAIT_DIE*/
 
         if (getLock) {
           if (checkTransMap(TxId, MutexPtr, Lock))  return true;
@@ -663,11 +654,10 @@
             return isUpgraded;
         }//switch
         return true;
-#endif /*DEADLOCK_DETECTION or WAIT_DIE*/
   }
-#endif /*DEADLOCK_DETECTION*/
+#endif
 
-#ifdef _DEADLOCK_DETECTION_
+
   bool LocksManager::getVertexLock(IdType VId
                                   , MutexType Mutex
                                   , LockType Lock
@@ -676,9 +666,7 @@
       auto MutexPtr = getVertexLockPointer(VId, Mutex);
       return getLock(MutexPtr, Lock, TxId);
   }
-#endif /*DEADLOCK_DETECTION*/
 
-#ifdef _DEADLOCK_DETECTION_
   bool LocksManager::getEdgeLock(IdType EId
                                 , MutexType Mutex
                                 , LockType Lock
@@ -687,9 +675,8 @@
       auto MutexPtr = getEdgeLockPointer(EId, Mutex);
       return getLock(MutexPtr, Lock, TxId);
     }
-#endif /*_DEADLOCK_DETECTION_*/
 
-#ifdef _DEADLOCK_DETECTION_
+
   auto LocksManager::registerWaitingMap(IdType TxId, LockPointer LockPtr)
     -> bool {
       if (WaitGuardMap.find(TxId) == WaitGuardMap.end()) {
@@ -872,7 +859,7 @@
       Guard->unlock();
       return true;
   }
-#endif
+//#endif
 
   auto LocksManager::registerToMap(IdType TransId, LockPointer LockPtr, LockType LType)
     ->  bool  {
@@ -1249,7 +1236,8 @@
     }
   }
 #endif /*_DEBUG_PRINT_*/
-//#endif /*_DEADLOCK_DETECTION_*/
+
+#endif /*_DEADLOCK_DETECTION_*/
 
 #else
   ///locks are encoded in Vertex and Edge

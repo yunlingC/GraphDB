@@ -100,6 +100,10 @@ public:
   MutexPointer  getVertexLockPointer(IdType VertexId, MutexType Mutex);
 
   MutexPointer  getEdgeLockPointer(IdType VertexId, MutexType Mutex);
+  // LockType can be either SH or EX
+  bool  tryLock(MutexPointer MutexPtr, LockType LType);
+
+  void  tryUnlock(MutexPointer MutexPtr, LockType LType);
 
   /*  New functions added to support deadlock detection */
 //  bool getLock(IdType ObjectId, MutexType Mutex, LockType Lock, IdType TxId);
@@ -192,11 +196,6 @@ public:
   void  buildLockMap(GraphType & Graph); 
 
 #endif
-
-  // LockType can be either SH or EX
-  bool  tryLock(MutexPointer MutexPtr, LockType LType);
-
-  void  tryUnlock(MutexPointer MutexPtr, LockType LType);
 
 protected:
 
