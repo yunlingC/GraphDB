@@ -15,6 +15,7 @@
 
 #include "Vertex.h"
 #include "Edge.h"
+#include "global.h"
 
 #include <unordered_map>
 #include <unordered_set>

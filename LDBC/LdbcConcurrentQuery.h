@@ -17,6 +17,7 @@
 
 #include "LdbcCustomVisitor.h"
 #include "QueryDescription.h"
+#include "global.h"
 #ifdef _INDEXING_
 #include "Index.h"
 #endif
@@ -30,8 +31,8 @@
 #include <iostream>
 #endif
 
-#define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
-#define MILLION 1000000
+//#define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
+#define CLOCK_ID CLOCK_REALTIME
 #define NANO 1000000000
 #define SCALE 1000
 
@@ -53,11 +54,15 @@ public:
   LdbcQuery(unsigned int Id) : QueryId(Id) {
 #ifdef _PRINTLOG_
     LdbcFile.open("ldbc"+std::to_string(Id)+".log", std::ios_base::out| std::ios_base::app);
+#elif defined _TIME_LDBC_
+    LdbcFile.open("ldbc"+std::to_string(Id)+".log", std::ios_base::out| std::ios_base::app);
 #endif
   }
 
   ~LdbcQuery() {
 #ifdef _PRINTLOG_
+    LdbcFile.close();
+#elif defined _TIME_LDBC_
     LdbcFile.close();
 #endif
   }
@@ -142,13 +147,13 @@ public:
   void getExecTime() {
     End = (struct timespec){ 0 };
     if ( clock_gettime( CLOCK_ID, &End) == -1) {
-#ifdef _PRINTLOG_
+#ifdef _TIME_LDBC_ 
       LdbcFile << "Query\t" << QueryId << "\tCould NOT get exec time\n"; 
 #endif
       exit(0);
     }
 
-#ifdef _PRINTLOG_
+#ifdef _TIME_LDBC_
     uint64_t execTime = (( End.tv_sec - Start.tv_sec )*NANO
                   + ( End.tv_nsec - Start.tv_nsec))/SCALE;
     LdbcFile << "Query\t" << QueryId << "\t" << execTime << "\n"; 
@@ -158,7 +163,7 @@ public:
   void getStartTime() { 
     Start = (struct timespec){ 0 };
     if ( clock_gettime( CLOCK_ID, &Start ) == -1 ) {
-#ifdef _PRINTLOG_
+#ifdef _TIME_LDBC_
       LdbcFile << "Fail to get start time\n";
 #endif
       exit(0);
@@ -173,6 +178,8 @@ protected:
   RangePairType ValueRange;
   RangePairType PropRange;
 #ifdef _PRINTLOG_
+  std::ofstream LdbcFile;
+#elif defined _TIME_LDBC_
   std::ofstream LdbcFile;
 #endif
 };

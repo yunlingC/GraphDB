@@ -23,7 +23,8 @@
 #include "global.h"
 
 #if _TIME_QUERY_
-#define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
+//#define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
+#define CLOCK_ID CLOCK_REALTIME
 #define NANO 1000000000 
 #define MILLION 1000000
 #define SCALE 1000
@@ -46,7 +47,9 @@ public:
 public:
   Query() { }
   Query(unsigned int Id) : QueryId(Id) { 
+#if _TIME_QUERY_
     GDFile.open("gd-time-"+std::to_string(QueryId)+".csv", std::ios_base::out | std::ios_base::app);
+#endif
   }
   
   virtual void runQuery(Graph & graph, TraversalType Traversal) { }

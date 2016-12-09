@@ -25,11 +25,27 @@
 #if _DEBUG_ENABLE_
 #include <iostream>
 #endif
+  void  LocksManager::lockVertex()  {
+    VertexProtector->lock();
+  }
+
+  void LocksManager::unlockVertex()  {
+    VertexProtector->unlock();
+  }
+
+  void LocksManager::lockEdge()  {
+    EdgeProtector->lock(); 
+  }
+
+  void LocksManager::unlockEdge() {
+    EdgeProtector->unlock();
+  }
 
 #ifndef _LOCKING_STORAGE_
 
   LocksManager::LocksManager() {
-
+    VertexProtector = std::shared_ptr<std::mutex>(new std::mutex);
+    EdgeProtector = std::shared_ptr<std::mutex>(new std::mutex);
 #ifdef _DEADLOCK_DETECTION_
     DeadlockDetector = std::shared_ptr<std::mutex>(new std::mutex) ;
 #endif
@@ -180,7 +196,7 @@
     ->  MutexPointer {
 #if _DEBUG_ENABLE_
       if (EdgeLockMap.find(EdgeId) == EdgeLockMap.end()) {
-        std::cerr << "Error : No such edge\t" << EdgeId <<"\tin map \n";
+        std::cerr << "Error : No such edge\t" << EdgeId <<"\tin map when getting pointer\n";
         exit(0);
       }
 #endif
@@ -1074,8 +1090,10 @@
     auto AcqLocks  = TransMap.find(TxId);
     /// This transaction does NOT have any lock
     if (AcqLocks == TransMap.end())  {
+#ifdef _DEBUG_PRINT_
       std::cout << "Transaction\t" << TxId << "\tholds NO lock\n";
       std::cout << "Transaction\t" << TxId << "\tFinishes\n";
+#endif
       return true;
     }
 
@@ -1158,7 +1176,9 @@
     }///for
     /// Now remove records of TxId from TransMap
     TransMap.erase(TxId);
+#ifdef _DEBUG_PRINT_
     std::cout << "Transaction\t" << TxId << "\tFinishes\n";
+#endif
     return true;
   }
 
@@ -1461,8 +1481,11 @@
 
       VertexLock* NewVertexLock = new VertexLock();
       Vertex->setVertexLock(NewVertexLock);
+
+#if _DEBUG_PRINT_
       std::cout << "Add vertex lock\t" <<  VertexId
               <<"\t to map\n";
+#endif
     }
 
   auto LocksManager::addToEdgeLockMap(IdType EdgeId) 
@@ -1474,8 +1497,10 @@
       }
       EdgeLock*  NewEdgeLock = new EdgeLock();
       Edge->setEdgeLock(NewEdgeLock);
+#if _DEBUG_PRINT_
       std::cout << "Add edge lock\t" << EdgeId
               <<"\t to map\n";
+#endif
   }
  
   auto LocksManager::buildLockMap(GraphType & Graph) 

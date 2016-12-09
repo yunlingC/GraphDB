@@ -5,10 +5,11 @@
 
 #define SCALE 1000
 #define NANO 1000000000
+#define MILLION 1000000
 
 uint64_t get_clock()  {
   timespec tp = (struct timespec) {0};
-  clock_gettime(CLOCK_THREAD_CPUTIME_ID, &tp);
+  clock_gettime(CLOCK_REALTIME, &tp);
   uint64_t ret = tp.tv_sec * NANO + tp.tv_nsec;
   return ret;
 }

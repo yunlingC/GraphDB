@@ -18,13 +18,14 @@
 #include "Transaction.h"
 #include "global.h"
 
-#define _PRINTLOG_ true
+//#define _PRINTLOG_ true
 
 #ifdef _PRINTLOG_
 #include <iostream>
 #endif
 
 #define CLOCK_ID  CLOCK_THREAD_CPUTIME_ID
+//#define CLOCK_ID  CLOCK_REALTIME
 #define MILLION 1000000
 #define NANO 1000000000
 #define SCALE 1000

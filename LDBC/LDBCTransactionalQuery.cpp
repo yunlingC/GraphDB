@@ -1395,14 +1395,20 @@ public:
 /// TODO add locks to map LockManager
 
     chainEdges();
+    LockManager.lockVertex();
     Graph.addVertex(NewVertex);
-    Index.buildVertexIndex("id", NewVertex);
     LockManager.addToVertexLockMap(NewVertex->getId());
+    Index.buildVertexIndex("id", NewVertex);
+    LockManager.unlockVertex();
 
+    LockManager.lockEdge();
     for(auto EdgePtr : EdgePtrMap)  {
-      Graph.addEdge(EdgePtr.first, false);
-      LockManager.addToEdgeLockMap(EdgePtr.first->getId());
+      if (EdgePtr.first) {
+        Graph.addEdge(EdgePtr.first, false);
+        LockManager.addToEdgeLockMap(EdgePtr.first->getId());
+      }
     }
+    LockManager.unlockEdge();
 
 		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
@@ -1557,8 +1563,10 @@ public:
     }///while
 
     if ( addSuccess ) {
+      LockManager.lockEdge();
       auto NewEdgeId = Graph.addEdge(NewEdge, false);
       LockManager.addToEdgeLockMap(NewEdgeId);
+      LockManager.unlockEdge();
     }
 
 #ifdef _PRINTLOG_

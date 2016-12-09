@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
   std::vector<LdbcQueryPtr> Queries;
 
   LdbcQuery1 q1(1);
-  q1.setParam("firstName", "");
+  q1.setParam("firstName", "Senator");
   Queries.push_back(&q1);
 
   LdbcQuery2 q2(2);
@@ -227,22 +227,6 @@ int main(int argc, char *argv[]) {
 
   if (run == 1) {
 
-    q15.runQuery(g, persons[pid], (TranxList[14]), LkManager, Index);
-  
-    q16.runQuery(g, persons[pid], (TranxList[15]), LkManager, Index);
-
-    q17.runQuery(g, persons[pid], (TranxList[16]), LkManager, Index);
-  
-    q18.runQuery(g, persons[pid], (TranxList[17]), LkManager, Index);
-
-    q19.runQuery(g, persons[pid], (TranxList[18]), LkManager, Index);
-
-    q20.runQuery(g, persons[pid], (TranxList[19]), LkManager, Index);
-
-    q21.runQuery(g, persons[pid], (TranxList[20]), LkManager, Index);
-
-    q22.runQuery(g, persons[pid], (TranxList[21]), LkManager, Index);
-
     q1.runQuery(g, persons[pid], (TranxList[0]), LkManager);
   
     q2.runQuery(g, persons[pid], (TranxList[1]), LkManager);
@@ -271,6 +255,22 @@ int main(int argc, char *argv[]) {
   
     q14.runQuery(g, persons[pid], persons[(pid+5)%persons.size()], (TranxList[13]), LkManager);
   
+    q15.runQuery(g, persons[pid], (TranxList[14]), LkManager, Index);
+  
+    q16.runQuery(g, persons[pid], (TranxList[15]), LkManager, Index);
+
+    q17.runQuery(g, persons[pid], (TranxList[16]), LkManager, Index);
+  
+    q18.runQuery(g, persons[pid], (TranxList[17]), LkManager, Index);
+
+    q19.runQuery(g, persons[pid], (TranxList[18]), LkManager, Index);
+
+    q20.runQuery(g, persons[pid], (TranxList[19]), LkManager, Index);
+
+    q21.runQuery(g, persons[pid], (TranxList[20]), LkManager, Index);
+
+    q22.runQuery(g, persons[pid], (TranxList[21]), LkManager, Index);
+
   } 
   else if (run == 2)  {
 
@@ -339,7 +339,6 @@ int main(int argc, char *argv[]) {
        << "\tQuery_Efficiency\t" << getPercent(querytime, runtime)
        << "\n";
 
-  cout <<"finish testing\n";
   fflush(stdout);
 
 }

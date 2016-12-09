@@ -196,8 +196,18 @@ public:
   void  buildLockMap(GraphType & Graph); 
 
 #endif
+  void lockVertex();
+  
+  void unlockVertex();
+
+  void lockEdge();
+
+  void unlockEdge();
 
 protected:
+  /// The following two locks are to guard graph vertices and edges
+  ExMutexPointer VertexProtector;
+  ExMutexPointer EdgeProtector;
 
 #ifndef _LOCKING_STORAGE_
   VertexLockMapType VertexLockMap;

@@ -15,7 +15,7 @@
 
 //#define _WAIT_DIE_
 
-#define _DEBUG_PRINT_ true
+//#define _DEBUG_PRINT_ true
 
 ///Debug print for RDFS ldbc
 //#define _PRINTLDBC_ true
@@ -25,6 +25,8 @@
 #define _TRANX_STATS_ true
 
 #define _INDEXING_ true
+
+//#define _TIME_LDBC_ true
 
 /// For GDBench
 #define _TIME_QUERY_ true
