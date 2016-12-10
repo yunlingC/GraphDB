@@ -176,6 +176,7 @@ int main(int argc, char *argv[]) {
 
     auto startTime = get_clock();
 
+    for (int i = 0; i < 40; i++) {
     if (run == 1) {
       Q1.runQuery(g, traversal);
   
@@ -206,27 +207,28 @@ int main(int argc, char *argv[]) {
       Q7.runQuery(g, traversal);
   
       Q8.runQuery(g, traversal);
-//      Q9.runQuery(g, traversal);
-//  
-//  //    auto Time8 = get_clock();
-//  //    cout << "Processing time Q8\t" << diff_clock(Time6, Time8) << "\n";
-//  
-//      Q10.runQuery(g, traversal);
-//      Q11.runQuery(g, traversal);
-//      Q12.runQuery(g, traversal);
-//  
-//  //    auto Time12 = get_clock();
-//  //    cout << "Processing time Q12\t" << diff_clock(Time8, Time12) << "\n";
-//  
-//      Q13.runQuery(g, traversal);
-//  
-//  //    auto Time13 = get_clock();
-//  //    cout << "Processing time Q13\t" << diff_clock(Time12, Time13) << "\n";
-//  
-//      Q14.runQuery(g, traversal);
-//  
-//  //    auto Time14 = get_clock();
-//  //    cout << "Processing time Q14\t" << diff_clock(Time8, Time14) << "\n";
+
+      Q9.runQuery(g, traversal);
+  
+  //    auto Time8 = get_clock();
+  //    cout << "Processing time Q8\t" << diff_clock(Time6, Time8) << "\n";
+  
+      Q10.runQuery(g, traversal);
+      Q11.runQuery(g, traversal);
+      Q12.runQuery(g, traversal);
+  
+  //    auto Time12 = get_clock();
+  //    cout << "Processing time Q12\t" << diff_clock(Time8, Time12) << "\n";
+  
+      Q13.runQuery(g, traversal);
+  
+  //    auto Time13 = get_clock();
+  //    cout << "Processing time Q13\t" << diff_clock(Time12, Time13) << "\n";
+  
+      Q14.runQuery(g, traversal);
+  
+  //    auto Time14 = get_clock();
+  //    cout << "Processing time Q14\t" << diff_clock(Time8, Time14) << "\n";
   
 
     }
@@ -241,12 +243,12 @@ int main(int argc, char *argv[]) {
       threads.push_back( thread([&]{Q6.runQuery(g, traversal );}));
       threads.push_back( thread([&]{Q7.runQuery(g, traversal );}));
       threads.push_back( thread([&]{Q8.runQuery(g, traversal );}));
-//      threads.push_back( thread([&]{Q9.runQuery(g, traversal );}));
-//      threads.push_back( thread([&]{Q10.runQuery(g, traversal);}));
-//      threads.push_back( thread([&]{Q11.runQuery(g, traversal);}));
-//      threads.push_back( thread([&]{Q12.runQuery(g, traversal);}));
-//      threads.push_back( thread([&]{Q13.runQuery(g, traversal);}));
-//      threads.push_back( thread([&]{Q14.runQuery(g, traversal);}));
+      threads.push_back( thread([&]{Q9.runQuery(g, traversal );}));
+      threads.push_back( thread([&]{Q10.runQuery(g, traversal);}));
+      threads.push_back( thread([&]{Q11.runQuery(g, traversal);}));
+      threads.push_back( thread([&]{Q12.runQuery(g, traversal);}));
+      threads.push_back( thread([&]{Q13.runQuery(g, traversal);}));
+      threads.push_back( thread([&]{Q14.runQuery(g, traversal);}));
     
       for_each(threads.begin(), threads.end(),
                std::mem_fn(&thread::join));
@@ -255,6 +257,7 @@ int main(int argc, char *argv[]) {
     else {
       cout << "Error: Not single thread or multithread\n";
       exit(0);
+    }
     }
 
   auto endTime = get_clock();
