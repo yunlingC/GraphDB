@@ -1198,12 +1198,12 @@ public:
           ExistVertex = NewEdge->getFirstVertexPtr();
         }
 
-#if _DEBUG_PRINT_
-        std::cout << "Existing vertex\n";
-        std::cout << ExistVertex->getId() << "\t"
-                  << ExistVertex->getType().std_str() 
-                  << "\n";
-#endif
+//#ifdef _PRINTLOG_
+//        std::cout << "Existing vertex\n";
+//        std::cout << ExistVertex->getId() << "\t"
+//                  << ExistVertex->getType().std_str() 
+//                  << "\n";
+//#endif
   
         auto ExistNextEdge = ExistVertex->getNextEdge();
         /// Existed vertex does NOT have NextEdge or is the FirstVertex of NextEdge
@@ -1214,13 +1214,13 @@ public:
           ExistNextEdge->setSecondPreviousEdge(NewEdge);
         }
 
-#if _DEBUG_PRINT_
-        if (ExistNextEdge)  {
-          std::cout <<"Existing Next Edge\n";
-          std::cout << ExistNextEdge->getId() << "\t"
-                    << ExistNextEdge->getType().std_str() << "\n";
-        }
-#endif
+//#if _DEBUG_PRINT_
+//        if (ExistNextEdge)  {
+//          std::cout <<"Existing Next Edge\n";
+//          std::cout << ExistNextEdge->getId() << "\t"
+//                    << ExistNextEdge->getType().std_str() << "\n";
+//        }
+//#endif
 
         ExistVertex->setNextEdge(NewEdge);
 
@@ -1257,13 +1257,13 @@ public:
         bool isExistedFirst = true;
   
         if (!ExistIndex.second) {
-#if _DEBUG_PRINT_
+#ifdef _PRINTLOG_
           std::cout << "Error: Fail in getting index on\n" ;
 #endif
           continue;
         }
 
-#if _DEBUG_PRINT_
+#ifdef _PRINTLOG_
         std::cout << "Existing vertex\n";
         std::cout << ExistIndex.first->getId() << "\t"
                   << ExistIndex.first->getType().std_str() 
@@ -1296,7 +1296,7 @@ public:
         auto ExistNextEdge = ExistIndex.first->getNextEdge();
         if (ExistNextEdge && (ExistNextEdge->getFirstVertexPtr() == ExistIndex.first)) {
 
-#if _DEBUG_PRINT_
+#ifdef _PRINTLOG_
           std::cout <<"Existing Next Edge\n";
           std::cout << ExistNextEdge->getId() << "\t"
                     << ExistNextEdge->getType().std_str() << "\n";
@@ -1318,7 +1318,7 @@ public:
         }
         else if(ExistNextEdge && (ExistNextEdge->getSecondVertexPtr() == ExistIndex.first)) {
 
-#if _DEBUG_PRINT_
+#ifdef _PRINTLOG_
           std::cout <<"Existing Next Edge\n";
           std::cout << ExistNextEdge->getId() << "\t"
                     << ExistNextEdge->getType().std_str() << "\n";
@@ -1443,7 +1443,8 @@ public:
       /// If both end vertices are retrievable, get locks on both vertex pointers
 
       if (FirstIndex.second && SecondIndex.second) {
-#if _DEBUG_PRINT_
+
+#ifdef _PRINTLOG_
         std::cout << "First Vertex\t" << FirstIndex.first->getId()
                   << "\tLabel\t" << FirstIndex.first->getType().std_str()
                   << "\n"

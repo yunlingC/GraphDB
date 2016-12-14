@@ -35,7 +35,7 @@
 //  Transaction::Transaction(IdType id) : TransId(id), TransStatus(T_EXPANDING){
 
   Transaction::Transaction(IdType id, LocksManager & LkManager) : LockManager(LkManager)
-                                                                    ,TransId(id)
+                                                                    , TransId(id)
                                                                     , TransStatus(T_EXPANDING){
 #ifdef _TRANX_STATS_
     initStats();

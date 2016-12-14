@@ -56,7 +56,6 @@ public:
 #endif
     CcBfs.releaseAll(LockManager);
     getExecTime();
-    LdbcFile.close();
   }
 };
 
@@ -102,7 +101,6 @@ public:
 
     CcBfs.releaseAll(LockManager);
     getExecTime();  
-    LdbcFile.close();
   }
 };
 
@@ -201,7 +199,6 @@ public:
 
     CcBfs.releaseAll(LockManager);
     getExecTime();  
-    LdbcFile.close();
   }
 };
 
@@ -247,7 +244,6 @@ public:
 
     CcBfs.releaseAll(LockManager);
     getExecTime();  
-    LdbcFile.close();
   }
 };
 
@@ -325,7 +321,6 @@ public:
 #endif
     CcBfs.releaseAll(LockManager);
     getExecTime();  
-    LdbcFile.close();
   }
 };
 
@@ -405,7 +400,6 @@ public:
 
     CcBfs.releaseAll(LockManager);
     getExecTime();  
-    LdbcFile.close();
   }
 };
 
@@ -474,7 +468,6 @@ public:
 
     CcBfs.releaseAll(LockManager);
     getExecTime();  
-    LdbcFile.close();
   }
 };
 
@@ -516,7 +509,6 @@ public:
 
     CcBfs.releaseAll(LockManager);
     getExecTime();  
-    LdbcFile.close();
   }
 };
 
@@ -586,7 +578,6 @@ public:
 
     CcBfs.releaseAll(LockManager);
     getExecTime();  
-    LdbcFile.close();
   }
 };
 
@@ -669,7 +660,6 @@ public:
 
     CcBfs.releaseAll(LockManager);
     getExecTime();  
-    LdbcFile.close();
   }
 protected:
   SimMapType SimMap;
@@ -747,7 +737,6 @@ public:
 
     CcBfs.releaseAll(LockManager);
     getExecTime();  
-    LdbcFile.close();
   }
 };
 
@@ -811,7 +800,6 @@ public:
     }
     CcBfs.releaseAll(LockManager);
     getExecTime();  
-    LdbcFile.close();
   }
 protected:
   SimMapType SimMap;
@@ -858,7 +846,6 @@ public:
 
     CcBfs.releaseAll(LockManager);
     getExecTime();  
-    LdbcFile.close();
   }
 
 };
@@ -927,7 +914,6 @@ public:
 #endif
   CcBfs.releaseAll(LockManager);
   getExecTime();  
-  LdbcFile.close();
  }//run
 };
 
@@ -965,7 +951,6 @@ public:
 
     getExecTime();  
     LdbcFile << "Add one more node into network \n";
-    LdbcFile.close();
   }
 protected:
   BranchMapType BranchMap;
@@ -1002,7 +987,6 @@ public:
     breadthFirstSearch(Graph, 0, v1);
 
     getExecTime();  
-    LdbcFile.close();
 
     //LdbcFile << "Add one more person into network \n";
   }

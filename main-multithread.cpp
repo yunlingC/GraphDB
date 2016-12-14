@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
 
     auto startTime = get_clock();
 
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < 100; i++) {
     if (run == 1) {
       Q1.runQuery(g, traversal);
   
