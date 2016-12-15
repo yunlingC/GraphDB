@@ -47,7 +47,7 @@ public:
   Vertex();
   unsigned int getId();
   EdgePtr getNextEdge();
-  EdgePtr getLastEdge();
+//  EdgePtr getLastEdge();
   LabelType getType();
   ReturnPropertyValueType getPropertyValue(KeyType Key);
   ReturnPropertyValueType getPropertyValue(std::string Key);
@@ -55,7 +55,7 @@ public:
   void setType(std::string Type);
   void setType(LabelType Type);
   void setNextEdge(EdgePtr Edge);
-  void setLastEdge(EdgePtr Edge);
+//  void setLastEdge(EdgePtr Edge);
   void setProperty(KeyType Key, ValueType Value);
   void setPropertyList(PropertyListType & List);
   bool updateProperty(KeyType Key, ValueType Value);
@@ -79,7 +79,7 @@ protected:
   // Pointer to next relationship
   EdgePtr NextEdge;
 
-  EdgePtr LastEdge;
+//  EdgePtr LastEdge;
 
   LabelType VertexLabel;
 

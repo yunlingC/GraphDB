@@ -15,12 +15,55 @@
 #ifndef _LOCK_H_
 #define _LOCK_H_
 
-#include <shared_mutex>
+#include "global.h"
+#include "Concurrency_control_config.h"
 
-class VertexLock {
+#include <shared_mutex>
+#include <cassert>
+
+#if _DEBUG_ENABLE_
+#include <iostream>
+#endif
+
+class Lock {
 public:
   typedef std::shared_timed_mutex Mutex;
   typedef std::shared_ptr<Mutex> MutexPointer;
+public:
+  MutexPointer IDMutex;
+public:
+  Lock() : IDMutex (MutexPointer(new Mutex)) {}
+
+  bool tryLock(MutexPointer MutexPtr, LockType LType) {
+    assert(MutexPtr && "MutexPointer invalid\n");
+    switch (LType) {   
+      ///Shared lock
+      case T_SH:
+        return MutexPtr->try_lock_shared();
+      ///Exclusive lock
+      case T_EX:
+        return MutexPtr->try_lock(); 
+      default:
+        assert(false && "Lock type invalid\n");
+      }
+    return true;
+  }
+  
+  void tryUnlock(MutexPointer MutexPtr, LockType LType) {
+    assert(MutexPtr != nullptr && "MutexPointer invalid\n");
+    switch (LType) {   
+      case T_SH:
+        return MutexPtr->unlock_shared();
+      case T_EX:
+        return MutexPtr->unlock(); 
+      default:
+        assert(false && "Lock type invalid\n");
+    }
+  }
+
+};
+
+class VertexLock : public Lock {
 public:
   VertexLock() : IdMutex (MutexPointer(new Mutex)),
                  NEMutex (MutexPointer(new Mutex)),
@@ -53,7 +96,19 @@ public:
     return LbMutex;
   }
 
+  bool tryLock(MutexType Mutex, LockType LType) {
+    switch(Mutex) {
+      case T_ID:
+        return Lock::tryLock(IdMutex, LType);
+      case T_NextEdge:
+        return Lock::tryLock(NEMutex, LType);
+    }
+    return true;
+  }
 
+  void tryUnlock(MutexType Mutex, LockType LType) {
+    return ;
+  }
 protected:
   MutexPointer IdMutex;
   MutexPointer NEMutex;
@@ -65,10 +120,7 @@ protected:
 #endif 
 };
 
-class EdgeLock {
-public:
-  typedef std::shared_timed_mutex Mutex;
-  typedef std::shared_ptr<Mutex> MutexPointer;
+class EdgeLock : public Lock {
 public:
   EdgeLock() : IdMutex (MutexPointer(new Mutex)),
                FVMutex (MutexPointer(new Mutex)),
@@ -125,9 +177,15 @@ public:
     return LbMutex;
   }
 
+  bool tryLock(MutexType Mutex, LockType LType) {
+    return true;
+  }
+
+  void tryUnlock(MutexType Mutex, LockType LType) {
+    return ;
+  }
+
 protected:
-  ///No mutex for label
-  /// won't be changed anyway;
   MutexPointer IdMutex;
   MutexPointer FVMutex;
   MutexPointer SVMutex;

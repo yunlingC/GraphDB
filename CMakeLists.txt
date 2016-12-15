@@ -43,24 +43,24 @@ link_directories(
 # Set the target folder
 set(TARGET t)
 
-# Set additional flags and parameters
-set(STORAGE_LIB storage)
-set(TRANSACTION_LIB transactions)
-#set(GDB_LD_FLAGS storage) 
-
 # Compiler flags
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -pthread -std=c++14 -Wall")
 
 # Debug flags
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++14  -Wall -fPIC")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3 -g -pthread -std=c++14  -Wall")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++14 -D_FIXALLOC_ -D_SKIP_ -Wall")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pthread -std=c++11 -Wall")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14   -Wall -fPIC")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}  -pthread -std=c++14 -Wall")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_PRINTLOG_ -D_LOCKING_ -Wall -fPIC")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++14 -D_FIXALLOC_  -D_SKIP_ -Wall")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -D_FIXALLOC_ -Wall")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pthread -std=c++11 -Wall")
+
+# Set additional flags and parameters
+set(STORAGE_LIB storage)
+set(TRANSACTION_LIB transactions)
+#set(GDB_LD_FLAGS storage) 
 
 
 # Storage sub directory
@@ -74,8 +74,9 @@ set(TESTS
   #  main-dfs.cpp
   #  main-rdfs-ldbc.cpp
     main-txbfs.cpp
-  main-multithread.cpp
-  main-input.cpp
+    main-multithread.cpp
+  #  main-input.cpp
+    main-test.cpp
   )
 
 

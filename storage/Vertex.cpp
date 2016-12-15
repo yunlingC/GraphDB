@@ -55,7 +55,7 @@ auto Vertex::getPropertyList()
 Vertex::Vertex(): 
   VertexId(-1) {
   NextEdge = nullptr;
-  LastEdge = nullptr;
+//  LastEdge = nullptr;
 }
 
 auto Vertex::setId(unsigned int Id) 
@@ -92,6 +92,11 @@ auto Vertex::getNextEdge() -> EdgePtr {
   return NextEdge;
 }
 
+/*
+ * These two functions are not needed if 
+ * LastEdge is not set in Vertex
+ * NewEdge will be inserted to the head
+ *
 auto Vertex::setLastEdge(EdgePtr NewEdge) 
   -> void {
    LastEdge = NewEdge;
@@ -100,6 +105,7 @@ auto Vertex::setLastEdge(EdgePtr NewEdge)
 auto Vertex::getLastEdge() -> EdgePtr {
   return LastEdge;
 }
+*/
 
 #ifdef _LOCKING_STORAGE_
 auto Vertex::getVertexLock() ->VertexLockPointer {

@@ -582,17 +582,12 @@
         if (getLock) {
           while(!registerLockMap(TxId, MutexPtr, Lock)) {
 #if _DEBUG_PRINT_
-            std::cout << "WAIT_DIE: Transaction\t" << TxId
-                      << "\tspins to register lock\t" << MutexPtr
-                      << "\n";
+//            std::cout << "WAIT_DIE: Transaction\t" << TxId
+//                      << "\tspins to register lock\t" << MutexPtr
+//                      << "\n";
 #endif
           }
 
-#if _DEBUG_PRINT_
-            std::cout << "WAIT_DIE: Transaction\t" << TxId
-                      << "\tacquires register lock\t" << MutexPtr
-                      << "\n";
-#endif
           registerTransMap(TxId, MutexPtr, Lock);
           return true;
         }
@@ -1561,7 +1556,8 @@
       EdgePtr Edge = Graph.getEdgePointer(EdgeId);
       if (Edge == nullptr) {
         std::cerr  << "Error : No such edge\t" << EdgeId << "\tin map \n";
-        exit(0);
+        return ;
+//        exit(0);
       }
       EdgeLock*  NewEdgeLock = new EdgeLock();
       Edge->setEdgeLock(NewEdgeLock);

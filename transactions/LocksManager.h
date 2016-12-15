@@ -63,12 +63,10 @@ public:
   typedef std::unordered_set<ExMutexPointer> LockGuardSetType;
 public:
 
-#ifndef _LOCKING_STORAGE_
 /// locks stored in a map 
+#ifndef _LOCKING_STORAGE_
   LocksManager();
 
-  /// TODO getVertexLock has to do check if current tx has hold this lock
-  /// So does getEdgeLock
   bool  getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock); 
 
   void  releaseVertexLock(IdType VertexId, MutexType Mutex, LockType Lock);
@@ -172,7 +170,6 @@ public:
 #else
   ///locks are encoded in Vertex and Edge
 public:
-  /// TODO const & g
   LocksManager(GraphType & g) : Graph(g) {};
 
   bool  getVertexLock(VertexPtr Vertex, MutexType Mutex, LockType Lock);
