@@ -177,8 +177,6 @@
       switch (Mutex) {
         case T_Property:
           return VertexLockMap[VertexId].getPpMutex();
-        case T_LastEdge:
-          return VertexLockMap[VertexId].getLEMutex();
         case T_NextEdge:
           return VertexLockMap[VertexId].getNEMutex();
         case T_ID:

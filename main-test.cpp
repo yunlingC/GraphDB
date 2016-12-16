@@ -1,62 +1,47 @@
-#include <thread>
-#include <shared_mutex>
+#include "Lock.h"
+#include "Vertex.h"
+#include "Edge.h"
 
+#include <cassert>
 #include <iostream>
 
 using namespace std;
 
-typedef std::shared_timed_mutex Mutex;
-typedef std::shared_ptr<Mutex> MutexPtr;
 
-bool requireLockS(MutexPtr lock) {
-  return lock->try_lock_shared();
-}
+int main(int argc, char *argv[]) {
+  assert(1+1==2);
 
-bool requireLockX(MutexPtr lock) {
-  return lock->try_lock();
-}
+//  std::mutex Mutex;
 
-bool getlock(bool input) {
-  if (input) {
-    std::cout <<"YES" << "\n";
-    return true;
-  }
-  else  {
-    std::cout <<"No" << "\n";
-    return false;
-  }
-}
+  Vertex * v = new Vertex;
 
-bool getlock_recursive(MutexPtr lock) {
-  unsigned int i = 0;
-  while (lock->try_lock_shared() && (i++<5)) {
-    std::cout <<  i <<" YES" << "\n";
-    return true;
-  }
-}
+  Edge * e = new Edge; 
+ 
+  MutexPointerType *MuPtr = new MutexPointerType();
 
-int main() {
+  Lock* lock = new Lock();
 
-  MutexPtr  lock(new Mutex);
-  
-//  std::thread  t(getlock_recursive, lock);
-//  t(getlock, requireLockS(lock));
-//  std::thread  t(requireLockS,  lock);
-//  t.join();
+  VertexLock *vlock = new VertexLock();
 
-//  while (lock->try_lock_shared()) {
-//    std::cout <<"YES" << "\n";
-//    return true;
-//  }
-  
-  getlock(requireLockS(lock));
-//  getlock(requireLockX(lock));
-  getlock(requireLockS(lock));
-  getlock(requireLockS(lock));
+  EdgeLock *elock = new EdgeLock();
 
-  unsigned int i = 0;
-  while (getlock(requireLockS(lock)) &&( i++ < 3)) {
-  };
+  cout << "Vertex size\t" << sizeof(*v) << endl;
+  cout << "Edge size\t" << sizeof(*e) << endl;
+//  cout << " Mutex size\t" << sizeof(Mutex) << endl;
+  cout << "MuPtr size\t" << sizeof(*MuPtr) << endl;
+  cout << "lock size\t" << sizeof(*lock) << endl;
+  cout << "vlock size\t" << sizeof(*vlock) << endl;
+  cout << "elock size\t" << sizeof(*elock) << endl;
+//  Vlock->tryLock(nullptr, T_SH);
+//  Vlock->tryUnlock(nullptr, T_SH);
 
+//  Vlock->tryLock(Vlock->IDMutex, T_SH);
+//  Vlock->tryUnlock(Vlock->IDMutex, T_SH);
+//
+//  VertexLock *V = new VertexLock();
+//  V->tryLock(T_NextEdge, T_SH);
+//  V->tryUnlock(T_NextEdge, T_SH);
+
+  std::cout << "Finish\n";
 }
 

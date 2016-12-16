@@ -6,7 +6,18 @@ enum OperationType { NOOP, READ, UPDATE, INSERT, DELETE };
 /// TODO need T_WAITING ?
 enum TransStatusType {T_COMMIT, T_ABORT, T_ROLLBACK, T_SHRINKING, T_EXPANDING};
 
-enum MutexType { T_ID, T_Property, T_LastEdge, T_NextEdge, T_FirstVertex, T_SecondVertex, T_FirstNextEdge, T_FirstPrevEdge, T_SecondNextEdge, T_SecondPrevEdge, T_Label};
+enum MutexType { T_ID
+                , T_Property
+//                , T_LastEdge
+                , T_NextEdge
+                , T_FirstVertex
+                , T_SecondVertex
+                , T_FirstNextEdge
+                , T_FirstPrevEdge
+                , T_SecondNextEdge
+                , T_SecondPrevEdge
+                , T_Label
+              };
 
 enum LockType { T_SH, T_EX };
 

@@ -20,19 +20,62 @@
 
 #include <shared_mutex>
 #include <cassert>
+#include <unordered_map>
 
 #if _DEBUG_ENABLE_
 #include <iostream>
 #endif
 
+class MutexPointerType {
+public:
+  typedef std::shared_timed_mutex Mutex;
+  typedef std::mutex ExMutex;
+  typedef std::shared_ptr<Mutex> MutexPointer;
+  typedef std::shared_ptr<ExMutex> ExMutexPointer;
+  typedef std::unordered_map<TransIdType, LockType> TxMapType;
+public:
+  MutexPointerType() : MutexPtr (MutexPointer(new Mutex)) 
+#if _LOCK_GUARD_
+                      , MutexGuardPtr(ExMutexPointer(new ExMutex))
+#endif
+                        {}
+#if _LOCK_GUARD_
+#endif
+
+protected:
+  MutexPointer MutexPtr;
+#if _LOCK_GUARD_
+  ExMutexPointer MutexGuardPtr;
+  TxMapType TxMap;
+
+#endif
+};
+
 class Lock {
 public:
+//  typedef MutexPointerType MutexPointer;
   typedef std::shared_timed_mutex Mutex;
   typedef std::shared_ptr<Mutex> MutexPointer;
 public:
-  MutexPointer IDMutex;
-public:
-  Lock() : IDMutex (MutexPointer(new Mutex)) {}
+  Lock(): IdMutex (MutexPointer(new Mutex))
+          , LbMutex (MutexPointer(new Mutex))
+          , PpMutex (MutexPointer(new Mutex))
+          {}
+
+  auto getPpMutex()
+    -> MutexPointer {
+    return PpMutex;
+  }
+
+  auto getIdMutex() 
+    -> MutexPointer {
+    return IdMutex;
+  }
+
+  auto getLbMutex() 
+    -> MutexPointer {
+    return LbMutex;
+  }
 
   bool tryLock(MutexPointer MutexPtr, LockType LType) {
     assert(MutexPtr && "MutexPointer invalid\n");
@@ -61,86 +104,58 @@ public:
     }
   }
 
+protected:
+  MutexPointer IdMutex;
+  MutexPointer LbMutex;
+  MutexPointer PpMutex;
 };
 
 class VertexLock : public Lock {
 public:
-  VertexLock() : IdMutex (MutexPointer(new Mutex)),
-                 NEMutex (MutexPointer(new Mutex)),
-                 LEMutex (MutexPointer(new Mutex)),
-                 LbMutex (MutexPointer(new Mutex)),
-                 PpMutex (MutexPointer(new Mutex)){} 
-
-  auto getPpMutex()
-    -> MutexPointer {
-    return PpMutex;
-  }
+  VertexLock() : NEMutex (MutexPointer(new Mutex))
+                 {} 
 
   auto getNEMutex()
     -> MutexPointer {
     return NEMutex;
   }
- 
-  auto getLEMutex()
-    -> MutexPointer {
-    return LEMutex;
-  }
-
-  auto getIdMutex() 
-    -> MutexPointer {
-    return IdMutex;
-  }
-
-  auto getLbMutex() 
-    -> MutexPointer {
-    return LbMutex;
-  }
 
   bool tryLock(MutexType Mutex, LockType LType) {
-    switch(Mutex) {
-      case T_ID:
-        return Lock::tryLock(IdMutex, LType);
-      case T_NextEdge:
-        return Lock::tryLock(NEMutex, LType);
-    }
-    return true;
+    return Lock::tryLock(getMutexPointer(Mutex), LType);
   }
 
   void tryUnlock(MutexType Mutex, LockType LType) {
-    return ;
+    return Lock::tryUnlock(getMutexPointer(Mutex), LType);
   }
+
+  MutexPointer getMutexPointer(MutexType Mutex) {
+    switch(Mutex) {
+      case T_ID:
+        return IdMutex;
+      case T_NextEdge:
+        return NEMutex;
+      case T_Property:
+        return PpMutex;
+      case T_Label:
+        return LbMutex;
+      default:
+        assert(false && "Mutex type invalid");
+    }
+  }
+
 protected:
-  MutexPointer IdMutex;
   MutexPointer NEMutex;
-  MutexPointer LEMutex;
-  MutexPointer LbMutex;
-  MutexPointer PpMutex;
-#ifdef _DEADLOCK_DETECTION_
-  /// TODO Mutex tables 
-#endif 
 };
 
 class EdgeLock : public Lock {
 public:
-  EdgeLock() : IdMutex (MutexPointer(new Mutex)),
-               FVMutex (MutexPointer(new Mutex)),
-               SVMutex (MutexPointer(new Mutex)),
-               FNEMutex (MutexPointer(new Mutex)),
-               FPEMutex (MutexPointer(new Mutex)),
-               SNEMutex (MutexPointer(new Mutex)),
-               SPEMutex (MutexPointer(new Mutex)),
-               LbMutex (MutexPointer(new Mutex)),
-               PpMutex (MutexPointer(new Mutex)){}
-
-  auto getIdMutex() 
-    -> MutexPointer {
-    return IdMutex;
-  }
-
-  auto getPpMutex()
-    -> MutexPointer {
-    return PpMutex;
-  }
+  EdgeLock() : FVMutex (MutexPointer(new Mutex))
+               , SVMutex (MutexPointer(new Mutex))
+               , FNEMutex (MutexPointer(new Mutex))
+               , FPEMutex (MutexPointer(new Mutex))
+               , SNEMutex (MutexPointer(new Mutex))
+               , SPEMutex (MutexPointer(new Mutex))
+               {}
 
   auto getFVMutex()
     -> MutexPointer {
@@ -172,33 +187,46 @@ public:
     return SPEMutex;
   }
 
-  auto getLbMutex() 
-    -> MutexPointer {
-    return LbMutex;
+  MutexPointer getMutexPointer(MutexType Mutex) {
+    switch(Mutex) {
+      case T_ID:
+        return IdMutex;
+      case T_FirstVertex:
+        return FVMutex;
+      case T_SecondVertex:
+        return SVMutex;
+      case T_FirstNextEdge:
+        return FNEMutex;
+      case T_SecondNextEdge:
+        return SNEMutex;
+      case T_FirstPrevEdge:
+        return FPEMutex;
+      case T_SecondPrevEdge:
+        return SPEMutex;
+      case T_Property:
+        return PpMutex;
+      case T_Label:
+        return LbMutex;
+      default:
+        assert(false && "Mutex type invalid");
+    }
   }
 
   bool tryLock(MutexType Mutex, LockType LType) {
-    return true;
+    return Lock::tryLock(getMutexPointer(Mutex), LType);
   }
 
   void tryUnlock(MutexType Mutex, LockType LType) {
-    return ;
+    return Lock::tryUnlock(getMutexPointer(Mutex), LType);
   }
 
 protected:
-  MutexPointer IdMutex;
   MutexPointer FVMutex;
   MutexPointer SVMutex;
   MutexPointer FNEMutex;
   MutexPointer FPEMutex;
   MutexPointer SNEMutex;
   MutexPointer SPEMutex;
-  /// Lb mutex for prefetching convenience(temporal)
-  MutexPointer LbMutex;
-  MutexPointer PpMutex;
-#ifdef _DEADLOCK_DETECTION_
-  /// TODO a mutex table <mutexPointer, <transaction_ptr, type> >
-#endif 
 };
 
 #endif /**_LOCK_H_*/
