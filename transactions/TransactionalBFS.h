@@ -29,17 +29,62 @@
 class TransactionalBFS {
 public:
   typedef GraphType::VertexPointer  VertexPointer;
+  typedef GraphType::EdgePointer EdgePointer;
   typedef GraphType::VertexDescriptor VertexDescriptor;
+  typedef Lock::MutexPointer MutexPointer;
   typedef unsigned int IdType;
 	typedef std::pair<VertexPointer, bool> VisitPair;
-	typedef Transaction* TransactionType;
+	typedef Transaction* TransactionPointer;
   typedef LocksManager   LockManagerType;
 
 public:
+
+  bool checkLock(MutexPointer MutexPtr
+               , LockType Locktype
+               , TransactionPointer TxPtr
+               , LockManagerType & LockManager
+               ) {
+    auto wait = LockManager.checkWaitOn(TxPtr->getId(), MutexPtr, Locktype);
+//    if (wait) {
+//      TxPtr->waitOn();
+//    }
+//    else {
+//      TxPtr->abort();
+//      return false;
+//    }
+    return true;
+  }
+
+  bool getVertexLock(VertexPointer VertexPtr
+                    , MutexType Mutextype
+                    , LockType Locktype
+                    , TransactionPointer TxPtr
+                    , LockManagerType & LockManager
+                    ) {
+    bool getLock = TxPtr->getVertexLock(VertexPtr, Mutextype, Locktype);
+    if (!getLock) {
+      checkLock(VertexPtr->getLockPointer()->getMutexPointer(Mutextype), Locktype, TxPtr, LockManager);
+    }
+    return true;
+  }
+
+  bool getEdgeLock(EdgePointer EdgePtr
+                  , MutexType Mutextype
+                  , LockType Locktype
+                  , TransactionPointer TxPtr
+                  , LockManagerType & LockManager
+                  )  {
+    bool getLock = TxPtr->getEdgeLock(EdgePtr, Mutextype, Locktype);
+    if (!getLock) {
+      checkLock(EdgePtr->getLockPointer()->getMutexPointer(Mutextype), Locktype, TxPtr, LockManager);
+    }
+    return true;
+  }
+
 	void breadthFirstSearch(GraphType & Graph
                         , const VertexDescriptor & StartVertex
                         , Visitor & GraphVisitor
-                        , TransactionType  Tranx
+                        , TransactionPointer  Tranx
                         , LockManagerType & LockManager
                         ) {
 

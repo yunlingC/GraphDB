@@ -248,12 +248,12 @@ auto Edge::getId()
 }
 
 #ifdef _LOCKING_STORAGE_
-auto Edge::getEdgeLock() -> EdgeLockPointer {
-  return EdgeLock;
+auto Edge::getLockPointer() -> EdgeLockPointer {
+  return LockPtr;
 }
 
-auto Edge::setEdgeLock(EdgeLockPointer NewLock) -> void {
-  EdgeLock = NewLock;
+auto Edge::setLockPointer(EdgeLockPointer NewLock) -> void {
+  LockPtr = NewLock;
 }
 #endif
 

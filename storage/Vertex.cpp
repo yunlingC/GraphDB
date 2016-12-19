@@ -107,16 +107,16 @@ auto Vertex::getLastEdge() -> EdgePtr {
 }
 */
 
-#ifdef _LOCKING_STORAGE_
-auto Vertex::getVertexLock() ->VertexLockPointer {
-  return VertexLock;
+//#ifdef _LOCKING_STORAGE_
+auto Vertex::getLockPointer() ->VertexLockPointer {
+  return LockPtr;
 }
 
-auto Vertex::setVertexLock(VertexLockPointer NewLock)
+auto Vertex::setLockPointer(VertexLockPointer NewLock)
   -> void {
-  VertexLock = NewLock;
+  LockPtr = NewLock;
   }
-#endif
+//#endif
 
 #ifdef _DEBUG_
 auto Vertex::dump() 

@@ -32,6 +32,7 @@ public:
   typedef std::mutex ExMutex;
   typedef std::shared_ptr<Mutex> MutexPointer;
   typedef std::shared_ptr<ExMutex> ExMutexPointer;
+  typedef unsigned int TransIdType;
   typedef std::unordered_map<TransIdType, LockType> TxMapType;
 public:
   MutexPointerType() : MutexPtr (MutexPointer(new Mutex)) 

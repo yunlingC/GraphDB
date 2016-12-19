@@ -34,11 +34,12 @@
       return id;
   }
 
-  auto TransactionManager::addTransaction(LocksManager & LkManager)
+//  auto TransactionManager::addTransaction(LocksManager & LkManager)
+  auto TransactionManager::addTransaction()
   -> TransactionEntryType {
       auto Id = assignTransId();
 //      std::cout <<"add transaction " << Id << std::endl;
-  		TransactionPointer TxPtr = new Transaction(Id, LkManager);
+  		TransactionPointer TxPtr = new Transaction(Id);
   		TransTable.insert(std::pair<IdType, TransactionPointer>(Id, TxPtr));
   		return TransactionEntryType(Id, TxPtr);
   }

@@ -18,13 +18,15 @@
 #include "Concurrency_control_config.h"
 #include "Lock.h"
 #include "GraphType.h"
-#include "LocksManager.h"
+//#include "LocksManager.h"
 #include "global.h"
 
 #include <stdlib.h>
 #include <unordered_map>
 
 #define _TRANX_STATS_ true
+
+class LocksManager;
 
 class Transaction {
 public:
@@ -47,7 +49,7 @@ public:
 
   Transaction(IdType id); 
 
-  Transaction(IdType id, LocksManager & LockManager); 
+//  Transaction(IdType id, LocksManager & LockManager); 
 
   IdType getId();
 
@@ -69,8 +71,15 @@ public:
 
   void releaseLock();
 
-  bool registerVertexLock(MutexPointer , VertexPointer, LockType );
+  /*TODO Prototype to get/release locks*/
+  bool getVertexLock(VertexPointer, MutexType, LockType);
+  bool getEdgeLock(EdgePointer, MutexType, LockType);
 
+  bool releaseVertexLock(VertexPointer, MutexType, LockType);
+  bool releaseEdgeLock(EdgePointer, MutexType, LockType);
+  /*TODO end**/
+
+  bool registerVertexLock(MutexPointer , VertexPointer, LockType );
   bool registerEdgeLock(MutexPointer , EdgePointer, LockType );
 
   VertexLockMapType getVertexLockMap();
@@ -81,6 +90,8 @@ public:
 
   ~Transaction();
 
+  friend class LocksManager;
+//  friend bool LocksManager::detectDeadlock();
 #ifdef _TRANX_STATS_
   void visitMutex(MutexPointer MutexPtr);
   void abortMutex(MutexPointer MutexPtr);
@@ -106,7 +117,7 @@ public:
 #endif
 
 protected:
-  LocksManager & LockManager;
+//  LocksManager * LockManager;
   IdType  TransId;
   TransStatusType TransStatus;
   EdgeLockMapType EdgeLockMap;
@@ -120,7 +131,6 @@ protected:
   uint64_t CommitTime;
   uint64_t ExpandTime;
   uint64_t CloseTime;
-
 #endif 
 };
 

@@ -39,9 +39,9 @@ public:
 
   TransactionManager();
 
-//  TransactionEntryType  addTransaction();
+  TransactionEntryType  addTransaction();
 
-  TransactionEntryType  addTransaction(LocksManager & LkManager);
+//  TransactionEntryType  addTransaction(LocksManager & LkManager);
 
   TransactionPointer getTransaction(IdType TxId);
 

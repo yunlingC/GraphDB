@@ -32,11 +32,11 @@
 
 //  Transaction::Transaction() : TransId(0), TransStatus(T_EXPANDING) {
 
-//  Transaction::Transaction(IdType id) : TransId(id), TransStatus(T_EXPANDING){
+  Transaction::Transaction(IdType id) : TransId(id), TransStatus(T_EXPANDING){
 
-  Transaction::Transaction(IdType id, LocksManager & LkManager) : LockManager(LkManager)
-                                                                    , TransId(id)
-                                                                    , TransStatus(T_EXPANDING){
+//  Transaction::Transaction(IdType id, LocksManager & LkManager) : LockManager(LkManager)
+//                                                                    , TransId(id)
+//                                                                    , TransStatus(T_EXPANDING){
 #ifdef _TRANX_STATS_
     initStats();
 #endif
@@ -207,23 +207,40 @@
   }
 
 
+  bool Transaction::getVertexLock(VertexPointer vptr, MutexType mt, LockType lt) {
+//    detectDeadlock();
+    return true;
+  }
+
+  bool Transaction::getEdgeLock(EdgePointer eptr, MutexType mt, LockType lt) {
+    return true;
+  }
+
+  bool Transaction::releaseVertexLock(VertexPointer vptr, MutexType mt, LockType lt) {
+    return true;
+  }
+
+  bool Transaction::releaseEdgeLock(EdgePointer eptr, MutexType mt, LockType lt)  {
+    return true;
+  }
+
   void Transaction::releaseVertexLock( ) {
-    for (auto LockEntry : VertexLockMap) {
-      LockManager.tryUnlock(LockEntry.first, LockEntry.second.second);
-#ifndef _NO_WAIT_
-      LockManager.retireFromLockMap(TransId, LockEntry.first, LockEntry.second.second);
-#endif
-    }
+//    for (auto LockEntry : VertexLockMap) {
+//      LockManager.tryUnlock(LockEntry.first, LockEntry.second.second);
+//#ifndef _NO_WAIT_
+//      LockManager.retireFromLockMap(TransId, LockEntry.first, LockEntry.second.second);
+//#endif
+//    }
     return ;
   }
 
   void Transaction::releaseEdgeLock( ) {
-    for (auto LockEntry : EdgeLockMap) {
-      LockManager.tryUnlock(LockEntry.first, LockEntry.second.second);
-#ifndef _NO_WAIT_
-      LockManager.retireFromLockMap(TransId, LockEntry.first, LockEntry.second.second);
-#endif
-    }
+//    for (auto LockEntry : EdgeLockMap) {
+//      LockManager.tryUnlock(LockEntry.first, LockEntry.second.second);
+//#ifndef _NO_WAIT_
+//      LockManager.retireFromLockMap(TransId, LockEntry.first, LockEntry.second.second);
+//#endif
+//    }
     return ;
   }
 
