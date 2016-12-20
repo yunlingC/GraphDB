@@ -170,7 +170,7 @@ public:
 #else
   ///locks are encoded in Vertex and Edge
 public:
-  LocksManager(GraphType & g) : Graph(g) {};
+  LocksManager(GraphType & g);
 
   bool  getVertexLock(VertexPtr Vertex, MutexType Mutex, LockType Lock);
 

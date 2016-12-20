@@ -55,6 +55,9 @@ auto Vertex::getPropertyList()
 Vertex::Vertex(): 
   VertexId(-1) {
   NextEdge = nullptr;
+#ifdef _LOCKING_STORAGE_
+  LockPtr = new VertexLock();
+#endif
 //  LastEdge = nullptr;
 }
 
@@ -107,16 +110,16 @@ auto Vertex::getLastEdge() -> EdgePtr {
 }
 */
 
-//#ifdef _LOCKING_STORAGE_
-auto Vertex::getLockPointer() ->VertexLockPointer {
+#ifdef _LOCKING_STORAGE_
+auto Vertex::getLockPtr() ->VertexLockPointer {
   return LockPtr;
 }
 
-auto Vertex::setLockPointer(VertexLockPointer NewLock)
+auto Vertex::setLockPtr(VertexLockPointer NewLock)
   -> void {
   LockPtr = NewLock;
   }
-//#endif
+#endif
 
 #ifdef _DEBUG_
 auto Vertex::dump() 

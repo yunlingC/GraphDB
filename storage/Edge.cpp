@@ -248,11 +248,11 @@ auto Edge::getId()
 }
 
 #ifdef _LOCKING_STORAGE_
-auto Edge::getLockPointer() -> EdgeLockPointer {
+auto Edge::getLockPtr() -> EdgeLockPointer {
   return LockPtr;
 }
 
-auto Edge::setLockPointer(EdgeLockPointer NewLock) -> void {
+auto Edge::setLockPtr(EdgeLockPointer NewLock) -> void {
   LockPtr = NewLock;
 }
 #endif
@@ -264,6 +264,9 @@ Edge::Edge(): EdgeId(-1) {
   FirstPreviousEdge = nullptr;
   SecondNextEdge = nullptr; 
   SecondPreviousEdge = nullptr;
+#ifdef _LOCKING_STORAGE_
+  LockPtr = new EdgeLock();
+#endif
 }
 
 Edge::Edge(VertexPointer StartVertex, VertexPointer EndVertex) {
@@ -273,6 +276,9 @@ Edge::Edge(VertexPointer StartVertex, VertexPointer EndVertex) {
   FirstPreviousEdge = nullptr;
   SecondNextEdge = nullptr; 
   SecondPreviousEdge = nullptr;
+#ifdef _LOCKING_STORAGE_
+  LockPtr = new EdgeLock();
+#endif
 }
   
 auto Edge::deleteEdge()

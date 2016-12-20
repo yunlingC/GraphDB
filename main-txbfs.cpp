@@ -212,8 +212,9 @@ int main(int argc, char *argv[]) {
 
   uint64_t init = get_clock();
 
-  LocksManager LkManager;
-  LkManager.buildLockMap(g);
+  LocksManager LkManager(g);
+/// Locks are embedded in vertex and edge structure
+//  LkManager.buildLockMap(g);
   TransactionManager TmManager;
 
   std::vector<TransactionPointerType> TranxList;

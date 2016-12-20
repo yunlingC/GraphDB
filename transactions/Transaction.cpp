@@ -60,6 +60,7 @@
     return TransId;
   }
 
+
   bool Transaction::begin() {
     TransStatus = T_EXPANDING;
 #ifdef _PRINTLOG_
@@ -147,9 +148,8 @@
       case T_ABORT:
 #ifdef _PRINTLOG_
         std::cout <<"Error in Abort:\t" << TransId << "\tis ABORT\n";
-        exit(0);
 #endif
-        TransStatus = T_ROLLBACK;
+        TransStatus = T_ABORT;
         break;
       case T_ROLLBACK:
         TransStatus = T_EXPANDING;
@@ -171,7 +171,8 @@
 #endif  
 
 #ifdef _TRANX_STATS_
-    NumAbort++;
+    if (retValue)
+      NumAbort++;
 #endif
     
     return retValue;
@@ -189,8 +190,8 @@
   }
 
 
-  bool Transaction::registerVertexLock(MutexPointer mptr, VertexPointer vptr, LockType lktype) {
-    if (VertexLockMap.find(mptr) != VertexLockMap.end())  {
+  bool Transaction::registerVertexLock(VertexPointer vptr, MutexPointer mptr, LockType lktype) {
+    if (checkVertexLock(mptr, lktype))  {
       /// This mutex exists in the map -> Transaction already holds this lock
       return false;
     }
@@ -198,21 +199,55 @@
     return true;
   }
 
-  bool Transaction::registerEdgeLock(MutexPointer mptr, EdgePointer eptr, LockType lktype) {
-    if (EdgeLockMap.find(mptr) != EdgeLockMap.end())  {
+  bool Transaction::registerEdgeLock(EdgePointer eptr, MutexPointer mptr, LockType lktype) {
+    if (checkEdgeLock(mptr, lktype))  {
       return false;
     }
     EdgeLockMap.insert(EdgeLockPairType(mptr, ELockPairType(eptr, lktype)));
     return true;
   }
 
+  /// True - lock already acquired; False - lock does not exist in map
+  bool Transaction::checkVertexLock(MutexPointer mptr, LockType lt) {
+//    auto mptr = vptr->getLockPtr()->getMutexPtr(mt);
+    if (VertexLockMap.find(mptr) != VertexLockMap.end()) 
+      ///TODO check lock type 
+      return true;
+    return false;
+  }
+
+  bool Transaction::checkEdgeLock(MutexPointer mptr, LockType lt) {
+//    auto mptr = eptr->getLockPtr()->getMutexPtr(mt);
+    if (EdgeLockMap.find(mptr) != EdgeLockMap.end())  
+      return true;
+    return false;
+  }
 
   bool Transaction::getVertexLock(VertexPointer vptr, MutexType mt, LockType lt) {
-//    detectDeadlock();
+    auto lockptr = vptr->getLockPtr();
+    assert(lockptr != nullptr && "Vertex lock pointer invalid");
+    auto mptr = lockptr->getMutexPtr(mt);
+    if (checkVertexLock(mptr, lt)) {
+      return true;
+    }
+    ///Lock not acquired && lock not available
+    if (!lockptr->tryLock(mt, lt)) {
+      return false;
+    }
     return true;
   }
 
   bool Transaction::getEdgeLock(EdgePointer eptr, MutexType mt, LockType lt) {
+    auto lockptr = eptr->getLockPtr();
+    assert(lockptr != nullptr && "Edge lock pointer invalid");
+    auto mptr = lockptr->getMutexPtr(mt);
+    if (checkEdgeLock(mptr, lt)) {
+      return true;
+    }
+
+    if (!lockptr->tryLock(mt, lt)) {
+      return false;
+    }
     return true;
   }
 
@@ -224,23 +259,28 @@
     return true;
   }
 
+
   void Transaction::releaseVertexLock( ) {
-//    for (auto LockEntry : VertexLockMap) {
-//      LockManager.tryUnlock(LockEntry.first, LockEntry.second.second);
+    for (auto LockEntry : VertexLockMap) {
+      auto lockptr = LockEntry.second.first->getLockPtr();
+      lockptr->tryUnlock(LockEntry.first, LockEntry.second.second);
 //#ifndef _NO_WAIT_
 //      LockManager.retireFromLockMap(TransId, LockEntry.first, LockEntry.second.second);
 //#endif
-//    }
+    }
+    VertexLockMap.clear();
     return ;
   }
 
   void Transaction::releaseEdgeLock( ) {
-//    for (auto LockEntry : EdgeLockMap) {
-//      LockManager.tryUnlock(LockEntry.first, LockEntry.second.second);
+    for (auto LockEntry : EdgeLockMap) {
+      auto lockptr = LockEntry.second.first->getLockPtr();
+      lockptr->tryUnlock(LockEntry.first, LockEntry.second.second);
 //#ifndef _NO_WAIT_
 //      LockManager.retireFromLockMap(TransId, LockEntry.first, LockEntry.second.second);
 //#endif
-//    }
+    }
+    EdgeLockMap.clear();
     return ;
   }
 
@@ -372,6 +412,8 @@
 
 #endif
 
-  Transaction::~Transaction(){}
+  Transaction::~Transaction(){
+    close();
+  }
  
 #endif /*_TRANSACTION_CPP_*/

@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <unordered_map>
 
-#define _TRANX_STATS_ true
+//#define _TRANX_STATS_ true
 
 class LocksManager;
 
@@ -72,15 +72,21 @@ public:
   void releaseLock();
 
   /*TODO Prototype to get/release locks*/
+  bool checkVertexLock(MutexPointer, LockType);
+  bool checkEdgeLock(MutexPointer, LockType);
+
   bool getVertexLock(VertexPointer, MutexType, LockType);
   bool getEdgeLock(EdgePointer, MutexType, LockType);
 
   bool releaseVertexLock(VertexPointer, MutexType, LockType);
   bool releaseEdgeLock(EdgePointer, MutexType, LockType);
+
+  bool waitOn(VertexPointer, MutexType, LockType);
+  bool waitOn(EdgePointer, MutexType, LockType);
   /*TODO end**/
 
-  bool registerVertexLock(MutexPointer , VertexPointer, LockType );
-  bool registerEdgeLock(MutexPointer , EdgePointer, LockType );
+  bool registerVertexLock(VertexPointer, MutexPointer , LockType );
+  bool registerEdgeLock(EdgePointer, MutexPointer , LockType );
 
   VertexLockMapType getVertexLockMap();
 

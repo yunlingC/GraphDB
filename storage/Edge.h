@@ -14,11 +14,12 @@
 #ifndef _EDGE_H_
 #define _EDGE_H_
 
+#include "global.h"
 #include "PropertyList.h"
 
-//#ifdef _LOCKING_STORAGE_
-class EdgeLock;
-//#endif 
+#ifdef _LOCKING_STORAGE_
+#include "Lock.h"
+#endif 
 
 class Vertex;
 
@@ -29,9 +30,9 @@ public:
   typedef Edge* EdgePointer;
   typedef unsigned int EdgeDescriptor;
   typedef unsigned int VertexDescriptor;
-//#ifdef _LOCKING_STORAGE_
+#ifdef _LOCKING_STORAGE_
   typedef EdgeLock* EdgeLockPointer;
-//#endif
+#endif
 
   typedef FixedString KeyType;
   typedef FixedString ValueType;
@@ -79,10 +80,10 @@ public:
   void setType(std::string t);
   void setType(LabelType Type);
 
-//#ifdef _LOCKING_STORAGE_
-  void setLockPointer(EdgeLockPointer el);
-  EdgeLockPointer getLockPointer();
-//#endif
+#ifdef _LOCKING_STORAGE_
+  void setLockPtr(EdgeLockPointer el);
+  EdgeLockPointer getLockPtr();
+#endif
 
   /// Constructors.
   Edge();
@@ -111,9 +112,9 @@ protected:
 
   PropertyListType EdgePropertyList;
 
-//#ifdef _LOCKING_STORAGE_
+#ifdef _LOCKING_STORAGE_
   EdgeLockPointer LockPtr;
-//#endif 
+#endif 
 
 };
 

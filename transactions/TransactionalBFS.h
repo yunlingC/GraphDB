@@ -39,14 +39,17 @@ public:
 
 public:
 
-  bool checkLock(MutexPointer MutexPtr
+  template<typename ObjectPointer>
+  bool checkLock(ObjectPointer ObjPtr
+               , MutexType Mutextype
                , LockType Locktype
                , TransactionPointer TxPtr
                , LockManagerType & LockManager
                ) {
-    auto wait = LockManager.checkWaitOn(TxPtr->getId(), MutexPtr, Locktype);
+    auto MutexPtr = ObjPtr->getLockPtr()->getMutexPtr(Mutextype);
+//    auto wait = LockManager.checkWaitOn(TxPtr->getId(), MutexPtr, Locktype);
 //    if (wait) {
-//      TxPtr->waitOn();
+//      TxPtr->waitOn(ObjPtr, Mutextype, Locktype);
 //    }
 //    else {
 //      TxPtr->abort();
@@ -63,7 +66,7 @@ public:
                     ) {
     bool getLock = TxPtr->getVertexLock(VertexPtr, Mutextype, Locktype);
     if (!getLock) {
-      checkLock(VertexPtr->getLockPointer()->getMutexPointer(Mutextype), Locktype, TxPtr, LockManager);
+      checkLock<VertexPointer>(VertexPtr, Mutextype, Locktype, TxPtr, LockManager);
     }
     return true;
   }
@@ -76,7 +79,7 @@ public:
                   )  {
     bool getLock = TxPtr->getEdgeLock(EdgePtr, Mutextype, Locktype);
     if (!getLock) {
-      checkLock(EdgePtr->getLockPointer()->getMutexPointer(Mutextype), Locktype, TxPtr, LockManager);
+      checkLock<EdgePointer>(EdgePtr, Mutextype, Locktype, TxPtr, LockManager);
     }
     return true;
   }
@@ -89,15 +92,9 @@ public:
                         ) {
 
 		auto ScheduledVertex = Graph.getVertexPointer(StartVertex);
-    IdType TxId = Tranx->getId();
 
-#if _DEBUG_ENABLE_
-		if (ScheduledVertex  == nullptr) {
-			std::cerr << "Error: No such vertex in graph \n";
-      return ;
-//			exit(1);
-		}
-#endif
+    assert(ScheduledVertex != nullptr && "Vertex pointer invalid" );
+
 		// Start traversing the graph from here.
 		std::queue<VertexPointer> VertexQueue;
 		/// True means visited and false means not visited.
@@ -115,10 +112,10 @@ public:
 
       /// If false, this lock canNOT be acquired and transaction aborts
 #ifdef _TRANX_STATS_
-      auto MutexPtr = LockManager.getVertexLockPointer(ScheduledVertex->getId(), T_Property);
+      auto MutexPtr = ScheduledVertex->getLockPtr()->getMutexPtr(T_Property);
       Tranx->visitMutex(MutexPtr);
 #endif
-			if (!(LockManager.getVertexLock(ScheduledVertex->getId(), T_Property, T_SH, TxId))) {
+			if (!getVertexLock(ScheduledVertex, T_Property, T_SH, Tranx, LockManager)) {
 #ifdef _TRANX_STATS_
         Tranx->abortMutex(MutexPtr);
 #endif
@@ -133,10 +130,10 @@ public:
 			ColorMap[ScheduledVertex] = true;
 
 #ifdef _TRANX_STATS_
-      auto NEMutexPtr = LockManager.getVertexLockPointer(ScheduledVertex->getId(), T_NextEdge);
+      auto NEMutexPtr = ScheduledVertex->getLockPtr()->getMutexPtr(T_NextEdge);
       Tranx->visitMutex(NEMutexPtr);
 #endif
-			if (!(LockManager.getVertexLock(ScheduledVertex->getId(), T_NextEdge, T_SH, TxId))){
+			if (!getVertexLock(ScheduledVertex, T_NextEdge, T_SH, Tranx, LockManager)) {
 #ifdef _TRANX_STATS_
         Tranx->abortMutex(NEMutexPtr);
 #endif
@@ -149,10 +146,10 @@ public:
 				/// Get locks on the target node.
 
 #ifdef _TRANX_STATS_
-      auto FVMutexPtr = LockManager.getEdgeLockPointer(NextEdge->getId(), T_FirstVertex);
+      auto FVMutexPtr = NextEdge->getLockPtr()->getMutexPtr(T_FirstVertex);
       Tranx->visitMutex(FVMutexPtr);
 #endif
-				if (!LockManager.getEdgeLock(NextEdge->getId(), T_FirstVertex, T_SH, TxId)) {
+				if (!getEdgeLock(NextEdge, T_FirstVertex, T_SH, Tranx, LockManager)) {
 
 #ifdef _TRANX_STATS_
         Tranx->abortMutex(FVMutexPtr);
@@ -162,10 +159,10 @@ public:
 				}
 
 #ifdef _TRANX_STATS_
-      auto SVMutexPtr = LockManager.getEdgeLockPointer(NextEdge->getId(), T_SecondVertex);
+      auto SVMutexPtr = NextEdge->getLockPtr()->getMutexPtr(T_SecondVertex);
       Tranx->visitMutex(SVMutexPtr);
 #endif
-				if (!LockManager.getEdgeLock(NextEdge->getId(), T_SecondVertex, T_SH, TxId)) { 
+				if (!getEdgeLock(NextEdge, T_SecondVertex, T_SH, Tranx, LockManager)) { 
 #ifdef _TRANX_STATS_
           Tranx->abortMutex(SVMutexPtr);
 #endif
@@ -198,10 +195,10 @@ public:
         /// Get shared locks on next edge
 
 #ifdef _TRANX_STATS_
-      auto FNEMutexPtr = LockManager.getEdgeLockPointer(NextEdge->getId(), T_FirstNextEdge);
+      auto FNEMutexPtr = NextEdge->getLockPtr()->getMutexPtr(T_FirstNextEdge);
       Tranx->visitMutex(FNEMutexPtr);
 #endif
-				if (!LockManager.getEdgeLock(NextEdge->getId(), T_FirstNextEdge, T_SH, TxId)) {
+				if (!getEdgeLock(NextEdge, T_FirstNextEdge, T_SH, Tranx, LockManager)) {
 #ifdef _TRANX_STATS_
           Tranx->abortMutex(FNEMutexPtr);
 #endif
@@ -210,10 +207,10 @@ public:
 				}
 
 #ifdef _TRANX_STATS_
-      auto SNEMutexPtr = LockManager.getEdgeLockPointer(NextEdge->getId(), T_SecondNextEdge);
+      auto SNEMutexPtr = NextEdge->getLockPtr()->getMutexPtr(T_SecondNextEdge);
       Tranx->visitMutex(SNEMutexPtr);
 #endif
-				if ( !LockManager.getEdgeLock(NextEdge->getId(), T_SecondNextEdge, T_SH, TxId)) {
+				if ( !getEdgeLock(NextEdge, T_SecondNextEdge, T_SH, Tranx, LockManager)) {
 
 #ifdef _TRANX_STATS_
           Tranx->abortMutex(SNEMutexPtr);

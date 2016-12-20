@@ -116,20 +116,23 @@ public:
   VertexLock() : NEMutex (MutexPointer(new Mutex))
                  {} 
 
+  using Lock::tryLock;
+  using Lock::tryUnlock;
+
   auto getNEMutex()
     -> MutexPointer {
     return NEMutex;
   }
 
   bool tryLock(MutexType Mutex, LockType LType) {
-    return Lock::tryLock(getMutexPointer(Mutex), LType);
+    return Lock::tryLock(getMutexPtr(Mutex), LType);
   }
 
   void tryUnlock(MutexType Mutex, LockType LType) {
-    return Lock::tryUnlock(getMutexPointer(Mutex), LType);
+    return Lock::tryUnlock(getMutexPtr(Mutex), LType);
   }
 
-  MutexPointer getMutexPointer(MutexType Mutex) {
+  MutexPointer getMutexPtr(MutexType Mutex) {
     switch(Mutex) {
       case T_ID:
         return IdMutex;
@@ -157,6 +160,9 @@ public:
                , SNEMutex (MutexPointer(new Mutex))
                , SPEMutex (MutexPointer(new Mutex))
                {}
+
+  using Lock::tryLock;
+  using Lock::tryUnlock;
 
   auto getFVMutex()
     -> MutexPointer {
@@ -188,7 +194,7 @@ public:
     return SPEMutex;
   }
 
-  MutexPointer getMutexPointer(MutexType Mutex) {
+  MutexPointer getMutexPtr(MutexType Mutex) {
     switch(Mutex) {
       case T_ID:
         return IdMutex;
@@ -214,11 +220,11 @@ public:
   }
 
   bool tryLock(MutexType Mutex, LockType LType) {
-    return Lock::tryLock(getMutexPointer(Mutex), LType);
+    return Lock::tryLock(getMutexPtr(Mutex), LType);
   }
 
   void tryUnlock(MutexType Mutex, LockType LType) {
-    return Lock::tryUnlock(getMutexPointer(Mutex), LType);
+    return Lock::tryUnlock(getMutexPtr(Mutex), LType);
   }
 
 protected:

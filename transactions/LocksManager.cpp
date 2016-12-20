@@ -1323,189 +1323,47 @@
 #else
   ///locks are encoded in Vertex and Edge
   /// TODO const & g
-  LocksManager::LocksManager(GraphType & g) : Graph(g) {};
+  LocksManager::LocksManager(GraphType & g) : Graph(g) {
+    VertexProtector = std::shared_ptr<std::mutex>(new std::mutex);
+    EdgeProtector = std::shared_ptr<std::mutex>(new std::mutex);
+  };
 
   auto LocksManager::getVertexLock(VertexPtr Vertex, MutexType Mutex, LockType Lock) 
     -> bool {
-    if (Vertex == nullptr) {
-      std::cerr  << "Error : No such vertex  in map \n";
-      ///TODO: shoould be exception here, need to be fixed.
-      /**
-      *exiting process would give out ownership of this mutex automatically,
-      * no need to release it before exiting
-      * but consistency state?
-      * need transaction rollback and redo
-      * anyway, it won't happen if we don't delete any lock from manager
-      */
-      exit(0);
-    }
-    MutexPointer MutexPtr = nullptr;
-    switch (Mutex) {
-      case T_Property:
-        MutexPtr = Vertex->getVertexLock()->getPpMutex();
-        break;
-      case T_LastEdge:
-        MutexPtr = Vertex->getVertexLock()->getLEMutex();
-        break;
-      case T_NextEdge:
-        MutexPtr = Vertex->getVertexLock()->getNEMutex();
-        break;
-      case T_ID:
-        MutexPtr = Vertex->getVertexLock()->getIdMutex();
-        break;
-      default:
-        std::cerr << "ERROR: No such Mutex in VertexLock\n";
-        exit(0);
-    }
-    switch (Lock) {   
-      ///Shared lock
-      case T_SH:
-        return MutexPtr->try_lock_shared();
-      case T_EX:
-        return MutexPtr->try_lock(); 
-      default:
-        std::cerr << "ERROR: No such Mutex in VertexLock\n";
-        exit(0);
-    }
+
+    assert(Vertex != nullptr && "Vertex pointer invalid" );
+    auto LockPtr = Vertex->getLockPtr();
+    assert(LockPtr != nullptr && "Lock pointer invalid" );
+    return LockPtr->tryLock(Mutex, Lock);
   }
 
   auto LocksManager::releaseVertexLock(VertexPtr Vertex, MutexType Mutex, LockType Lock) 
-    -> bool {
-    if (Vertex == nullptr) {
-      std::cerr << "Error : No such vertex  in map \n";
-      exit(0);
-    }
+    -> void {
 
-    MutexPointer MutexPtr = nullptr;
-    switch (Mutex) {
-      case T_Property:
-        MutexPtr = Vertex->getVertexLock()->getPpMutex();
-        break;
-      case T_LastEdge:
-        MutexPtr = Vertex->getVertexLock()->getLEMutex();
-        break;
-      case T_NextEdge:
-        MutexPtr = Vertex->getVertexLock()->getNEMutex();
-        break;
-      case T_ID:
-        MutexPtr = Vertex->getVertexLock()->getIdMutex();
-        break;
-      default:
-        std::cerr << "ERROR: No such Mutex in VertexLock\n";
-        exit(0);
-    }
-
-    switch (Lock) {   
-      ///Shared lock
-      case T_SH:
-        MutexPtr->unlock_shared();
-        break;
-      case T_EX:
-        MutexPtr->unlock(); 
-        break;
-      default:
-        ///TODO Should be exception here
-        std::cerr << "ERROR: No such Mutex in VertexLock\n";
-        exit(0);
-    } return true;
+    assert(Vertex != nullptr && "Vertex pointer invalid" );
+    auto LockPtr = Vertex->getLockPtr();
+    assert(LockPtr != nullptr && "Lock pointer invalid" );
+    LockPtr->tryUnlock(Mutex, Lock);
+    return;
   }
 
   auto LocksManager::getEdgeLock(EdgePtr Edge, MutexType Mutex, LockType Lock) 
     -> bool {
-    if (Edge == nullptr) {
-      std::cerr << "Error : No such edge in map \n";
-      exit(0);
-    }
-    MutexPointer MutexPtr = nullptr;
-    switch (Mutex) {
-      case T_ID:
-        MutexPtr = Edge->getEdgeLock()->getIdMutex();
-        break;
-      case T_Property:
-        MutexPtr = Edge->getEdgeLock()->getPpMutex();
-        break;
-      case T_FirstVertex:
-        MutexPtr = Edge->getEdgeLock()->getFVMutex();
-        break;
-      case T_SecondVertex:
-        MutexPtr = Edge->getEdgeLock()->getSVMutex();
-        break;
-      case T_FirstNextEdge:
-        MutexPtr = Edge->getEdgeLock()->getFNEMutex();
-        break;
-      case T_FirstPrevEdge:
-        MutexPtr = Edge->getEdgeLock()->getFPEMutex();
-        break;
-      case T_SecondNextEdge:
-        MutexPtr = Edge->getEdgeLock()->getSNEMutex();
-        break;
-      case T_SecondPrevEdge:
-        MutexPtr = Edge->getEdgeLock()->getSPEMutex();
-        break;
-      default:
-        std::cerr << "ERROR: No such Mutex in EdgeLock\n";
-        exit(0);
-    }
-    switch (Lock) {   
-      case T_SH:
-        return MutexPtr->try_lock_shared();
-      case T_EX:
-        return MutexPtr->try_lock(); 
-      default:
-        std::cerr  << "ERROR: No such Mutex in EdgeLock\n";
-        exit(0);
-    }
+
+    assert(Edge != nullptr && "Edge pointer invalid" );
+    auto LockPtr = Edge->getLockPtr();
+    assert(LockPtr != nullptr && "Lock pointer invalid" );
+    return LockPtr->tryLock(Mutex, Lock);
   }
 
   auto LocksManager::releaseEdgeLock(EdgePtr Edge, MutexType Mutex, LockType Lock) 
-    -> bool {
-    if (Edge == nullptr) {
-      exit(0);
-    }
+    -> void {
 
-    MutexPointer MutexPtr = nullptr;
-    switch (Mutex) {
-      case T_ID:
-        MutexPtr = Edge->getEdgeLock()->getIdMutex();
-        break;
-      case T_Property:
-        MutexPtr = Edge->getEdgeLock()->getPpMutex();
-        break;
-      case T_FirstVertex:
-        MutexPtr = Edge->getEdgeLock()->getFVMutex();
-        break;
-      case T_SecondVertex:
-        MutexPtr = Edge->getEdgeLock()->getSVMutex();
-        break;
-      case T_FirstNextEdge:
-        MutexPtr = Edge->getEdgeLock()->getFNEMutex();
-        break;
-      case T_FirstPrevEdge:
-        MutexPtr = Edge->getEdgeLock()->getFPEMutex();
-        break;
-      case T_SecondNextEdge:
-        MutexPtr = Edge->getEdgeLock()->getSNEMutex();
-        break;
-      case T_SecondPrevEdge:
-        MutexPtr = Edge->getEdgeLock()->getSPEMutex();
-        break;
-      default:
-        std::cerr << "ERROR: No such Mutex in EdgeLock\n";
-        exit(0);
-    }
-
-    switch (Lock) {   
-      case T_SH:
-        MutexPtr->unlock_shared();
-        break;
-      case T_EX:
-        MutexPtr->unlock(); 
-        break;
-      default:
-        std::cerr << "ERROR: No such Mutex in EdgeLock\n";
-        exit(0);
-    }
-    return true;
+    assert(Edge != nullptr && "Edge pointer invalid" );
+    auto LockPtr = Edge->getLockPtr();
+    assert(LockPtr != nullptr && "Lock pointer invalid" );
+    LockPtr->tryUnlock(Mutex, Lock);
+    return;
   }
 
   auto LocksManager::releaseEdgeAll(ELockListType & EdgeLocks) 
@@ -1541,7 +1399,7 @@
       }
 
       VertexLock* NewVertexLock = new VertexLock();
-      Vertex->setVertexLock(NewVertexLock);
+      Vertex->setLockPtr(NewVertexLock);
 
 #if _DEBUG_PRINT_
       std::cout << "Add vertex lock\t" <<  VertexId
@@ -1558,7 +1416,7 @@
 //        exit(0);
       }
       EdgeLock*  NewEdgeLock = new EdgeLock();
-      Edge->setEdgeLock(NewEdgeLock);
+      Edge->setLockPtr(NewEdgeLock);
 #if _DEBUG_PRINT_
       std::cout << "Add edge lock\t" << EdgeId
               <<"\t to map\n";
@@ -1576,14 +1434,18 @@
   
       for (auto iter = VertexList.begin(), iter_end = VertexList.end();
           iter != iter_end; iter++) {
-        VertexLock* NewVertexLock = new VertexLock();
-        (*iter)->setVertexLock(NewVertexLock); 
+        if ((*iter)->getLockPtr() == nullptr) {
+          VertexLock* NewVertexLock = new VertexLock();
+          (*iter)->setLockPtr(NewVertexLock); 
+        }
       }
   
       for (auto it = EdgeList.begin(), it_end = EdgeList.end();
           it != it_end; it++) {
-        EdgeLock* NewEdgeLock = new EdgeLock();
-        (*it)->setEdgeLock(NewEdgeLock);
+        if ((*it)->getLockPtr() == nullptr) {
+          EdgeLock* NewEdgeLock = new EdgeLock();
+          (*it)->setLockPtr(NewEdgeLock);
+        }
       }
     }
 #endif
