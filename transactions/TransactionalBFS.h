@@ -65,10 +65,14 @@ public:
                     , LockManagerType & LockManager
                     ) {
     bool getLock = TxPtr->getVertexLock(VertexPtr, Mutextype, Locktype);
+#ifdef _NO_WAIT_
+    return getLock;
+#else
     if (!getLock) {
       checkLock<VertexPointer>(VertexPtr, Mutextype, Locktype, TxPtr, LockManager);
     }
     return true;
+#endif
   }
 
   bool getEdgeLock(EdgePointer EdgePtr
@@ -78,10 +82,14 @@ public:
                   , LockManagerType & LockManager
                   )  {
     bool getLock = TxPtr->getEdgeLock(EdgePtr, Mutextype, Locktype);
+#ifdef _NO_WAIT_
+    return getLock;
+#else
     if (!getLock) {
       checkLock<EdgePointer>(EdgePtr, Mutextype, Locktype, TxPtr, LockManager);
     }
     return true;
+#endif
   }
 
 	void breadthFirstSearch(GraphType & Graph

@@ -150,6 +150,7 @@
         std::cout <<"Error in Abort:\t" << TransId << "\tis ABORT\n";
 #endif
         TransStatus = T_ABORT;
+        retValue = true;
         break;
       case T_ROLLBACK:
         TransStatus = T_EXPANDING;
@@ -170,8 +171,11 @@
     std::cout <<"Transaction\t" << TransId << "\tABORT\n";
 #endif  
 
+    if (retValue) {
+      releaseLock();
+    }
 #ifdef _TRANX_STATS_
-    if (retValue)
+//    if (retValue)
       NumAbort++;
 #endif
     
@@ -191,18 +195,18 @@
 
 
   bool Transaction::registerVertexLock(VertexPointer vptr, MutexPointer mptr, LockType lktype) {
-    if (checkVertexLock(mptr, lktype))  {
-      /// This mutex exists in the map -> Transaction already holds this lock
-      return false;
-    }
+//    if (checkVertexLock(mptr, lktype))  {
+//      /// This mutex exists in the map -> Transaction already holds this lock
+//      return false;
+//    }
     VertexLockMap.insert(VertexLockPairType(mptr, VLockPairType(vptr, lktype)));
     return true;
   }
 
   bool Transaction::registerEdgeLock(EdgePointer eptr, MutexPointer mptr, LockType lktype) {
-    if (checkEdgeLock(mptr, lktype))  {
-      return false;
-    }
+//    if (checkEdgeLock(mptr, lktype))  {
+//      return false;
+//    }
     EdgeLockMap.insert(EdgeLockPairType(mptr, ELockPairType(eptr, lktype)));
     return true;
   }
@@ -234,6 +238,7 @@
     if (!lockptr->tryLock(mt, lt)) {
       return false;
     }
+    registerVertexLock(vptr, mptr, lt);
     return true;
   }
 
@@ -248,6 +253,7 @@
     if (!lockptr->tryLock(mt, lt)) {
       return false;
     }
+    registerEdgeLock(eptr, mptr, lt);
     return true;
   }
 
