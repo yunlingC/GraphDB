@@ -74,7 +74,7 @@ public:
       return TxPtr->waitOn(VertexPtr, Mutextype, Locktype);
     }
     else {
-      TxPtr->abort(VertexPtr, Mutextype, Locktype);
+//      TxPtr->abort(VertexPtr, Mutextype, Locktype);
       return false;
     }
     return true;
@@ -98,7 +98,7 @@ public:
       return TxPtr->waitOn(EdgePtr, Mutextype, Locktype);
     }
     else {
-      TxPtr->abort(EdgePtr, Mutextype, Locktype);
+//      TxPtr->abort(EdgePtr, Mutextype, Locktype);
       return false;
     }
     return true;
