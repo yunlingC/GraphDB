@@ -33,7 +33,7 @@ class LocksManager {
 public:
   typedef std::shared_timed_mutex Mutex;
   typedef std::shared_ptr<std::mutex> ExMutexPointer;
-  typedef VertexLock::MutexPointer  MutexPointer;
+  typedef Lock::MutexPointer MutexPointer;
   typedef MutexPointer  LockPointer;
   typedef GraphType::VertexPointer VertexPtr;
   typedef GraphType::EdgePointer EdgePtr;

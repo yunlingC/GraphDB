@@ -38,12 +38,8 @@ public:
   typedef std::pair<TransIdType, LockType> TxLockPairType;
 public:
   MutexPointerType() : MutexPtr (MutexPointer(new Mutex)) 
-//#if _LOCK_GUARD_
                       , MutexGuardPtr(ExMutexPointer(new ExMutex))
-//#endif
                         {}
-//#if _LOCK_GUARD_
-//#endif
 
   bool try_lock_shared()  {
     return MutexPtr->try_lock_shared();
@@ -61,12 +57,15 @@ public:
     MutexPtr->unlock(); 
   }
 
-  void registerTx(TransIdType txid, LockType lt) {
-    MutexGuardPtr->lock();
-
+  bool registerTx(TransIdType txid, LockType lt) {
+    if (!MutexGuardPtr->try_lock()) {
+      return false; 
+    }
+    ///TODO need to do a check before insertion
     TxMap.insert(TxLockPairType(txid, lt));
 
     MutexGuardPtr->unlock();
+    return true;
   }
 
   void retireTx(TransIdType txid, LockType lt) {
@@ -101,7 +100,6 @@ public:
 
 protected:
   MutexPointer MutexPtr;
-//#if _LOCK_GUARD_
   ExMutexPointer MutexGuardPtr;
   TxMapType TxMap;
 };
@@ -110,17 +108,19 @@ protected:
 class Lock {
 public:
 #if _LOCK_GUARD_
-  typedef MutexPointerType MutexPointer;
+  typedef MutexPointerType * MutexPointer;
 #else 
   typedef std::shared_timed_mutex Mutex;
   typedef std::shared_ptr<Mutex> MutexPointer;
 #endif
 public:
 #if _LOCK_GUARD_
-  Lock(): IdMutex (new MutexPointer())
-          , LbMutex (new MutexPointer())
-          , PpMutex (new MutexPointer())
-          {}
+  Lock()  {
+    IdMutex = new MutexPointerType();
+    LbMutex = new MutexPointerType();
+    PpMutex = new MutexPointerType();
+  }
+  
 #else 
   Lock(): IdMutex (MutexPointer(new Mutex))
           , LbMutex (MutexPointer(new Mutex))
@@ -181,8 +181,9 @@ protected:
 class VertexLock : public Lock {
 public:
 #if _LOCK_GUARD_
-  VertexLock() : NEMutex (new MutexPointer())
-                 {} 
+  VertexLock()  {
+    NEMutex = new MutexPointerType();
+  } 
 #else 
   VertexLock() : NEMutex (MutexPointer(new Mutex))
                  {} 
@@ -226,13 +227,14 @@ protected:
 class EdgeLock : public Lock {
 public:
 #if _LOCK_GUARD_
-  EdgeLock() : FVMutex (new MutexPointer())
-               , SVMutex (new MutexPointer())
-               , FNEMutex (new MutexPointer())
-               , FPEMutex (new MutexPointer())
-               , SNEMutex (new MutexPointer())
-               , SPEMutex (new MutexPointer())
-               {}
+  EdgeLock() {
+    FVMutex = new MutexPointerType();
+    SVMutex = new MutexPointerType();
+    FNEMutex = new MutexPointerType();
+    FPEMutex = new MutexPointerType();
+    SNEMutex = new MutexPointerType();
+    SPEMutex = new MutexPointerType();
+  }
 #else
   EdgeLock() : FVMutex (MutexPointer(new Mutex))
                , SVMutex (MutexPointer(new Mutex))

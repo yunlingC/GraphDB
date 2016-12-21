@@ -1321,8 +1321,11 @@
 #endif /*_DEADLOCK_DETECTION_*/
 
 #else
-  ///locks are encoded in Vertex and Edge
-  /// TODO const & g
+/**
+ * No lock tables in LockManager
+ * Locks are encoded in Vertex and Edge
+ * This is the active part of program so far
+  */
   LocksManager::LocksManager(GraphType & g) : Graph(g) {
     VertexProtector = std::shared_ptr<std::mutex>(new std::mutex);
     EdgeProtector = std::shared_ptr<std::mutex>(new std::mutex);
@@ -1389,7 +1392,11 @@
       releaseEdgeAll(EdgeLocks);
   }
 
-
+/**
+ * Following functions are not active 
+ * This is because there is no lock map in LockManager
+ * Transactions (threads) and locks has locking information in their structures
+ */
   auto LocksManager::addToVertexLockMap(IdType VertexId) 
     -> void  {
       VertexPtr Vertex = Graph.getVertexPointer(VertexId);
@@ -1413,7 +1420,6 @@
       if (Edge == nullptr) {
         std::cerr  << "Error : No such edge\t" << EdgeId << "\tin map \n";
         return ;
-//        exit(0);
       }
       EdgeLock*  NewEdgeLock = new EdgeLock();
       Edge->setLockPtr(NewEdgeLock);

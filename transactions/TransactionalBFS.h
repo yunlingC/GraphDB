@@ -47,20 +47,12 @@ public:
                , LockManagerType & LockManager
                ) {
     auto MutexPtr = ObjPtr->getLockPtr()->getMutexPtr(Mutextype);
+#ifdef _WAIT_DIE_
     ///True - wait
     return MutexPtr->checkTx(TxPtr->getId());
-//      TxPtr->waitOn(ObjPtr, Mutextype, Locktype);
-//    }
-//    return false;
-   
-//    auto wait = LockManager.checkWaitOn(TxPtr->getId(), MutexPtr, Locktype);
-//    if (wait) {
-//      TxPtr->waitOn(ObjPtr, Mutextype, Locktype);
-//    }
-//    else {
-//      TxPtr->abort();
-//      return false;
-//    }
+#elif defined _DEADLOCK_DETECTION_
+    return LockManager.checkWaitOn(TxPtr->getId(), MutexPtr, Locktype);
+#endif
     return true;
   }
 
@@ -74,16 +66,17 @@ public:
 #ifdef _NO_WAIT_
     return getLock;
 #else
-    if (!getLock) {
-      if (checkLock<VertexPointer>(VertexPtr, Mutextype, Locktype, TxPtr, LockManager)) {
-        TxPtr->waitOn();
-      }
-      else {
-//        TxPtr->abort();
-        return false;
-      }
+    if (getLock) {
+      return true;
     }
-    ///TODO register to txmap
+
+    if (checkLock<VertexPointer>(VertexPtr, Mutextype, Locktype, TxPtr, LockManager)) {
+      return TxPtr->waitOn(VertexPtr, Mutextype, Locktype);
+    }
+    else {
+      TxPtr->abort(VertexPtr, Mutextype, Locktype);
+      return false;
+    }
     return true;
 #endif
   }
@@ -98,8 +91,15 @@ public:
 #ifdef _NO_WAIT_
     return getLock;
 #else
-    if (!getLock) {
-      checkLock<EdgePointer>(EdgePtr, Mutextype, Locktype, TxPtr, LockManager);
+    if (getLock) {
+      return true;
+    }
+    if (checkLock<EdgePointer>(EdgePtr, Mutextype, Locktype, TxPtr, LockManager)) {
+      return TxPtr->waitOn(EdgePtr, Mutextype, Locktype);
+    }
+    else {
+      TxPtr->abort(EdgePtr, Mutextype, Locktype);
+      return false;
     }
     return true;
 #endif

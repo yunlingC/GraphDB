@@ -205,18 +205,21 @@
 
 
   bool Transaction::registerVertexLock(VertexPointer vptr, MutexPointer mptr, LockType lktype) {
-//    if (checkVertexLock(mptr, lktype))  {
-//      /// This mutex exists in the map -> Transaction already holds this lock
-//      return false;
-//    }
+
+#ifdef _WAIT_DIE_
+    if (!mptr->registerTx(TransId, lktype)) 
+      return false;
+#endif
     VertexLockMap.insert(VertexLockPairType(mptr, VLockPairType(vptr, lktype)));
     return true;
   }
 
   bool Transaction::registerEdgeLock(EdgePointer eptr, MutexPointer mptr, LockType lktype) {
-//    if (checkEdgeLock(mptr, lktype))  {
-//      return false;
-//    }
+
+#ifdef _WAIT_DIE_
+    if (!mptr->registerTx(TransId, lktype))
+      return false;
+#endif
     EdgeLockMap.insert(EdgeLockPairType(mptr, ELockPairType(eptr, lktype)));
     return true;
   }
@@ -224,9 +227,13 @@
   /// True - lock already acquired; False - lock does not exist in map
   bool Transaction::checkVertexLock(MutexPointer mptr, LockType lt) {
 //    auto mptr = vptr->getLockPtr()->getMutexPtr(mt);
-    if (VertexLockMap.find(mptr) != VertexLockMap.end()) 
-      ///TODO check lock type 
-      return true;
+    auto LockPair = VertexLockMap.find(mptr);
+    if (LockPair != VertexLockMap.end()) {
+      ///Check lock type 
+      if (LockPair->second.second == lt) {
+        return true;
+      }
+    }
     return false;
   }
 
@@ -251,9 +258,7 @@
     if (!lockptr->tryLock(mt, lt)) {
       return false;
     }
-    registerVertexLock(vptr, mptr, lt);
-//    registerTx();
-    return true;
+    return registerVertexLock(vptr, mptr, lt);
   }
 
   bool Transaction::getEdgeLock(EdgePointer eptr, MutexType mt, LockType lt) {
@@ -270,9 +275,13 @@
     if (!lockptr->tryLock(mt, lt)) {
       return false;
     }
-    registerEdgeLock(eptr, mptr, lt);
-    return true;
+    return registerEdgeLock(eptr, mptr, lt);
   }
+
+  /**
+   * TODO
+   * The following two funcs are not active
+   * */
 
   bool Transaction::releaseVertexLock(VertexPointer vptr, MutexType mt, LockType lt) {
     return true;
@@ -285,11 +294,12 @@
 
   void Transaction::releaseVertexLock( ) {
     for (auto LockEntry : VertexLockMap) {
+      /// LockEntry <MutexPtr, <VertexPtr, LockType>>
       auto lockptr = LockEntry.second.first->getLockPtr();
       lockptr->tryUnlock(LockEntry.first, LockEntry.second.second);
-//#ifndef _NO_WAIT_
-//      LockManager.retireFromLockMap(TransId, LockEntry.first, LockEntry.second.second);
-//#endif
+#ifdef _WAIT_DIE_
+      LockEntry.first->retireTx(TransId, LockEntry.second.second);
+#endif
     }
     VertexLockMap.clear();
     return ;
@@ -299,9 +309,9 @@
     for (auto LockEntry : EdgeLockMap) {
       auto lockptr = LockEntry.second.first->getLockPtr();
       lockptr->tryUnlock(LockEntry.first, LockEntry.second.second);
-//#ifndef _NO_WAIT_
-//      LockManager.retireFromLockMap(TransId, LockEntry.first, LockEntry.second.second);
-//#endif
+#ifdef _WAIT_DIE_
+      LockEntry.first->retireTx(TransId, LockEntry.second.second);
+#endif
     }
     EdgeLockMap.clear();
     return ;
@@ -317,8 +327,8 @@
     auto lptr = vptr->getLockPtr();
     while(!lptr->tryLock(mt, lt));
     auto mptr = lptr->getMutexPtr(mt);
-    registerVertexLock(vptr, mptr, lt);
-    return true;
+    return registerVertexLock(vptr, mptr, lt);
+//    return true;
   }
 
   bool Transaction::waitOn(EdgePointer eptr, MutexType mt, LockType lt) {
@@ -326,8 +336,8 @@
     auto lptr = eptr->getLockPtr();
     while(!lptr->tryLock(mt, lt));
     auto mptr = lptr->getMutexPtr(mt);
-    registerEdgeLock(eptr, mptr, lt);
-    return true;
+    return registerEdgeLock(eptr, mptr, lt);
+//    return true;
   }
 
 #ifdef _TRANX_STATS_
