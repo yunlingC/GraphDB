@@ -76,7 +76,7 @@ set(TESTS
     main-txbfs.cpp
     main-multithread.cpp
   #  main-input.cpp
-    main-test.cpp
+  #    main-test.cpp
   )
 
 

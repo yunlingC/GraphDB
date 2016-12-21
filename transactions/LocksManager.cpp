@@ -98,7 +98,7 @@
     -> void {
       auto MutexPtr = getEdgeLockPointer(EdgeId, Mutex);
       return tryUnlock(MutexPtr, Lock);
-    }
+  }
 
   auto LocksManager::addToVertexLockMap(IdType VertexId) 
     -> void  {

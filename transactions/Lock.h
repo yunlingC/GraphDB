@@ -26,6 +26,7 @@
 #include <iostream>
 #endif
 
+#if _LOCK_GUARD_
 class MutexPointerType {
 public:
   typedef std::shared_timed_mutex Mutex;
@@ -34,35 +35,98 @@ public:
   typedef std::shared_ptr<ExMutex> ExMutexPointer;
   typedef unsigned int TransIdType;
   typedef std::unordered_map<TransIdType, LockType> TxMapType;
+  typedef std::pair<TransIdType, LockType> TxLockPairType;
 public:
   MutexPointerType() : MutexPtr (MutexPointer(new Mutex)) 
-#if _LOCK_GUARD_
+//#if _LOCK_GUARD_
                       , MutexGuardPtr(ExMutexPointer(new ExMutex))
-#endif
+//#endif
                         {}
-#if _LOCK_GUARD_
-#endif
+//#if _LOCK_GUARD_
+//#endif
+
+  bool try_lock_shared()  {
+    return MutexPtr->try_lock_shared();
+  }
+
+  bool try_lock() {
+    return MutexPtr->try_lock(); 
+  }
+
+  void unlock_shared() {
+    MutexPtr->unlock_shared();
+  }
+
+  void unlock() {
+    MutexPtr->unlock(); 
+  }
+
+  void registerTx(TransIdType txid, LockType lt) {
+    MutexGuardPtr->lock();
+
+    TxMap.insert(TxLockPairType(txid, lt));
+
+    MutexGuardPtr->unlock();
+  }
+
+  void retireTx(TransIdType txid, LockType lt) {
+    MutexGuardPtr->lock();
+
+    if (TxMap.find(txid) != TxMap.end())  {
+      if (TxMap[txid] == lt)
+        TxMap.erase(txid);
+      else {
+        assert(false && "Transaction register lock type incorrectly");
+      }
+    }
+    MutexGuardPtr->unlock();
+  }
+
+  ///True - wait 
+  bool checkTx(TransIdType txid)  {
+    bool wait = true;
+    MutexGuardPtr->lock();
+
+    for (auto Tx : TxMap) {
+      ///<TranxId, LockType> 
+      if (Tx.first < txid)  {
+        ///Don't wait for this lock
+        wait =  false;
+        break;
+      }
+    }
+    MutexGuardPtr->unlock();
+    return wait;
+  }
 
 protected:
   MutexPointer MutexPtr;
-#if _LOCK_GUARD_
+//#if _LOCK_GUARD_
   ExMutexPointer MutexGuardPtr;
   TxMapType TxMap;
-
-#endif
 };
+#endif
 
 class Lock {
 public:
-//  typedef MutexPointerType MutexPointer;
+#if _LOCK_GUARD_
+  typedef MutexPointerType MutexPointer;
+#else 
   typedef std::shared_timed_mutex Mutex;
   typedef std::shared_ptr<Mutex> MutexPointer;
+#endif
 public:
+#if _LOCK_GUARD_
+  Lock(): IdMutex (new MutexPointer())
+          , LbMutex (new MutexPointer())
+          , PpMutex (new MutexPointer())
+          {}
+#else 
   Lock(): IdMutex (MutexPointer(new Mutex))
           , LbMutex (MutexPointer(new Mutex))
           , PpMutex (MutexPointer(new Mutex))
           {}
-
+#endif
   auto getPpMutex()
     -> MutexPointer {
     return PpMutex;
@@ -79,7 +143,7 @@ public:
   }
 
   bool tryLock(MutexPointer MutexPtr, LockType LType) {
-    assert(MutexPtr && "MutexPointer invalid\n");
+    assert(MutexPtr && "Mutex pointer invalid\n");
     switch (LType) {   
       ///Shared lock
       case T_SH:
@@ -91,10 +155,11 @@ public:
         assert(false && "Lock type invalid\n");
       }
     return true;
+//    return MutexPtr->tryLock(LType);
   }
   
   void tryUnlock(MutexPointer MutexPtr, LockType LType) {
-    assert(MutexPtr != nullptr && "MutexPointer invalid\n");
+    assert(MutexPtr != nullptr && "Mutex pointer invalid\n");
     switch (LType) {   
       case T_SH:
         return MutexPtr->unlock_shared();
@@ -103,6 +168,8 @@ public:
       default:
         assert(false && "Lock type invalid\n");
     }
+    return;
+//    MutexPtr->tryUnlock(LType);
   }
 
 protected:
@@ -113,8 +180,13 @@ protected:
 
 class VertexLock : public Lock {
 public:
+#if _LOCK_GUARD_
+  VertexLock() : NEMutex (new MutexPointer())
+                 {} 
+#else 
   VertexLock() : NEMutex (MutexPointer(new Mutex))
                  {} 
+#endif
 
   using Lock::tryLock;
   using Lock::tryUnlock;
@@ -153,6 +225,15 @@ protected:
 
 class EdgeLock : public Lock {
 public:
+#if _LOCK_GUARD_
+  EdgeLock() : FVMutex (new MutexPointer())
+               , SVMutex (new MutexPointer())
+               , FNEMutex (new MutexPointer())
+               , FPEMutex (new MutexPointer())
+               , SNEMutex (new MutexPointer())
+               , SPEMutex (new MutexPointer())
+               {}
+#else
   EdgeLock() : FVMutex (MutexPointer(new Mutex))
                , SVMutex (MutexPointer(new Mutex))
                , FNEMutex (MutexPointer(new Mutex))
@@ -160,6 +241,7 @@ public:
                , SNEMutex (MutexPointer(new Mutex))
                , SPEMutex (MutexPointer(new Mutex))
                {}
+#endif
 
   using Lock::tryLock;
   using Lock::tryUnlock;

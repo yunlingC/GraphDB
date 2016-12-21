@@ -226,9 +226,11 @@ int main(int argc, char *argv[]) {
   
   uint64_t build = get_clock();
 
+  /// one transaction running multiple time not supported yet
+  for (int i = 0; i < 1; i++) {
   if (run == 1) {
 
-    q1.runQuery(g, persons[pid], (TranxList[0]), LkManager);
+//    q1.runQuery(g, persons[pid], (TranxList[0]), LkManager);
   
     q2.runQuery(g, persons[pid], (TranxList[1]), LkManager);
 
@@ -236,7 +238,7 @@ int main(int argc, char *argv[]) {
   
     q4.runQuery(g, persons[pid], (TranxList[3]), LkManager);
 
-    q5.runQuery(g, persons[pid], (TranxList[4]), LkManager);
+//    q5.runQuery(g, persons[pid], (TranxList[4]), LkManager);
 
     q6.runQuery(g, persons[pid], (TranxList[5]), LkManager);
 
@@ -277,11 +279,11 @@ int main(int argc, char *argv[]) {
 
     vector<std::thread> threads;
 
-    threads.push_back(std::thread([&]{q1.runQuery(g, persons[pid], (TranxList[0]), LkManager);}));
+ //   threads.push_back(std::thread([&]{q1.runQuery(g, persons[pid], (TranxList[0]), LkManager);}));
     threads.push_back(std::thread([&]{q2.runQuery(g, persons[pid], (TranxList[1]), LkManager);}));
     threads.push_back(std::thread([&]{q3.runQuery(g, persons[pid], (TranxList[2]), LkManager);}));
     threads.push_back(std::thread([&]{q4.runQuery(g, persons[pid], (TranxList[3]), LkManager);}));
-    threads.push_back(std::thread([&]{q5.runQuery(g, persons[pid], (TranxList[4]), LkManager);}));
+//    threads.push_back(std::thread([&]{q5.runQuery(g, persons[pid], (TranxList[4]), LkManager);}));
     threads.push_back(std::thread([&]{q6.runQuery(g, persons[pid], (TranxList[5]), LkManager);}));
     threads.push_back(std::thread([&]{q7.runQuery(g, persons[pid], (TranxList[6]), LkManager);}));
     threads.push_back(std::thread([&]{q8.runQuery(g, persons[pid], (TranxList[7]), LkManager);}));
@@ -310,6 +312,7 @@ int main(int argc, char *argv[]) {
   else {
     std::cout << "Error: Not single thread or multithread\n";
     exit(0);
+  }
   }
 
   uint64_t end = get_clock();

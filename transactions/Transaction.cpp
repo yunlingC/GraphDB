@@ -15,12 +15,10 @@
 #ifndef _TRANSACTION_CPP_
 #define _TRANSACTION_CPP_
 
-#include "Transaction.h"
 #include "global.h"
+#include "Transaction.h"
 
-//#define _PRINTLOG_ true
-
-#ifdef _PRINTLOG_
+#ifdef _TRANX_STATUS_
 #include <iostream>
 #endif
 
@@ -63,7 +61,7 @@
 
   bool Transaction::begin() {
     TransStatus = T_EXPANDING;
-#ifdef _PRINTLOG_
+#ifdef _TRANX_STATUS_
     std::cout <<"Transaction\t" << TransId << "\tSTART\n";
 #endif 
 
@@ -75,7 +73,7 @@
 
   bool Transaction::expand()  {
     TransStatus = T_EXPANDING;
-#ifdef _PRINTLOG_
+#ifdef _TRANX_STATUS_
     std::cout <<"Transaction\t" << TransId << "\tEXPAND\n";
 #endif 
 
@@ -110,7 +108,7 @@
         retValue = true;
         break;
     }
-#ifdef _PRINTLOG_
+#ifdef _TRANX_STATUS_
     if (retValue)
     std::cout <<"Transaction\t" << TransId << "\tCOMMIT\n";
 #endif 
@@ -125,6 +123,7 @@
 #ifdef _TRANX_STATS_
     setCloseTime();
 #endif
+    releaseLock();
     return true;
   }
 
@@ -140,13 +139,13 @@
       case T_SHRINKING:
         TransStatus = T_ROLLBACK;
         /// Abort is not allowed in shrinking phase with SS2PL
-#ifdef _PRINTLOG_
+#ifdef _TRANX_STATUS_
         std::cout <<"Error in Abort:\t" << TransId << "\tis Shrinking\n";
         exit(0);
 #endif
         break;
       case T_ABORT:
-#ifdef _PRINTLOG_
+#ifdef _TRANX_STATUS_
         std::cout <<"Error in Abort:\t" << TransId << "\tis ABORT\n";
 #endif
         TransStatus = T_ABORT;
@@ -154,19 +153,19 @@
         break;
       case T_ROLLBACK:
         TransStatus = T_EXPANDING;
-#ifdef _PRINTLOG_
+#ifdef _TRANX_STATUS_
         std::cout <<"Error in Abort:\t" << TransId << "\tis ROLLBACK\n";
         exit(0);
 #endif
         break;
       case T_COMMIT:
-#ifdef _PRINTLOG_
+#ifdef _TRANX_STATUS_
         std::cout <<"Error in Abort:\t" << TransId << "\tis COMMIT\n";
         exit(0);
 #endif
         break;
     }
-#ifdef _PRINTLOG_
+#ifdef _TRANX_STATUS_
     if (retValue)
     std::cout <<"Transaction\t" << TransId << "\tABORT\n";
 #endif  
@@ -180,6 +179,17 @@
 #endif
     
     return retValue;
+  }
+
+
+  bool Transaction::abort(VertexPointer vptr, MutexType mt, LockType lt) {
+    abortMutex(vptr->getLockPtr()->getMutexPtr(mt));
+    return abort();
+  }
+
+  bool Transaction::abort(EdgePointer eptr, MutexType mt, LockType lt) {
+    abortMutex(eptr->getLockPtr()->getMutexPtr(mt));
+    return abort();
   }
 
   bool Transaction::rollBack()
@@ -231,6 +241,9 @@
     auto lockptr = vptr->getLockPtr();
     assert(lockptr != nullptr && "Vertex lock pointer invalid");
     auto mptr = lockptr->getMutexPtr(mt);
+#ifdef _TRANX_STATS_
+    visitMutex(mptr);
+#endif
     if (checkVertexLock(mptr, lt)) {
       return true;
     }
@@ -239,6 +252,7 @@
       return false;
     }
     registerVertexLock(vptr, mptr, lt);
+//    registerTx();
     return true;
   }
 
@@ -246,6 +260,9 @@
     auto lockptr = eptr->getLockPtr();
     assert(lockptr != nullptr && "Edge lock pointer invalid");
     auto mptr = lockptr->getMutexPtr(mt);
+#ifdef _TRANX_STATS_
+    visitMutex(mptr);
+#endif
     if (checkEdgeLock(mptr, lt)) {
       return true;
     }
@@ -295,6 +312,23 @@
     releaseEdgeLock();
   }
 
+  bool Transaction::waitOn(VertexPointer vptr, MutexType mt, LockType lt) {
+    ///TODO need waitMap lock 
+    auto lptr = vptr->getLockPtr();
+    while(!lptr->tryLock(mt, lt));
+    auto mptr = lptr->getMutexPtr(mt);
+    registerVertexLock(vptr, mptr, lt);
+    return true;
+  }
+
+  bool Transaction::waitOn(EdgePointer eptr, MutexType mt, LockType lt) {
+    ///TODO need waitMap lock 
+    auto lptr = eptr->getLockPtr();
+    while(!lptr->tryLock(mt, lt));
+    auto mptr = lptr->getMutexPtr(mt);
+    registerEdgeLock(eptr, mptr, lt);
+    return true;
+  }
 
 #ifdef _TRANX_STATS_
   void Transaction::visitMutex(MutexPointer mptr) {

@@ -68,7 +68,6 @@ public:
 #endif
     }
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -121,7 +120,6 @@ public:
   #endif
     }
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -252,7 +250,6 @@ public:
   #endif
     }
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -303,7 +300,6 @@ public:
 #endif
     }
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -395,7 +391,6 @@ public:
 #endif
     }
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -489,7 +484,6 @@ public:
 #endif
     }
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -568,7 +562,6 @@ public:
 #endif
     }
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -616,7 +609,6 @@ public:
 #endif
     }
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -706,7 +698,6 @@ public:
 #endif
     }
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -823,7 +814,6 @@ public:
       Tranx->commit();
     }
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -924,7 +914,6 @@ public:
 #endif
     }
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -1010,7 +999,6 @@ public:
       Tranx->commit();
 		}///while
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -1071,7 +1059,6 @@ public:
       Tranx->commit();
     }
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -1166,7 +1153,6 @@ public:
 #endif
     }///while
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
 	}
@@ -1198,13 +1184,6 @@ public:
           ExistVertex = NewEdge->getFirstVertexPtr();
         }
 
-//#ifdef _PRINTLOG_
-//        std::cout << "Existing vertex\n";
-//        std::cout << ExistVertex->getId() << "\t"
-//                  << ExistVertex->getType().std_str() 
-//                  << "\n";
-//#endif
-  
         auto ExistNextEdge = ExistVertex->getNextEdge();
         /// Existed vertex does NOT have NextEdge or is the FirstVertex of NextEdge
         if (isExistedFirst && ExistNextEdge) {
@@ -1213,14 +1192,6 @@ public:
         else if (ExistNextEdge) {
           ExistNextEdge->setSecondPreviousEdge(NewEdge);
         }
-
-//#if _DEBUG_PRINT_
-//        if (ExistNextEdge)  {
-//          std::cout <<"Existing Next Edge\n";
-//          std::cout << ExistNextEdge->getId() << "\t"
-//                    << ExistNextEdge->getType().std_str() << "\n";
-//        }
-//#endif
 
         ExistVertex->setNextEdge(NewEdge);
 
@@ -1280,16 +1251,9 @@ public:
   
         /// Get locks on existing vertex and edge
 
-#ifdef _TRANX_STATS_
-        auto NEMutexPtr = ExistIndex.first->getLockPtr()->getMutexPtr(T_NextEdge); 
-        Tranx->visitMutex(NEMutexPtr);
-#endif
         if (!txBFS.getVertexLock(ExistIndex.first, T_NextEdge, T_EX, Tranx, LockManager)) {
 
-#ifdef _TRANX_STATS_
-          Tranx->abortMutex(NEMutexPtr);
-#endif
-          Tranx->abort();
+          Tranx->abort(ExistIndex.first, T_NextEdge, T_EX);
           needRestart = true;
           break;
         }
@@ -1303,16 +1267,9 @@ public:
                     << ExistNextEdge->getType().std_str() << "\n";
 #endif
 
-#ifdef _TRANX_STATS_
-          auto FPEMutexPtr = ExistNextEdge->getLockPtr()->getMutexPtr(T_FirstPrevEdge);
-          Tranx->visitMutex(FPEMutexPtr);
-#endif
           if (!txBFS.getEdgeLock(ExistNextEdge, T_FirstPrevEdge, T_EX, Tranx, LockManager))  {
 
-#ifdef _TRANX_STATS_
-            Tranx->abortMutex(FPEMutexPtr);
-#endif
-            Tranx->abort();
+            Tranx->abort(ExistNextEdge, T_FirstPrevEdge, T_EX);
             needRestart = true;
             break;
           }
@@ -1327,16 +1284,9 @@ public:
 
           isExistedFirst = false;
 
-#ifdef _TRANX_STATS_
-          auto SPEMutexPtr = ExistNextEdge->getLockPtr()->getMutexPtr(T_SecondPrevEdge);
-          Tranx->visitMutex(SPEMutexPtr);
-#endif
           if (!txBFS.getEdgeLock(ExistNextEdge, T_SecondPrevEdge, T_EX, Tranx, LockManager))  {
 
-#ifdef _TRANX_STATS_
-            Tranx->abortMutex(SPEMutexPtr);
-#endif
-            Tranx->abort();
+            Tranx->abort(ExistNextEdge, T_SecondPrevEdge, T_EX);
             needRestart = true;
             break;
           }
@@ -1411,7 +1361,6 @@ public:
     }
     LockManager.unlockEdge();
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
   }
@@ -1455,58 +1404,27 @@ public:
                   << "\tLabel\t" << SecondIndex.first->getType().std_str()
                   << "\n";
 #endif
-        /// Switch here
-
-#ifdef _TRANX_STATS_
-        auto NEMutexPtr = FirstIndex.first->getLockPtr()->getMutexPtr(T_NextEdge);
-        Tranx->visitMutex(NEMutexPtr);
-#endif
 
         if (!txBFS.getVertexLock(FirstIndex.first, T_NextEdge, T_EX, Tranx, LockManager)) {
 
-#ifdef _TRANX_STATS_
-          Tranx->abortMutex(NEMutexPtr);
-#endif
-          Tranx->abort();
+          Tranx->abort(FirstIndex.first, T_NextEdge, T_EX);
           continue;
         }
 
-#ifdef _TRANX_STATS_
-        auto SNEMutexPtr = SecondIndex.first->getLockPtr()->getMutexPtr(T_NextEdge);
-        Tranx->visitMutex(SNEMutexPtr);
-#endif
         if (!txBFS.getVertexLock(SecondIndex.first, T_NextEdge, T_EX, Tranx, LockManager))  {
 
-#ifdef _TRANX_STATS_
-          Tranx->abortMutex(SNEMutexPtr);
-#endif
-          Tranx->abort();
+          Tranx->abort(SecondIndex.first, T_NextEdge, T_EX);
           continue;
         }
         auto FNEdge = FirstIndex.first->getNextEdge();
         if (FNEdge) {
-#ifdef _TRANX_STATS_
-          auto FPEMutexPtr = FNEdge->getLockPtr()->getMutexPtr(T_FirstPrevEdge);
-          Tranx->visitMutex(FPEMutexPtr);
-#endif
-
           if (!txBFS.getEdgeLock(FNEdge, T_FirstPrevEdge, T_EX, Tranx, LockManager))  {
-#ifdef _TRANX_STATS_
-            Tranx->abortMutex(FPEMutexPtr);
-#endif
-            Tranx->abort();
+            Tranx->abort(FNEdge, T_FirstPrevEdge, T_EX);
             continue;
           }
 
-#ifdef _TRANX_STATS_
-          auto SPEMutexPtr = FNEdge->getLockPtr()->getMutexPtr(T_SecondPrevEdge);
-          Tranx->visitMutex(SPEMutexPtr);
-#endif
           if (!txBFS.getEdgeLock(FNEdge, T_SecondPrevEdge, T_EX, Tranx, LockManager))  {
-#ifdef _TRANX_STATS_
-            Tranx->abortMutex(SPEMutexPtr);
-#endif
-            Tranx->abort();
+            Tranx->abort(FNEdge, T_SecondPrevEdge, T_EX);
             continue;
           }
         }
@@ -1514,28 +1432,13 @@ public:
         auto SNEdge = SecondIndex.first->getNextEdge();
         if (SNEdge && (SNEdge != FNEdge) ) {
 
-#ifdef _TRANX_STATS_
-          auto SFPEMutexPtr = SNEdge->getLockPtr()->getMutexPtr(T_FirstPrevEdge);
-          Tranx->visitMutex(SFPEMutexPtr);
-#endif
           if (!txBFS.getEdgeLock(SNEdge, T_FirstPrevEdge, T_EX, Tranx, LockManager))  {
-#ifdef _TRANX_STATS_
-            Tranx->abortMutex(SFPEMutexPtr);
-#endif
-            Tranx->abort();
+            Tranx->abort(SNEdge, T_FirstPrevEdge, T_EX);
             continue;
           }
 
-#ifdef _TRANX_STATS_
-          auto SSPEMutexPtr = SNEdge->getLockPtr()->getMutexPtr(T_SecondPrevEdge);
-          Tranx->visitMutex(SSPEMutexPtr);
-#endif
           if (!txBFS.getEdgeLock(SNEdge, T_SecondPrevEdge, T_EX, Tranx, LockManager))  {
-
-#ifdef _TRANX_STATS_
-            Tranx->abortMutex(SSPEMutexPtr);
-#endif
-            Tranx->abort();
+            Tranx->abort(SNEdge, T_SecondPrevEdge, T_EX);
             continue;
           }
         }
@@ -1588,7 +1491,6 @@ public:
     }
 #endif
 
-//		LockManager.releaseAll(Tranx->getId());
 		getExecTime();
     Tranx->close();
   }

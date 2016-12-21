@@ -61,6 +61,10 @@ public:
 
   bool abort(); 
 
+  bool abort(VertexPointer, MutexType, LockType); 
+
+  bool abort(EdgePointer, MutexType, LockType); 
+
   bool rollBack();
 
   bool close(); 
