@@ -19,6 +19,7 @@
 #include "GraphType.h"
 #include "Visitor.h"
 #include "Transaction.h"
+//#include "TransactionManager.h"
 #include "LocksManager.h"
 #include "global.h"
 
@@ -51,7 +52,7 @@ public:
     ///True - wait
     return MutexPtr->checkTx(TxPtr->getId());
 #elif defined _DEADLOCK_DETECTION_
-    return LockManager.checkWaitOn(TxPtr->getId(), MutexPtr, Locktype);
+    return LockManager.checkWaitOn(TxPtr, MutexPtr, Locktype);
 #endif
     return true;
   }

@@ -17,6 +17,7 @@
 
 #include "GraphType.h"
 #include "Lock.h"
+#include "TransactionManager.h"
 #include "Concurrency_control_config.h"
 #include "global.h"
 
@@ -31,19 +32,18 @@
 
 class LocksManager {
 public:
+  typedef GraphType::VertexPointer VertexPtr;
+  typedef GraphType::EdgePointer EdgePtr;
+  typedef unsigned int  IdType;
+#ifndef _LOCKING_STORAGE_
   typedef std::shared_timed_mutex Mutex;
   typedef std::shared_ptr<std::mutex> ExMutexPointer;
   typedef Lock::MutexPointer MutexPointer;
   typedef MutexPointer  LockPointer;
-  typedef GraphType::VertexPointer VertexPtr;
-  typedef GraphType::EdgePointer EdgePtr;
-  typedef unsigned int  IdType;
   typedef std::unordered_map<IdType, VertexLock>  VertexLockMapType;
   typedef std::unordered_map<IdType, EdgeLock>    EdgeLockMapType;
   typedef std::pair<IdType, VertexLock> VLockPair;
   typedef std::pair<IdType, EdgeLock>   ELockPair;
-  typedef std::vector<std::pair<VertexPtr,std::pair<MutexType,LockType> > > VLockListType; 
-  typedef std::vector<std::pair<EdgePtr, std::pair<MutexType, LockType> > > ELockListType; 
   typedef std::set<LockPointer> LockListType;
   typedef std::unordered_map<LockPointer, LockType> LockMapType;
   typedef std::pair<LockPointer, LockType> LockEntryType;
@@ -61,6 +61,16 @@ public:
   typedef std::set<IdType> TransSetType;
   typedef std::pair<bool, LockPointer> LockRetPairType;
   typedef std::unordered_set<ExMutexPointer> LockGuardSetType;
+#else 
+  typedef std::vector<std::pair<VertexPtr,std::pair<MutexType,LockType>>> VLockListType; 
+  typedef std::vector<std::pair<EdgePtr, std::pair<MutexType, LockType>>> ELockListType; 
+  typedef Lock::MutexPointer MutexPointer;
+#if _LOCK_GUARD_
+  typedef Lock::ExMutexPointer ExMutexPointer;
+  typedef Lock::ExMutex ExMutex;
+#endif
+  typedef TransactionManager::TransactionPointer TranxPointer;
+#endif
 public:
 
 /// locks stored in a map 
@@ -104,7 +114,6 @@ public:
   void  tryUnlock(MutexPointer MutexPtr, LockType LType);
 
   /*  New functions added to support deadlock detection */
-//  bool getLock(IdType ObjectId, MutexType Mutex, LockType Lock, IdType TxId);
 
 #ifdef _DEADLOCK_DETECTION_
   bool getVertexLock(IdType VertexId, MutexType Mutex, LockType Lock, IdType TxId);
@@ -170,7 +179,11 @@ public:
 #else
   ///locks are encoded in Vertex and Edge
 public:
+#ifndef _DEADLOCK_DETECTION_
   LocksManager(GraphType & g);
+#else 
+  LocksManager(GraphType & g, TransactionManager & tm);
+#endif
 
   bool  getVertexLock(VertexPtr Vertex, MutexType Mutex, LockType Lock);
 
@@ -185,6 +198,8 @@ public:
   void  releaseVertexAll(VLockListType & VertexLocks);
 
   void  releaseAll(VLockListType & VertexLocks, ELockListType & EdgeLocks); 
+
+  bool  checkWaitOn(TranxPointer, MutexPointer, LockType);
 
   void  addToVertexLockMap(IdType VertexId);
 
@@ -209,10 +224,6 @@ protected:
 #ifndef _LOCKING_STORAGE_
   VertexLockMapType VertexLockMap;
   EdgeLockMapType EdgeLockMap;
-#else 
-  GraphType & Graph;
-#endif
-
 #ifdef _DEADLOCK_DETECTION_
   ExMutexPointer DeadlockDetector;
 	TransactionResourceMap  TransMap;
@@ -220,10 +231,14 @@ protected:
   WaitingTransactionMap WaitMap;
   ResourceGuardMapType  ResrGuardMap;
   WaitGuardMapType   WaitGuardMap;
-
-#else 
-
 #endif /*_DEADLOCK_DETECTION_ */
+#else 
+  GraphType & Graph;
+#ifdef _DEADLOCK_DETECTION_
+  TransactionManager & TxManager;
+#endif
+#endif
+
     
 };
 

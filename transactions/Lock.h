@@ -58,9 +58,8 @@ public:
   }
 
   bool registerTx(TransIdType txid, LockType lt) {
-    if (!MutexGuardPtr->try_lock()) {
-      return false; 
-    }
+    MutexGuardPtr->lock();
+
     ///TODO need to do a check before insertion
     TxMap.insert(TxLockPairType(txid, lt));
 
@@ -78,6 +77,9 @@ public:
         assert(false && "Transaction register lock type incorrectly");
       }
     }
+    else {
+      assert(false && "Transaction does NOT register this lock");
+    }
     MutexGuardPtr->unlock();
   }
 
@@ -85,16 +87,27 @@ public:
   bool checkTx(TransIdType txid)  {
     bool wait = true;
     MutexGuardPtr->lock();
+//    if (!(MutexGuardPtr->try_lock())) {
+//      return false; 
+//    }
 
     for (auto Tx : TxMap) {
       ///<TranxId, LockType> 
+      assert(Tx.first != txid && "Transaction does not wait for itself");
       if (Tx.first < txid)  {
         ///Don't wait for this lock
         wait =  false;
+#if _DEBUG_PRINT_
+        std::cout << "Tx\t" << txid << "\t does not wait for\t" << Tx.first << "\n";
+#endif 
         break;
       }
     }
     MutexGuardPtr->unlock();
+#if _DEBUG_PRINT_
+    if (wait) 
+      std::cout << "Tx\t" << txid << "\t wait for lock\n";
+#endif 
     return wait;
   }
 
@@ -109,6 +122,8 @@ class Lock {
 public:
 #if _LOCK_GUARD_
   typedef MutexPointerType * MutexPointer;
+  typedef MutexPointerType::ExMutex ExMutex;
+  typedef MutexPointerType::ExMutexPointer ExMutexPointer;
 #else 
   typedef std::shared_timed_mutex Mutex;
   typedef std::shared_ptr<Mutex> MutexPointer;
@@ -159,7 +174,7 @@ public:
   }
   
   void tryUnlock(MutexPointer MutexPtr, LockType LType) {
-    assert(MutexPtr != nullptr && "Mutex pointer invalid\n");
+    assert(MutexPtr && "Mutex pointer invalid\n");
     switch (LType) {   
       case T_SH:
         return MutexPtr->unlock_shared();

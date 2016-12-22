@@ -33,6 +33,10 @@ public:
   typedef unsigned int IdType;
   typedef GraphType::VertexPointer VertexPointer;
   typedef GraphType::EdgePointer EdgePointer;
+#ifdef _DEADLOCK_DETECTION_
+  typedef MutexPointerType::ExMutexPointer ExMutexPointer;
+  typedef MutexPointerType::ExMutex ExMutex;
+#endif
   typedef VertexLock::MutexPointer MutexPointer;
   typedef std::pair<VertexPointer, LockType> VLockPairType;
   typedef std::pair<EdgePointer, LockType> ELockPairType;
@@ -87,6 +91,10 @@ public:
 
   bool waitOn(VertexPointer, MutexType, LockType);
   bool waitOn(EdgePointer, MutexType, LockType);
+
+  bool startWait(MutexPointer);
+  bool endWait(MutexPointer);
+
   /*TODO end**/
 
   bool registerVertexLock(VertexPointer, MutexPointer , LockType );
@@ -100,7 +108,7 @@ public:
 
   ~Transaction();
 
-  friend class LocksManager;
+//  friend class LocksManager;
 //  friend bool LocksManager::detectDeadlock();
 #ifdef _TRANX_STATS_
   void visitMutex(MutexPointer MutexPtr);
@@ -132,6 +140,11 @@ protected:
   TransStatusType TransStatus;
   EdgeLockMapType EdgeLockMap;
   VertexLockMapType VertexLockMap;
+#ifdef _DEADLOCK_DETECTION_
+  ExMutexPointer WaitGuardPtr;
+  MutexPointer WaitMutexPtr;
+#endif
+
 #ifdef _TRANX_STATS_
   int NumAbort;
   MutexMapType AbortedMap;

@@ -31,6 +31,10 @@
 //  Transaction::Transaction() : TransId(0), TransStatus(T_EXPANDING) {
 
   Transaction::Transaction(IdType id) : TransId(id), TransStatus(T_EXPANDING){
+#ifdef _DEADLOCK_DETECTION_
+    WaitGuardPtr = ExMutexPointer(new ExMutex);
+    WaitMutexPtr = nullptr;
+#endif
 
 //  Transaction::Transaction(IdType id, LocksManager & LkManager) : LockManager(LkManager)
 //                                                                    , TransId(id)
@@ -170,9 +174,9 @@
     std::cout <<"Transaction\t" << TransId << "\tABORT\n";
 #endif  
 
-    if (retValue) {
+//    if (retValue) {
       releaseLock();
-    }
+//    }
 #ifdef _TRANX_STATS_
 //    if (retValue)
       NumAbort++;
@@ -231,6 +235,10 @@
     if (LockPair != VertexLockMap.end()) {
       ///Check lock type 
       if (LockPair->second.second == lt) {
+        return true;
+      }
+      else {
+        assert(false && "Transaction requires a lock of both types");
         return true;
       }
     }
@@ -325,8 +333,10 @@
   bool Transaction::waitOn(VertexPointer vptr, MutexType mt, LockType lt) {
     ///TODO need waitMap lock 
     auto lptr = vptr->getLockPtr();
-    while(!lptr->tryLock(mt, lt));
     auto mptr = lptr->getMutexPtr(mt);
+    startWait(mptr);
+    while(!lptr->tryLock(mt, lt));
+    endWait(mptr);
     return registerVertexLock(vptr, mptr, lt);
 //    return true;
   }
@@ -334,10 +344,35 @@
   bool Transaction::waitOn(EdgePointer eptr, MutexType mt, LockType lt) {
     ///TODO need waitMap lock 
     auto lptr = eptr->getLockPtr();
-    while(!lptr->tryLock(mt, lt));
     auto mptr = lptr->getMutexPtr(mt);
+    startWait(mptr);
+    while(!lptr->tryLock(mt, lt));
+    endWait(mptr);
     return registerEdgeLock(eptr, mptr, lt);
 //    return true;
+  }
+
+  bool Transaction::startWait(MutexPointer MuPtr) {
+#ifdef _DEADLOCK_DETECTION_
+    WaitGuardPtr->lock();
+
+    WaitMutexPtr = MuPtr;
+
+    WaitGuardPtr->unlock();
+#endif
+    return true;
+  }
+
+
+  bool Transaction::endWait(MutexPointer MuPtr) {
+#ifdef _DEADLOCK_DETECTION_
+    WaitGuardPtr->lock();
+
+    WaitMutexPtr = nullptr;
+
+    WaitGuardPtr->unlock();
+#endif
+    return true;
   }
 
 #ifdef _TRANX_STATS_
@@ -463,7 +498,15 @@
 #endif
 
   Transaction::~Transaction(){
-    close();
+#ifdef _TRANX_STATUS_
+    std::cout << "Transaction\t" << TransId 
+              << "\tstatus\t" << TransStatus
+              << "\tVertex Lock num\t" << VertexLockMap.size()
+              << "\tEdge Lock num\t" << EdgeLockMap.size()
+              << "\n";
+
+#endif 
+//    close();
   }
  
 #endif /*_TRANSACTION_CPP_*/

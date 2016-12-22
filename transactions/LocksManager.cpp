@@ -309,7 +309,7 @@
 #if _DEBUG_ENABLE_
       if (Guard == ResrGuardMap.end()) {
         std::cout << "Transaction\t" << TransId
-                  << "\tcould not get ResrGuard when checkWaitON on\t" << LockPtr
+                  << "\tcould not get ResrGuard when checkWaitOn on\t" << LockPtr
                   << "\n";
         return T_Abort;
       }
@@ -1326,10 +1326,20 @@
  * Locks are encoded in Vertex and Edge
  * This is the active part of program so far
   */
+#ifdef _DEADLOCK_DETECTION_
+  LocksManager::LocksManager(GraphType & g
+                            , TransactionManager & tm
+                            ) : Graph(g)
+                               , TxManager(tm) {
+    VertexProtector = std::shared_ptr<std::mutex>(new std::mutex);
+    EdgeProtector = std::shared_ptr<std::mutex>(new std::mutex);
+  };
+#else 
   LocksManager::LocksManager(GraphType & g) : Graph(g) {
     VertexProtector = std::shared_ptr<std::mutex>(new std::mutex);
     EdgeProtector = std::shared_ptr<std::mutex>(new std::mutex);
   };
+#endif
 
   auto LocksManager::getVertexLock(VertexPtr Vertex, MutexType Mutex, LockType Lock) 
     -> bool {
@@ -1392,6 +1402,11 @@
       releaseEdgeAll(EdgeLocks);
   }
 
+  auto LocksManager::checkWaitOn(TranxPointer TxPtr, MutexPointer MuPtr, LockType lt) 
+    -> bool {
+
+    return true;
+  }
 /**
  * Following functions are not active 
  * This is because there is no lock map in LockManager

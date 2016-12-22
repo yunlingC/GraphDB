@@ -9,14 +9,14 @@
 
 #define _DEBUG_ENABLE_ true
 
-//#define _DEADLOCK_DETECTION_  true
+#define _DEADLOCK_DETECTION_  true
 
 /// Only WAIT_DIE and DEADLOCK_DETECTION need this lock guard
 #define _LOCK_GUARD_ true
 
 //#define _NO_WAIT_ true
 
-#define _WAIT_DIE_ true
+//#define _WAIT_DIE_ true
 
 //#define _DEBUG_PRINT_ true
 
