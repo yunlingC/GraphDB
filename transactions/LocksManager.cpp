@@ -41,6 +41,13 @@
     EdgeProtector->unlock();
   }
 
+  void LocksManager::dismissGuard(LockGuardSetType & Guards)  {
+    for (auto guard : Guards) {
+      guard->unlock(); 
+    }
+    return;
+  }
+
 #ifndef _LOCKING_STORAGE_
 
   LocksManager::LocksManager() {
@@ -542,12 +549,6 @@
       return false;
     }
 
-  void LocksManager::dismissGuard(LockGuardSetType & Guards)  {
-    for (auto guard : Guards) {
-      guard->unlock(); 
-    }
-    return;
-  }
 
 
 #ifdef _NO_WAIT_
@@ -1333,6 +1334,7 @@
                                , TxManager(tm) {
     VertexProtector = std::shared_ptr<std::mutex>(new std::mutex);
     EdgeProtector = std::shared_ptr<std::mutex>(new std::mutex);
+    DeadlockDetector = std::shared_ptr<std::mutex>(new std::mutex) ;
   };
 #else 
   LocksManager::LocksManager(GraphType & g) : Graph(g) {
@@ -1404,8 +1406,59 @@
 
   auto LocksManager::checkWaitOn(TranxPointer TxPtr, MutexPointer MuPtr, LockType lt) 
     -> bool {
+    /// This transaction cannot wait for more than one lock
+    assert(TxPtr->checkTxWaitOn() == nullptr && "Transaction busy waiting");
 
+    DeadlockDetector->lock();
+
+    GuardSetType Guards;
+    TranxSetType ChkTxSet;
+
+    MuPtr->getGuardPtr()->lock();
+    Guards.insert(MuPtr->getGuardPtr());
+  
+    for (auto Tx : MuPtr->getTx())  {
+      assert(Tx.first != TxPtr->getId() && "Transaction already holds this lock");
+
+      auto LockingTx = TxManager.getTransaction(Tx.first);
+      if (!checkWaitOnRecursive(TxPtr, LockingTx, ChkTxSet, Guards )) {
+        dismissGuard(Guards);
+        return false;
+      }
+    }
+    dismissGuard(Guards);
+
+    DeadlockDetector->unlock();
     return true;
+  }
+
+  auto LocksManager::checkWaitOnRecursive(TranxPointer WaitingTx
+                                          , TranxPointer LockingTx
+                                          , TranxSetType ChkTxSet
+                                          , GuardSetType Guards)
+    -> bool {
+      if (WaitingTx == LockingTx) {
+        return false;
+      }
+
+      ChkTxSet.insert(LockingTx);
+      LockingTx->getGuardPtr()->lock();
+      Guards.insert(LockingTx->getGuardPtr());
+
+      auto WaitMuPtr = LockingTx->getWaitMutexPtr();
+      ///Locking Tx is not waiting
+      if (!WaitMuPtr)  {
+        return true;
+      }
+
+      for (auto Tx : WaitMuPtr->getTx())  {
+        auto LockingTxPtr = TxManager.getTransaction(Tx.first);
+        if (ChkTxSet.find(LockingTxPtr) == ChkTxSet.end())  {
+          if (! checkWaitOnRecursive(WaitingTx, LockingTxPtr, ChkTxSet, Guards))
+            return false;
+        }
+      }
+      return true;
   }
 /**
  * Following functions are not active 

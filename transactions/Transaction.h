@@ -95,6 +95,12 @@ public:
   bool startWait(MutexPointer);
   bool endWait(MutexPointer);
 
+#ifdef _DEADLOCK_DETECTION_
+  MutexPointer checkTxWaitOn();
+  MutexPointer getWaitMutexPtr();
+  ExMutexPointer getGuardPtr();
+#endif
+
   /*TODO end**/
 
   bool registerVertexLock(VertexPointer, MutexPointer , LockType );

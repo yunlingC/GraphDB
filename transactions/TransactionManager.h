@@ -57,7 +57,7 @@ public:
   void dumpStats();
   float getPercent(uint64_t, uint64_t);
 #endif
-//  friend class LocksManager;
+
 private:
   IdType assignTransId();
 

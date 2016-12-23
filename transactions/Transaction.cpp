@@ -375,6 +375,26 @@
     return true;
   }
 
+#ifdef _DEADLOCK_DETECTION_
+  Transaction::MutexPointer Transaction::checkTxWaitOn()  {
+    WaitGuardPtr->lock();
+
+    auto retPtr = WaitMutexPtr;
+
+    WaitGuardPtr->unlock();
+
+    return retPtr;
+  }
+
+  Transaction::MutexPointer Transaction::getWaitMutexPtr()  {
+    return WaitMutexPtr;
+  }
+
+  Transaction::ExMutexPointer Transaction::getGuardPtr()  {
+    return WaitGuardPtr;
+  }
+#endif
+
 #ifdef _TRANX_STATS_
   void Transaction::visitMutex(MutexPointer mptr) {
     if ( VisitedMap.find(mptr) == VisitedMap.end() )  {

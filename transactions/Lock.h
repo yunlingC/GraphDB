@@ -57,6 +57,13 @@ public:
     MutexPtr->unlock(); 
   }
 
+#ifdef _DEADLOCK_DETECTION_
+  ExMutexPointer getGuardPtr() {
+    return MutexGuardPtr;
+  }
+
+#endif
+
   bool registerTx(TransIdType txid, LockType lt) {
     MutexGuardPtr->lock();
 
@@ -81,6 +88,10 @@ public:
       assert(false && "Transaction does NOT register this lock");
     }
     MutexGuardPtr->unlock();
+  }
+
+  TxMapType getTx() {
+    return TxMap;
   }
 
   ///True - wait 

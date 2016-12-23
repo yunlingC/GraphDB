@@ -35,9 +35,10 @@ public:
   typedef GraphType::VertexPointer VertexPtr;
   typedef GraphType::EdgePointer EdgePtr;
   typedef unsigned int  IdType;
+  typedef std::shared_ptr<std::mutex> ExMutexPointer;
+  typedef std::unordered_set<ExMutexPointer> LockGuardSetType;
 #ifndef _LOCKING_STORAGE_
   typedef std::shared_timed_mutex Mutex;
-  typedef std::shared_ptr<std::mutex> ExMutexPointer;
   typedef Lock::MutexPointer MutexPointer;
   typedef MutexPointer  LockPointer;
   typedef std::unordered_map<IdType, VertexLock>  VertexLockMapType;
@@ -60,16 +61,15 @@ public:
   typedef std::stack<IdType> TransStackType; 
   typedef std::set<IdType> TransSetType;
   typedef std::pair<bool, LockPointer> LockRetPairType;
-  typedef std::unordered_set<ExMutexPointer> LockGuardSetType;
 #else 
   typedef std::vector<std::pair<VertexPtr,std::pair<MutexType,LockType>>> VLockListType; 
   typedef std::vector<std::pair<EdgePtr, std::pair<MutexType, LockType>>> ELockListType; 
   typedef Lock::MutexPointer MutexPointer;
 #if _LOCK_GUARD_
-  typedef Lock::ExMutexPointer ExMutexPointer;
-  typedef Lock::ExMutex ExMutex;
-#endif
   typedef TransactionManager::TransactionPointer TranxPointer;
+  typedef LockGuardSetType GuardSetType;
+  typedef std::unordered_set<TranxPointer> TranxSetType;
+#endif
 #endif
 public:
 
@@ -133,7 +133,6 @@ public:
   /// Yes - wait  No - deadlock
   bool  checkWaitOnRecursive(IdType, IdType, TransStackType, TransSetType, LockGuardSetType );
 
-  void  dismissGuard(LockGuardSetType & Guards);
 
   bool  releaseAll(IdType TxId);
 
@@ -201,6 +200,8 @@ public:
 
   bool  checkWaitOn(TranxPointer, MutexPointer, LockType);
 
+  bool checkWaitOnRecursive(TranxPointer, TranxPointer, TranxSetType, GuardSetType);
+
   void  addToVertexLockMap(IdType VertexId);
 
   void  addToEdgeLockMap(IdType EdgeId);
@@ -215,6 +216,8 @@ public:
   void lockEdge();
 
   void unlockEdge();
+
+  void  dismissGuard(LockGuardSetType & Guards);
 
 protected:
   /// The following two locks are to guard graph vertices and edges
@@ -232,10 +235,13 @@ protected:
   ResourceGuardMapType  ResrGuardMap;
   WaitGuardMapType   WaitGuardMap;
 #endif /*_DEADLOCK_DETECTION_ */
+
 #else 
+
   GraphType & Graph;
 #ifdef _DEADLOCK_DETECTION_
   TransactionManager & TxManager;
+  ExMutexPointer DeadlockDetector;
 #endif
 #endif
 
