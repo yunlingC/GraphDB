@@ -65,7 +65,9 @@ public:
 #endif
 
   bool registerTx(TransIdType txid, LockType lt) {
-    MutexGuardPtr->lock();
+//    MutexGuardPtr->lock();
+    if (!MutexGuardPtr->try_lock())
+      return false;
 
     ///TODO need to do a check before insertion
     TxMap.insert(TxLockPairType(txid, lt));
@@ -98,9 +100,6 @@ public:
   bool checkTx(TransIdType txid)  {
     bool wait = true;
     MutexGuardPtr->lock();
-//    if (!(MutexGuardPtr->try_lock())) {
-//      return false; 
-//    }
 
     for (auto Tx : TxMap) {
       ///<TranxId, LockType> 

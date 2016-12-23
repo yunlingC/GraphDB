@@ -72,9 +72,19 @@ public:
     }
 
     if (checkLock<VertexPointer>(VertexPtr, Mutextype, Locktype, TxPtr, LockManager)) {
+#if _DEBUG_PRINT_
+      std::cout << "Transaction\t" << TxPtr->getId() 
+                << "\t waits for Lock\t" << VertexPtr->getId()
+                << "\n";
+#endif
       return TxPtr->waitOn(VertexPtr, Mutextype, Locktype);
     }
     else {
+#if _DEBUG_PRINT_
+      std::cout << "Transaction\t" << TxPtr->getId() 
+                << "\t aborts on Lock\t" << VertexPtr->getId()
+                << "\n";
+#endif
 //      TxPtr->abort(VertexPtr, Mutextype, Locktype);
       return false;
     }
@@ -96,9 +106,19 @@ public:
       return true;
     }
     if (checkLock<EdgePointer>(EdgePtr, Mutextype, Locktype, TxPtr, LockManager)) {
+#if _DEBUG_PRINT_
+      std::cout << "Transaction\t" << TxPtr->getId() 
+                << "\t waits for Lock\t" << EdgePtr->getId()
+                << "\n";
+#endif
       return TxPtr->waitOn(EdgePtr, Mutextype, Locktype);
     }
     else {
+#if _DEBUG_PRINT_
+      std::cout << "Transaction\t" << TxPtr->getId() 
+                << "\t aborts on Lock\t" << EdgePtr->getId()
+                << "\n";
+#endif
 //      TxPtr->abort(EdgePtr, Mutextype, Locktype);
       return false;
     }

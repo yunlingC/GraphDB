@@ -45,6 +45,7 @@
     for (auto guard : Guards) {
       guard->unlock(); 
     }
+    Guards.clear();
     return;
   }
 
@@ -1422,13 +1423,14 @@
 
       auto LockingTx = TxManager.getTransaction(Tx.first);
       if (!checkWaitOnRecursive(TxPtr, LockingTx, ChkTxSet, Guards )) {
+        DeadlockDetector->unlock();
         dismissGuard(Guards);
         return false;
       }
     }
-    dismissGuard(Guards);
 
     DeadlockDetector->unlock();
+    dismissGuard(Guards);
     return true;
   }
 

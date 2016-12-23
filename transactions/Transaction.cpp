@@ -211,9 +211,16 @@
   bool Transaction::registerVertexLock(VertexPointer vptr, MutexPointer mptr, LockType lktype) {
 
 #ifdef _WAIT_DIE_
-    if (!mptr->registerTx(TransId, lktype)) 
+    while (!mptr->registerTx(TransId, lktype))
+#elif defined _DEADLOCK_DETECTION_
+    if (!mptr->registerTx(TransId, lktype)) {
+      std::cout << "Transaction\t" << TransId
+                << "\t cannot register lock\t" << vptr->getId()
+                << "\n";
       return false;
+    }
 #endif
+
     VertexLockMap.insert(VertexLockPairType(mptr, VLockPairType(vptr, lktype)));
     return true;
   }
@@ -221,9 +228,16 @@
   bool Transaction::registerEdgeLock(EdgePointer eptr, MutexPointer mptr, LockType lktype) {
 
 #ifdef _WAIT_DIE_
-    if (!mptr->registerTx(TransId, lktype))
+    while (!mptr->registerTx(TransId, lktype))
+#elif defined _DEADLOCK_DETECTION_
+    if (!mptr->registerTx(TransId, lktype)) {
+      std::cout << "Transaction\t" << TransId
+                << "\t cannot register lock\t" << eptr->getId()
+                << "\n";
       return false;
+    }
 #endif
+
     EdgeLockMap.insert(EdgeLockPairType(mptr, ELockPairType(eptr, lktype)));
     return true;
   }
@@ -262,11 +276,26 @@
     if (checkVertexLock(mptr, lt)) {
       return true;
     }
-    ///Lock not acquired && lock not available
-    if (!lockptr->tryLock(mt, lt)) {
-      return false;
+
+    int trial = 10;
+
+    while (trial-- > 0) {
+    if (lockptr->tryLock(mt, lt)) {
+      if (registerVertexLock(vptr, mptr, lt)) {
+        return true;
+      } else {
+        lockptr->tryUnlock(mt, lt);
+      }
     }
-    return registerVertexLock(vptr, mptr, lt);
+    }
+
+    return false;
+
+//    if (!registerVertexLock(vptr, mptr, lt)) {
+//      lockptr->tryUnlock(mt, lt);
+//      return false;
+//    }
+//    return true;
   }
 
   bool Transaction::getEdgeLock(EdgePointer eptr, MutexType mt, LockType lt) {
@@ -280,10 +309,27 @@
       return true;
     }
 
-    if (!lockptr->tryLock(mt, lt)) {
-      return false;
+    int trial = 10;
+
+    while (trial-- > 0) {
+    if (lockptr->tryLock(mt, lt)) {
+      if (registerEdgeLock(eptr, mptr, lt)) {
+        return true;
+      } else {
+        lockptr->tryUnlock(mt, lt);
+      }
     }
-    return registerEdgeLock(eptr, mptr, lt);
+    }
+
+    return false;
+
+//    if (!registerEdgeLock(eptr, mptr, lt)) {
+//      lockptr->tryUnlock(mt, lt);
+//      return false;
+//    }
+//    }
+
+//    return true;
   }
 
   /**
@@ -335,10 +381,12 @@
     auto lptr = vptr->getLockPtr();
     auto mptr = lptr->getMutexPtr(mt);
     startWait(mptr);
-    while(!lptr->tryLock(mt, lt));
+    while(!getVertexLock(vptr, mt, lt));
+//    while(!lptr->tryLock(mt, lt));
     endWait(mptr);
-    return registerVertexLock(vptr, mptr, lt);
-//    return true;
+    ///TODO bug here need to return ret=getVertexLock()
+//    return registerVertexLock(vptr, mptr, lt);
+    return true;
   }
 
   bool Transaction::waitOn(EdgePointer eptr, MutexType mt, LockType lt) {
@@ -346,10 +394,12 @@
     auto lptr = eptr->getLockPtr();
     auto mptr = lptr->getMutexPtr(mt);
     startWait(mptr);
-    while(!lptr->tryLock(mt, lt));
+    while(!getEdgeLock(eptr, mt, lt));
+//    while(!lptr->tryLock(mt, lt));
     endWait(mptr);
-    return registerEdgeLock(eptr, mptr, lt);
-//    return true;
+//    return registerEdgeLock(eptr, mptr, lt);
+    ///TODO bug here need to return ret=getVertexLock()
+    return true;
   }
 
   bool Transaction::startWait(MutexPointer MuPtr) {
