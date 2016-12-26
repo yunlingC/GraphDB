@@ -1418,20 +1418,22 @@
     MuPtr->getGuardPtr()->lock();
     Guards.insert(MuPtr->getGuardPtr());
   
+    bool retValue = true;
     for (auto Tx : MuPtr->getTx())  {
       assert(Tx.first != TxPtr->getId() && "Transaction already holds this lock");
 
       auto LockingTx = TxManager.getTransaction(Tx.first);
-      if (!checkWaitOnRecursive(TxPtr, LockingTx, ChkTxSet, Guards )) {
-        DeadlockDetector->unlock();
-        dismissGuard(Guards);
-        return false;
+      if (ChkTxSet.find(LockingTx) == ChkTxSet.end())  {
+        if (!checkWaitOnRecursive(TxPtr, LockingTx, ChkTxSet, Guards )) {
+          retValue = false;
+          break;
+        }
       }
     }
 
     DeadlockDetector->unlock();
     dismissGuard(Guards);
-    return true;
+    return retValue;
   }
 
   auto LocksManager::checkWaitOnRecursive(TranxPointer WaitingTx
@@ -1452,6 +1454,9 @@
       if (!WaitMuPtr)  {
         return true;
       }
+
+      WaitMuPtr->getGuardPtr()->lock();
+      Guards.insert(WaitMuPtr->getGuardPtr());
 
       for (auto Tx : WaitMuPtr->getTx())  {
         auto LockingTxPtr = TxManager.getTransaction(Tx.first);
