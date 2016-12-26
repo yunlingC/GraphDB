@@ -277,7 +277,7 @@
       return true;
     }
 
-    int trial = 10;
+    int trial = 2;
 
     while (trial-- > 0) {
     if (lockptr->tryLock(mt, lt)) {
@@ -309,7 +309,7 @@
       return true;
     }
 
-    int trial = 10;
+    int trial = 2;
 
     while (trial-- > 0) {
     if (lockptr->tryLock(mt, lt)) {

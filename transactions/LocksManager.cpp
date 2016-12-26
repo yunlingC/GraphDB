@@ -1423,7 +1423,8 @@
       assert(Tx.first != TxPtr->getId() && "Transaction already holds this lock");
 
       auto LockingTx = TxManager.getTransaction(Tx.first);
-      if (ChkTxSet.find(LockingTx) == ChkTxSet.end())  {
+      if (Guards.find(LockingTx->getGuardPtr()) == Guards.end()) {
+//      if (ChkTxSet.find(LockingTx) == ChkTxSet.end())  {
         if (!checkWaitOnRecursive(TxPtr, LockingTx, ChkTxSet, Guards )) {
           retValue = false;
           break;
@@ -1455,12 +1456,21 @@
         return true;
       }
 
-      WaitMuPtr->getGuardPtr()->lock();
-      Guards.insert(WaitMuPtr->getGuardPtr());
+      /// Avoid traversing the same mutex twice by checking 
+      /// if its Guard has been inserted into Guards set or not.
+      /// This is O(1) operation since we use hash set here
+      auto MuGuard = WaitMuPtr->getGuardPtr();
+      if (Guards.find(MuGuard) != Guards.end()) {
+        return true;
+      }
+      
+      MuGuard->lock();
+      Guards.insert(MuGuard);
 
       for (auto Tx : WaitMuPtr->getTx())  {
         auto LockingTxPtr = TxManager.getTransaction(Tx.first);
-        if (ChkTxSet.find(LockingTxPtr) == ChkTxSet.end())  {
+        if (Guards.find(LockingTxPtr->getGuardPtr()) == Guards.end()) {
+//        if (ChkTxSet.find(LockingTxPtr) == ChkTxSet.end())  {
           if (! checkWaitOnRecursive(WaitingTx, LockingTxPtr, ChkTxSet, Guards))
             return false;
         }

@@ -288,7 +288,7 @@ int main(int argc, char *argv[]) {
     threads.push_back(std::thread([&]{q6.runQuery(g, persons[pid], (TranxList[19]), LkManager);}));
     threads.push_back(std::thread([&]{q7.runQuery(g, persons[pid], (TranxList[20]), LkManager);}));
     threads.push_back(std::thread([&]{q8.runQuery(g, persons[pid], (TranxList[21]), LkManager);}));
-    threads.push_back(std::thread([&]{q9.runQuery(g, persons[pid], (TranxList[8]), LkManager);}));
+//    threads.push_back(std::thread([&]{q9.runQuery(g, persons[pid], (TranxList[8]), LkManager);}));
     threads.push_back(std::thread([&]{q10.runQuery(g, persons[pid], (TranxList[9]), LkManager);}));
     threads.push_back(std::thread([&]{q11.runQuery(g, persons[pid], (TranxList[10]), LkManager);}));
     threads.push_back(std::thread([&]{q12.runQuery(g, persons[pid], (TranxList[11]), LkManager);}));
