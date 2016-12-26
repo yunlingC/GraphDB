@@ -1405,12 +1405,26 @@
       releaseEdgeAll(EdgeLocks);
   }
 
+  auto LocksManager::startDetect()  
+    -> void {
+#ifdef _DEADLOCK_DETECTION_
+    DeadlockDetector->lock();
+#endif
+  }
+
+  auto LocksManager::endDetect()
+    -> void {
+#ifdef _DEADLOCK_DETECTION_
+    DeadlockDetector->unlock();
+#endif
+  }
+
   auto LocksManager::checkWaitOn(TranxPointer TxPtr, MutexPointer MuPtr, LockType lt) 
     -> bool {
     /// This transaction cannot wait for more than one lock
     assert(TxPtr->checkTxWaitOn() == nullptr && "Transaction busy waiting");
 
-    DeadlockDetector->lock();
+//    DeadlockDetector->lock();
 
     GuardSetType Guards;
     TranxSetType ChkTxSet;
@@ -1432,8 +1446,12 @@
       }
     }
 
-    DeadlockDetector->unlock();
+//    DeadlockDetector->unlock();
     dismissGuard(Guards);
+    std::cout << "Transaction\t" <<TxPtr->getId()
+              << "\tfinishes detecting and holds guards\t"
+              << Guards.size() << "\n";
+
     return retValue;
   }
 

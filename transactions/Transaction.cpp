@@ -128,6 +128,11 @@
     setCloseTime();
 #endif
     releaseLock();
+#ifdef _TRANX_STATUS_
+        std::cout <<"Transaction\t" << TransId 
+                  << "\tCLOSE\n";
+#endif
+    
     return true;
   }
 
@@ -214,9 +219,12 @@
     while (!mptr->registerTx(TransId, lktype))
 #elif defined _DEADLOCK_DETECTION_
     if (!mptr->registerTx(TransId, lktype)) {
+#if _DEBUG_PRINT_
+//#ifdef _TRANX_STATUS_
       std::cout << "Transaction\t" << TransId
-                << "\t cannot register lock\t" << vptr->getId()
+                << "\t cannot register vertex lock\t" << vptr->getId()
                 << "\n";
+#endif
       return false;
     }
 #endif
@@ -231,9 +239,12 @@
     while (!mptr->registerTx(TransId, lktype))
 #elif defined _DEADLOCK_DETECTION_
     if (!mptr->registerTx(TransId, lktype)) {
+//#ifdef _TRANX_STATUS_
+#if _DEBUG_PRINT_
       std::cout << "Transaction\t" << TransId
-                << "\t cannot register lock\t" << eptr->getId()
+                << "\t cannot register edge lock\t" << eptr->getId()
                 << "\n";
+#endif
       return false;
     }
 #endif
@@ -309,7 +320,7 @@
       return true;
     }
 
-    int trial = 2;
+    int trial = 5;
 
     while (trial-- > 0) {
     if (lockptr->tryLock(mt, lt)) {
@@ -345,15 +356,20 @@
     return true;
   }
 
-
+/*
+ * TODO
+ * Implement SKIP technique in releasing locks (vertex and edge):
+ * Release locks that can be retired first 
+ * and then release others later
+ **/
   void Transaction::releaseVertexLock( ) {
     for (auto LockEntry : VertexLockMap) {
       /// LockEntry <MutexPtr, <VertexPtr, LockType>>
       auto lockptr = LockEntry.second.first->getLockPtr();
-      lockptr->tryUnlock(LockEntry.first, LockEntry.second.second);
-#ifdef _WAIT_DIE_
+#ifndef _NO_WAIT_
       LockEntry.first->retireTx(TransId, LockEntry.second.second);
 #endif
+      lockptr->tryUnlock(LockEntry.first, LockEntry.second.second);
     }
     VertexLockMap.clear();
     return ;
@@ -362,10 +378,10 @@
   void Transaction::releaseEdgeLock( ) {
     for (auto LockEntry : EdgeLockMap) {
       auto lockptr = LockEntry.second.first->getLockPtr();
-      lockptr->tryUnlock(LockEntry.first, LockEntry.second.second);
-#ifdef _WAIT_DIE_
+#ifndef _NO_WAIT_
       LockEntry.first->retireTx(TransId, LockEntry.second.second);
 #endif
+      lockptr->tryUnlock(LockEntry.first, LockEntry.second.second);
     }
     EdgeLockMap.clear();
     return ;
@@ -380,26 +396,52 @@
     ///TODO need waitMap lock 
     auto lptr = vptr->getLockPtr();
     auto mptr = lptr->getMutexPtr(mt);
+    int trial = 10;
+    bool retValue = false;
     startWait(mptr);
-    while(!getVertexLock(vptr, mt, lt));
+#ifdef _TRANX_STATUS_
+    std::cout << "Transaction\t" << TransId
+              << "\twaits for vertex lock\t" << vptr->getId()
+              << "\n";
+#endif
+    while (trial-- > 0) {
+      retValue = getVertexLock(vptr, mt, lt);
+      if (retValue) {
+        break;
+      }
+    }
+//    while(!getVertexLock(vptr, mt, lt));
 //    while(!lptr->tryLock(mt, lt));
     endWait(mptr);
     ///TODO bug here need to return ret=getVertexLock()
 //    return registerVertexLock(vptr, mptr, lt);
-    return true;
+    return retValue;
   }
 
   bool Transaction::waitOn(EdgePointer eptr, MutexType mt, LockType lt) {
     ///TODO need waitMap lock 
     auto lptr = eptr->getLockPtr();
     auto mptr = lptr->getMutexPtr(mt);
+    int trial = 10;
+    bool retValue = false;
     startWait(mptr);
-    while(!getEdgeLock(eptr, mt, lt));
+#ifdef _TRANX_STATUS_
+    std::cout << "Transaction\t" << TransId
+              << "\twaits for edge lock\t" << eptr->getId()
+              << "\n";
+#endif
+    while (trial-- > 0) {
+      retValue = getEdgeLock(eptr, mt, lt);
+      if (retValue) 
+        break;
+    }
+//    while(!getEdgeLock(eptr, mt, lt));
 //    while(!lptr->tryLock(mt, lt));
     endWait(mptr);
 //    return registerEdgeLock(eptr, mptr, lt);
     ///TODO bug here need to return ret=getVertexLock()
-    return true;
+//    return true;
+    return retValue;
   }
 
   bool Transaction::startWait(MutexPointer MuPtr) {

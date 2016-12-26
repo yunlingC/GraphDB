@@ -71,24 +71,34 @@ public:
       return true;
     }
 
+#ifdef _TRANX_STATUS_
+    std::cout << "Transaction\t" << TxPtr->getId()
+              << "\tfails in getting vertex lock on\t" << VertexPtr->getId()
+              << "\tand needs a check\n";
+#endif
+    bool retValue = false;
+    LockManager.startDetect();
     if (checkLock<VertexPointer>(VertexPtr, Mutextype, Locktype, TxPtr, LockManager)) {
-#if _DEBUG_PRINT_
+#ifdef _TRANX_STATUS_
       std::cout << "Transaction\t" << TxPtr->getId() 
-                << "\t waits for Lock\t" << VertexPtr->getId()
+                << "\t waits for vertex Lock\t" << VertexPtr->getId()
                 << "\n";
 #endif
-      return TxPtr->waitOn(VertexPtr, Mutextype, Locktype);
+      retValue =  TxPtr->waitOn(VertexPtr, Mutextype, Locktype);
     }
     else {
-#if _DEBUG_PRINT_
+#ifdef _TRANX_STATUS_
       std::cout << "Transaction\t" << TxPtr->getId() 
-                << "\t aborts on Lock\t" << VertexPtr->getId()
+                << "\t aborts on vertex Lock\t" << VertexPtr->getId()
                 << "\n";
 #endif
 //      TxPtr->abort(VertexPtr, Mutextype, Locktype);
-      return false;
+//      return false;
     }
-    return true;
+
+    LockManager.endDetect();
+    return retValue;
+//    return true;
 #endif
   }
 
@@ -105,24 +115,34 @@ public:
     if (getLock) {
       return true;
     }
-    if (checkLock<EdgePointer>(EdgePtr, Mutextype, Locktype, TxPtr, LockManager)) {
-#if _DEBUG_PRINT_
-      std::cout << "Transaction\t" << TxPtr->getId() 
-                << "\t waits for Lock\t" << EdgePtr->getId()
-                << "\n";
+
+#ifdef _TRANX_STATUS_
+    std::cout << "Transaction\t" << TxPtr->getId()
+              << "\tfails in getting edge lock on\t" << EdgePtr->getId()
+              << "\tand needs a check\n";
 #endif
-      return TxPtr->waitOn(EdgePtr, Mutextype, Locktype);
+
+    bool retValue = false;
+    LockManager.startDetect();
+    if (checkLock<EdgePointer>(EdgePtr, Mutextype, Locktype, TxPtr, LockManager)) {
+#ifdef _TRANX_STATUS_
+//      std::cout << "Transaction\t" << TxPtr->getId() 
+//                << "\t waits for edge Lock\t" << EdgePtr->getId()
+//                << "\n";
+#endif
+      retValue = TxPtr->waitOn(EdgePtr, Mutextype, Locktype);
     }
     else {
-#if _DEBUG_PRINT_
+#ifdef _TRANX_STATUS_
       std::cout << "Transaction\t" << TxPtr->getId() 
                 << "\t aborts on Lock\t" << EdgePtr->getId()
                 << "\n";
 #endif
 //      TxPtr->abort(EdgePtr, Mutextype, Locktype);
-      return false;
+//      return false;
     }
-    return true;
+    LockManager.endDetect();
+    return retValue;
 #endif
   }
 
