@@ -18,6 +18,8 @@
 #include "TransactionManager.h"
 
 #ifdef _TRANX_STATS_
+#include <chrono>
+#include <thread>
 #include <iostream>
 #endif
 
@@ -47,6 +49,21 @@
       TransactionPointer TxPtr = nullptr;
   		if (TransTable.find(TxId) == TransTable.end()) return TxPtr;
       return TransTable.at(TxId);
+  }
+
+  auto TransactionManager::printTransaction(int num) 
+    -> void {
+#ifdef _TRANX_STATS_
+    while (num-- > 0) {
+      for (auto Tx : TransTable)  {
+        std::cout << "Transaction\t" << Tx.first
+                  << "\tstatus\t" << Tx.second->checkStatus()
+                  << "\n";
+      }
+  
+      std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    }
+#endif
   }
 
 #ifdef _TRANX_STATS_

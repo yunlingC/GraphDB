@@ -2,7 +2,7 @@
 #define _GLOBAL_H_
 
 
-#define _LOCKING_STORAGE_
+#define _LOCKING_STORAGE_ true
 
 ///This is for debug print in storage classes and reader classes
 //#define _DEBUG_ true

@@ -1408,23 +1408,27 @@
   auto LocksManager::startDetect()  
     -> void {
 #ifdef _DEADLOCK_DETECTION_
-    DeadlockDetector->lock();
+      DeadlockDetector->lock();
+      std::cout << "Deadlock detection starts\n";
 #endif
   }
 
   auto LocksManager::endDetect()
     -> void {
 #ifdef _DEADLOCK_DETECTION_
-    DeadlockDetector->unlock();
+      std::cout << "Deadlock detection ends\n";
+      DeadlockDetector->unlock();
 #endif
   }
 
+#ifdef _DEADLOCK_DETECTION_
+#if _LOCK_GUARD_
   auto LocksManager::checkWaitOn(TranxPointer TxPtr, MutexPointer MuPtr, LockType lt) 
     -> bool {
     /// This transaction cannot wait for more than one lock
     assert(TxPtr->checkTxWaitOn() == nullptr && "Transaction busy waiting");
 
-//    DeadlockDetector->lock();
+    startDetect();
 
     GuardSetType Guards;
     TranxSetType ChkTxSet;
@@ -1437,8 +1441,8 @@
       assert(Tx.first != TxPtr->getId() && "Transaction already holds this lock");
 
       auto LockingTx = TxManager.getTransaction(Tx.first);
-      if (Guards.find(LockingTx->getGuardPtr()) == Guards.end()) {
-//      if (ChkTxSet.find(LockingTx) == ChkTxSet.end())  {
+//      if (Guards.find(LockingTx->getGuardPtr()) == Guards.end()) {
+        if (ChkTxSet.find(LockingTx) == ChkTxSet.end())  {
         if (!checkWaitOnRecursive(TxPtr, LockingTx, ChkTxSet, Guards )) {
           retValue = false;
           break;
@@ -1446,6 +1450,7 @@
       }
     }
 
+    endDetect();
 //    DeadlockDetector->unlock();
     dismissGuard(Guards);
     std::cout << "Transaction\t" <<TxPtr->getId()
@@ -1465,10 +1470,10 @@
       }
 
       ChkTxSet.insert(LockingTx);
-      LockingTx->getGuardPtr()->lock();
-      Guards.insert(LockingTx->getGuardPtr());
+//      LockingTx->getGuardPtr()->lock();
+//      Guards.insert(LockingTx->getGuardPtr());
 
-      auto WaitMuPtr = LockingTx->getWaitMutexPtr();
+      auto WaitMuPtr = LockingTx->checkTxWaitOn();
       ///Locking Tx is not waiting
       if (!WaitMuPtr)  {
         return true;
@@ -1487,14 +1492,16 @@
 
       for (auto Tx : WaitMuPtr->getTx())  {
         auto LockingTxPtr = TxManager.getTransaction(Tx.first);
-        if (Guards.find(LockingTxPtr->getGuardPtr()) == Guards.end()) {
-//        if (ChkTxSet.find(LockingTxPtr) == ChkTxSet.end())  {
+//        if (Guards.find(LockingTxPtr->getGuardPtr()) == Guards.end()) {
+        if (ChkTxSet.find(LockingTxPtr) == ChkTxSet.end())  {
           if (! checkWaitOnRecursive(WaitingTx, LockingTxPtr, ChkTxSet, Guards))
             return false;
         }
       }
       return true;
   }
+#endif
+#endif
 /**
  * Following functions are not active 
  * This is because there is no lock map in LockManager

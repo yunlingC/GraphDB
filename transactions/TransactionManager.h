@@ -43,6 +43,8 @@ public:
 
   TransactionPointer getTransaction(IdType TxId);
 
+  void printTransaction(int );
+
   ~TransactionManager();
 
 #ifdef _TRANX_STATS_

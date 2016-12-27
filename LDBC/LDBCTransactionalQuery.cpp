@@ -1348,7 +1348,6 @@ public:
     chainEdges();
     LockManager.lockVertex();
     Graph.addVertex(NewVertex);
-//    LockManager.addToVertexLockMap(NewVertex->getId());
     Index.buildVertexIndex("id", NewVertex);
     LockManager.unlockVertex();
 
@@ -1356,7 +1355,6 @@ public:
     for(auto EdgePtr : EdgePtrMap)  {
       if (EdgePtr.first) {
         Graph.addEdge(EdgePtr.first, false);
-//        LockManager.addToEdgeLockMap(EdgePtr.first->getId());
       }
     }
     LockManager.unlockEdge();

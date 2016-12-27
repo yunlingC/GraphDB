@@ -15,11 +15,9 @@
 #ifndef _TRANSACTIONAL_BFS_H_
 #define _TRANSACTIONAL_BFS_H_
 
-/// Local includes.
 #include "GraphType.h"
 #include "Visitor.h"
 #include "Transaction.h"
-//#include "TransactionManager.h"
 #include "LocksManager.h"
 #include "global.h"
 
@@ -77,7 +75,7 @@ public:
               << "\tand needs a check\n";
 #endif
     bool retValue = false;
-    LockManager.startDetect();
+//    LockManager.startDetect();
     if (checkLock<VertexPointer>(VertexPtr, Mutextype, Locktype, TxPtr, LockManager)) {
 #ifdef _TRANX_STATUS_
       std::cout << "Transaction\t" << TxPtr->getId() 
@@ -96,7 +94,7 @@ public:
 //      return false;
     }
 
-    LockManager.endDetect();
+//    LockManager.endDetect();
     return retValue;
 //    return true;
 #endif
@@ -123,7 +121,7 @@ public:
 #endif
 
     bool retValue = false;
-    LockManager.startDetect();
+//    LockManager.startDetect();
     if (checkLock<EdgePointer>(EdgePtr, Mutextype, Locktype, TxPtr, LockManager)) {
 #ifdef _TRANX_STATUS_
 //      std::cout << "Transaction\t" << TxPtr->getId() 
@@ -141,7 +139,7 @@ public:
 //      TxPtr->abort(EdgePtr, Mutextype, Locktype);
 //      return false;
     }
-    LockManager.endDetect();
+//    LockManager.endDetect();
     return retValue;
 #endif
   }

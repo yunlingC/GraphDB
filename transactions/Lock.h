@@ -80,7 +80,7 @@ public:
 //    std::cout << "Transaction\t" << txid
 //              << "\twaits to retire lock\t" << MutexPtr
 //              << "\n";
-    MutexGuardPtr->lock();
+//    MutexGuardPtr->lock();
 
     if (TxMap.find(txid) != TxMap.end())  {
       if (TxMap[txid] == lt)
@@ -92,7 +92,7 @@ public:
     else {
       assert(false && "Transaction does NOT register this lock");
     }
-    MutexGuardPtr->unlock();
+//    MutexGuardPtr->unlock();
   }
 
   TxMapType getTx() {

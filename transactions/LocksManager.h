@@ -198,9 +198,13 @@ public:
 
   void  releaseAll(VLockListType & VertexLocks, ELockListType & EdgeLocks); 
 
+#ifdef _DEADLOCK_DETECTION_
+#if _LOCK_GUARD_
   bool  checkWaitOn(TranxPointer, MutexPointer, LockType);
 
-  bool checkWaitOnRecursive(TranxPointer, TranxPointer, TranxSetType, GuardSetType);
+  bool  checkWaitOnRecursive(TranxPointer, TranxPointer, TranxSetType, GuardSetType);
+#endif
+#endif
 
   void  addToVertexLockMap(IdType VertexId);
 

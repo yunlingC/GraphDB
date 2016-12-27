@@ -27,7 +27,8 @@
 #define MILLION 1000000
 #define NANO 1000000000
 #define SCALE 1000
-
+#define FIRST_TRY  20
+#define SECOND_TRY  20
 //  Transaction::Transaction() : TransId(0), TransStatus(T_EXPANDING) {
 
   Transaction::Transaction(IdType id) : TransId(id), TransStatus(T_EXPANDING){
@@ -216,16 +217,16 @@
   bool Transaction::registerVertexLock(VertexPointer vptr, MutexPointer mptr, LockType lktype) {
 
 #ifdef _WAIT_DIE_
-    while (!mptr->registerTx(TransId, lktype))
+    while (!mptr->registerTx(TransId, lktype));
 #elif defined _DEADLOCK_DETECTION_
-    if (!mptr->registerTx(TransId, lktype)) {
+    while (!mptr->registerTx(TransId, lktype)) {
 #if _DEBUG_PRINT_
 //#ifdef _TRANX_STATUS_
       std::cout << "Transaction\t" << TransId
                 << "\t cannot register vertex lock\t" << vptr->getId()
                 << "\n";
 #endif
-      return false;
+//      return false;
     }
 #endif
 
@@ -236,16 +237,16 @@
   bool Transaction::registerEdgeLock(EdgePointer eptr, MutexPointer mptr, LockType lktype) {
 
 #ifdef _WAIT_DIE_
-    while (!mptr->registerTx(TransId, lktype))
+    while (!mptr->registerTx(TransId, lktype));
 #elif defined _DEADLOCK_DETECTION_
-    if (!mptr->registerTx(TransId, lktype)) {
+    while (!mptr->registerTx(TransId, lktype)) {
 //#ifdef _TRANX_STATUS_
 #if _DEBUG_PRINT_
       std::cout << "Transaction\t" << TransId
                 << "\t cannot register edge lock\t" << eptr->getId()
                 << "\n";
 #endif
-      return false;
+//      return false;
     }
 #endif
 
@@ -288,7 +289,7 @@
       return true;
     }
 
-    int trial = 2;
+    int trial = FIRST_TRY;
 
     while (trial-- > 0) {
     if (lockptr->tryLock(mt, lt)) {
@@ -320,7 +321,7 @@
       return true;
     }
 
-    int trial = 5;
+    int trial = FIRST_TRY;
 
     while (trial-- > 0) {
     if (lockptr->tryLock(mt, lt)) {
@@ -396,7 +397,7 @@
     ///TODO need waitMap lock 
     auto lptr = vptr->getLockPtr();
     auto mptr = lptr->getMutexPtr(mt);
-    int trial = 10;
+    int trial = SECOND_TRY;
     bool retValue = false;
     startWait(mptr);
 #ifdef _TRANX_STATUS_
@@ -422,7 +423,7 @@
     ///TODO need waitMap lock 
     auto lptr = eptr->getLockPtr();
     auto mptr = lptr->getMutexPtr(mt);
-    int trial = 10;
+    int trial = SECOND_TRY;
     bool retValue = false;
     startWait(mptr);
 #ifdef _TRANX_STATUS_
