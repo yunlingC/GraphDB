@@ -77,6 +77,9 @@ public:
   }
 
   void retireTx(TransIdType txid, LockType lt) {
+//    std::cout << "Transaction\t" << txid
+//              << "\twaits to retire lock\t" << MutexPtr
+//              << "\n";
     MutexGuardPtr->lock();
 
     if (TxMap.find(txid) != TxMap.end())  {
