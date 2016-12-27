@@ -1405,12 +1405,26 @@
       releaseEdgeAll(EdgeLocks);
   }
 
+  auto LocksManager::startDetect()  
+    -> void {
+#ifdef _DEADLOCK_DETECTION_
+    DeadlockDetector->lock();
+#endif
+  }
+
+  auto LocksManager::endDetect()
+    -> void {
+#ifdef _DEADLOCK_DETECTION_
+    DeadlockDetector->unlock();
+#endif
+  }
+
   auto LocksManager::checkWaitOn(TranxPointer TxPtr, MutexPointer MuPtr, LockType lt) 
     -> bool {
     /// This transaction cannot wait for more than one lock
     assert(TxPtr->checkTxWaitOn() == nullptr && "Transaction busy waiting");
 
-    DeadlockDetector->lock();
+//    DeadlockDetector->lock();
 
     GuardSetType Guards;
     TranxSetType ChkTxSet;
@@ -1423,7 +1437,8 @@
       assert(Tx.first != TxPtr->getId() && "Transaction already holds this lock");
 
       auto LockingTx = TxManager.getTransaction(Tx.first);
-      if (ChkTxSet.find(LockingTx) == ChkTxSet.end())  {
+      if (Guards.find(LockingTx->getGuardPtr()) == Guards.end()) {
+//      if (ChkTxSet.find(LockingTx) == ChkTxSet.end())  {
         if (!checkWaitOnRecursive(TxPtr, LockingTx, ChkTxSet, Guards )) {
           retValue = false;
           break;
@@ -1431,8 +1446,12 @@
       }
     }
 
-    DeadlockDetector->unlock();
+//    DeadlockDetector->unlock();
     dismissGuard(Guards);
+    std::cout << "Transaction\t" <<TxPtr->getId()
+              << "\tfinishes detecting and holds guards\t"
+              << Guards.size() << "\n";
+
     return retValue;
   }
 
@@ -1455,12 +1474,21 @@
         return true;
       }
 
-      WaitMuPtr->getGuardPtr()->lock();
-      Guards.insert(WaitMuPtr->getGuardPtr());
+      /// Avoid traversing the same mutex twice by checking 
+      /// if its Guard has been inserted into Guards set or not.
+      /// This is O(1) operation since we use hash set here
+      auto MuGuard = WaitMuPtr->getGuardPtr();
+      if (Guards.find(MuGuard) != Guards.end()) {
+        return true;
+      }
+      
+      MuGuard->lock();
+      Guards.insert(MuGuard);
 
       for (auto Tx : WaitMuPtr->getTx())  {
         auto LockingTxPtr = TxManager.getTransaction(Tx.first);
-        if (ChkTxSet.find(LockingTxPtr) == ChkTxSet.end())  {
+        if (Guards.find(LockingTxPtr->getGuardPtr()) == Guards.end()) {
+//        if (ChkTxSet.find(LockingTxPtr) == ChkTxSet.end())  {
           if (! checkWaitOnRecursive(WaitingTx, LockingTxPtr, ChkTxSet, Guards))
             return false;
         }

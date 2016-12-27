@@ -208,6 +208,10 @@ public:
  
   void  buildLockMap(GraphType & Graph); 
 
+  void  startDetect();
+
+  void  endDetect();
+
 #endif
   void lockVertex();
   
