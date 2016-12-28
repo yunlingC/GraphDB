@@ -8,7 +8,9 @@ enum TransStatusType {T_EXPANDING
                       , T_COMMIT
                       , T_ABORT
                       , T_ROLLBACK
-                      , T_SHRINKING};
+                      , T_WAIT
+                      , T_SHRINKING
+                      , T_CLOSE};
 
 enum MutexType { T_ID
                 , T_Property

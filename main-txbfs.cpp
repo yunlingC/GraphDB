@@ -310,7 +310,7 @@ int main(int argc, char *argv[]) {
 
 
     ///For debug
-    threads.push_back(std::thread([&]{TmManager.printTransaction(10);}));
+    threads.push_back(std::thread([&]{TmManager.printTransaction(20);}));
 
     for_each(threads.begin(), threads.end(), std::mem_fn(&thread::join)); 
   }

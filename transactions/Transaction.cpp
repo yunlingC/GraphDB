@@ -134,6 +134,7 @@
                   << "\tCLOSE\n";
 #endif
     
+    TransStatus = T_CLOSE;
     return true;
   }
 
@@ -389,6 +390,7 @@
   }
 
   void Transaction::releaseLock()  {
+//    TransStatus = T_SHRINKING;
     releaseVertexLock();
     releaseEdgeLock();
   }
@@ -453,6 +455,8 @@
 
     WaitGuardPtr->unlock();
 #endif
+    
+//    TransStatus = T_WAIT;
     return true;
   }
 
@@ -465,6 +469,7 @@
 
     WaitGuardPtr->unlock();
 #endif
+//    TransStatus = T_EXPANDING;
     return true;
   }
 
