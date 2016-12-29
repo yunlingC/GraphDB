@@ -435,8 +435,9 @@
 #endif
     while (trial-- > 0) {
       retValue = getEdgeLock(eptr, mt, lt);
-      if (retValue) 
+      if (retValue) {
         break;
+      }
     }
 //    while(!getEdgeLock(eptr, mt, lt));
 //    while(!lptr->tryLock(mt, lt));
@@ -456,7 +457,7 @@
     WaitGuardPtr->unlock();
 #endif
     
-//    TransStatus = T_WAIT;
+    TransStatus = T_WAIT;
     return true;
   }
 
@@ -469,7 +470,7 @@
 
     WaitGuardPtr->unlock();
 #endif
-//    TransStatus = T_EXPANDING;
+    TransStatus = T_EXPANDING;
     return true;
   }
 

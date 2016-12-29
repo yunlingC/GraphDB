@@ -70,6 +70,13 @@ public:
       return false;
 
     ///TODO need to do a check before insertion
+    if(TxMap.find(txid) != TxMap.end()) {
+      if (TxMap[txid] != lt) {
+        assert(false && "Transaction already registers this lock");
+      }
+      assert(false && "Transaction already registers this lock");
+    }
+
     TxMap.insert(TxLockPairType(txid, lt));
 
     MutexGuardPtr->unlock();

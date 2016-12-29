@@ -39,7 +39,7 @@ public:
 public:
 
   template<typename ObjectPointer>
-  bool checkLock(ObjectPointer ObjPtr
+  bool checkWait(ObjectPointer ObjPtr
                , MutexType Mutextype
                , LockType Locktype
                , TransactionPointer TxPtr
@@ -75,8 +75,7 @@ public:
               << "\tand needs a check\n";
 #endif
     bool retValue = false;
-//    LockManager.startDetect();
-    if (checkLock<VertexPointer>(VertexPtr, Mutextype, Locktype, TxPtr, LockManager)) {
+    if (checkWait<VertexPointer>(VertexPtr, Mutextype, Locktype, TxPtr, LockManager)) {
 #ifdef _TRANX_STATUS_
       std::cout << "Transaction\t" << TxPtr->getId() 
                 << "\t waits for vertex Lock\t" << VertexPtr->getId()
@@ -94,9 +93,7 @@ public:
 //      return false;
     }
 
-//    LockManager.endDetect();
     return retValue;
-//    return true;
 #endif
   }
 
@@ -121,8 +118,7 @@ public:
 #endif
 
     bool retValue = false;
-//    LockManager.startDetect();
-    if (checkLock<EdgePointer>(EdgePtr, Mutextype, Locktype, TxPtr, LockManager)) {
+    if (checkWait<EdgePointer>(EdgePtr, Mutextype, Locktype, TxPtr, LockManager)) {
 #ifdef _TRANX_STATUS_
 //      std::cout << "Transaction\t" << TxPtr->getId() 
 //                << "\t waits for edge Lock\t" << EdgePtr->getId()
@@ -139,7 +135,6 @@ public:
 //      TxPtr->abort(EdgePtr, Mutextype, Locktype);
 //      return false;
     }
-//    LockManager.endDetect();
     return retValue;
 #endif
   }

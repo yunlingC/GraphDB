@@ -1408,7 +1408,14 @@
   auto LocksManager::startDetect()  
     -> void {
 #ifdef _DEADLOCK_DETECTION_
-      DeadlockDetector->lock();
+      std::lock_guard<std::mutex> guard(*DeadlockDetector);
+//      DeadlockDetector->lock();
+      int pt = 5;
+      while (!DeadlockDetector->try_lock()) {
+        if (pt-- > 0) {
+          std::cout <<"Spin on dl_detector\n";
+        }
+      }
       std::cout << "Deadlock detection starts\n";
 #endif
   }
@@ -1417,6 +1424,7 @@
     -> void {
 #ifdef _DEADLOCK_DETECTION_
       std::cout << "Deadlock detection ends\n";
+      std::lock_guard<std::mutex> guard(*DeadlockDetector);
       DeadlockDetector->unlock();
 #endif
   }
@@ -1443,16 +1451,15 @@
       auto LockingTx = TxManager.getTransaction(Tx.first);
 //      if (Guards.find(LockingTx->getGuardPtr()) == Guards.end()) {
         if (ChkTxSet.find(LockingTx) == ChkTxSet.end())  {
-        if (!checkWaitOnRecursive(TxPtr, LockingTx, ChkTxSet, Guards )) {
-          retValue = false;
-          break;
+          if (!checkWaitOnRecursive(TxPtr, LockingTx, ChkTxSet, Guards )) {
+            retValue = false;
+            break;
+          }
         }
-      }
     }
 
-    endDetect();
-//    DeadlockDetector->unlock();
     dismissGuard(Guards);
+    endDetect();
     std::cout << "Transaction\t" <<TxPtr->getId()
               << "\tfinishes detecting and holds guards\t"
               << Guards.size() << "\n";
