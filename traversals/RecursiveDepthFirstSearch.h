@@ -49,7 +49,7 @@ void recursiveDFS(GraphType & Graph,
 
   bool ExitMatch = GraphVisitor.checkVertex(CurrentVertex);
   if (ExitMatch == true) { 
-    ///should be exit here
+    /// Should be exit here
     exit(0);
   }
 
@@ -71,6 +71,9 @@ void recursiveDFS(GraphType & Graph,
 
     bool DirectionMatch = GraphVisitor.visitDirection(TargetVertex, NextEdge);
 
+    /// Return instead of breaking out of the loop
+    /// Once returned, RDFT traverses path from last vertex it visits.
+    /// Exiting is not recommanded
     if (BranchMatch == true) {
       return;
     }

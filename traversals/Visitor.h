@@ -20,8 +20,13 @@
 
 class GraphType;
 
+/// This is a base class of visitor
+/// With default settings in this class, BFT and DFT traverses 
+/// the whole graph and visits each vertex andd edge once.
+/// Return values of each function below can be customized according to queries.
 class Visitor {
 public:
+  /// FixedString can be replaced with std::string
   typedef FixedString KeyType;
   typedef FixedString ValueType;
   typedef GraphType::VertexPointer VertexPointer;
@@ -80,9 +85,7 @@ public:
     return false;
   }
 
-  ///for RecursiveDepthFirstSearch only
-  /// shoulb be built in another derived class
-  ///TODO
+  ///For RecursiveDepthFirstSearch only
   virtual bool checkVertex(VertexPointer VertexPtr) {
     return false;
   }
@@ -95,13 +98,13 @@ public:
     return false;
   }
   virtual bool scheduleEdge(EdgePointer EdgePtr) {
-    /// default value = true so that the vertex will be pushed into queue 
+    /// Default value = true so that the vertex will be pushed into queue 
     return true; 
   }
 
-  /// for bfs only
+  /// For bfs only
   virtual bool visitDirection(VertexPointer TargetVertex, EdgePointer EdgePtr){
-    /// the same above
+    /// The same reason as above
     return true; 
   }
 
@@ -135,6 +138,7 @@ protected:
   VertexSetType   VertexSet;
   FilterType Filter;
 //#ifdef _STATS_
+/// Visitor collects stats during each traversal
   int NumVertices;
   int NumEdges;
 //#endif 

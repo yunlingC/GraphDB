@@ -33,6 +33,7 @@ void depthFirstSearch(GraphType & Graph,
   VertexStack.push_back(ScheduledVertex);
   GraphVisitor.visitStartVertex(ScheduledVertex);
 
+  /// ColorMap is used to not enter a loop (in acyclic graphs)
   ColorMap.insert(VisitPair(ScheduledVertex, false));
 
   GraphType::VertexPointer TargetVertex = nullptr;
@@ -59,11 +60,15 @@ void depthFirstSearch(GraphType & Graph,
     GraphVisitor.countEdge(NextEdge);
 #endif
       TargetVertex = NextEdge->getTarget(ScheduledVertex);
+      /// Revisit flag is set when one vertex appears in different depths 
+      /// and count depth is needed.
       bool RevisitFlag = GraphVisitor.discoverVertex(TargetVertex);
       bool BranchMatch = GraphVisitor.scheduleBranch(ScheduledVertex, NextEdge, TargetVertex);
+      /// Type (label) and direction decide to visit later or not
       bool TypeMatch = GraphVisitor.scheduleEdge(NextEdge);
       bool DirectionMatch = GraphVisitor.visitDirection(TargetVertex, NextEdge);
 
+      /// Break out of the loop but not return
       if (BranchMatch == true)
         break;
 

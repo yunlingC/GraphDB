@@ -20,10 +20,10 @@
 #include <map>
 #include <vector>
 
-
+/// This class is mainly for passing parameters to visitor
+/// Params include direction, label, depth and so on.
 class FilterType {
 public:
-  ///TODO: enum every type
   typedef std::string KeyType;
   typedef std::string ValueType;
   typedef std::string Type;
@@ -80,6 +80,7 @@ public:
     _TypeList = typeList;
   }
 
+  /// Usually this is used when filtering time (date, month, year) is needed
   auto setValueRange(KeyType key, ValueType valueMin, ValueType valueMax) 
     -> void {
     _Key = key;
@@ -89,6 +90,8 @@ public:
     _ValueRange = ValueList;
   }
 
+  /// Used when multiple labels of vertices/edges are allowed 
+  /// to be traversed for a certain depth.
   auto setValueList(KeyType key, ValueListType & ValueList) 
     -> void {
     _Key = key;
@@ -111,6 +114,7 @@ public:
   }
 
   
+  /// Clear filter for other depths filters are not defined for.
   void setDefault() {
     _Key = "";
     _Value = "";
@@ -169,6 +173,7 @@ public:
     return _BranchPropertyMap;
   }
 
+  /// Traversal only goes to branch of certain type
   auto getBranchMap() 
     -> BranchMapTypeReference {
     return _BranchMap;
