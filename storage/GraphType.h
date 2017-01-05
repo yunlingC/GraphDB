@@ -20,7 +20,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-///TODO : GraphType for immutable graphs
 class GraphType {
 public:
   /// Typedefs that are used to refer to within other classes.
@@ -31,8 +30,8 @@ public:
   typedef std::vector<EdgePointer> EdgeList;
   typedef std::vector<VertexPointer> VertexList;
   typedef std::vector<VertexDescriptor> VertexIDList;
+  /// PropertyList def should be the same in Vertex and Edge class
   typedef PropertyList<FixedString, FixedString> PropertyListType;
-//  typedef PropertyList<std::string, std::string> PropertyListType;
   typedef PropertyListType VertexPropertyList;
   typedef PropertyListType EdgePropertyList;
   typedef std::pair<VertexDescriptor, VertexPointer> VertexEntryType;

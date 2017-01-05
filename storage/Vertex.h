@@ -20,29 +20,30 @@
 
 #include <vector>
 
-/// Forward declaration.
 #ifdef _LOCKING_STORAGE_
 #include "Lock.h"
 #endif
 
+/// Forward declaration.
 class Edge;
 
 class Vertex { 
 public:
   typedef Edge* EdgePtr;
   typedef unsigned int EdgeDescriptor;
+  /// Alternate type std::string
   typedef FixedString KeyType;
   typedef FixedString ValueType;
   typedef FixedString LabelType;
-#ifdef _LOCKING_STORAGE_
-  typedef VertexLock* VertexLockPointer;
-#endif
-
   // PropertyList typedefs.
   typedef PropertyList< KeyType, ValueType > PropertyListType;
   typedef PropertyListType& PropertyListTypeReference;
   typedef std::vector<EdgePtr>& EdgeListReference;
   typedef std::pair<ValueType, bool> ReturnPropertyValueType;
+
+#ifdef _LOCKING_STORAGE_
+  typedef VertexLock* VertexLockPointer;
+#endif
 
 public:
   Vertex();
@@ -75,17 +76,18 @@ public:
 
 
 protected:
-  // Vertex id.
+  /// Vertex id.
   unsigned int VertexId;
-  // Pointer to next relationship
+  /// Pointer to next relationship
   EdgePtr NextEdge;
-
-//  EdgePtr LastEdge;
-
+  /// LastEdge is not in use
+  // EdgePtr LastEdge;
+  /// LabelType can be string or FixedString
   LabelType VertexLabel;
-
+  /// PropertyList <KeyType, ValueType>
   PropertyListType VertexPropertyList;
-
+  /// Embedded lock for each vertex
+  /// macros are defined in "global.h"
 #ifdef _LOCKING_STORAGE_
   VertexLockPointer  LockPtr; 
 #endif 

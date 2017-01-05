@@ -93,23 +93,24 @@ public:
 protected:
   unsigned int EdgeId;
 
-  // Pointer to first node.
+  /// Pointer to first node.
   VertexPointer  FirstVertex;
-  // Pointer to second node.
+  /// Pointer to second node.
   VertexPointer SecondVertex;
 
-  // Pointer to first pointer's next relationship.
+  /// Pointer to first pointer's next relationship.
   EdgePointer FirstNextEdge;
-  // Pointer to first pointer's previous relationship.
+  /// Pointer to first pointer's previous relationship.
   EdgePointer FirstPreviousEdge;
 
-  // Repeat for second.
+  /// Repeat for second.
   EdgePointer SecondNextEdge;
   EdgePointer SecondPreviousEdge;
   
-  // Label to denote type.
+  /// Label to denote type.
   LabelType EdgeLabel;
 
+  /// PropertyList<KeyType, ValueType> 
   PropertyListType EdgePropertyList;
 
 #ifdef _LOCKING_STORAGE_
