@@ -2,12 +2,14 @@
 #define _GLOBAL_H_
 
 
+//#define _FIXALLOC_ true
+
 #define _LOCKING_STORAGE_ true
 
 ///This is for debug print in storage classes and reader classes
 //#define _DEBUG_ true
 
-#define _DEBUG_ENABLE_ true
+//#define _DEBUG_ENABLE_ true
 
 #define _DEADLOCK_DETECTION_  true
 

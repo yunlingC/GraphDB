@@ -192,7 +192,12 @@ auto GraphType::getInNeighbors(VertexPointer CurrentVertex)
 
 auto  GraphType::addVertex() 
   -> VertexDescriptor {
+    
+#ifdef _FIXALLOC_
+  VertexPointer NewVertex = new(fixallocVertex()) Vertex();
+#else
   VertexPointer NewVertex = new Vertex();
+#endif
 
   NewVertex->setId(NumberOfVertices); 
   VertexMap.insert(VertexEntryType(NumberOfVertices, NewVertex));
@@ -204,7 +209,11 @@ auto  GraphType::addVertex()
 auto GraphType::addVertex(std::string Label, 
                           PropertyListType & InitialPropertyList) 
   -> VertexDescriptor {
+#ifdef _FIXALLOC_
+  VertexPointer NewVertex = new(fixallocVertex()) Vertex();
+#else
   VertexPointer NewVertex = new Vertex();
+#endif
   NewVertex->setPropertyList(InitialPropertyList);
   NewVertex->setId(NumberOfVertices); 
   NewVertex->setType(Label);
@@ -216,7 +225,11 @@ auto GraphType::addVertex(std::string Label,
 
 auto GraphType::addVertex(PropertyListType & InitialPropertyList) 
   -> VertexDescriptor { 
-  VertexPointer NewVertex = new Vertex(); 
+#ifdef _FIXALLOC_
+  VertexPointer NewVertex = new(fixallocVertex()) Vertex();
+#else
+  VertexPointer NewVertex = new Vertex();
+#endif
   NewVertex->setPropertyList(InitialPropertyList);
   NewVertex->setId(NumberOfVertices); 
   VertexMap.insert(VertexEntryType(NumberOfVertices, NewVertex));
@@ -225,6 +238,8 @@ auto GraphType::addVertex(PropertyListType & InitialPropertyList)
   return NewVertex->getId();
 }
 
+/// This function does NOT have FIXALLOC option unless specified
+/// in Visitor or Query
 auto GraphType::addVertex(VertexPointer NewVertex) 
   ->  VertexDescriptor {
   NewVertex->setId(NumberOfVertices); 
@@ -329,7 +344,11 @@ auto GraphType::assignPointers(VertexDescriptor vs, VertexDescriptor vd,
 auto GraphType::addEdge(VertexDescriptor StartVertex, 
                         VertexDescriptor EndVertex) 
   -> EdgeDescriptor {
+#ifdef _FIXALLOC_
+  EdgePointer NewEdge = new(fixallocEdge()) Edge(VertexMap[StartVertex], VertexMap[EndVertex]);
+#else 
   EdgePointer NewEdge = new Edge(VertexMap[StartVertex], VertexMap[EndVertex]);
+#endif
   NewEdge->setId(NumberOfEdges);
   assignPointers(StartVertex, EndVertex, NewEdge);
   EdgeMap.insert(EdgeEntryType(NumberOfEdges, NewEdge));
@@ -342,7 +361,11 @@ auto GraphType::addEdge(VertexDescriptor StartVertex,
                                       VertexDescriptor EndVertex, 
                                       const std::string & Label) 
   -> EdgeDescriptor {
+#ifdef _FIXALLOC_
+  EdgePointer NewEdge = new(fixallocEdge()) Edge(VertexMap[StartVertex], VertexMap[EndVertex]);
+#else 
   EdgePointer NewEdge = new Edge(VertexMap[StartVertex], VertexMap[EndVertex]);
+#endif
   
   NewEdge->setId(NumberOfEdges);
   NewEdge->setType(Label);
@@ -358,7 +381,11 @@ auto  GraphType::addEdge(VertexDescriptor StartVertex,
                        PropertyListType & InitialPropertyList) 
   -> EdgeDescriptor {
 
+#ifdef _FIXALLOC_
+  EdgePointer NewEdge = new(fixallocEdge()) Edge(VertexMap[StartVertex], VertexMap[EndVertex]);
+#else 
   EdgePointer NewEdge = new Edge(VertexMap[StartVertex], VertexMap[EndVertex]);
+#endif
 
   NewEdge->setPropertyList(InitialPropertyList);
   NewEdge->setId(NumberOfEdges);    
@@ -375,7 +402,11 @@ auto GraphType::addEdge(VertexDescriptor StartVertex,
                        PropertyListType & InitialPropertyList) 
   -> EdgeDescriptor {
 
+#ifdef _FIXALLOC_
+  EdgePointer NewEdge = new(fixallocEdge()) Edge(VertexMap[StartVertex], VertexMap[EndVertex]);
+#else 
   EdgePointer NewEdge = new Edge(VertexMap[StartVertex], VertexMap[EndVertex]);
+#endif
 
   NewEdge->setType(Label);
   NewEdge->setPropertyList(InitialPropertyList);
@@ -444,11 +475,11 @@ GraphType::~GraphType() {
 //    delete EdgeMap[i];
 //  }
 //
-//  #ifdef _FIXALLOC_
-//    ///    Delete the memory spaces.
-//    delete NodeMemory;
-//    delete EdgeMemory;
-//  #endif /* _FIXALLOC_ */
+  #ifdef _FIXALLOC_
+    ///    Delete the memory spaces.
+    delete NodeMemory;
+    delete EdgeMemory;
+  #endif /* _FIXALLOC_ */
 
 }
 
@@ -486,6 +517,41 @@ GraphType::~GraphType() {
 ///              << reinterpret_cast<int*>(EdgeMemory + sizeof(Edge)*sz) 
 ///              << "\n";
   }
+
+  auto GraphType::fixallocVertex() 
+  -> char * {
+    if (NodeMemory == NULL) {
+#ifdef _DEBUG_PRINT_
+      cout << "ERROR: Vertex space not allocated\n";
+#endif
+      exit(1);
+    }
+
+    char * placePtr = NodeMemory + NumberOfVertices*sizeof(Vertex);
+#ifdef _DEBUG_PRINT_
+    cout << "Place vertex at\t" << reinterpret_cast<int*>(placePtr) 
+          << "\n";
+#endif
+    return placePtr;
+  }
+
+  auto GraphType::fixallocEdge()  
+  -> char * {
+    if (EdgeMemory == NULL) {
+#ifdef _DEBUG_PRINT_
+      cout << "ERROR: Edge space not allocated\n";
+#endif
+      exit(1);
+    }
+
+    char * placePtr = EdgeMemory + NumberOfEdges*sizeof(Edge);
+#ifdef _DEBUG_PRINT_
+    cout << "Place edge at\t" << reinterpret_cast<int*>(placePtr) 
+          << "\n";
+#endif
+    return placePtr;
+  }
+
 #endif /* _FIXALLOC_ */
 
 

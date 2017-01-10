@@ -20,6 +20,11 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#ifdef _DEBUG_PRINT_ 
+#include <iostream>
+using std::cout;
+#endif 
+
 class GraphType {
 public:
   /// Typedefs that are used to refer to within other classes.
@@ -119,6 +124,11 @@ public:
   void allocEdgeMemory(unsigned int Size);
 
   void allocEdgeMemory(char *StartMemory, unsigned int Size);
+
+  /// Compute and return pre-alloc starting address for next vertex/edge
+  char * fixallocVertex();
+
+  char * fixallocEdge();
 
 #endif /* _FIXALLOC_ */
 
