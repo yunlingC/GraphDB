@@ -19,7 +19,7 @@
 #include "DepthFirstSearch.h"
 #include "CustomVisitor.h"
 
-#define _PRINTGDB_ 1
+#define _PRINTGDB_ 0
 
 #ifdef _PRINTGDB_
 #include <fstream>

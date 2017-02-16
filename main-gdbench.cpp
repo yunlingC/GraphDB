@@ -2,8 +2,9 @@
 #include "QueryDescription.h"
 #include "QueryRandomizer.h"
 #include "GraphType.h"
+#include "NeoReader.h"
+#include "helper.h"
 
-//#include "macros.h"
 #include <iostream>
 #include <string>
 #include <time.h>
@@ -30,9 +31,15 @@ int main(int argc, char *argv[]) {
   std::cout << "Begin testing\n";
 
   GDBReader reader(g);
-  reader.readFile("../tests/gd/sndata1000.gd");
+  reader.readFile("/home/y49cui/research/graph/gromit/gdbench/graphdb/tests/gd/sndata.gd");
 
-  cout << "begin randomizing\n";
+  cout << "Done reading graph\n";
+
+  NeoReader input;
+  input.readFile("/home/y49cui/research/graph/gromit/gdbench/graphdb/readers/GDBenchQueryInput.csv");
+
+  cout << "Done reading input\n";
+//  cout << "begin randomizing\n";
   QueryRandomizer rander(reader);
 
 //  string name[5], pid[5] ;
@@ -56,14 +63,15 @@ int main(int argc, char *argv[]) {
 */
 
 
-  if(argc < 3) {
-    cout <<"Error: At least 2 arguments\n";
+  if(argc < 1) {
+    cout <<"Error: At least 1 arguments\n";
     return 1;
-  } else {
+  } 
+
     string name, pid;
     GraphType::VertexDescriptor webId, personId1, personId2, personId3;
 
-    auto id = atoi(argv[2]);
+    auto id = 0; //atoi(argv[2]);
     if ((id < 0) || (id > 499)) {
       cout <<"Error: Out of range(0:499)\n";
       return 0;
@@ -76,15 +84,15 @@ int main(int argc, char *argv[]) {
     personId2 = rander.getAPersonIndex(id);
     personId3 = 0;
     if(argc > 3) {
-      personId3 = atoi(argv[3]);
+      personId3 = 10; //atoi(argv[3]);
     }
 
-    cout << "name\t" << name << endl 
-         << "pid\t" << pid << endl 
-         << "webId\t" << webId << endl 
-         << "personId1\t" <<  personId1 << endl 
-         << "personId\t" <<  personId2 << endl 
-         << "personId3\t" << personId3 << endl;
+//    cout << "name\t" << name << endl 
+//         << "pid\t" << pid << endl 
+//         << "webId\t" << webId << endl 
+//         << "personId1\t" <<  personId1 << endl 
+//         << "personId\t" <<  personId2 << endl 
+//         << "personId3\t" << personId3 << endl;
 
     Query1 Q1;
     Query2 Q2;
@@ -135,8 +143,12 @@ int main(int argc, char *argv[]) {
     QueryList.push_back(&Q13);
     QueryList.push_back(&Q14);
 
-    auto qid = atoi(argv[1]);
-    if((qid < 1) || (qid > 14)) {
+    auto qid = 0; 
+    if (argc > 1) {
+      qid = atoi(argv[1]);
+    }
+
+    if((qid < 0) || (qid > 14)) {
       cout <<"Error: Out of range(1:14)\n";
       return 1;
     }
@@ -149,14 +161,67 @@ int main(int argc, char *argv[]) {
     }
 
     cout <<"query number is " << qid << endl;
-    auto query = QueryList[qid-1];
 
-    query->runQuery(g, 2);
+    auto query = QueryList[0];
+    if (qid > 0) {
+      query = QueryList[qid-1];
+    }
 
-  }
+    auto begin = get_clock();
 
+    switch(qid) {
+      case 1: 
+        for (int i = 0; i < 100; i++) {
+          name = input.getInput()[i];
+          query->setPersonProperty("name", name);
+          query->runQuery(g, 2);
+        }
+        break;
 
+      case 2:
+        for (int i = 100; i < 200; i++) {
+          webId= std::stoi(input.getInput()[i]);
+          query->setWebId(webId);
+          query->runQuery(g, 2);
+        }
+        break;
 
+      case 4:
+        for (int i = 300; i < 400; i++) {
+          pid= std::stoi(input.getInput()[i]);
+          query->setPersonProperty("pid", pid);
+          query->runQuery(g, 2);
+        }
+        break;
+
+      case 3:
+      case 5:
+      case 6:
+      case 7:
+      case 12:
+        for (int i = (qid-1)*100; i < qid*100; i++) {
+          personId1 = std::stoi(input.getInput()[i]);
+          query->setPersonId(personId1);
+          query->runQuery(g, 2);
+        }
+        break;
+
+      case 8:
+      case 9:
+      case 10:
+      case 11:
+  
+      default:
+        Q1.runQuery(g, 2);
+    }
+
+    auto end = get_clock();
+    cout << "----processing time\t" << diff_clock(begin, end) << "\n";
+
+    pthread_t threads[2];
+    pthread_create(&threads[0], NULL, &runQuery, &g, 2);
+    pthread_create(&threads[1], NULL, &runQuery, &g, 2);
+    pthread_exit(NULL);
 //  Q1.runQuery(g,  2);
 //  Q2.runQuery(g,  1);
 //  Q2.runQuery(g, 2);

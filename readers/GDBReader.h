@@ -84,7 +84,7 @@ public:
       }//END_TRY
 
     catch (int i){
-//      cout << "Error:"<< i <<"\tFailed to open file" << std::endl;
+//      std::cout << "Error:"<< i <<"\tFailed to open file" << std::endl;
     }
       _GDfile.close();
 
