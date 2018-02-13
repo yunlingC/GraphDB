@@ -52,10 +52,11 @@ public:
     GDBReader(Graph &graph):_Graph(graph){};
 
     void readFile(std::string FileName) {
-      try{
+//      try{
         _GDfile.open(FileName.c_str());
         if (_GDfile.fail())
-          throw 1;
+          exit(1);
+//          throw 1;
        
         while (getline(_GDfile, Str_Line) != NULL){
           switch(String2Int(Str_Line)) {
@@ -81,11 +82,11 @@ public:
 //              cout << "Error: " << "2" <<"\t Failed to recognize type" << std::endl;
           }//END_SWITCH
         } //END_WHILE
-      }//END_TRY
+//      }//END_TRY
 
-    catch (int i){
+//    catch (int i){
 //      std::cout << "Error:"<< i <<"\tFailed to open file" << std::endl;
-    }
+//    }
       _GDfile.close();
 
   } //END_READFILE

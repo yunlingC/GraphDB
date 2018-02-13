@@ -23,7 +23,7 @@
 #include <map>
 #include <dirent.h>
 
-#define _DEBUG_ 0
+//#define _DEBUG_ 0
 
 #ifdef _DEBUG_ 
 #include <iostream>
@@ -117,10 +117,11 @@ private:
     _VertexLabelMap.insert(std::pair<std::string, VertexMapType>
                           (Label.First, VertexMap));
 
-    try{
+//    try{
       _LDBCFile.open(FileName.c_str());
       if (_LDBCFile.fail())
-        throw 1;
+        exit(1);
+//        throw 1;
 
       auto Counter = 0;
       if (getline(_LDBCFile, line) != NULL) {
@@ -147,13 +148,13 @@ private:
 #ifdef _DEBUG_
       std::cout << counter << " Nodes are read in this file\n";
 #endif
-    }//END_TRY
-    catch (int i){
+//    }//END_TRY
+//    catch (int i){
 #ifdef  _DEBUG_
-      std::cerr << "Error:"<< i <<"\tFailed to open file" <<"\n";
+//      std::cerr << "Error:"<< i <<"\tFailed to open file" <<"\n";
 #endif
-      exit(0);
-    }
+//      exit(0);
+//    }
     _LDBCFile.close();
   }//END_READNODEINFO_
 
@@ -165,10 +166,11 @@ private:
     KeyListType keys;
     AttributeListType attributes;
 
-    try{
-      _LDBCFile.open(FileName.c_str());
+//    try{
+//      _LDBCFile.open(FileName.c_str());
       if (_LDBCFile.fail())
-        throw 1;
+        exit(0);
+//        throw 1;
 
       if (getline(_LDBCFile, line) != NULL) {
         boost::split(keys, line, boost::is_any_of("|"));
@@ -207,13 +209,13 @@ private:
 #ifdef _DEBUG_
       std::cout << counter << " Rels are read in this file\n";
 #endif
-    }//END_TRY
-    catch (int i){
+//    }//END_TRY
+//    catch (int i){
 #ifdef _DEBUG_
-      std::cerr << "Error:"<< i <<"\tFailed to open file" <<"\n";
+//      std::cerr << "Error:"<< i <<"\tFailed to open file" <<"\n";
 #endif
-      exit(0);
-    }
+//      exit(0);
+//    }
 
     _LDBCFile.close();
 
