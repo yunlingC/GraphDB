@@ -21,7 +21,6 @@ int main(int argc, char *argv[]) {
   typedef GraphType Graph;
 
   Graph g;
-//  cout << "Begin testing\n";
 
 #ifdef _FIXALLOC_
   g.allocVertexMemory(5000);
@@ -35,53 +34,49 @@ int main(int argc, char *argv[]) {
 
   QueryRandomizer rander(reader);
 
-//  string name[5], pid[5] ;
-//  VertexDescriptor webId[5], personId1[5], personId2[5], personId3[5];
+  string name, pid ;
+  Graph::VertexDescriptor webId, personId1, personId2, personId3;
  
   ///not random now 
-  /**
-  for(auto i = 0; i < 1; i++) {
-    name[i] = rander.getName();
-    pid[i]  = rander.getPid();
-    webId[i] = rander.getAWebpageIndex();
-    personId1[i] = rander.getAPersonIndex();
-    personId2[i] = rander.getAPersonIndex();
-    personId3[i] = personId2[i];
+  name = rander.getName();
+  pid  = rander.getPid();
+  webId = rander.getAWebpageIndex();
+  personId1 = rander.getAPersonIndex();
+  personId2 = rander.getAPersonIndex();
+  personId3 = personId2;
 
-    ///TODO maybe infinite loop !!
-    while( personId3[i] == personId2[i])     //for query of connection with p1 and p2
-    personId3[i] = rander.getAPersonIndex();
-//    cout << name[i] << endl << pid[i] << endl << webId[i] << endl << personId1[i] << endl << personId2[i] << endl << personId3[i] << endl;
+  ///TODO maybe infinite loop !!
+  while( personId3 == personId2)     //for query of connection with p1 and p2
+  {
+    personId3 = rander.getAPersonIndex();
   }
-*/
 
+//  if(argc < 3) {
+//    cout <<"Error: At least 3 arguments\n";
+//    cout <<" 1. query number \n"
+//         <<" 2. traversal    \n"
+//         <<" 3. parameter #  \n";
+//    return 1;
+//  }
+//    string name, pid;
+//    GraphType::VertexDescriptor webId, personId1, personId2, personId3;
 
-  if(argc < 3) {
-    cout <<"Error: At least 3 arguments\n";
-    cout <<" 1. query number \n"
-         <<" 2. traversal    \n"
-         <<" 3. parameter #  \n";
-    return 1;
-  } else {
-    string name, pid;
-    GraphType::VertexDescriptor webId, personId1, personId2, personId3;
+//    auto id = atoi(argv[3]);
+//    if ((id < 0) || (id > 499)) {
+//      cout <<"Error: Out of range(0:499)\n";
+//      return 0;
+//    }
 
-    auto id = atoi(argv[3]);
-    if ((id < 0) || (id > 499)) {
-      cout <<"Error: Out of range(0:499)\n";
-      return 0;
-    }
-
-    name = rander.getName(id);
-    pid  = rander.getPid(id);
-    webId = rander.getAWebpageIndex(id);
-    personId1 = rander.getAPersonIndex(id);
-    personId2 = rander.getAPersonIndex(id);
-    personId3 = 0;
-
-    if(argc > 4) {
-      personId3 = atoi(argv[4]);
-    }
+//    name = rander.getName(id);
+//    pid  = rander.getPid(id);
+//    webId = rander.getAWebpageIndex(id);
+//    personId1 = rander.getAPersonIndex(id);
+//    personId2 = rander.getAPersonIndex(id);
+//    personId3 = 0;
+//
+//    if(argc > 4) {
+//      personId3 = atoi(argv[4]);
+//    }
 
     cout << "name\t" << name << endl 
          << "pid\t" << pid << endl 
@@ -186,62 +181,39 @@ int main(int argc, char *argv[]) {
     QueryList.push_back(&Q13);
     QueryList.push_back(&Q14);
 
-    auto qid = atoi(argv[1]);
-    if((qid < 1) || (qid > 14)) {
-      cout <<"Error: Out of range(1:14)\n";
-      return 1;
-    }
-
-    if((qid > 7) && (qid < 12)) {
-      if(personId3 < 0) {
-        cout <<"Error: No end vertex id\n";
-        return 1;
-      }
-    }
-
-    auto traversal = atoi(argv[2]);
+//    auto qid = atoi(argv[1]);
+//    if((qid < 1) || (qid > 14)) {
+//      cout <<"Error: Out of range(1:14)\n";
+//      return 1;
+//    }
+//
+//    if((qid > 7) && (qid < 12)) {
+//      if(personId3 < 0) {
+//        cout <<"Error: No end vertex id\n";
+//        return 1;
+//      }
+//    }
+//
+    auto traversal = 1; // atoi(argv[2]);
     if (traversal !=1 && traversal !=2 && traversal !=3) {
       cout << " no way to traversing \n";
       return 1;
     }
 
-    cout <<"query number is " << qid << endl;
-    auto query = QueryList[qid-1];
+//    cout <<"query number is " << qid << endl;
+//    auto query = QueryList[qid-1];
+//
+//    query->runQuery(g, traversal);
 
-    query->runQuery(g, traversal);
+    for (auto query : QueryList)
+    {
+        query->runQuery(g, traversal);
+    }
 
-  }
 
 
 
-//  Q1.runQuery(g,  2);
-//  Q2.runQuery(g,  1);
-//  Q2.runQuery(g, 2);
-//  Q3.runQuery(g, 1);
-//  Q3.runQuery(g, 2);
-//  Q4.runQuery(g, 1);
-//  Q4.runQuery(g, 2);
-//  Q5.runQuery(g, 1);
-//  Q5.runQuery(g, 2);
-//  Q6.runQuery(g, 1);
-//  Q6.runQuery(g, 2);
-//  Q7.runQuery(g, 1);
-//  Q7.runQuery(g, 2);
-//  Q8.runQuery(g, 1);
-//  Q8.runQuery(g, 2);
-//  Q9.runQuery(g, 1);
-//  Q9.runQuery(g, 2);
-//  Q10.runQuery(g, 1);
-//  Q10.runQuery(g, 2);
-//  Q11.runQuery(g, 1);
-//  Q11.runQuery(g, 2);
-//  Q12.runQuery(g, 1);
-//  Q12.runQuery(g, 2);
-//  Q13.runQuery(g, 1);
-//  Q13.runQuery(g, 2);
-//  Q14.runQuery(g, 1);
-//  Q14.runQuery(g, 2);
 
-  cout << "finish testing\n";
+  cout << "Finish testing\n";
   return 0;
 }

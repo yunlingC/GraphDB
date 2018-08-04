@@ -68,7 +68,7 @@ add_subdirectory(storage)
 add_subdirectory(transactions)
 
 set(TESTS 
-  #  main-gdbench.cpp
+    main-gdbench.cpp
   #  main-algo.cpp
   #  main-ldbc.cpp
   #  main-dfs.cpp
