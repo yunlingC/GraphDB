@@ -90,19 +90,19 @@ public:
 
   } //END_READFILE
 
-  unsigned int  getPeopleCounter(){
+  unsigned int  getNumberOfPeople(){
     return _People;
   } 
  
-  unsigned int  getWebpagesCounter(){
+  unsigned int  getNumberOfWebpages(){
     return _Webpages;
   }
 
-  unsigned int  getFriendsCounter(){
+  unsigned int  getNumberOfFriends(){
     return _Friends;
   }
 
-  unsigned int  getLikesCounter(){
+  unsigned int  getNumberofLikes(){
     return _Likes;
   }
 

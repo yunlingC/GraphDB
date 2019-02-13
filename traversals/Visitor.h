@@ -43,11 +43,11 @@ public:
     NumEdges = 0;
   }
 
-  int getNumVertices() {
+  const int getNumVertices() {
     return NumVertices;
   }
 
-  int getNumEdges() {
+  const int getNumEdges() {
     return NumEdges;
   }
 
@@ -55,7 +55,7 @@ public:
     Filter = filter;
   }
 
-  virtual FilterType & getFilter() { 
+  virtual FilterType & getFilter() {
     return Filter;
   }
 

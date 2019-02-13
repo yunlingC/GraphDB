@@ -51,8 +51,8 @@ private:
   /// Randomized output 
   /// But need srand(time(null)) as completely randmization if necessary
   string createName() {
-    unsigned int nameCounter = _GDReader.getPeopleCounter();
-    unsigned int nameId = rand() % (nameCounter/3);
+    unsigned int nameCount = _GDReader.getNumberOfPeople();
+    unsigned int nameId = rand() % (nameCount/3);
     return _GDReader.getNameList().at(nameId);
   }
 
@@ -61,8 +61,8 @@ private:
   }
 
   string createPid() {
-    unsigned int pidCounter = _GDReader.getPeopleCounter();
-    unsigned int pidId = rand() % (pidCounter/3);
+    unsigned int pidCount = _GDReader.getNumberOfPeople();
+    unsigned int pidId = rand() % (pidCount/3);
     return _GDReader.getPidList().at(pidId);
   }
 
@@ -71,19 +71,19 @@ private:
   }
 
   unsigned int createPersonIndex() {
-    unsigned int personCounter = _GDReader.getPeopleCounter();
-    return rand() % (personCounter/3);
+    unsigned int personCount= _GDReader.getNumberOfPeople();
+    return rand() % (personCount/3);
   }
 
   unsigned int createWebpageIndex(unsigned int index) {
-    unsigned int personCounter = _GDReader.getPeopleCounter();
-    return index + personCounter;
+    unsigned int personCount= _GDReader.getNumberOfPeople();
+    return index + personCount;
   }
 
   unsigned int createWebpageIndex() {
-    unsigned int personCounter = _GDReader.getPeopleCounter();
-    unsigned int webCounter = _GDReader.getWebpagesCounter();
-    return rand() % (webCounter/3) + personCounter;
+    unsigned int personCount = _GDReader.getNumberOfPeople();
+    unsigned int webCount= _GDReader.getNumberOfWebpages();
+    return rand() % (webCount/3) + personCount;
   } 
 
 private:

@@ -129,11 +129,11 @@ public:
     return _Key;
   }
 
-  ValueType & getValue() {
+  const ValueType & getValue() {
     return _Value;
   }
 
-  Type & getType() { 
+  Type & getType() {
     return _Type; 
   }
 
@@ -153,7 +153,7 @@ public:
     return _TypeList;
   }
 
-  auto getValueRange() 
+  auto getValueRange()
     -> ValueListTypeReference {
     return _ValueRange;
   }
@@ -163,18 +163,18 @@ public:
     return _ValueList;
   }
 
-  auto getPropertyMap() 
+  auto getPropertyMap()
     -> PropertyMapTypeReference {
     return _PropertyMap;
   }
 
-  auto getBranchPropertyMap() 
+  auto getBranchPropertyMap()
     -> BranchPropertyTypeReference {
     return _BranchPropertyMap;
   }
 
   /// Traversal only goes to branch of certain type
-  auto getBranchMap() 
+  auto getBranchMap()
     -> BranchMapTypeReference {
     return _BranchMap;
   }
